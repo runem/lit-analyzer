@@ -1,9 +1,13 @@
 {
 	"name": "ts-html-plugin",
 	"version": "0.0.16",
-	"description": "Type checking and code completion for html inside tagged template strings templates like lit-html.",
+	"description": "Type checking and code completion for html inside tagged templates like lit-html.",
 	"author": "runem",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/runem/ts-html-plugin.git"
+	},
 	"keywords": [
 		"typescript",
 		"tagged",
