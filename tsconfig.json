@@ -1,0 +1,24 @@
+{
+	"include": ["src"],
+	"compilerOptions": {
+		"plugins": [
+			{
+				"name": "tslint-language-service",
+				"ignoreDefinitionFiles": true,
+				"alwaysShowRuleFailuresAsWarnings": false
+			}
+		],
+		"target": "es5",
+		"module": "commonjs",
+		"lib": ["esnext"],
+		"outDir": "./lib",
+		"downlevelIteration": true,
+		"strict": true,
+		"esModuleInterop": true,
+		"experimentalDecorators": true,
+		"noUnusedLocals": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitThis": true,
+		"noImplicitAny": true
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+		"plugins": [
+			{
+				"name": "ts-html-plugin",
+				"verbose": true,
+				"flavor": "lit-html",
+				"externalTagNames": ["my-external-tag"]
+			}
+		],
+		"experimentalDecorators": true,
+		"target": "es5",
+		"module": "commonjs",
+		"lib": ["esnext", "dom"],
+		"strict": true,
+		"esModuleInterop": true
+	}
+}

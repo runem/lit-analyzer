@@ -1,0 +1,27 @@
+{
+	"rules": {
+		"completed-docs": {
+			"options": ["classes", "functions", "methods"],
+			"severity": "warning"
+		},
+		"prefer-const": true,
+		"no-duplicate-variable": true,
+		"no-internal-module": true,
+		"no-trailing-whitespace": true,
+		"no-var-keyword": true,
+		"triple-equals": [true, "allow-null-check"],
+		"quotemark": [true, "double", "avoid-escape"],
+		"variable-name": [true, "ban-keywords"],
+		"whitespace": [true, "check-branch", "check-decl", "check-operator", "check-separator", "check-type"],
+		"typedef-whitespace": [
+			true,
+			{
+				"call-signature": "nospace",
+				"index-signature": "nospace",
+				"parameter": "nospace",
+				"property-declaration": "nospace",
+				"variable-declaration": "nospace"
+			}
+		]
+	}
+}

@@ -1,0 +1,61 @@
+{
+	"name": "ts-html-plugin",
+	"version": "0.0.16",
+	"description": "Type checking and code completion for html inside tagged template strings templates like lit-html.",
+	"author": "runem",
+	"license": "MIT",
+	"keywords": [
+		"typescript",
+		"tagged",
+		"template",
+		"lit-html",
+		"lit",
+		"lit-element"
+	],
+	"scripts": {
+		"prepublish": "npm run build",
+		"release:patch": "standard-version --release-as patch",
+		"release:minor": "standard-version --release-as minor",
+		"release:major": "standard-version --release-as major",
+		"watch": "tsc --watch",
+		"build": "rm -rf lib && tsc",
+		"publish:patch": "npm run build && npm version patch && npm publish",
+		"logs": "touch log.txt && tail -f log.txt",
+		"lint": "tslint --project ./",
+		"open": "TSS_LOG=\"-traceToConsole true -level verbose -file $(pwd)/ts-server-log.txt\" TSS_DEBUG=5999 code dev",
+		"prettier:check": "prettier --list-different \"src/**/*.{ts,tsx}\"",
+		"prettier:write": "prettier --write \"src/**/*.{ts,tsx}\""
+	},
+	"main": "lib/index.js",
+	"files": [
+		"/lib/",
+		"/html-documentation/"
+	],
+	"dependencies": {
+		"didyoumean2": "^2.0.0",
+		"parse5": "^5.1.0",
+		"ts-is-assignable": "^0.0.12"
+	},
+	"devDependencies": {
+		"@types/node": "^10.12.9",
+		"@types/parse5": "^5.0.0",
+		"husky": "^1.2.1",
+		"prettier": "^1.15.3",
+		"pretty-quick": "^1.8.0",
+		"standard-version": "^4.4.0",
+		"tslint": "^5.11.0",
+		"tslint-language-service": "^0.9.9",
+		"typescript": "^3.2.2"
+	},
+	"prettier": {
+		"useTabs": true,
+		"tabWidth": 4,
+		"singleQuote": false,
+		"printWidth": 200
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "pretty-quick --staged"
+		}
+	}
+}

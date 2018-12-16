@@ -1,0 +1,19 @@
+{
+	"name": "example",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"dependencies": {
+		"@polymer/lit-element": "^0.6.4"
+	},
+	"devDependencies": {
+		"ts-html-plugin": "file:../",
+		"typescript": "^3.2.2"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC"
+}
