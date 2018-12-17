@@ -1,5 +1,5 @@
 {
-	"accept": "",
+	"accept": "string",
 	"accept-charset": "",
 	"accesskey": "string",
 	"action": "",
@@ -7,16 +7,8 @@
 	"allow": "",
 	"alt": "",
 	"async": "boolean",
-	"autocapitalize": [
-		"off",
-		"on",
-		"words",
-		"characters"
-	],
-	"autocomplete": [
-		"on",
-		"off"
-	],
+	"autocapitalize": ["off", "on", "words", "characters"],
+	"autocomplete": ["on", "off"],
 	"autofocus": "boolean",
 	"autoplay": "",
 	"bgcolor": "string",
@@ -42,27 +34,15 @@
 	"data": "any",
 	"data-*": "any",
 	"datetime": "",
-	"decoding": [
-		"sync",
-		"async",
-		"auto"
-	],
+	"decoding": ["sync", "async", "auto"],
 	"default": "",
 	"defer": "",
-	"dir": [
-		"ltr",
-		"rtl",
-		"auto"
-	],
+	"dir": ["ltr", "rtl", "auto"],
 	"dirname": "",
 	"disabled": "boolean",
 	"download": "",
 	"draggable": "boolean",
-	"dropzone": [
-		"copy",
-		"move",
-		"link"
-	],
+	"dropzone": ["copy", "move", "link"],
 	"enctype": "",
 	"for": "",
 	"form": "string",
@@ -136,10 +116,7 @@
 	"tabindex": "number",
 	"target": "",
 	"title": "string",
-	"translate": [
-		"yes",
-		"no"
-	],
+	"translate": ["yes", "no"],
 	"type": [
 		"button",
 		"checkbox",
@@ -169,4 +146,3 @@
 	"width": "",
 	"wrap": ""
 }
-

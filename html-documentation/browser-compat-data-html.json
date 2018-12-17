@@ -2024,6 +2024,7 @@
 	},
 	"input": {
 		"attributes": {
+			"accept": {},
 			"autocomplete": {},
 			"autofocus": {},
 			"disabled": {},
