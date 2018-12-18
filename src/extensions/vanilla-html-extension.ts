@@ -1,4 +1,4 @@
-import { TypeKind } from "ts-is-assignable";
+import { SimpleTypeKind } from "ts-is-assignable";
 import { CompletionEntry, DiagnosticWithLocation, QuickInfo, ScriptElementKind } from "typescript";
 import { IP5NodeAttr, IP5TagNode } from "../parse-html-nodes/parse-html-p5/parse-html-types";
 import { IHtmlAttrAssignment } from "../parse-html-nodes/types/html-attr-assignment-types";
@@ -103,7 +103,14 @@ export class VanillaHtmlExtension implements ITsHtmlExtension {
 					kind: ScriptElementKind.memberVariableElement,
 					kindModifiers: "",
 					textSpan: { start, length: end - start },
-					displayParts: [{ text: "<", kind: "punctuation" }, { text: htmlNode.tagName || "unknown", kind: "text" }, { text: ">", kind: "punctuation" }],
+					displayParts: [
+						{ text: "<", kind: "punctuation" },
+						{
+							text: htmlNode.tagName || "unknown",
+							kind: "text"
+						},
+						{ text: ">", kind: "punctuation" }
+					],
 					documentation:
 						description == null
 							? []
@@ -133,7 +140,14 @@ export class VanillaHtmlExtension implements ITsHtmlExtension {
 					kind: ScriptElementKind.memberVariableElement,
 					kindModifiers: "",
 					textSpan: { start, length: end - start },
-					displayParts: [{ text: "(", kind: "punctuation" }, { text: "attribute", kind: "text" }, { text: ")", kind: "punctuation" }],
+					displayParts: [
+						{ text: "(", kind: "punctuation" },
+						{ text: "attribute", kind: "text" },
+						{
+							text: ")",
+							kind: "punctuation"
+						}
+					],
 					documentation:
 						description == null
 							? []
@@ -239,7 +253,7 @@ export class VanillaHtmlExtension implements ITsHtmlExtension {
 
 		return {
 			...assignmentBase,
-			typeA: getBuiltInAttributeType(htmlAttr.name) || TypeKind.ANY
+			typeA: getBuiltInAttributeType(htmlAttr.name) || { kind: SimpleTypeKind.ANY }
 		};
 	}
 

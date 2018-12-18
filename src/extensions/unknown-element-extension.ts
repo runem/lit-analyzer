@@ -1,4 +1,4 @@
-import { TypeKind } from "ts-is-assignable";
+import { SimpleTypeKind } from "ts-is-assignable";
 import { CodeFixAction, DiagnosticWithLocation } from "typescript";
 import { IP5NodeAttr, IP5TagNode } from "../parse-html-nodes/parse-html-p5/parse-html-types";
 import { IHtmlAttrAssignment } from "../parse-html-nodes/types/html-attr-assignment-types";
@@ -158,7 +158,7 @@ export class UnknownElementExtension implements ITsHtmlExtension {
 	 */
 	parseHtmlAttrAssignment(htmlAttr: HtmlAttr, { assignmentBase }: ITsHtmlExtensionParseAttrAssignmentContext): IHtmlAttrAssignment | undefined {
 		return {
-			typeA: TypeKind.ANY,
+			typeA: { kind: SimpleTypeKind.ANY },
 			...assignmentBase
 		};
 	}

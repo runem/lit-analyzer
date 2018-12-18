@@ -1,10 +1,8 @@
 import { readFileSync } from "fs";
 import { resolve } from "path";
-import { TypeKind } from "ts-is-assignable";
+import { SimpleType, SimpleTypeKind, SimpleTypeStringLiteral } from "ts-is-assignable";
 
 const cache = new Map<string, any>();
-
-export type BuiltInAttributeType = TypeKind | string[];
 
 /**
  * Reads and caches a json file.
@@ -54,22 +52,25 @@ export function getBuiltInTags(): string[] {
  * Returns the type of a built in attribute.
  * @param attrName
  */
-export function getBuiltInAttributeType(attrName: string): BuiltInAttributeType {
+export function getBuiltInAttributeType(attrName: string): SimpleType {
 	const type = getBuiltInAttrType()[attrName] || "";
 
 	switch (type) {
 		case "":
 		case "any":
-			return TypeKind.ANY;
+			return { kind: SimpleTypeKind.ANY };
 		case "number":
-			return TypeKind.NUMBER;
+			return { kind: SimpleTypeKind.NUMBER };
 		case "boolean":
-			return TypeKind.BOOLEAN;
+			return { kind: SimpleTypeKind.BOOLEAN };
 		case "string":
-			return TypeKind.STRING;
+			return { kind: SimpleTypeKind.STRING };
 		default:
 			if (Array.isArray(type)) {
-				return type;
+				return {
+					kind: SimpleTypeKind.UNION,
+					types: type.map(value => ({ kind: SimpleTypeKind.STRING_LITERAL, value } as SimpleTypeStringLiteral))
+				};
 			}
 
 			throw new Error(`Error reading html documentation attr type: ${type}`);

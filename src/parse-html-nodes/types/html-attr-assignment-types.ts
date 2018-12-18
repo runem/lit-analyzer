@@ -1,7 +1,7 @@
-import { TypeKind } from "ts-is-assignable";
+import { SimpleType } from "ts-is-assignable";
 import { Type } from "typescript";
 
-export type HtmlAttrAssignmentType = Type | TypeKind | string[];
+export type HtmlAttrAssignmentType = Type | SimpleType;
 
 export interface IHtmlAttrAssignment {
 	value?: string;

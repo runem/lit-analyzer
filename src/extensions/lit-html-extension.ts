@@ -1,4 +1,4 @@
-import { TypeKind } from "ts-is-assignable";
+import { SimpleTypeKind, isAssignableToSimpleTypeKind } from "ts-is-assignable";
 import { CodeFixAction, DiagnosticWithLocation } from "typescript";
 import { IP5NodeAttr } from "../parse-html-nodes/parse-html-p5/parse-html-types";
 import { HtmlAttr, HtmlAttrKind, IHtmlAttrBuiltIn } from "../parse-html-nodes/types/html-attr-types";
@@ -169,12 +169,12 @@ export class LitHtmlExtension extends VanillaHtmlExtension {
 
 		// Opt out if typeB is a function (eg. lit-html directive).
 		// TODO: Support typechecking of lit-html directives.
-		if (isAssignableTo(typeB, TypeKind.FUNCTION)) return [];
+		if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.FUNCTION)) return [];
 
 		switch (htmlAttr.modifier) {
 			case "?":
 				// Test if the user is trying to use the ? modifier on a non-boolean type.
-				if (!isAssignableTo(typeA, TypeKind.BOOLEAN)) {
+				if (!isAssignableTo(typeA, { kind: SimpleTypeKind.BOOLEAN })) {
 					return [
 						{
 							kind: LitHtmlReportKind.LIT_BOOL_MOD_ON_NON_BOOL,

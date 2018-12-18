@@ -1,4 +1,4 @@
-import { TypeKind } from "ts-is-assignable";
+import { SimpleTypeKind } from "ts-is-assignable";
 import { IP5NodeAttr, IP5TagNode } from "../parse-html-p5/parse-html-types";
 import { IHtmlAttrAssignment } from "../types/html-attr-assignment-types";
 import { IHtmlAttrBase } from "../types/html-attr-types";
@@ -41,7 +41,7 @@ export function parseHtmlAttrAssignment(p5Node: IP5TagNode, p5Attr: IP5NodeAttr,
 			value,
 			isBooleanAssignment,
 			isMixedExpression,
-			typeB: typeB != null ? typeB : isBooleanAssignment ? TypeKind.BOOLEAN : value != null ? [value] : TypeKind.STRING
+			typeB: typeB != null ? typeB : isBooleanAssignment ? { kind: SimpleTypeKind.BOOLEAN } : value != null ? { kind: SimpleTypeKind.STRING_LITERAL, value } : { kind: SimpleTypeKind.STRING }
 		}
 	});
 }

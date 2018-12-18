@@ -1,5 +1,5 @@
-import { isAssignableToTypeKind, TypeKind } from "ts-is-assignable";
-import { Node, PropertyDeclaration, ClassLikeDeclaration } from "typescript";
+import { isAssignableToSimpleTypeKind, SimpleTypeKind } from "ts-is-assignable";
+import { ClassLikeDeclaration, Node, PropertyDeclaration } from "typescript";
 import { IComponentDeclarationJsDoc, IComponentDeclarationJsDocTag, IComponentDeclarationMeta, IComponentDeclarationProp } from "../component-types";
 import { IComponentDeclarationVisitContext, IComponentDefinitionVisitContext, IParseComponentFlavor } from "../parse-components";
 
@@ -138,7 +138,7 @@ function parsePropertyDeclaration(node: PropertyDeclaration, context: IComponent
 	})();
 
 	const name = String(propertyName);
-	const required = node.initializer == null && !isAssignableToTypeKind(type, [TypeKind.UNDEFINED, TypeKind.NULL], "or");
+	const required = node.initializer == null && !isAssignableToSimpleTypeKind(type, [SimpleTypeKind.UNDEFINED, SimpleTypeKind.NULL]);
 
 	return {
 		name,
