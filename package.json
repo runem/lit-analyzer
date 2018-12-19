@@ -1,6 +1,6 @@
 {
 	"name": "ts-html-plugin",
-	"version": "0.0.16",
+	"version": "0.0.17",
 	"description": "Type checking and code completion for html inside tagged templates like lit-html.",
 	"author": "runem",
 	"license": "MIT",
