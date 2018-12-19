@@ -10,7 +10,7 @@ import { parseHtmlNodeAttrs } from "./parse-html-attribute";
  * @param context
  */
 export function parseHtmlNodes(p5Nodes: P5Node[], context: IParseHtmlContext): IHtmlNodeBase[] {
-	return p5Nodes.map(child => parseHtmlNode(child, context)).filter(elem => elem != null) as IHtmlNodeBase[];
+	return p5Nodes.map(child => parseHtmlNode(child, context)).filter((elem): elem is IHtmlNodeBase => elem != null);
 }
 
 /**

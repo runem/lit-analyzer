@@ -2034,7 +2034,16 @@
 			"required": {},
 			"tabindex": {},
 			"type": {},
-			"value": {}
+			"value": {},
+			"readonly": {},
+			"pattern": {},
+			"minlength": {},
+			"maxlength": {},
+			"min": {},
+			"max": {},
+			"checked": {},
+			"multiple": {},
+			"placeholder": {}
 		}
 	},
 	"ins": {
@@ -3591,6 +3600,7 @@
 			"deprecated": false
 		},
 		"attributes": {
+			"value": {},
 			"autocapitalize": {
 				"status": {
 					"experimental": false,

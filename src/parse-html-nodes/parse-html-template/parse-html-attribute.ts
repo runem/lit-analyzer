@@ -16,7 +16,7 @@ export function parseHtmlNodeAttrs(p5Node: IP5TagNode, context: IParseHtmlAttrCo
 				htmlNode: context.htmlNode
 			})
 		)
-		.filter(attr => attr != null) as IHtmlAttrBase[];
+		.filter((attr): attr is IHtmlAttrBase => attr != null);
 }
 
 /**

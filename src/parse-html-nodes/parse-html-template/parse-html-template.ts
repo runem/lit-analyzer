@@ -1,5 +1,5 @@
 import { parseHtml } from "../parse-html-p5/parse-html";
-import { HtmlNode, IHtmlTemplate } from "../types/html-node-types";
+import { IHtmlNodeBase, IHtmlTemplate } from "../types/html-node-types";
 import { IParseHtmlContext } from "./i-parse-html-context";
 import { parseHtmlNode } from "./parse-html-node";
 
@@ -10,7 +10,7 @@ import { parseHtmlNode } from "./parse-html-node";
 export function parseHtmlTemplate(context: IParseHtmlContext): IHtmlTemplate {
 	const htmlAst = parseHtml(context.html);
 
-	const childNodes = htmlAst.childNodes.map(childNode => parseHtmlNode(childNode, context)).filter(elem => elem != null) as HtmlNode[];
+	const childNodes = htmlAst.childNodes.map(childNode => parseHtmlNode(childNode, context)).filter((elem): elem is IHtmlNodeBase => elem != null);
 
 	const { astNode } = context;
 
