@@ -1,4 +1,4 @@
-import { isAssignableTo, isAssignableToPrimitiveType, isAssignableToValue, isSimpleType, simpleTypeToString } from "ts-is-assignable";
+import { isAssignableToPrimitiveType, isAssignableToValue, isSimpleType, simpleTypeToString, isAssignableToType } from "ts-is-assignable";
 import { Node, TypeChecker } from "typescript";
 import { ITsHtmlExtensionValidateExpressionContext } from "../extensions/i-ts-html-extension";
 import { HtmlAttrAssignmentType } from "../parse-html-nodes/types/html-attr-assignment-types";
@@ -31,7 +31,7 @@ export function makeValidateAttributeAssignmentContext(astNode: Node, checker: T
 		astNode,
 		getTypeString: (type: HtmlAttrAssignmentType) => getTypeString(type, checker),
 		isAssignableToPrimitive: (type: HtmlAttrAssignmentType) => isAssignableToPrimitiveType(type),
-		isAssignableTo: (typeA: HtmlAttrAssignmentType, typeB: HtmlAttrAssignmentType) => isAssignableTo(typeA, typeB, checker),
+		isAssignableTo: (typeA: HtmlAttrAssignmentType, typeB: HtmlAttrAssignmentType) => isAssignableToType(typeA, typeB, checker),
 		isAssignableToValue: (type: HtmlAttrAssignmentType, value: string) => isAssignableToValue(type, value)
 	};
 }
