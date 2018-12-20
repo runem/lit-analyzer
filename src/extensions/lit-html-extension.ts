@@ -1,4 +1,4 @@
-import { SimpleTypeKind, isAssignableToSimpleTypeKind } from "ts-is-assignable";
+import { isAssignableToSimpleTypeKind, SimpleTypeKind } from "ts-is-assignable";
 import { CodeFixAction, DiagnosticWithLocation } from "typescript";
 import { IP5NodeAttr } from "../parse-html-nodes/parse-html-p5/parse-html-types";
 import { HtmlAttr, HtmlAttrKind, IHtmlAttrBuiltIn } from "../parse-html-nodes/types/html-attr-types";
@@ -202,6 +202,10 @@ export class LitHtmlExtension extends VanillaHtmlExtension {
 							typeB: getTypeString(typeB) // isBooleanAssignment ? "boolean" : "string"
 						}
 					];
+				} else if (isAssignableToPrimitive(typeB) && !(isAssignableToSimpleTypeKind(typeA, SimpleTypeKind.STRING) || isAssignableToSimpleTypeKind(typeA, SimpleTypeKind.STRING_LITERAL))) {
+					// Return if typeA and typeB are both primitives and we don't have any modifiers.
+					// However if typeA is a string, validate that the "value" (typeB which is a string literal) is assignable to typeA
+					return [];
 				}
 		}
 

@@ -6,6 +6,7 @@ export class MyButton extends LitElement {
 	@property({ type: String }) color: "red" | "purple" | undefined;
 	@property({ type: String }) text: string = "";
 	@property({ type: String }) disabled: boolean = false;
+	@property({ type: String }) maxlength: number | undefined;
 
 	render() {
 		return html`
