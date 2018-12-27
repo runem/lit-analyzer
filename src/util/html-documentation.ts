@@ -22,14 +22,14 @@ const getBuiltInAttrType = () => getCachedJsonFile<Record<string, string | strin
 const getAttrDescriptions = () => getCachedJsonFile<Record<string, string>>("../../html-documentation/attribute-descriptions.json");
 const getTagDescriptions = () => getCachedJsonFile<Record<string, string>>("../../html-documentation/tag-descriptions.json");
 
-const browserCompatDataHtml = () => getCachedJsonFile<Record<string, { attributes: Record<string, {}> }>>("../../html-documentation/browser-compat-data-html.json");
+const getHtmlTags = () => getCachedJsonFile<Record<string, Record<string, {}>>>("../../html-documentation/tags.json");
 
 /**
  * Tests if a tag name is built in.
  * @param tagName
  */
 export function isBuiltInTag(tagName: string): boolean {
-	return browserCompatDataHtml()[tagName] != null;
+	return getHtmlTags()[tagName] != null;
 }
 
 /**
@@ -45,7 +45,7 @@ export function isBuiltInAttrForTag(tagName: string, attrName: string): boolean 
  * Returns all built in tags.
  */
 export function getBuiltInTags(): string[] {
-	return Object.keys(browserCompatDataHtml()).filter(tagName => tagName !== "*");
+	return Object.keys(getHtmlTags()).filter(tagName => tagName !== "*");
 }
 
 /**
@@ -82,8 +82,8 @@ export function getBuiltInAttributeType(attrName: string): SimpleType {
  * @param tagName
  */
 export function getBuiltInAttrsForTag(tagName: string): string[] {
-	const tagData = browserCompatDataHtml()[tagName];
-	return [...(tagData != null ? Object.keys(tagData.attributes) : []), ...Object.keys(browserCompatDataHtml()["*"].attributes)];
+	const tagData = getHtmlTags()[tagName];
+	return [...(tagData != null ? Object.keys(tagData) : []), ...Object.keys(getHtmlTags()["*"])];
 }
 
 /**

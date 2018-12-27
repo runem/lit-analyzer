@@ -45,7 +45,7 @@
 	"dropzone": "Indicates that the element accept the dropping of content on it.",
 	"enctype": "Defines the content type of the form date when the method is POST.",
 	"for": "Describes elements which belongs to this one.",
-	"form": "Indicates the form that is the owner of the element.",
+	"form": "The id of the <form> of which the input is a member; if absent, the input is a member of the nearest containing form, or is not a member of a form at all.",
 	"formaction": "Indicates the action of the element, overriding the action defined in the <form>.",
 	"headers": "IDs of the <th> elements which applies to this element.",
 	"height": " Specifies the height of elements listed here. For all other elements, use the CSS height property. Note: In some instances, such as <div>, this is a legacy attribute, in which case the CSS height property should be used instead.",
