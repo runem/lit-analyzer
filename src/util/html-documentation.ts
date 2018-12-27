@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import { resolve } from "path";
-import { SimpleType, SimpleTypeKind, SimpleTypeStringLiteral } from "ts-is-assignable";
+import { SimpleType, SimpleTypeKind, SimpleTypeStringLiteral } from "ts-simple-type";
 
 const cache = new Map<string, any>();
 

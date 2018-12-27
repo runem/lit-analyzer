@@ -1,3 +1,4 @@
+import { SimpleTypeKind } from "ts-simple-type";
 import { CodeFixAction, CompletionEntry, DefinitionInfoAndBoundSpan, DiagnosticWithLocation, Node, QuickInfo, SourceFile, TypeChecker } from "typescript";
 import { IP5NodeAttr, IP5TagNode } from "../parse-html-nodes/parse-html-p5/parse-html-types";
 import { HtmlAttrAssignmentType, IHtmlAttrAssignment } from "../parse-html-nodes/types/html-attr-assignment-types";
@@ -60,6 +61,7 @@ export interface ITsHtmlExtensionValidateExpressionContext extends ITsHtmlExtens
 	isAssignableToPrimitive: (type: HtmlAttrAssignmentType) => boolean;
 	isAssignableTo: (typeA: HtmlAttrAssignmentType, typeB: HtmlAttrAssignmentType) => boolean;
 	isAssignableToValue: (type: HtmlAttrAssignmentType, value: string) => boolean;
+	isAssignableToSimpleTypeKind: (type: HtmlAttrAssignmentType, kind: SimpleTypeKind) => boolean;
 }
 
 export interface ITsHtmlExtensionCompletionContext extends ITsHtmlExtensionBaseContext {

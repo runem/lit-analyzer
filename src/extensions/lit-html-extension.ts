@@ -1,4 +1,4 @@
-import { isAssignableToSimpleTypeKind, SimpleTypeKind } from "ts-is-assignable";
+import { SimpleTypeKind } from "ts-simple-type";
 import { CodeFixAction, DiagnosticWithLocation } from "typescript";
 import { IP5NodeAttr } from "../parse-html-nodes/parse-html-p5/parse-html-types";
 import { HtmlAttr, HtmlAttrKind, IHtmlAttrBuiltIn } from "../parse-html-nodes/types/html-attr-types";
@@ -153,13 +153,10 @@ export class LitHtmlExtension extends VanillaHtmlExtension {
 	 * @param htmlAttr
 	 * @param context
 	 */
+	validateHtmlAttrAssignment(htmlAttr: HtmlAttr, context: ITsHtmlExtensionValidateExpressionContext): VanillaHtmlReport[] | undefined;
 	validateHtmlAttrAssignment(
 		htmlAttr: HtmlAttr,
-		{ isAssignableToValue, getTypeString, isAssignableTo, isAssignableToPrimitive }: ITsHtmlExtensionValidateExpressionContext
-	): VanillaHtmlReport[] | undefined;
-	validateHtmlAttrAssignment(
-		htmlAttr: HtmlAttr,
-		{ getTypeString, isAssignableTo, isAssignableToValue, isAssignableToPrimitive }: ITsHtmlExtensionValidateExpressionContext
+		{ getTypeString, isAssignableTo, isAssignableToValue, isAssignableToPrimitive, isAssignableToSimpleTypeKind }: ITsHtmlExtensionValidateExpressionContext
 	): VanillaHtmlReport[] | LitHtmlReport[] | undefined {
 		if (htmlAttr.assignment == null) return;
 

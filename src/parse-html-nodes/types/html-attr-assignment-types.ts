@@ -1,4 +1,4 @@
-import { SimpleType } from "ts-is-assignable";
+import { SimpleType } from "ts-simple-type";
 import { Type } from "typescript";
 
 export type HtmlAttrAssignmentType = Type | SimpleType;

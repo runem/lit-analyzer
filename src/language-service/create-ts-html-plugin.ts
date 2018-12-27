@@ -1,4 +1,4 @@
-import { setTypescriptModule as setTsIsAssignableModule } from "ts-is-assignable";
+import { setTypescriptModule as setTsIsAssignableModule } from "ts-simple-type";
 import { LanguageService } from "typescript";
 import * as ts from "typescript/lib/tsserverlibrary";
 import { CustomElementExtension } from "../extensions/custom-element-extension";

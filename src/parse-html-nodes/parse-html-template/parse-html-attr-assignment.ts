@@ -1,4 +1,4 @@
-import { SimpleTypeKind } from "ts-is-assignable";
+import { SimpleTypeKind } from "ts-simple-type";
 import { IP5NodeAttr, IP5TagNode } from "../parse-html-p5/parse-html-types";
 import { IHtmlAttrAssignment } from "../types/html-attr-assignment-types";
 import { IHtmlAttrBase } from "../types/html-attr-types";

@@ -38,7 +38,7 @@
 	"dependencies": {
 		"didyoumean2": "^2.0.0",
 		"parse5": "^5.1.0",
-		"ts-is-assignable": "^0.2.2"
+		"ts-simple-type": "^0.2.7"
 	},
 	"devDependencies": {
 		"@types/node": "^10.12.9",
