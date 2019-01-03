@@ -1,5 +1,6 @@
 import { appendFileSync, writeFileSync } from "fs";
 import { join } from "path";
+import { inspect } from "util";
 
 const logPath = join(__dirname, "../../log.txt");
 
@@ -27,41 +28,37 @@ export class Logger {
 
 	/**
 	 * Logs if level >= DEBUG
-	 * @param msg
 	 * @param args
 	 */
-	debug(msg: string, ...args: any[]) {
-		this.appendLogWithLevel(LoggingLevel.DEBUG, msg, ...args);
+	debug(...args: any[]) {
+		this.appendLogWithLevel(LoggingLevel.DEBUG, ...args);
 	}
 
 	/**
 	 * Logs if level >= VERBOSE
-	 * @param msg
 	 * @param args
 	 */
-	verbose(msg: string, ...args: any[]) {
-		this.appendLogWithLevel(LoggingLevel.VERBOSE, msg, ...args);
+	verbose(...args: any[]) {
+		this.appendLogWithLevel(LoggingLevel.VERBOSE, ...args);
 	}
 
 	/**
 	 * Appends a log if this.level > level
 	 * @param level
-	 * @param msg
 	 * @param args
 	 */
-	private appendLogWithLevel(level: LoggingLevel, msg: string, ...args: any[]) {
+	private appendLogWithLevel(level: LoggingLevel, ...args: any[]) {
 		if (this.level >= level) {
-			this.appendLog(msg, ...args);
+			this.appendLog(...args);
 		}
 	}
 
 	/**
 	 * Appends a log entry to the log file.
-	 * @param msg
 	 * @param args
 	 */
-	private appendLog(msg: string, ...args: any[]) {
-		appendFileSync(logPath, `${msg} ${args.length > 0 ? JSON.stringify(args) : ""}\n`);
+	private appendLog(...args: any[]) {
+		appendFileSync(logPath, inspect(args, { colors: true, depth: 4, breakLength: 50, maxArrayLength: 10 }));
 	}
 }
 
