@@ -71,7 +71,7 @@ function getIntersectingHtmlNodeAttrArea(htmlNode: IHtmlNodeBase | IHtmlNodeBase
 		return undefined;
 	} else {
 		// Tests if the position is inside the start tag
-		outer: if (intersects(position, htmlNode.location.startTag)) {
+		outer: if (position > htmlNode.location.name.end && intersects(position, htmlNode.location.startTag)) {
 			// Check if the position intersects any attributes. Break if so.
 			for (const htmlAttr of htmlNode.attributes || []) {
 				if (intersects(position, htmlAttr.location)) {
