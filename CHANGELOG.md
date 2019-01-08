@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.0.19"></a>
+
+## [0.0.19](https://github.com/runem/ts-html-plugin/compare/v0.0.18...v0.0.19) (2019-01-08)
+
+### Bug Fixes
+
+-   Fix issue where tags didn't close correctly ([c832b90](https://github.com/runem/ts-html-plugin/commit/c832b90))
+-   Fix issue where the plugin wouldn't suggest tag names ([f047747](https://github.com/runem/ts-html-plugin/commit/f047747))
+
 <a name="0.0.18"></a>
 
 ## [0.0.18](https://github.com/runem/ts-html-plugin/compare/v0.0.17...v0.0.18) (2018-12-27)
