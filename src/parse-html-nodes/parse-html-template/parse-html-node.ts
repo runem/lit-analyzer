@@ -19,6 +19,9 @@ export function parseHtmlNodes(p5Nodes: P5Node[], context: IParseHtmlContext): I
  * @param context
  */
 export function parseHtmlNode(p5Node: P5Node, context: IParseHtmlContext): IHtmlNodeBase | undefined {
+	// Sometimes "sourceCodeLocation" is "undefined". This isn't a documented "parse5" behavior. TODO: Investigate.
+	if (p5Node.sourceCodeLocation == null) return undefined;
+
 	if (isTagNode(p5Node)) {
 		const { store } = context;
 
@@ -47,8 +50,9 @@ export function parseHtmlNode(p5Node: P5Node, context: IParseHtmlContext): IHtml
  * @param context
  */
 function isSelfClosed(p5Node: IP5TagNode, context: IParseHtmlContext) {
-	// TODO: Find better solution than searching for "/>"
-	return p5Node.sourceCodeLocation.endTag == null && context.html[Math.max(0, p5Node.sourceCodeLocation.startTag.endOffset - 2)] === "/";
+	const isEmpty = p5Node.childNodes == null || p5Node.childNodes.length === 0;
+	const isSelfClosed = p5Node.sourceCodeLocation.startTag.endOffset === p5Node.sourceCodeLocation.endOffset;
+	return isEmpty && isSelfClosed;
 }
 
 /**

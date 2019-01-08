@@ -3,6 +3,7 @@ import { HtmlNode, IHtmlTemplate } from "../../parse-html-nodes/types/html-node-
 import { TsHtmlPluginStore } from "../../state/store";
 import { getHtmlPositionInSourceFile } from "../../util/get-html-position";
 import { iterateHtmlTemplate } from "../../util/iterate-html-template";
+import { intersects } from "../../util/util";
 
 /**
  * Returns closing tag information based on html templates.
@@ -16,8 +17,15 @@ export function getClosingTagFromHtmlTemplates(sourceFile: SourceFile, htmlTempl
 	let closestMatch: [number, HtmlNode] | null = null;
 	iterateHtmlTemplate(htmlTemplates, {
 		getNodeItems(htmlNode: HtmlNode) {
-			// Only look at non-closed tags
-			if (!htmlNode.selfClosed && !htmlNode.location.endTag) {
+			// Only look at non-closed tags or tags that "position" intersects.
+			if (
+				!htmlNode.selfClosed &&
+				(!htmlNode.location.endTag ||
+					intersects(position, {
+						start: htmlNode.location.startTag.start,
+						end: htmlNode.location.endTag.end - 1
+					}))
+			) {
 				const thisDist = position - htmlNode.location.startTag.end;
 				const [closestDist] = closestMatch || [thisDist];
 
