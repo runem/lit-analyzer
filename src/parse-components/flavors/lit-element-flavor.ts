@@ -85,6 +85,8 @@ export class LitElementFlavor implements IParseComponentFlavor {
 		const superJsDocTags: IComponentDeclarationJsDocTag[] = [];
 		if (node.heritageClauses != null) {
 			for (const heritage of node.heritageClauses) {
+				if (heritage.token !== context.ts.SyntaxKind.ExtendsKeyword) continue;
+
 				for (const type of heritage.types) {
 					// Find the super class symbol
 					const symbol = context.checker.getSymbolAtLocation(type.expression);

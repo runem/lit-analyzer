@@ -58,7 +58,7 @@ export class Logger {
 	 * @param args
 	 */
 	private appendLog(...args: any[]) {
-		appendFileSync(logPath, inspect(args, { colors: true, depth: 4, breakLength: 50, maxArrayLength: 10 }));
+		appendFileSync(logPath, `${inspect(args, { colors: true, depth: 3, breakLength: 50, maxArrayLength: 10 })}\n`);
 	}
 }
 
