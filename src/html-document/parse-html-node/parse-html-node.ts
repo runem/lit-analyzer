@@ -1,4 +1,5 @@
-import { isTagNode } from "../parse-html-p5/parse-html";
+import { logger } from "../../util/logger";
+import { isCommentNode, isTagNode } from "../parse-html-p5/parse-html";
 import { IP5TagNode, P5Node } from "../parse-html-p5/parse-html-types";
 import { IHtmlNodeBase, IHtmlNodeSourceCodeLocation } from "../types/html-node-types";
 import { parseHtmlNodeAttrs } from "./parse-html-attribute";
@@ -10,7 +11,30 @@ import { ParseHtmlContext } from "./types/parse-html-context";
  * @param context
  */
 export function parseHtmlNodes(p5Nodes: P5Node[], context: ParseHtmlContext): IHtmlNodeBase[] {
-	return p5Nodes.map(child => parseHtmlNode(child, context)).filter((elem): elem is IHtmlNodeBase => elem != null);
+	const htmlNodes: IHtmlNodeBase[] = [];
+	let ignoreNextNode = false;
+	for (const p5Node of p5Nodes) {
+		// Check ts-ignore comments and indicate that we wan't to ignore the next node
+		if (isCommentNode(p5Node)) {
+			if (p5Node.data != null && p5Node.data.includes("@ts-ignore")) {
+				ignoreNextNode = true;
+			}
+		}
+
+		if (isTagNode(p5Node)) {
+			if (!ignoreNextNode) {
+				const htmlNode = parseHtmlNode(p5Node, context);
+
+				if (htmlNode != null) {
+					htmlNodes.push(htmlNode);
+				}
+			} else {
+				logger.debug("Ignoring node", p5Node.tagName);
+				ignoreNextNode = false;
+			}
+		}
+	}
+	return htmlNodes;
 }
 
 /**
@@ -18,30 +42,28 @@ export function parseHtmlNodes(p5Nodes: P5Node[], context: ParseHtmlContext): IH
  * @param p5Node
  * @param context
  */
-export function parseHtmlNode(p5Node: P5Node, context: ParseHtmlContext): IHtmlNodeBase | undefined {
+export function parseHtmlNode(p5Node: IP5TagNode, context: ParseHtmlContext): IHtmlNodeBase | undefined {
 	// `sourceCodeLocation` will be undefined if the element was implicitly created by the parser.
 	if (p5Node.sourceCodeLocation == null) return undefined;
 
-	if (isTagNode(p5Node)) {
-		const { store } = context;
+	const { store } = context;
 
-		const htmlNode = store.extension.parseHtmlNode(p5Node, {
-			store,
-			htmlNodeBase: {
-				tagName: p5Node.tagName,
-				selfClosed: isSelfClosed(p5Node, context),
-				attributes: [],
-				location: makeHtmlNodeLocation(p5Node, context),
-				children: parseHtmlNodes(p5Node.childNodes || [], context)
-			}
-		});
+	const htmlNode = store.extension.parseHtmlNode(p5Node, {
+		store,
+		htmlNodeBase: {
+			tagName: p5Node.tagName,
+			selfClosed: isSelfClosed(p5Node, context),
+			attributes: [],
+			location: makeHtmlNodeLocation(p5Node, context),
+			children: parseHtmlNodes(p5Node.childNodes || [], context)
+		}
+	});
 
-		if (htmlNode == null) return;
+	if (htmlNode == null) return;
 
-		htmlNode.attributes = parseHtmlNodeAttrs(p5Node, { ...context, htmlNode });
+	htmlNode.attributes = parseHtmlNodeAttrs(p5Node, { ...context, htmlNode });
 
-		return htmlNode;
-	}
+	return htmlNode;
 }
 
 /**

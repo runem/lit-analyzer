@@ -1,7 +1,7 @@
 import { customElement, property, html, LitElement } from "lit-element";
 import { classMap } from "lit-html/directives/class-map";
 
-@customElement("my-button")
+@customElement("my-button" as any)
 export class MyButton extends LitElement {
 	@property({ type: String }) color: "red" | "purple" | undefined;
 	@property({ type: String }) text: string = "";
@@ -16,7 +16,7 @@ export class MyButton extends LitElement {
 }
 
 /*declare global {
-	interface HTMLElementTagNameMap {
-		"my-button": MyButton;
-	}
+    interface HTMLElementTagNameMap {
+        "my-button": MyButton;
+    }
 }*/
