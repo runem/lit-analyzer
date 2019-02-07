@@ -7,7 +7,8 @@ const logPath = join(__dirname, "../../log.txt");
 export enum LoggingLevel {
 	NONE = 0,
 	DEBUG = 1,
-	VERBOSE = 2
+	VERBOSE = 2,
+	ERROR = 3
 }
 
 /**
@@ -27,11 +28,19 @@ export class Logger {
 	}
 
 	/**
-	 * Logs if level >= DEBUG
+	 * Logs if this.level >= DEBUG
 	 * @param args
 	 */
 	debug(...args: any[]) {
 		this.appendLogWithLevel(LoggingLevel.DEBUG, ...args);
+	}
+
+	/**
+	 * Logs if this.level >= ERROR
+	 * @param args
+	 */
+	error(...args: any[]) {
+		this.appendLogWithLevel(LoggingLevel.ERROR, ...args);
 	}
 
 	/**
@@ -49,16 +58,39 @@ export class Logger {
 	 */
 	private appendLogWithLevel(level: LoggingLevel, ...args: any[]) {
 		if (this.level >= level) {
-			this.appendLog(...args);
+			const prefix = this.getLogLevelPrefix(level);
+			this.appendLog(prefix, ...args);
 		}
 	}
 
 	/**
 	 * Appends a log entry to the log file.
+	 * @param prefix
 	 * @param args
 	 */
-	private appendLog(...args: any[]) {
-		appendFileSync(logPath, `${inspect(args, { colors: true, depth: 3, breakLength: 50, maxArrayLength: 10 })}\n`);
+	private appendLog(prefix: string, ...args: any[]) {
+		appendFileSync(
+			logPath,
+			`${prefix}${inspect(args, {
+				colors: true,
+				depth: 4,
+				breakLength: 50,
+				maxArrayLength: 10
+			})}\n`
+		);
+	}
+
+	private getLogLevelPrefix(level: LoggingLevel) {
+		switch (level) {
+			case LoggingLevel.VERBOSE:
+				return "\x1b[36m DEBUG: \x1b[0m"; // CYAN
+			case LoggingLevel.DEBUG:
+				return "\x1b[33m DEBUG: \x1b[0m"; // YELLOW
+			case LoggingLevel.ERROR:
+				return "\x1b[31m ERROR: \x1b[0m"; // RED
+			case LoggingLevel.NONE:
+				return "";
+		}
 	}
 }
 

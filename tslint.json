@@ -1,7 +1,7 @@
 {
 	"rules": {
 		"completed-docs": {
-			"options": ["classes", "functions", "methods"],
+			"options": ["classes", "functions"],
 			"severity": "warning"
 		},
 		"prefer-const": true,

@@ -1,10 +1,10 @@
 import { SimpleTypeKind } from "ts-simple-type";
 import { CompletionEntry, DiagnosticWithLocation, QuickInfo, ScriptElementKind } from "typescript";
-import { IP5NodeAttr, IP5TagNode } from "../parse-html-nodes/parse-html-p5/parse-html-types";
-import { IHtmlAttrAssignment } from "../parse-html-nodes/types/html-attr-assignment-types";
-import { HtmlAttr, HtmlAttrKind, IHtmlAttrBuiltIn } from "../parse-html-nodes/types/html-attr-types";
-import { HtmlNode, HtmlNodeKind, IHtmlNodeBuiltIn } from "../parse-html-nodes/types/html-node-types";
-import { IHtmlReportBase } from "../parse-html-nodes/types/html-report-types";
+import { IP5NodeAttr, IP5TagNode } from "../html-document/parse-html-p5/parse-html-types";
+import { IHtmlAttrAssignment } from "../html-document/types/html-attr-assignment-types";
+import { HtmlAttr, HtmlAttrKind, IHtmlAttrBuiltIn } from "../html-document/types/html-attr-types";
+import { HtmlNode, HtmlNodeKind, IHtmlNodeBase, IHtmlNodeBuiltIn } from "../html-document/types/html-node-types";
+import { IHtmlReportBase } from "../html-document/types/html-report-types";
 import {
 	getBuiltInAttributeType,
 	getBuiltInAttrsForTag,
@@ -14,6 +14,7 @@ import {
 	isBuiltInAttrForTag,
 	isBuiltInTag
 } from "../util/html-documentation";
+import { rangeToTSSpan } from "../util/util";
 import {
 	ITsHtmlExtension,
 	ITsHtmlExtensionCompletionContext,
@@ -22,16 +23,18 @@ import {
 	ITsHtmlExtensionParseAttrContext,
 	ITsHtmlExtensionParseHtmlNodeContext,
 	ITsHtmlExtensionQuickInfoContext,
+	ITsHtmlExtensionValidateContext,
 	ITsHtmlExtensionValidateExpressionContext
 } from "./i-ts-html-extension";
 
-const DIAGNOSTIC_SOURCE = "ts-html";
+const DIAGNOSTIC_SOURCE = "tagged-html";
 
 export enum VanillaHtmlReportKind {
-	HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE = "HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE"
+	HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE = "HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE",
+	TAG_NOT_CLOSED = "TAG_NOT_CLOSED"
 }
 
-export interface IHtmlReportVanillaHtmlInvalidAttributeExpressionType extends IHtmlReportBase {
+export interface IHtmlReportVanillaHtmlInvlAttrExprType extends IHtmlReportBase {
 	kind: VanillaHtmlReportKind.HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE;
 	typeAPrimitive: boolean;
 	typeBPrimitive: boolean;
@@ -39,7 +42,11 @@ export interface IHtmlReportVanillaHtmlInvalidAttributeExpressionType extends IH
 	typeB: string;
 }
 
-export type VanillaHtmlReport = IHtmlReportVanillaHtmlInvalidAttributeExpressionType;
+export interface IHtmlReportVanillaHtmlTagNotClosed extends IHtmlReportBase {
+	kind: VanillaHtmlReportKind.TAG_NOT_CLOSED;
+}
+
+export type VanillaHtmlReport = IHtmlReportVanillaHtmlInvlAttrExprType | IHtmlReportVanillaHtmlTagNotClosed;
 
 /**
  * An extension that extends ts-html with basic html functionality.
@@ -161,6 +168,24 @@ export class VanillaHtmlExtension implements ITsHtmlExtension {
 		}
 	}
 
+	diagnosticsForHtmlNodeReport(htmlNode: IHtmlNodeBase, htmlReport: VanillaHtmlReport, { file, store: { ts } }: ITsHtmlExtensionDiagnosticContext): DiagnosticWithLocation[] | undefined {
+		switch (htmlReport.kind) {
+			case VanillaHtmlReportKind.TAG_NOT_CLOSED:
+				const messageText = "This tag isn't closed.";
+
+				return [
+					{
+						file,
+						...rangeToTSSpan(htmlNode.location.name),
+						messageText,
+						category: ts.DiagnosticCategory.Error,
+						source: DIAGNOSTIC_SOURCE,
+						code: 2322
+					}
+				];
+		}
+	}
+
 	/**
 	 * Returns diagnostics for built in html attributes.
 	 * @param htmlAttr
@@ -168,12 +193,12 @@ export class VanillaHtmlExtension implements ITsHtmlExtension {
 	 * @param file
 	 * @param store
 	 */
-	diagnosticsForHtmlAttr(htmlAttr: HtmlAttr, htmlReport: VanillaHtmlReport, { file, store }: ITsHtmlExtensionDiagnosticContext): DiagnosticWithLocation[] {
+	diagnosticsForHtmlAttrReport(htmlAttr: HtmlAttr, htmlReport: VanillaHtmlReport, { file, store }: ITsHtmlExtensionDiagnosticContext): DiagnosticWithLocation[] | undefined {
 		const { start, end } = htmlAttr.location.name;
 
-		const messageText = (() => {
-			switch (htmlReport.kind) {
-				case VanillaHtmlReportKind.HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE:
+		switch (htmlReport.kind) {
+			case VanillaHtmlReportKind.HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE:
+				const messageText = (() => {
 					if (!htmlReport.typeAPrimitive && !htmlReport.typeBPrimitive) {
 						return `Non-primitive type '${htmlReport.typeB}' cannot be assigned to non-primitive type '${htmlReport.typeA}'.`;
 					} else if (!htmlReport.typeAPrimitive) {
@@ -183,13 +208,9 @@ export class VanillaHtmlExtension implements ITsHtmlExtension {
 					} else {
 						return `Type '${htmlReport.typeB}' is not assignable to '${htmlReport.typeA}'`;
 					}
-					break;
-			}
-		})();
+				})();
 
-		return messageText == null
-			? []
-			: [
+				return [
 					{
 						file,
 						start,
@@ -199,7 +220,53 @@ export class VanillaHtmlExtension implements ITsHtmlExtension {
 						source: DIAGNOSTIC_SOURCE,
 						code: 2322
 					}
-			  ];
+				];
+		}
+	}
+
+	validateHtmlNode(htmlNode: HtmlNode, context: ITsHtmlExtensionValidateContext): VanillaHtmlReport[] | undefined {
+		if (!htmlNode.selfClosed && htmlNode.location.endTag == null) {
+			return [
+				{
+					kind: VanillaHtmlReportKind.TAG_NOT_CLOSED
+				}
+			];
+		}
+	}
+
+	/**
+	 * Validates attribute assignment using basic html rules.
+	 * Eg. assigning an object becomes "[Object object]"
+	 * @param htmlAttr
+	 * @param isAssignableToValue
+	 * @param getTypeString
+	 * @param isAssignableTo
+	 * @param isAssignableToPrimitive
+	 */
+	validateHtmlAttrAssignment(
+		htmlAttr: HtmlAttr,
+		{ isAssignableToValue, getTypeString, isAssignableTo, isAssignableToPrimitive }: ITsHtmlExtensionValidateExpressionContext
+	): VanillaHtmlReport[] | undefined {
+		if (htmlAttr.assignment == null) return;
+
+		const {
+			assignment: { typeA, typeB }
+		} = htmlAttr;
+
+		const typeAPrimitive = isAssignableToPrimitive(typeA);
+		const typeBPrimitive = isAssignableToPrimitive(typeB);
+
+		if (!typeAPrimitive || !typeBPrimitive || !isAssignableTo(typeA, typeB)) {
+			return [
+				{
+					kind: VanillaHtmlReportKind.HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE,
+					typeAPrimitive,
+					typeBPrimitive,
+					typeA: getTypeString(typeA),
+					typeB: getTypeString(typeB)
+				}
+			];
+		}
 	}
 
 	/**
@@ -217,7 +284,7 @@ export class VanillaHtmlExtension implements ITsHtmlExtension {
 			return {
 				...htmlNodeBase,
 				kind: HtmlNodeKind.BUILT_IN,
-				childNodes: isBlacklisted ? [] : htmlNodeBase.childNodes
+				children: isBlacklisted ? [] : htmlNodeBase.children
 			};
 		}
 	}
@@ -255,40 +322,5 @@ export class VanillaHtmlExtension implements ITsHtmlExtension {
 			...assignmentBase,
 			typeA: getBuiltInAttributeType(htmlAttr.name) || { kind: SimpleTypeKind.ANY }
 		};
-	}
-
-	/**
-	 * Validates attribute assignment using basic html rules.
-	 * Eg. assigning an object becomes "[Object object]"
-	 * @param htmlAttr
-	 * @param isAssignableToValue
-	 * @param getTypeString
-	 * @param isAssignableTo
-	 * @param isAssignableToPrimitive
-	 */
-	validateHtmlAttrAssignment(
-		htmlAttr: HtmlAttr,
-		{ isAssignableToValue, getTypeString, isAssignableTo, isAssignableToPrimitive }: ITsHtmlExtensionValidateExpressionContext
-	): VanillaHtmlReport[] | undefined {
-		if (htmlAttr.assignment == null) return;
-
-		const {
-			assignment: { typeA, typeB }
-		} = htmlAttr;
-
-		const typeAPrimitive = isAssignableToPrimitive(typeA);
-		const typeBPrimitive = isAssignableToPrimitive(typeB);
-
-		if (!typeAPrimitive || !typeBPrimitive || !isAssignableTo(typeA, typeB)) {
-			return [
-				{
-					kind: VanillaHtmlReportKind.HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE,
-					typeAPrimitive,
-					typeBPrimitive,
-					typeA: getTypeString(typeA),
-					typeB: getTypeString(typeB)
-				}
-			];
-		}
 	}
 }

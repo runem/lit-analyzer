@@ -1,4 +1,5 @@
 import { Node } from "typescript";
+import { Range } from "../types/range";
 import { intersects } from "./util";
 
 /**
@@ -16,7 +17,7 @@ export function findParent(node: Node | undefined, test: (node: Node) => boolean
  * @param node
  * @param position
  */
-export function getNodeAtPosition(node: Node, position: number): Node | undefined {
+export function getNodeAtPosition(node: Node, position: number | Range): Node | undefined {
 	if (!intersects(position, { start: node.pos, end: node.end })) {
 		return;
 	}

@@ -8,12 +8,7 @@ import { VanillaHtmlExtension } from "../extensions/vanilla-html-extension";
 import { makeConfig } from "../state/config";
 import { TsHtmlPluginStore } from "../state/store";
 import { logger, LoggingLevel } from "../util/logger";
-import { getClosingTagAtPosition } from "./closing-tag-at-position/get-closing-tag-at-position";
-import { getCodeFixesAtPosition } from "./code-fixes/get-code-fixes-at-position";
-import { getCompletionsAtPosition } from "./completions/get-completions-at-position";
-import { getDefinitionAndBoundSpan } from "./definition-and-bound-span/get-definition-and-bound-span";
-import { getQuickInfoAtPosition } from "./quick-info/get-quick-info-at-position";
-import { getSemanticDiagnostics } from "./semantic-diagnostics/get-semantic-diagnostics";
+import { Plugin } from "./plugin";
 
 /**
  * Wraps a function in try catch in order to debug the plugin.
@@ -25,7 +20,7 @@ function wrapTryCatch<T extends Function>(proxy: T): T {
 		try {
 			return proxy(...args);
 		} catch (e) {
-			logger.debug(`Error (${e.stack}) ${e.message}`);
+			logger.error(`Error (${e.stack}) ${e.message}`);
 		}
 	}) as unknown) as T;
 }
@@ -56,7 +51,7 @@ export function createTsHtmlPlugin(typescript: typeof ts, info: ts.server.Plugin
 	store.config = makeConfig(info.config);
 
 	// Setup logging
-	logger.level = store.config.verbose ? LoggingLevel.VERBOSE : LoggingLevel.NONE;
+	logger.level = store.config.verbose ? LoggingLevel.ERROR : LoggingLevel.NONE;
 	logger.resetLogs();
 	logger.verbose("CreateLitTsPlugin called");
 	logger.debug("Config", store.config);
@@ -76,14 +71,17 @@ export function createTsHtmlPlugin(typescript: typeof ts, info: ts.server.Plugin
 
 	const prevLanguageService = info.languageService;
 
+	const plugin = new Plugin(prevLanguageService, store);
+
 	const nextLanguageService: LanguageService = {
 		...prevLanguageService,
-		getCompletionsAtPosition: getCompletionsAtPosition(prevLanguageService, store),
-		getCodeFixesAtPosition: getCodeFixesAtPosition(prevLanguageService, store),
-		getSemanticDiagnostics: getSemanticDiagnostics(prevLanguageService, store),
-		getQuickInfoAtPosition: getQuickInfoAtPosition(prevLanguageService, store),
-		getDefinitionAndBoundSpan: getDefinitionAndBoundSpan(prevLanguageService, store),
-		getJsxClosingTagAtPosition: getClosingTagAtPosition(prevLanguageService, store)
+		getCompletionsAtPosition: plugin.getCompletionsAtPosition.bind(plugin),
+		getCodeFixesAtPosition: plugin.getCodeFixesAtPosition.bind(plugin),
+		getSemanticDiagnostics: plugin.getSemanticDiagnostics.bind(plugin),
+		getQuickInfoAtPosition: plugin.getQuickInfoAtPosition.bind(plugin),
+		getFormattingEditsForRange: plugin.getFormattingEditsForRange.bind(plugin),
+		getDefinitionAndBoundSpan: plugin.getDefinitionAndBoundSpan.bind(plugin),
+		getJsxClosingTagAtPosition: plugin.getJsxClosingTagAtPosition.bind(plugin)
 	};
 
 	// Wrap all method called to the service in tryCatch and logging.

@@ -1,5 +1,6 @@
 import { isAssignableToSimpleTypeKind, SimpleTypeKind } from "ts-simple-type";
-import { ClassLikeDeclaration, Node, PropertyDeclaration } from "typescript";
+import { ClassLikeDeclaration, InterfaceDeclaration, Node, PropertyDeclaration } from "typescript";
+import { logger } from "../../util/logger";
 import { IComponentDeclarationJsDoc, IComponentDeclarationJsDocTag, IComponentDeclarationMeta, IComponentDeclarationProp } from "../component-types";
 import { IComponentDeclarationVisitContext, IComponentDefinitionVisitContext, IParseComponentFlavor } from "../parse-components";
 
@@ -13,22 +14,48 @@ export class LitElementFlavor implements IParseComponentFlavor {
 	 * @param context
 	 */
 	visitComponentDefinitions(node: Node, context: IComponentDefinitionVisitContext): void {
+		const { ts, checker } = context;
+
+		// Handle "declare global { interface HTMLElementTagNameMap { "my-button": MyButton; } }"
+		if (ts.isModuleBlock(node)) {
+			for (const statement of node.statements) {
+				if (ts.isInterfaceDeclaration(statement)) {
+					if (statement.name.text === "HTMLElementTagNameMap") {
+						for (const member of (statement as InterfaceDeclaration).members) {
+							if (ts.isPropertySignature(member) && ts.isStringLiteral(member.name) && member.type != null && ts.isTypeReferenceNode(member.type)) {
+								const tagName = member.name.text;
+								const typeName = member.type.typeName;
+
+								const symbol = checker.getSymbolAtLocation(typeName);
+
+								if (symbol != null) {
+									const declaration = symbol.valueDeclaration || context.checker.getAliasedSymbol(symbol).valueDeclaration;
+
+									context.addComponentDefinition(tagName, declaration);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
 		// Check "@customElement("my-element")"
-		if (context.ts.isClassDeclaration(node)) {
+		if (ts.isClassDeclaration(node)) {
 			for (const decorator of node.decorators || []) {
 				const callExpression = decorator.expression;
-				if (context.ts.isCallExpression(callExpression) && context.ts.isIdentifier(callExpression.expression)) {
+				if (ts.isCallExpression(callExpression) && ts.isIdentifier(callExpression.expression)) {
 					const decoratorIdentifierName = callExpression.expression.escapedText;
 					if (decoratorIdentifierName === "customElement") {
 						const find = (node: Node | undefined): Node | undefined => {
 							if (!node) return;
-							if (context.ts.isStringLiteral(node)) return node;
+							if (ts.isStringLiteral(node)) return node;
 							return node.forEachChild(child => find(child));
 						};
 
 						const tagNameNode = find(callExpression.arguments[0]);
 
-						if (tagNameNode != null && context.ts.isStringLiteralLike(tagNameNode)) {
+						if (tagNameNode != null && ts.isStringLiteralLike(tagNameNode)) {
 							context.addComponentDefinition(tagNameNode.text, node);
 						}
 					}
@@ -50,7 +77,9 @@ export class LitElementFlavor implements IParseComponentFlavor {
 	 * @param context
 	 */
 	visitComponentDeclaration(node: Node, context: IComponentDeclarationVisitContext): void {
-		if (context.ts.isClassLike(node)) {
+		if (node == null) {
+			logger.error("WTF???? NOT IS NULL");
+		} else if (context.ts.isClassLike(node)) {
 			const thisJsDoc = visitJsDoc(node, context) || {};
 			const superJsDocTags = this.visitSuperClass(node, context);
 
@@ -117,20 +146,34 @@ export class LitElementFlavor implements IParseComponentFlavor {
  * @param context
  */
 function parsePropertyDeclaration(node: PropertyDeclaration, context: IComponentDeclarationVisitContext): IComponentDeclarationProp | undefined {
-	const { checker } = context;
-
 	const decoratorIdentifier = (() =>
 		(node.decorators || []).find(decorator => {
 			const expression = decorator.expression;
 			return context.ts.isCallExpression(expression) && context.ts.isIdentifier(expression.expression) && expression.expression.getText() === "property";
 		}))();
 
-	if (decoratorIdentifier == null) return;
+	const fromExternalModule = context.ts.isExternalModule(node.getSourceFile());
 
-	const propertyName = node.name.getText();
-	if (propertyName == null) return;
+	// It's okay if we can't find a @property decorator in a library file because they aren't shipped with type declarations.
+	if (decoratorIdentifier == null && !fromExternalModule) {
+		return;
+	}
 
-	const type = checker.getTypeAtLocation(node);
+	const name = String(node.name.getText());
+
+	if (node.modifiers != null) {
+		const ignoreModifierKinds = [
+			context.ts.SyntaxKind.PrivateKeyword,
+			context.ts.SyntaxKind.ProtectedKeyword,
+			context.ts.SyntaxKind.ReadonlyKeyword,
+			context.ts.SyntaxKind.StaticKeyword,
+			context.ts.SyntaxKind.StaticKeyword
+		];
+		const hasIgnoredModifier = node.modifiers.find(m => ignoreModifierKinds.includes(m.kind));
+		if (hasIgnoredModifier) return;
+	}
+
+	const type = context.checker.getTypeAtLocation(node);
 
 	const defaultValue = (() => {
 		if (node.initializer == null) return undefined;
@@ -139,18 +182,18 @@ function parsePropertyDeclaration(node: PropertyDeclaration, context: IComponent
 		}
 	})();
 
-	const name = String(propertyName);
-	const required = node.initializer == null && !isAssignableToSimpleTypeKind(type, [SimpleTypeKind.UNDEFINED, SimpleTypeKind.NULL], checker, { op: "or" });
+	// Properties in external modules don't have initializers, so we cannot infer if the property is required or not
+	const required = fromExternalModule ? false : node.initializer == null && !isAssignableToSimpleTypeKind(type, [SimpleTypeKind.UNDEFINED, SimpleTypeKind.NULL], context.checker, { op: "or" });
 
 	return {
-		name,
 		type,
 		required,
+		name,
 		default: defaultValue,
 		jsDoc: visitJsDoc(node, context),
 		location: {
-			start: decoratorIdentifier.getStart(),
-			end: decoratorIdentifier.getEnd()
+			start: node.getStart(),
+			end: node.getEnd()
 		}
 	};
 }

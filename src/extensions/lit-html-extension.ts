@@ -1,13 +1,13 @@
 import { SimpleTypeKind } from "ts-simple-type";
 import { CodeFixAction, DiagnosticWithLocation } from "typescript";
-import { IP5NodeAttr } from "../parse-html-nodes/parse-html-p5/parse-html-types";
-import { HtmlAttr, HtmlAttrKind, IHtmlAttrBuiltIn } from "../parse-html-nodes/types/html-attr-types";
-import { HtmlNode } from "../parse-html-nodes/types/html-node-types";
-import { HtmlReport, IHtmlReportBase } from "../parse-html-nodes/types/html-report-types";
+import { IP5NodeAttr } from "../html-document/parse-html-p5/parse-html-types";
+import { HtmlAttr, HtmlAttrKind, IHtmlAttrBuiltIn } from "../html-document/types/html-attr-types";
+import { HtmlNode } from "../html-document/types/html-node-types";
+import { HtmlReport, IHtmlReportBase } from "../html-document/types/html-report-types";
 import { ITsHtmlExtensionCodeFixContext, ITsHtmlExtensionDiagnosticContext, ITsHtmlExtensionParseAttrContext, ITsHtmlExtensionValidateExpressionContext } from "./i-ts-html-extension";
 import { VanillaHtmlExtension, VanillaHtmlReport } from "./vanilla-html-extension";
 
-const DIAGNOSTIC_SOURCE = "lit-html";
+const DIAGNOSTIC_SOURCE = "tagged-html";
 
 type LitHtmlAttributeModifier = "." | "?" | "@";
 
@@ -48,7 +48,7 @@ export class LitHtmlExtension extends VanillaHtmlExtension {
 	 * @param htmlReport
 	 * @param context
 	 */
-	codeFixesForHtmlAttr(htmlAttr: HtmlAttr, htmlReport: HtmlReport & LitHtmlReport, context: ITsHtmlExtensionCodeFixContext): CodeFixAction[] | undefined {
+	codeFixesForHtmlAttrReport(htmlAttr: HtmlAttr, htmlReport: HtmlReport & LitHtmlReport, context: ITsHtmlExtensionCodeFixContext): CodeFixAction[] | undefined {
 		const { start } = htmlAttr.location.name;
 
 		switch (htmlReport.kind) {
@@ -93,7 +93,7 @@ export class LitHtmlExtension extends VanillaHtmlExtension {
 	 * @param htmlReport
 	 * @param context
 	 */
-	diagnosticsForHtmlAttr(htmlAttr: HtmlAttr, htmlReport: VanillaHtmlReport | LitHtmlReport, context: ITsHtmlExtensionDiagnosticContext): DiagnosticWithLocation[] {
+	diagnosticsForHtmlAttrReport(htmlAttr: HtmlAttr, htmlReport: VanillaHtmlReport | LitHtmlReport, context: ITsHtmlExtensionDiagnosticContext): DiagnosticWithLocation[] {
 		const { start, end } = htmlAttr.location.name;
 
 		const messageText = (() => {
@@ -112,7 +112,7 @@ export class LitHtmlExtension extends VanillaHtmlExtension {
 		})();
 
 		return [
-			...super.diagnosticsForHtmlAttr(htmlAttr, htmlReport as VanillaHtmlReport, context),
+			...(super.diagnosticsForHtmlAttrReport(htmlAttr, htmlReport as VanillaHtmlReport, context) || []),
 			...(messageText != null
 				? [
 						{

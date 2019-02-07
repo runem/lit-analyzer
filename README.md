@@ -56,8 +56,6 @@ Then add a `plugins` section to your [`tsconfig.json`](http://www.typescriptlang
 
 ## Roadmap
 
--   Format html
--   Warning on malformed HTML
 -   Support for [web-components.json](https://github.com/w3c/webcomponents/issues/776)
 -   Add tests
 -   Aria/accessibility mode

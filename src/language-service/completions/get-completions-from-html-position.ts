@@ -1,7 +1,7 @@
 import { CompletionEntry, CompletionInfo } from "typescript";
 import { ITsHtmlExtensionCompletionContext } from "../../extensions/i-ts-html-extension";
-import { IHtmlAttrBase } from "../../parse-html-nodes/types/html-attr-types";
-import { IHtmlNodeBase } from "../../parse-html-nodes/types/html-node-types";
+import { IHtmlAttrBase } from "../../html-document/types/html-attr-types";
+import { IHtmlNodeBase } from "../../html-document/types/html-node-types";
 import { TsHtmlPluginStore } from "../../state/store";
 import { IHtmlPositionContext } from "../../util/get-html-position";
 import { intersects } from "../../util/util";
@@ -12,11 +12,11 @@ import { intersects } from "../../util/util";
  * @param store
  */
 export function getCompletionInfoFromHtmlPosition(htmlPosition: IHtmlPositionContext, store: TsHtmlPluginStore): CompletionInfo | undefined {
-	const { htmlTemplate, beforeWord, position } = htmlPosition;
+	const { htmlDocument, beforeWord, position } = htmlPosition;
 
 	// Get possible intersecting html attribute or attribute area.
-	const htmlAttr = getIntersectingHtmlAttrName(htmlTemplate.childNodes, position) || undefined;
-	const insideAttrAreaNode = getIntersectingHtmlNodeAttrArea(htmlTemplate.childNodes, position);
+	const htmlAttr = getIntersectingHtmlAttrName(htmlDocument.rootNodes, position) || undefined;
+	const insideAttrAreaNode = getIntersectingHtmlNodeAttrArea(htmlDocument.rootNodes, position);
 
 	const context: ITsHtmlExtensionCompletionContext = {
 		...htmlPosition,
@@ -73,7 +73,7 @@ function getIntersectingHtmlNodeAttrArea(htmlNode: IHtmlNodeBase | IHtmlNodeBase
 		// Tests if the position is inside the start tag
 		outer: if (position > htmlNode.location.name.end && intersects(position, htmlNode.location.startTag)) {
 			// Check if the position intersects any attributes. Break if so.
-			for (const htmlAttr of htmlNode.attributes || []) {
+			for (const htmlAttr of htmlNode.attributes) {
 				if (intersects(position, htmlAttr.location)) {
 					break outer;
 				}
@@ -83,7 +83,7 @@ function getIntersectingHtmlNodeAttrArea(htmlNode: IHtmlNodeBase | IHtmlNodeBase
 		}
 
 		// Check recursively on all child nodes.
-		return getIntersectingHtmlNodeAttrArea(htmlNode.childNodes || [], position);
+		return getIntersectingHtmlNodeAttrArea(htmlNode.children || [], position);
 	}
 }
 
@@ -110,6 +110,6 @@ function getIntersectingHtmlAttrName(htmlNode: IHtmlNodeBase | IHtmlNodeBase[], 
 			}
 		}
 
-		return getIntersectingHtmlAttrName(htmlNode.childNodes || [], position);
+		return getIntersectingHtmlAttrName(htmlNode.children || [], position);
 	}
 }

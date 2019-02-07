@@ -19,15 +19,15 @@ export function parseDependencies(sourceFile: SourceFile, store: TsHtmlPluginSto
 		ts: store.ts,
 		lockedFiles: [],
 		addComponentsForFile(fileName: string, components: IComponentsInFile[], isCircular: boolean) {
-			// Only set the result if this isn't a circular import of file is equal to the start file.
+			// Only set the result if this isn't a circular import and file is equal to the start file.
 			if (!isCircular || fileName === sourceFile.fileName) {
 				importedComponentsInFile.set(fileName, components);
 			}
 		},
-		allComponentsInFileScope(fileName: string) {
+		getImportedComponentsInFile(fileName: string) {
 			return importedComponentsInFile.get(fileName);
 		},
-		customElementResultForFile(fileName: string) {
+		getComponentsInFile(fileName: string) {
 			return store.componentsInFile.get(fileName);
 		},
 		addCircularReference(fromFileName: string, toFileName: string): void {}

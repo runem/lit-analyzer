@@ -1,12 +1,12 @@
-import { basename } from "path";
 import * as tsModule from "typescript";
 import { SourceFile } from "typescript";
 import * as ts from "typescript/lib/tsserverlibrary";
 import { ExtensionCollectionExtension } from "../extensions/extension-collection-extension";
+import { HtmlDocumentCollection } from "../html-document/html-document-collection";
+import { IHtmlAttrBase } from "../html-document/types/html-attr-types";
+import { IHtmlNodeBase } from "../html-document/types/html-node-types";
+import { IHtmlReportBase } from "../html-document/types/html-report-types";
 import { ComponentTagName, IComponentDeclaration, IComponentsInFile } from "../parse-components/component-types";
-import { IHtmlTemplateResult } from "../parse-html-nodes/i-html-template-result";
-import { IHtmlTemplate } from "../parse-html-nodes/types/html-node-types";
-import { logger } from "../util/logger";
 import { IConfig } from "./config";
 
 export type FileName = string;
@@ -17,23 +17,29 @@ export type FileName = string;
 export class TsHtmlPluginStore {
 	config!: IConfig;
 	extension = new ExtensionCollectionExtension([]);
-
-	htmlTemplatesInFile = new Map<FileName, IHtmlTemplateResult>();
 	componentsInFile = new Map<FileName, IComponentsInFile>();
 	importedComponentsInFile = new Map<FileName, IComponentsInFile[]>();
-
 	allTagNameFileNames = new Map<ComponentTagName, FileName>();
 	allComponents = new Map<ComponentTagName, IComponentDeclaration>();
+	private htmlReportsForHtml = new Map<IHtmlNodeBase | IHtmlAttrBase, IHtmlReportBase[]>();
+	private htmlDocumentCache = new WeakMap<SourceFile, HtmlDocumentCollection>();
 
 	constructor(public ts: typeof tsModule, public info: ts.server.PluginCreateInfo) {}
 
+	getReportsForHtmlNodeOrAttr(source: IHtmlNodeBase | IHtmlAttrBase): IHtmlReportBase[] {
+		return this.htmlReportsForHtml.get(source) || [];
+	}
+
+	absorbReports(source: IHtmlNodeBase | IHtmlAttrBase, reports: IHtmlReportBase[]) {
+		this.htmlReportsForHtml.set(source, reports);
+	}
+
 	/**
-	 * Returns all html templates in a specific file.
-	 * @param fileName
+	 * Returns all html documents in a specific file.
+	 * @param file
 	 */
-	getHtmlTemplatesForFile(fileName: string): IHtmlTemplate[] {
-		const templateResultForFile = this.htmlTemplatesInFile.get(fileName);
-		return templateResultForFile ? templateResultForFile.templates : [];
+	getDocumentsCollectionForFile(file: SourceFile): HtmlDocumentCollection {
+		return this.htmlDocumentCache.get(file) || new HtmlDocumentCollection(file, [], this.ts);
 	}
 
 	/**
@@ -52,30 +58,12 @@ export class TsHtmlPluginStore {
 	}
 
 	/**
-	 * Prints the state of this store.
-	 */
-	printState() {
-		logger.debug("====== State ======");
-		logger.debug("File Results", this.componentsInFile.size);
-		logger.debug(
-			"Components In Scope",
-			this.importedComponentsInFile.size,
-			Array.from(this.importedComponentsInFile.entries())
-				.map(([fileName, r]) => `${basename(fileName)}: ${r.map(rr => Array.from(rr.components.keys()).join(","))}`)
-				.join(" | ")
-		);
-		logger.debug("Elements", this.allComponents.size, Array.from(this.allComponents.keys()));
-		logger.debug("Html Templates", this.allComponents.size, Array.from(this.htmlTemplatesInFile.values()).reduce((acc, c) => acc + c.templates.length, 0));
-		logger.debug("===================");
-	}
-
-	/**
-	 * Saves html templates for a specific source file.
+	 * Saves html documents for a specific source file.
 	 * @param sourceFile
-	 * @param result
+	 * @param documentCollection
 	 */
-	absorbHtmlTemplateResult(sourceFile: SourceFile, result: IHtmlTemplateResult) {
-		this.htmlTemplatesInFile.set(sourceFile.fileName, result);
+	absorbHtmlDocumentCollection(sourceFile: SourceFile, documentCollection: HtmlDocumentCollection) {
+		this.htmlDocumentCache.set(sourceFile, documentCollection);
 	}
 
 	/**

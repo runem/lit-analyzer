@@ -1,10 +1,10 @@
 import { basename, dirname, relative } from "path";
 import { CodeFixAction, CompletionEntry, DefinitionInfoAndBoundSpan, DiagnosticWithLocation, Node, QuickInfo, ScriptElementKind, SourceFile } from "typescript";
-import { IP5NodeAttr, IP5TagNode } from "../parse-html-nodes/parse-html-p5/parse-html-types";
-import { IHtmlAttrAssignment } from "../parse-html-nodes/types/html-attr-assignment-types";
-import { HtmlAttr, HtmlAttrKind, IHtmlAttrCustomProp } from "../parse-html-nodes/types/html-attr-types";
-import { HtmlNode, HtmlNodeKind, IHtmlNodeCustomElement } from "../parse-html-nodes/types/html-node-types";
-import { HtmlReport, HtmlReportKind } from "../parse-html-nodes/types/html-report-types";
+import { IP5NodeAttr, IP5TagNode } from "../html-document/parse-html-p5/parse-html-types";
+import { IHtmlAttrAssignment } from "../html-document/types/html-attr-assignment-types";
+import { HtmlAttr, HtmlAttrKind, IHtmlAttrCustomProp } from "../html-document/types/html-attr-types";
+import { HtmlNode, HtmlNodeKind, IHtmlNodeCustomElement } from "../html-document/types/html-node-types";
+import { HtmlReport, HtmlReportKind } from "../html-document/types/html-report-types";
 import { caseInsensitiveCmp } from "../util/util";
 import {
 	ITsHtmlExtension,
@@ -19,7 +19,7 @@ import {
 	ITsHtmlExtensionValidateContext
 } from "./i-ts-html-extension";
 
-const DIAGNOSTIC_SOURCE = "ts-html";
+const DIAGNOSTIC_SOURCE = "tagged-html";
 
 /**
  * An extension that adds custom element capabilities to the ts-html plugin.
@@ -212,7 +212,7 @@ export class CustomElementExtension implements ITsHtmlExtension {
 	 * @param store
 	 * @param file
 	 */
-	codeFixesForHtmlNode(htmlNode: HtmlNode, htmlReport: HtmlReport, { store, file }: ITsHtmlExtensionCodeFixContext): CodeFixAction[] | undefined {
+	codeFixesForHtmlNodeReport(htmlNode: HtmlNode, htmlReport: HtmlReport, { store, file }: ITsHtmlExtensionCodeFixContext): CodeFixAction[] | undefined {
 		switch (htmlReport.kind) {
 			case HtmlReportKind.MISSING_IMPORT:
 				if (htmlNode.kind !== HtmlNodeKind.COMPONENT) break;
@@ -251,7 +251,7 @@ export class CustomElementExtension implements ITsHtmlExtension {
 	 * @param htmlReport
 	 * @param file
 	 */
-	diagnosticsForHtmlNode(htmlNode: HtmlNode, htmlReport: HtmlReport, { file, store: { ts } }: ITsHtmlExtensionDiagnosticContext): DiagnosticWithLocation[] {
+	diagnosticsForHtmlNodeReport(htmlNode: HtmlNode, htmlReport: HtmlReport, { file, store: { ts } }: ITsHtmlExtensionDiagnosticContext): DiagnosticWithLocation[] {
 		const { start, end } = htmlNode.location.name;
 		const diagnostics: DiagnosticWithLocation[] = [];
 
@@ -346,7 +346,7 @@ export class CustomElementExtension implements ITsHtmlExtension {
 	 * @param astNode
 	 * @param store
 	 */
-	validateHtmlNode(htmlNode: HtmlNode, { astNode, store }: ITsHtmlExtensionValidateContext): HtmlReport[] | undefined {
+	validateHtmlNode(htmlNode: HtmlNode, { file, store }: ITsHtmlExtensionValidateContext): HtmlReport[] | undefined {
 		const reports: HtmlReport[] = [];
 
 		switch (htmlNode.kind) {
@@ -365,7 +365,7 @@ export class CustomElementExtension implements ITsHtmlExtension {
 
 				// Check if this element is imported
 				if (!store.config.ignoreImports) {
-					const isDefinitionImported = store.hasTagNameBeenImported(astNode.getSourceFile().fileName, htmlNode.tagName);
+					const isDefinitionImported = store.hasTagNameBeenImported(file.fileName, htmlNode.tagName);
 
 					if (!isDefinitionImported) {
 						reports.push({ kind: HtmlReportKind.MISSING_IMPORT });

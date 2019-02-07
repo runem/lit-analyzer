@@ -3,6 +3,8 @@
  * @param strA
  * @param strB
  */
+import { Range } from "../types/range";
+
 export function caseInsensitiveCmp(strA: string, strB: string): boolean {
 	return strA.match(new RegExp(`^${strB}$`, "i")) != null;
 }
@@ -13,7 +15,7 @@ export function caseInsensitiveCmp(strA: string, strB: string): boolean {
  * @param start
  * @param end
  */
-export function intersects(position: number | { start: number; end: number }, { start, end }: { start: number; end: number }): boolean {
+export function intersects(position: number | Range, { start, end }: Range): boolean {
 	if (typeof position === "number") {
 		return start <= position && position <= end;
 	} else {
@@ -27,6 +29,14 @@ export function intersects(position: number | { start: number; end: number }, { 
  */
 export function flatten<T>(items: T[][]): T[] {
 	return items.reduce((acc, item) => [...acc, ...item], []);
+}
+
+export function rangeToTSSpan({ start, end }: Range): { start: number; length: number } {
+	return { start, length: end - start };
+}
+
+export function tsSpanToRange({ start, length }: { start: number; length: number }): Range {
+	return { start, end: start + length };
 }
 
 export type Newable<T> = { new (...args: any[]): T };

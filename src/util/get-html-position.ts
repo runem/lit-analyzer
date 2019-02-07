@@ -1,10 +1,7 @@
-import { SourceFile } from "typescript";
-import { IHtmlTemplate } from "../parse-html-nodes/types/html-node-types";
-import { TsHtmlPluginStore } from "../state/store";
-import { findParent, getNodeAtPosition } from "./ast-util";
+import { HTMLDocument } from "../html-document/html-document";
 
 export interface IHtmlPositionContext {
-	htmlTemplate: IHtmlTemplate;
+	htmlDocument: HTMLDocument;
 	html: string;
 	positionInHtml: number;
 	position: number;
@@ -16,71 +13,45 @@ export interface IHtmlPositionContext {
 }
 
 /**
- * Returns information about the position in a possible intersecting html template.
- * @param sourceFile
+ * Returns information about the position in a html document.
+ * @param htmlDocument
  * @param position
- * @param store
  */
-function getIntersectingHtmlTemplate(sourceFile: SourceFile, position: number, store: TsHtmlPluginStore): Pick<IHtmlPositionContext, "positionInHtml" | "html" | "htmlTemplate"> | undefined {
-	const htmlTemplates = store.getHtmlTemplatesForFile(sourceFile.fileName);
+export function getHtmlPositionInHtmlDocument(htmlDocument: HTMLDocument, position: number): IHtmlPositionContext {
+	const html = htmlDocument.astNode.getText();
+	const start = htmlDocument.astNode.getStart();
+	const positionInHtml = position - start;
 
-	const token = getNodeAtPosition(sourceFile, position);
-	const node = findParent(token, store.ts.isTaggedTemplateExpression);
+	const leftWord = grabWordInDirection({
+		stopChar: /[\/=<>\s"${}]/,
+		direction: "left",
+		text: html,
+		startPosition: positionInHtml
+	});
 
-	if (node != null) {
-		const html = node.getText();
-		const start = node.getStart();
-		const htmlTemplate = htmlTemplates.find(template => template.location.start === start);
+	const rightWord = grabWordInDirection({
+		stopChar: /[\/=<>\s"${}]/,
+		direction: "right",
+		text: html,
+		startPosition: positionInHtml
+	});
 
-		if (htmlTemplate) {
-			const positionInHtml = position - start;
+	const word = leftWord + rightWord;
 
-			return { positionInHtml, html, htmlTemplate };
-		}
-	}
-}
+	const beforeWord = html[Math.max(0, positionInHtml - leftWord.length - 1)];
+	const afterWord = html[Math.min(html.length, positionInHtml - leftWord.length)];
 
-/**
- * Returns information about the position in a html template.
- * @param sourceFile
- * @param position
- * @param store
- */
-export function getHtmlPositionInSourceFile(sourceFile: SourceFile, position: number, store: TsHtmlPluginStore): IHtmlPositionContext | undefined {
-	const res = getIntersectingHtmlTemplate(sourceFile, position, store);
-
-	if (res != null) {
-		const { html, positionInHtml } = res;
-
-		const leftWord = grabWordInDirection({
-			stopChar: /[\/=<>\s"${}]/,
-			direction: "left",
-			text: html,
-			startPosition: positionInHtml
-		});
-
-		const rightWord = grabWordInDirection({
-			stopChar: /[\/=<>\s"${}]/,
-			direction: "right",
-			text: html,
-			startPosition: positionInHtml
-		});
-
-		const word = leftWord + rightWord;
-
-		const beforeWord = html[Math.max(0, positionInHtml - leftWord.length - 1)];
-		const afterWord = html[Math.min(html.length, positionInHtml - leftWord.length)];
-
-		return {
-			...res,
-			position,
-			word,
-			leftWord,
-			rightWord,
-			beforeWord,
-			afterWord
-		};
-	}
+	return {
+		positionInHtml,
+		html,
+		htmlDocument,
+		position,
+		word,
+		leftWord,
+		rightWord,
+		beforeWord,
+		afterWord
+	};
 }
 
 /**

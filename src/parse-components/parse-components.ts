@@ -31,8 +31,9 @@ const allFlavors: IParseComponentFlavor[] = [new LitElementFlavor(), new CustomE
  * @param flavors
  */
 export function parseComponents(node: Node, checker: TypeChecker, flavors = allFlavors): IComponentsInFile {
+	const sourceFile = node.getSourceFile();
 	const result: IComponentsInFile = {
-		fileName: node.getSourceFile().fileName,
+		fileName: sourceFile.fileName,
 		components: new Map()
 	};
 
