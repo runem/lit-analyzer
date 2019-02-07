@@ -1,6 +1,9 @@
 import { Expression, Node, TaggedTemplateExpression, TypeChecker } from "typescript";
 import { TsHtmlPluginStore } from "../state/store";
+import { leadingCommentsIncludes } from "../util/util";
 import { VirtualDocument } from "./virtual-document";
+
+const TS_IGNORE_FLAG = "@ts-ignore";
 
 export interface VisitContext {
 	store: TsHtmlPluginStore;
@@ -17,7 +20,10 @@ export interface VisitContext {
 export function visitTaggedTemplateNodes(astNode: Node, context: VisitContext) {
 	const newContext = { ...context };
 	if (context.store.ts.isTaggedTemplateExpression(astNode)) {
-		newContext.parent = visitTaggedTemplateExpression(astNode, context);
+		// Only visit the template expression if the leading comments does not include the ts-ignore flag.
+		if (!leadingCommentsIncludes(astNode.getSourceFile().getText(), astNode.getFullStart(), TS_IGNORE_FLAG, context)) {
+			newContext.parent = visitTaggedTemplateExpression(astNode, context);
+		}
 	}
 
 	astNode.forEachChild(child => visitTaggedTemplateNodes(child, context));
