@@ -1,6 +1,6 @@
 <div align="center" markdown="1">
 
-![](documentation/asset/lit-plugin@128w.png)
+<img src="https://raw.githubusercontent.com/runem/ts-lit-plugin/master/documentation/asset/lit-plugin@256w.png" width="200">
 
 **Typescript plugin that adds type checking and code completion for [lit-html](https://github.com/polymer/lit-html).**
 
@@ -16,17 +16,17 @@
 
 ## Overview
 
--   Attribute type checking
--   Automatically pick up on lit-element custom elements
--   Support for dependencies that extend the global HTMLElementTagNameMap
--   Report missing imports of custom elements
--   Goto definition for html tags and attributes
--   Code completions for html tags and attributes
--   Quick info on on hover for html tags and attributes
--   Warn if required attributes not included
--   Support for @ts-ignore comments inside html
--   Reformat html
--   Auto close tags
+-   [Attribute type checking](#attribute-type-checking)
+-   [Automatically pick up on lit-element custom elements](#automatically-pick-up-on-lit-element-custom-elements)
+-   [Support for dependencies that extend the global HTMLElementTagNameMap](#support-for-dependencies-that-extend-the-global-HTMLElementTagNameMap)
+-   [Report missing imports of custom elements](#report-missing-imports-of-custom elements)
+-   [Goto definition for html tags and attributes](#goto-definition-for-html-tags-and-attributes)
+-   [Code completions for html tags and attributes](#code-completions-for-html-tags-and-attributes)
+-   [Quick info on hover for html tags and attributes](#quick-info-on-hover-for-html-tags-and-attributes)
+-   [Warning if required attributes not included](#warning-if-required-attributes-not-included)
+-   [Support for @ts-ignore comments inside html](#support-for-@ts-ignore-comments-inside-html)
+-   [Reformat html](#reformat-html)
+-   [Auto close tags](#auto-close-tags)
 
 See [Features](#features) for a description of each feature.
 
@@ -69,15 +69,18 @@ See [Configuring the plugin](#configuring-the-plugin) for more information regar
 
 ### Attribute type checking
 
-This library type checks that all attributes assigned in html and comes with suggestion on how to fix problems. For example you will get a warning if you assign a non-primitive type without using the "." lit-html attribute modifier. There's also type support for attributes on most built in tags. Please open an issue if you experience problems with type checking.
+`lit-plugin` type checks all attributes assignment, both on your own elements, library elements and built in elements. You will also get the following warnings:
+
+-   Warning if you assign a complex type without using the `.` modifier.
+-   Warning if you use the `?` modifier on a non-boolean type.
 
 ### Automatically pick up on lit-element custom elements
 
-If you define a `lit-element` custom element somewhere in your code this library will automatically pick up on it. Then it will provide auto-import functionality, type checking and code completion out of the box by looking at `@property` decorators on the element.
+If you define a `lit-element` custom element somewhere in your code `lit-plugin` will automatically pick up on it. Then it will provide auto-import functionality, type checking and code completion out of the box by looking at `@property` decorators on the element.
 
 ### Support for dependencies that extend the global HTMLElementTagNameMap
 
-If a dependency extends the global `HTMLElementTagNameMap` this plugin will pick up on the map between the tag name and the class. Please add the following line in your library typescript definition files if you want type checking support for a given html tag.
+If a dependency extends the global `HTMLElementTagNameMap` this plugin will pick up on the map between the tag name and the class. Below you will see an example of what to add to your library typescript definition files if you want type checking support for a given html tag.
 
 <!-- prettier-ignore -->
 ```typescript
@@ -88,16 +91,16 @@ declare global {
 }
 ```
 
-**Two challenges using this approach as of now**
+**Two limitations using this approach as of now**
 
 -   By using this approach the plugin wont see detailed information about a given element as (e.g @property decorators and initializers) because it can only read public fields and their corresponding types. Therefore all properties on custom elements imported from libraries are optional and wont respect meta information in @property decorators.
--   This library will only be able two find your elements if you somewhere in the code imports the file. Before your import the file it will complain that the element is unknown not that it can be imported. This due to the constraint that Typescript only adds library files to the array of program files once the file has been imported.
+-   `lit-plugin` will only be able two find your elements if you somewhere in the code imports the file. Before your import the file it will complain that the element is unknown not that it can be imported. This due to the constraint that Typescript only adds library files to the array of program files once the file has been imported.
 
 I'm working on integrating support for the proposed [web-components.json](https://github.com/w3c/webcomponents/issues/776) file.
 
 ### Report missing imports of custom elements
 
-When using custom elements `lit-plugin` checks if the element has been imported and is available in the current context. It's considered imported if any file in the path of imports defines the custom element. You can disable this check by setting `ignoreMissingImports` to true. Be aware that dependencies need to extend the global `HTMLElementTagNameMap` in order for this plugin to pick up on them.
+When using custom elements `lit-plugin` checks if the element has been imported and is available in the current context. It's considered imported if any file in the path of imports defines the custom element. You can disable this check by setting `ignoreMissingImports` to true in the configuration (see [Configuring the plugin](#configuring-the-plugin)). Be aware that dependencies need to extend the global `HTMLElementTagNameMap` in order for this plugin to pick up on them.
 
 ### Goto definition for html tags and attributes
 
@@ -107,13 +110,13 @@ When using custom elements `lit-plugin` checks if the element has been imported 
 
 Press `Ctrl+Space` in an html context and to get code completions for html tags and attributes.
 
-### Quick info on on hover for html tags and attributes
+### Quick info on hover for html tags and attributes
 
 Hover above a html tag or attribute and see more information about the identifier such as type and jsdoc.
 
-### Warn if required attributes not included
+### Warning if required attributes not included
 
-`lit-plugin` will warn you if you forget to set any required attributes on a given html tag. Right now this is based on the assumption that the property is required if it doesn't have an initializer and isn't assignable to undefined or null . Be aware that right now the plugin doesn't check if you assign it else where (for example in the constructor).
+`lit-plugin` will warn you if you forget to set any required attributes on a given html tag. Right now this is based on the assumption that the property is required if it doesn't have an initializer and isn't assignable to `undefined` or `null`. Be aware that right now the plugin doesn't check if you assign it else where (for example in the constructor).
 
 **lit-plugin will think that the following is a required property**:
 
