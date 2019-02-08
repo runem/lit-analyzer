@@ -1,6 +1,6 @@
 {
 	"name": "ts-lit-plugin",
-	"version": "0.0.23",
+	"version": "0.0.24",
 	"description": "Typescript plugin that adds type checking and code completion for lit-html",
 	"author": "runem",
 	"license": "MIT",
@@ -17,10 +17,6 @@
 		"lit-element"
 	],
 	"scripts": {
-		"releasetag": " git tag \"v$npm_package_version\" -m \"v$npm_package_version\"",
-		"release:patch": "npm version patch && npm run releasetag",
-		"release:minor": "npm version minor && npm run releasetag",
-		"release:major": "npm version major && npm run releasetag",
 		"prepublish": "npm run build",
 		"watch": "tsc --watch",
 		"build": "rm -rf lib && tsc",
