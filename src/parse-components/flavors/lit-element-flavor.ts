@@ -1,6 +1,5 @@
 import { isAssignableToSimpleTypeKind, SimpleTypeKind } from "ts-simple-type";
 import { ClassLikeDeclaration, InterfaceDeclaration, Node, PropertyDeclaration } from "typescript";
-import { logger } from "../../util/logger";
 import { IComponentDeclarationJsDoc, IComponentDeclarationJsDocTag, IComponentDeclarationMeta, IComponentDeclarationProp } from "../component-types";
 import { IComponentDeclarationVisitContext, IComponentDefinitionVisitContext, IParseComponentFlavor } from "../parse-components";
 
@@ -77,9 +76,7 @@ export class LitElementFlavor implements IParseComponentFlavor {
 	 * @param context
 	 */
 	visitComponentDeclaration(node: Node, context: IComponentDeclarationVisitContext): void {
-		if (node == null) {
-			logger.error("WTF???? NOT IS NULL");
-		} else if (context.ts.isClassLike(node)) {
+		if (context.ts.isClassLike(node)) {
 			const thisJsDoc = visitJsDoc(node, context) || {};
 			const superJsDocTags = this.visitSuperClass(node, context);
 

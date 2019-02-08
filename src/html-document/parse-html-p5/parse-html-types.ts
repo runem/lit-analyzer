@@ -33,6 +33,7 @@ export interface IP5TextNode extends IP5NodeBase {
 export interface IP5CommentNode extends IP5NodeBase {
 	nodeName: "#comment";
 	value: string;
+	data?: string;
 	parentNode: P5Node;
 	sourceCodeLocation: IP5BaseSourceCodeLocation;
 }
