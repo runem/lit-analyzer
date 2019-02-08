@@ -149,10 +149,10 @@ function parsePropertyDeclaration(node: PropertyDeclaration, context: IComponent
 			return context.ts.isCallExpression(expression) && context.ts.isIdentifier(expression.expression) && expression.expression.getText() === "property";
 		}))();
 
-	const fromExternalModule = context.ts.isExternalModule(node.getSourceFile());
+	const isDeclarationFile = node.getSourceFile().isDeclarationFile;
 
-	// It's okay if we can't find a @property decorator in a library file because they aren't shipped with type declarations.
-	if (decoratorIdentifier == null && !fromExternalModule) {
+	// It's okay if we can't find a @property decorator in a library file because decorators aren't included in type declarations.
+	if (decoratorIdentifier == null && !isDeclarationFile) {
 		return;
 	}
 
@@ -180,7 +180,7 @@ function parsePropertyDeclaration(node: PropertyDeclaration, context: IComponent
 	})();
 
 	// Properties in external modules don't have initializers, so we cannot infer if the property is required or not
-	const required = fromExternalModule ? false : node.initializer == null && !isAssignableToSimpleTypeKind(type, [SimpleTypeKind.UNDEFINED, SimpleTypeKind.NULL], context.checker, { op: "or" });
+	const required = isDeclarationFile ? false : node.initializer == null && !isAssignableToSimpleTypeKind(type, [SimpleTypeKind.UNDEFINED, SimpleTypeKind.NULL], context.checker, { op: "or" });
 
 	return {
 		type,

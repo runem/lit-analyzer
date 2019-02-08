@@ -1,11 +1,10 @@
-export type HtmlFlavor = "lit-html" | "vanilla";
-
 export interface IConfig {
 	verbose: boolean;
-	flavor: HtmlFlavor;
-	tags: string[];
-	externalTagNames: string[];
-	ignoreImports: boolean;
+	htmlTemplateTags: string[];
+	externalHtmlTags: string[];
+	ignoreMissingImports: boolean;
+	ignoreUnknownHtmlTags: boolean;
+	ignoreUnknownHtmlAttributes: boolean;
 }
 
 /**
@@ -14,10 +13,11 @@ export interface IConfig {
  */
 export function makeConfig(userConfig: Partial<IConfig>): IConfig {
 	return {
-		verbose: userConfig.verbose === true || false,
-		flavor: userConfig.flavor || "lit-html",
-		tags: userConfig.tags || ["html", "raw"],
-		externalTagNames: userConfig.externalTagNames || [],
-		ignoreImports: userConfig.ignoreImports || false
+		verbose: userConfig.verbose || false,
+		htmlTemplateTags: userConfig.htmlTemplateTags || ["html", "raw"],
+		externalHtmlTags: userConfig.externalHtmlTags || [],
+		ignoreMissingImports: userConfig.ignoreMissingImports || false,
+		ignoreUnknownHtmlTags: userConfig.ignoreUnknownHtmlTags || false,
+		ignoreUnknownHtmlAttributes: userConfig.ignoreUnknownHtmlAttributes || false
 	};
 }

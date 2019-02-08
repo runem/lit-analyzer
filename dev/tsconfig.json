@@ -2,9 +2,8 @@
 	"compilerOptions": {
 		"plugins": [
 			{
-				"name": "ts-html-plugin",
+				"name": "ts-lit-plugin",
 				"verbose": true,
-				"flavor": "lit-html",
 				"externalTagNames": ["my-external-tag"]
 			}
 		],

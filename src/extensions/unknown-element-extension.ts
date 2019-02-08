@@ -105,7 +105,7 @@ export class UnknownElementExtension implements ITsHtmlExtension {
 						file,
 						messageText,
 						category: ts.DiagnosticCategory.Error,
-						source: "tagged-html",
+						source: "lit-plugin",
 						code: 2322
 					}
 				];
@@ -127,7 +127,9 @@ export class UnknownElementExtension implements ITsHtmlExtension {
 		switch (htmlReport.kind) {
 			case HtmlReportKind.UNKNOWN:
 				// Don't report unknown attributes on unknown elements
-				if (store.config.externalTagNames.includes(htmlAttr.htmlNode.tagName)) return [];
+				if (store.config.externalHtmlTags.includes(htmlAttr.htmlNode.tagName)) return [];
+
+				if (store.config.ignoreUnknownHtmlAttributes) return [];
 
 				const messageText = `Unknown attribute "${htmlAttr.name}"${htmlReport.suggestedName ? `. Did you mean '${htmlReport.suggestedName}'?` : ""}`;
 
@@ -137,7 +139,7 @@ export class UnknownElementExtension implements ITsHtmlExtension {
 						file,
 						messageText,
 						category: store.ts.DiagnosticCategory.Error,
-						source: "tagged-html",
+						source: "lit-plugin",
 						code: 2322
 					}
 				];
@@ -156,9 +158,11 @@ export class UnknownElementExtension implements ITsHtmlExtension {
 
 		switch (htmlNode.kind) {
 			case HtmlNodeKind.UNKNOWN:
-				if (store.config.externalTagNames.includes(htmlNode.tagName)) return [];
+				if (store.config.externalHtmlTags.includes(htmlNode.tagName)) return [];
 
-				const suggestedName = findBestMatch(htmlNode.tagName, [...Array.from(store.allComponents.keys()), ...store.config.externalTagNames]);
+				if (store.config.ignoreUnknownHtmlTags) return [];
+
+				const suggestedName = findBestMatch(htmlNode.tagName, [...Array.from(store.allComponents.keys()), ...store.config.externalHtmlTags]);
 
 				return [
 					{
@@ -188,7 +192,7 @@ export class UnknownElementExtension implements ITsHtmlExtension {
 				if (htmlAttr.name.startsWith("data-")) return [];
 
 				// Don't report unknown attributes on unknown elements
-				if (store.config.externalTagNames.includes(htmlAttr.htmlNode.tagName)) return [];
+				if (store.config.externalHtmlTags.includes(htmlAttr.htmlNode.tagName)) return [];
 
 				const suggestedName = findBestMatch(htmlAttr.name, [...(element ? element.props.map(p => p.name) : []), ...getBuiltInAttrsForTag(htmlAttr.htmlNode.tagName)]);
 

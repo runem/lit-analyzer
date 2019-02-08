@@ -7,7 +7,7 @@ import { HtmlReport, IHtmlReportBase } from "../html-document/types/html-report-
 import { ITsHtmlExtensionCodeFixContext, ITsHtmlExtensionDiagnosticContext, ITsHtmlExtensionParseAttrContext, ITsHtmlExtensionValidateExpressionContext } from "./i-ts-html-extension";
 import { VanillaHtmlExtension, VanillaHtmlReport } from "./vanilla-html-extension";
 
-const DIAGNOSTIC_SOURCE = "tagged-html";
+const DIAGNOSTIC_SOURCE = "lit-plugin";
 
 type LitHtmlAttributeModifier = "." | "?" | "@";
 

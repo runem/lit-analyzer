@@ -4,7 +4,6 @@ import * as ts from "typescript/lib/tsserverlibrary";
 import { CustomElementExtension } from "../extensions/custom-element-extension";
 import { LitHtmlExtension } from "../extensions/lit-html-extension";
 import { UnknownElementExtension } from "../extensions/unknown-element-extension";
-import { VanillaHtmlExtension } from "../extensions/vanilla-html-extension";
 import { makeConfig } from "../state/config";
 import { TsHtmlPluginStore } from "../state/store";
 import { logger, LoggingLevel } from "../util/logger";
@@ -42,7 +41,7 @@ function wrapLog<T extends Function>(name: string, proxy: T): T {
  * @param typescript
  * @param info
  */
-export function createTsHtmlPlugin(typescript: typeof ts, info: ts.server.PluginCreateInfo): LanguageService {
+export function createPlugin(typescript: typeof ts, info: ts.server.PluginCreateInfo): LanguageService {
 	// Cache the typescript module
 	setTsIsAssignableModule(typescript);
 
@@ -56,18 +55,7 @@ export function createTsHtmlPlugin(typescript: typeof ts, info: ts.server.Plugin
 	logger.verbose("CreateLitTsPlugin called");
 	logger.debug("Config", store.config);
 
-	// Choose extensions based on the config
-	switch (store.config.flavor) {
-		case "lit-html":
-			store.extension.addExtension(new UnknownElementExtension(), new CustomElementExtension(), new LitHtmlExtension());
-			break;
-		case "vanilla":
-			store.extension.addExtension(new UnknownElementExtension(), new CustomElementExtension(), new VanillaHtmlExtension());
-			break;
-		default:
-			logger.debug("Unknown flavor");
-			break;
-	}
+	store.extension.addExtension(new UnknownElementExtension(), new CustomElementExtension(), new LitHtmlExtension());
 
 	const prevLanguageService = info.languageService;
 

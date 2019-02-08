@@ -7,10 +7,10 @@
 	},
 	"dependencies": {
 		"lit-element": "2.0.1",
-		"lit-html": "1.0.0"
+		"lit-html": "1.0.0",
+		"ts-lit-plugin": "file:../"
 	},
 	"devDependencies": {
-		"ts-html-plugin": "file:../",
 		"typescript": "^3.2.2"
 	},
 	"keywords": [],

@@ -33,7 +33,7 @@ function visitTaggedTemplateExpression(astNode: TaggedTemplateExpression, contex
 	const { store } = context;
 
 	const templateTag = astNode.tag.getText();
-	if (store.config.tags.includes(templateTag)) {
+	if (store.config.htmlTemplateTags.includes(templateTag)) {
 		const expressionParts: Expression[] = [];
 		const htmlParts: Node[] = [];
 

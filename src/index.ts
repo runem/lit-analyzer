@@ -1,5 +1,5 @@
 import * as ts from "typescript/lib/tsserverlibrary";
-import { createTsHtmlPlugin } from "./language-service/create-ts-html-plugin";
+import { createPlugin } from "./language-service/create-plugin";
 
 const tsHtmlPluginSymbol = Symbol("__tsHtmlPlugin__");
 
@@ -16,7 +16,7 @@ function init(typescript: { typescript: typeof ts }) {
 			}
 
 			// Decorate the service with our plugin
-			const decoratedService = createTsHtmlPlugin(typescript.typescript, info);
+			const decoratedService = createPlugin(typescript.typescript, info);
 			(decoratedService as any)[tsHtmlPluginSymbol] = true;
 			return decoratedService;
 		}

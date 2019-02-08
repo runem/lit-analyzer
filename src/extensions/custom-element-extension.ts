@@ -19,7 +19,7 @@ import {
 	ITsHtmlExtensionValidateContext
 } from "./i-ts-html-extension";
 
-const DIAGNOSTIC_SOURCE = "tagged-html";
+const DIAGNOSTIC_SOURCE = "lit-plugin";
 
 /**
  * An extension that adds custom element capabilities to the ts-html plugin.
@@ -364,7 +364,7 @@ export class CustomElementExtension implements ITsHtmlExtension {
 				}
 
 				// Check if this element is imported
-				if (!store.config.ignoreImports) {
+				if (!store.config.ignoreMissingImports) {
 					const isDefinitionImported = store.hasTagNameBeenImported(file.fileName, htmlNode.tagName);
 
 					if (!isDefinitionImported) {

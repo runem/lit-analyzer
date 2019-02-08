@@ -1,12 +1,12 @@
 {
-	"name": "ts-html-plugin",
+	"name": "ts-lit-plugin",
 	"version": "0.0.23",
-	"description": "Type checking and code completion for html inside tagged templates like lit-html.",
+	"description": "Typescript plugin that adds type checking and code completion for lit-html",
 	"author": "runem",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/runem/ts-html-plugin.git"
+		"url": "https://github.com/runem/ts-lit-plugin.git"
 	},
 	"keywords": [
 		"typescript",
@@ -17,10 +17,11 @@
 		"lit-element"
 	],
 	"scripts": {
+		"releasetag": " git tag \"v$npm_package_version\" -m \"v$npm_package_version\"",
+		"release:patch": "npm version patch && npm run releasetag",
+		"release:minor": "npm version minor && npm run releasetag",
+		"release:major": "npm version major && npm run releasetag",
 		"prepublish": "npm run build",
-		"release:patch": "npm run prepublish && standard-version --release-as patch",
-		"release:minor": "npm run prepublish && standard-version --release-as minor",
-		"release:major": "npm run prepublish && standard-version --release-as major",
 		"watch": "tsc --watch",
 		"build": "rm -rf lib && tsc",
 		"logs": "touch log.txt && tail -f log.txt",
@@ -45,7 +46,6 @@
 		"husky": "^1.3.1",
 		"prettier": "^1.15.3",
 		"pretty-quick": "^1.8.0",
-		"standard-version": "^4.4.0",
 		"tslint": "^5.12.0",
 		"tslint-language-service": "^0.9.9",
 		"typescript": "^3.2.2"

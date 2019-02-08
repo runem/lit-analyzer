@@ -27,7 +27,7 @@ import {
 	ITsHtmlExtensionValidateExpressionContext
 } from "./i-ts-html-extension";
 
-const DIAGNOSTIC_SOURCE = "tagged-html";
+const DIAGNOSTIC_SOURCE = "lit-plugin";
 
 export enum VanillaHtmlReportKind {
 	HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE = "HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE",
@@ -79,7 +79,7 @@ export class VanillaHtmlExtension implements ITsHtmlExtension {
 	 * @param store
 	 */
 	completionsForHtmlNodes({ position, leftWord, rightWord, store }: ITsHtmlExtensionCompletionContext): CompletionEntry[] | undefined {
-		return [...getBuiltInTags(), ...store.config.externalTagNames].map(
+		return [...getBuiltInTags(), ...store.config.externalHtmlTags].map(
 			tagName =>
 				({
 					name: tagName,
