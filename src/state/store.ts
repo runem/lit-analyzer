@@ -7,7 +7,7 @@ import { IHtmlAttrBase } from "../html-document/types/html-attr-types";
 import { IHtmlNodeBase } from "../html-document/types/html-node-types";
 import { IHtmlReportBase } from "../html-document/types/html-report-types";
 import { ComponentTagName, IComponentDeclaration, IComponentsInFile } from "../parse-components/component-types";
-import { IConfig } from "./config";
+import { Config } from "./config";
 
 export type FileName = string;
 
@@ -15,7 +15,7 @@ export type FileName = string;
  * The main store that this ts-plugin uses.
  */
 export class TsHtmlPluginStore {
-	config!: IConfig;
+	config!: Config;
 	extension = new ExtensionCollectionExtension([]);
 	componentsInFile = new Map<FileName, IComponentsInFile>();
 	importedComponentsInFile = new Map<FileName, IComponentsInFile[]>();

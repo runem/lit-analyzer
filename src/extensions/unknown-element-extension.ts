@@ -129,7 +129,7 @@ export class UnknownElementExtension implements ITsHtmlExtension {
 				// Don't report unknown attributes on unknown elements
 				if (store.config.externalHtmlTags.includes(htmlAttr.htmlNode.tagName)) return [];
 
-				if (store.config.ignoreUnknownHtmlAttributes) return [];
+				if (store.config.skipUnknownHtmlAttributes) return [];
 
 				const messageText = `Unknown attribute "${htmlAttr.name}"${htmlReport.suggestedName ? `. Did you mean '${htmlReport.suggestedName}'?` : ""}`;
 
@@ -160,7 +160,7 @@ export class UnknownElementExtension implements ITsHtmlExtension {
 			case HtmlNodeKind.UNKNOWN:
 				if (store.config.externalHtmlTags.includes(htmlNode.tagName)) return [];
 
-				if (store.config.ignoreUnknownHtmlTags) return [];
+				if (store.config.skipUnknownHtmlTags) return [];
 
 				const suggestedName = findBestMatch(htmlNode.tagName, [...Array.from(store.allComponents.keys()), ...store.config.externalHtmlTags]);
 

@@ -183,7 +183,7 @@ export class Plugin {
 	}
 
 	private findDependencies(sourceFile: SourceFile) {
-		if (this.store.config.ignoreMissingImports) return;
+		if (this.store.config.skipMissingImports) return;
 
 		// Build a graph of component dependencies
 		this.store.importedComponentsInFile = parseDependencies(sourceFile, this.store);

@@ -100,7 +100,7 @@ I'm working on integrating support for the proposed [web-components.json](https:
 
 ### Report missing imports of custom elements
 
-When using custom elements `lit-plugin` checks if the element has been imported and is available in the current context. It's considered imported if any file in the path of imports defines the custom element. You can disable this check by setting `ignoreMissingImports` to true in the configuration (see [Configuring the plugin](#configuring-the-plugin)). Be aware that dependencies need to extend the global `HTMLElementTagNameMap` in order for this plugin to pick up on them.
+When using custom elements `lit-plugin` checks if the element has been imported and is available in the current context. It's considered imported if any file in the path of imports defines the custom element. You can disable this check by setting `skipMissingImports` to true in the configuration (see [Configuring the plugin](#configuring-the-plugin)). Be aware that dependencies need to extend the global `HTMLElementTagNameMap` in order for this plugin to pick up on them.
 
 ### Goto definition for html tags and attributes
 
@@ -213,19 +213,19 @@ If you are using the vscode plugin you can configure these options directly from
 -   **Default**: []
 -   **Description**: List of html tag names that you expect to be present at all times. These tag names including its attributes are not checked at all.
 
-### ignoreMissingImports
+### skipMissingImports
 
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Ignore missing imports of custom elements.
 
-### ignoreUnknownHtmlTags
+### skipUnknownHtmlTags
 
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Ignore unknown html tags.
 
-### ignoreUnknownHtmlAttributes
+### skipUnknownHtmlAttributes
 
 -   **Type**: boolean
 -   **Default**: false

@@ -364,7 +364,7 @@ export class CustomElementExtension implements ITsHtmlExtension {
 				}
 
 				// Check if this element is imported
-				if (!store.config.ignoreMissingImports) {
+				if (!store.config.skipMissingImports) {
 					const isDefinitionImported = store.hasTagNameBeenImported(file.fileName, htmlNode.tagName);
 
 					if (!isDefinitionImported) {
