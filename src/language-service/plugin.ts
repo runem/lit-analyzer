@@ -31,6 +31,7 @@ import { getQuickInfoFromHtmlDocument } from "./quick-info/get-quick-info-from-h
 import { getDiagnosticsFromHtmlDocuments } from "./semantic-diagnostics/get-diagnostics-from-html-documents";
 
 export class Plugin {
+	currentPrimarySourceFile: SourceFile | undefined;
 	primarySourceFileIterator = changedSourceFileIterator();
 	secondarySourceFileIterator = changedSourceFileIterator();
 
@@ -159,11 +160,14 @@ export class Plugin {
 		}
 
 		// Update more detailed information for the primary source file if it has changed
-		for (const sourceFile of this.primarySourceFileIterator([primarySourceFile])) {
+		// Force update if primarySource file has been changed.
+		for (const sourceFile of this.currentPrimarySourceFile !== primarySourceFile ? [primarySourceFile] : this.primarySourceFileIterator([primarySourceFile])) {
 			this.findDependencies(sourceFile);
 			this.findHtmlDocuments(sourceFile);
 			this.validateHtmlDocuments(sourceFile);
 		}
+
+		this.currentPrimarySourceFile = primarySourceFile;
 	}
 
 	private validateHtmlDocuments(sourceFile: SourceFile) {
