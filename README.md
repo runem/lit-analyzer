@@ -9,8 +9,9 @@
 <a href="https://www.npmjs.com/package/ts-lit-plugin"><img alt="NPM Version" src="https://badge.fury.io/js/ts-lit-plugin.svg" height="20"></img></a>
 <a href="https://github.com/runem/ts-lit-plugin/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/runem/ts-lit-plugin.svg" height="20"></img></a>
 <a href="https://opensource.org/licenses/MIT"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-yellow.svg" height="20"></img></a>
+[![](https://vsmarketplacebadge.apphb.com/version/runem.lit-plugin.svg)](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin)
 
-![](documentation/asset/preview.gif)
+![](documentation/asset/lit-plugin.gif)
 
 </div>
 
@@ -19,7 +20,7 @@
 -   [Attribute type checking](#attribute-type-checking)
 -   [Automatically pick up on lit-element custom elements](#automatically-pick-up-on-lit-element-custom-elements)
 -   [Support for dependencies that extend the global HTMLElementTagNameMap](#support-for-dependencies-that-extend-the-global-HTMLElementTagNameMap)
--   [Report missing imports of custom elements](#report-missing-imports-of-custom elements)
+-   [Report missing imports of custom elements](#report-missing-imports-of-custom-elements)
 -   [Goto definition for html tags and attributes](#goto-definition-for-html-tags-and-attributes)
 -   [Code completions for html tags and attributes](#code-completions-for-html-tags-and-attributes)
 -   [Quick info on hover for html tags and attributes](#quick-info-on-hover-for-html-tags-and-attributes)
