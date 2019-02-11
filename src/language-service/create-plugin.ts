@@ -59,6 +59,11 @@ export function createPlugin(typescript: typeof ts, info: ts.server.PluginCreate
 
 	const prevLanguageService = info.languageService;
 
+	// Don't do anything if the disable config has been enabled
+	if (store.config.disable) {
+		return prevLanguageService;
+	}
+
 	const plugin = new Plugin(prevLanguageService, store);
 
 	const nextLanguageService: LanguageService = {

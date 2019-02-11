@@ -86,9 +86,9 @@ If a dependency extends the global `HTMLElementTagNameMap` this plugin will pick
 <!-- prettier-ignore -->
 ```typescript
 declare global {
-	interface HTMLElementTagNameMap {
-		"my-element": MyElement;
-	}
+  interface HTMLElementTagNameMap {
+    "my-element": MyElement;
+  }
 }
 ```
 
@@ -125,7 +125,7 @@ Hover above a html tag or attribute and see more information about the identifie
 ```typescript
 @customElement("my-element")
 export class MyElement extends LitElement {
-	@property({ type: String }) text!: string;
+  @property({ type: String }) text!: string;
 }
 ```
 
@@ -202,6 +202,12 @@ When typing html inside a template tag `lit-plugin` auto-closes tags as you woul
 
 If you are using the vscode plugin you can configure these options directly from extension settings. If not you can add the options directly to the `compilerOptions.plugins` section of your `ts-config.json` file.
 
+### disable
+
+-   **Type**: boolean
+-   **Default**: false
+-   **Description**: Completely disable this plugin.
+
 ### htmlTemplateTags
 
 -   **Type**: string[]
@@ -218,16 +224,28 @@ If you are using the vscode plugin you can configure these options directly from
 
 -   **Type**: boolean
 -   **Default**: false
--   **Description**: Ignore missing imports of custom elements.
+-   **Description**: Skip reporting missing imports of custom elements.
 
 ### skipUnknownHtmlTags
 
 -   **Type**: boolean
 -   **Default**: false
--   **Description**: Ignore unknown html tags.
+-   **Description**: Skip reporting unknown html tags.
 
 ### skipUnknownHtmlAttributes
 
 -   **Type**: boolean
 -   **Default**: false
--   **Description**: Ignore unknown html attributes.
+-   **Description**: Skip reporting unknown html attributes.
+
+### skipTypeChecking
+
+-   **Type**: boolean
+-   **Default**: false
+-   **Description**: Skip type checking of attributes.
+
+### format.disable
+
+-   **Type**: boolean
+-   **Default**: false
+-   **Description**: Disable formatting the HTML on code reformat.

@@ -113,14 +113,19 @@ export class Plugin {
 	}
 
 	getFormattingEditsForRange(fileName: string, start: number, end: number, settings: FormatCodeSettings): TextChange[] {
+		const prev = this.prevLangService.getFormattingEditsForRange(fileName, start, end, settings);
+
+		// Return previous result if we need to skip formatting.
+		if (this.store.config.format.disable) {
+			return prev;
+		}
+
 		this.updateFromFile(fileName);
 
 		const sourceFile = this.program.getSourceFile(fileName)!;
 		const collection = this.store.getDocumentsCollectionForFile(sourceFile);
 
 		const edits = flatten(collection.htmlDocuments.map(htmlDocument => new VscodeHtmlServiceWrapper(htmlDocument).format(settings)));
-
-		const prev = this.prevLangService.getFormattingEditsForRange(fileName, start, end, settings);
 
 		return [...prev, ...edits];
 	}

@@ -23,7 +23,7 @@ export function validateHTMLDocuments(htmlDocuments: HTMLDocument[], checker: Ty
 				...(store.extension.validateHtmlAttr(htmlAttr, { file: astNode.getSourceFile(), store }) || []),
 
 				// Validate html attr assignment and add reports to the attribute
-				...(store.extension.validateHtmlAttrAssignment(htmlAttr, makeValidateAttributeAssignmentContext(astNode, checker, store)) || [])
+				...((!store.config.skipTypeChecking ? store.extension.validateHtmlAttrAssignment(htmlAttr, makeValidateAttributeAssignmentContext(astNode, checker, store)) : undefined) || [])
 			];
 
 			return {
