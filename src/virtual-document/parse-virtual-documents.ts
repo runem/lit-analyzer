@@ -1,5 +1,5 @@
 import { Node, TypeChecker } from "typescript";
-import { TsHtmlPluginStore } from "../state/store";
+import { TsLitPluginStore } from "../state/store";
 import { VirtualDocument } from "./virtual-document";
 import { visitTaggedTemplateNodes } from "./visit-tagged-template-nodes";
 
@@ -9,7 +9,7 @@ import { visitTaggedTemplateNodes } from "./visit-tagged-template-nodes";
  * @param checker
  * @param store
  */
-export function parseVirtualDocuments(astNode: Node, checker: TypeChecker, store: TsHtmlPluginStore): VirtualDocument[] {
+export function parseVirtualDocuments(astNode: Node, checker: TypeChecker, store: TsLitPluginStore): VirtualDocument[] {
 	const textDocuments: VirtualDocument[] = [];
 
 	visitTaggedTemplateNodes(astNode, {

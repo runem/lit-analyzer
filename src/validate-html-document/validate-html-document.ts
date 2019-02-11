@@ -3,11 +3,11 @@ import { HTMLDocument } from "../html-document/html-document";
 import { HtmlAttr } from "../html-document/types/html-attr-types";
 import { HtmlNode } from "../html-document/types/html-node-types";
 import { IHtmlReportBase } from "../html-document/types/html-report-types";
-import { TsHtmlPluginStore } from "../state/store";
+import { TsLitPluginStore } from "../state/store";
 import { iterateHtmlDocuments } from "../util/iterate-html-documents";
 import { makeValidateAttributeAssignmentContext } from "./validate-attribute-assignment-context";
 
-export function validateHTMLDocuments(htmlDocuments: HTMLDocument[], checker: TypeChecker, store: TsHtmlPluginStore) {
+export function validateHTMLDocuments(htmlDocuments: HTMLDocument[], checker: TypeChecker, store: TsLitPluginStore) {
 	return iterateHtmlDocuments<{ source: HtmlNode | HtmlAttr; reports: IHtmlReportBase[] }>(htmlDocuments, {
 		getNodeItems(htmlNode: HtmlNode, astNode: Node) {
 			// Ask extensions for node reports

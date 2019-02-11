@@ -2,7 +2,7 @@ import { CodeFixAction } from "typescript";
 import { HTMLDocument } from "../../html-document/html-document";
 import { isHTMLAttr } from "../../html-document/types/html-attr-types";
 import { isHTMLNode } from "../../html-document/types/html-node-types";
-import { TsHtmlPluginStore } from "../../state/store";
+import { TsLitPluginStore } from "../../state/store";
 import { flatten } from "../../util/util";
 
 /**
@@ -12,7 +12,7 @@ import { flatten } from "../../util/util";
  * @param htmlDocument
  * @param store
  */
-export function getCodeFixFromHtmlDocument(start: number, end: number, htmlDocument: HTMLDocument, store: TsHtmlPluginStore): CodeFixAction[] {
+export function getCodeFixFromHtmlDocument(start: number, end: number, htmlDocument: HTMLDocument, store: TsLitPluginStore): CodeFixAction[] {
 	const hit = htmlDocument.htmlNodeOrAttrAtPosition({ start, end });
 	if (hit == null) return [];
 

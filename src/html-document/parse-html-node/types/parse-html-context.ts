@@ -1,9 +1,9 @@
 import { Type } from "typescript";
-import { TsHtmlPluginStore } from "../../../state/store";
+import { TsLitPluginStore } from "../../../state/store";
 
 export interface ParseHtmlContext {
 	html: string;
-	store: TsHtmlPluginStore;
+	store: TsLitPluginStore;
 	getSourceCodeLocation(htmlOffset: number): number;
 	getTypeFromExpressionId(id: string): Type | undefined;
 }

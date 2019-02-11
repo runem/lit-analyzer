@@ -2,7 +2,7 @@ import { isAssignableToPrimitiveType, isAssignableToSimpleTypeKind, isAssignable
 import { Node, TypeChecker } from "typescript";
 import { ITsHtmlExtensionValidateExpressionContext } from "../extensions/i-ts-html-extension";
 import { HtmlAttrAssignmentType } from "../html-document/types/html-attr-assignment-types";
-import { TsHtmlPluginStore } from "../state/store";
+import { TsLitPluginStore } from "../state/store";
 
 /**
  * Takes a type and returns a user friendly string that can be used in the UI.
@@ -24,7 +24,7 @@ function getTypeString(type: HtmlAttrAssignmentType, checker: TypeChecker): stri
  * @param checker
  * @param store
  */
-export function makeValidateAttributeAssignmentContext(astNode: Node, checker: TypeChecker, store: TsHtmlPluginStore): ITsHtmlExtensionValidateExpressionContext {
+export function makeValidateAttributeAssignmentContext(astNode: Node, checker: TypeChecker, store: TsLitPluginStore): ITsHtmlExtensionValidateExpressionContext {
 	return {
 		file: astNode.getSourceFile(),
 		store,

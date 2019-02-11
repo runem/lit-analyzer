@@ -14,7 +14,7 @@ export type FileName = string;
 /**
  * The main store that this ts-plugin uses.
  */
-export class TsHtmlPluginStore {
+export class TsLitPluginStore {
 	config!: Config;
 	extension = new ExtensionCollectionExtension([]);
 	componentsInFile = new Map<FileName, IComponentsInFile>();

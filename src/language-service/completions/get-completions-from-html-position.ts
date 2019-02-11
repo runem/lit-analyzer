@@ -2,7 +2,7 @@ import { CompletionEntry, CompletionInfo } from "typescript";
 import { ITsHtmlExtensionCompletionContext } from "../../extensions/i-ts-html-extension";
 import { IHtmlAttrBase } from "../../html-document/types/html-attr-types";
 import { IHtmlNodeBase } from "../../html-document/types/html-node-types";
-import { TsHtmlPluginStore } from "../../state/store";
+import { TsLitPluginStore } from "../../state/store";
 import { IHtmlPositionContext } from "../../util/get-html-position";
 import { intersects } from "../../util/util";
 
@@ -11,7 +11,7 @@ import { intersects } from "../../util/util";
  * @param htmlPosition
  * @param store
  */
-export function getCompletionInfoFromHtmlPosition(htmlPosition: IHtmlPositionContext, store: TsHtmlPluginStore): CompletionInfo | undefined {
+export function getCompletionInfoFromHtmlPosition(htmlPosition: IHtmlPositionContext, store: TsLitPluginStore): CompletionInfo | undefined {
 	const { htmlDocument, beforeWord, position } = htmlPosition;
 
 	// Get possible intersecting html attribute or attribute area.

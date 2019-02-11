@@ -1,6 +1,6 @@
 import { DiagnosticWithLocation } from "typescript";
 import { HtmlDocumentCollection } from "../../html-document/html-document-collection";
-import { TsHtmlPluginStore } from "../../state/store";
+import { TsLitPluginStore } from "../../state/store";
 import { flatten } from "../../util/util";
 
 /**
@@ -8,7 +8,7 @@ import { flatten } from "../../util/util";
  * @param collection
  * @param store
  */
-export function getDiagnosticsFromHtmlDocuments(collection: HtmlDocumentCollection, store: TsHtmlPluginStore): DiagnosticWithLocation[] {
+export function getDiagnosticsFromHtmlDocuments(collection: HtmlDocumentCollection, store: TsLitPluginStore): DiagnosticWithLocation[] {
 	const context = {
 		file: collection.sourceFile,
 		store

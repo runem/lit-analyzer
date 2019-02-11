@@ -2,7 +2,7 @@ import { DefinitionInfoAndBoundSpan } from "typescript";
 import { HTMLDocument } from "../../html-document/html-document";
 import { isHTMLAttr } from "../../html-document/types/html-attr-types";
 import { isHTMLNode } from "../../html-document/types/html-node-types";
-import { TsHtmlPluginStore } from "../../state/store";
+import { TsLitPluginStore } from "../../state/store";
 
 /**
  * Asks extensions for definitions.
@@ -10,7 +10,7 @@ import { TsHtmlPluginStore } from "../../state/store";
  * @param document
  * @param store
  */
-export function getDefinitionAndBoundSpanFromHtmlDocument(position: number, document: HTMLDocument, store: TsHtmlPluginStore): DefinitionInfoAndBoundSpan | undefined {
+export function getDefinitionAndBoundSpanFromHtmlDocument(position: number, document: HTMLDocument, store: TsLitPluginStore): DefinitionInfoAndBoundSpan | undefined {
 	const hit = document.htmlNodeOrAttrAtPosition(position);
 	if (hit == null) return;
 

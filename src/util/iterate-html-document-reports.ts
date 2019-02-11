@@ -3,13 +3,13 @@ import { HTMLDocument } from "../html-document/html-document";
 import { HtmlAttr, IHtmlAttrBase } from "../html-document/types/html-attr-types";
 import { HtmlNode, IHtmlNodeBase } from "../html-document/types/html-node-types";
 import { IHtmlReportBase } from "../html-document/types/html-report-types";
-import { TsHtmlPluginStore } from "../state/store";
+import { TsLitPluginStore } from "../state/store";
 import { iterateHtmlDocuments } from "./iterate-html-documents";
 import { flatten, intersects } from "./util";
 
 export interface IContext<T> {
 	position?: { start: number; end: number };
-	store: TsHtmlPluginStore;
+	store: TsLitPluginStore;
 	getNodeItems(htmlNode: IHtmlNodeBase, htmlReport: IHtmlReportBase, astNode: Node): T[] | T | undefined;
 	getAttrItems(htmlAttr: IHtmlAttrBase, htmlReport: IHtmlReportBase, astNode: Node): T[] | T | undefined;
 }

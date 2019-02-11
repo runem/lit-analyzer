@@ -17,9 +17,11 @@ import { HtmlDocumentCollection } from "../html-document/html-document-collectio
 import { parseHTMLDocuments } from "../html-document/parse-html-document";
 import { parseComponents } from "../parse-components/parse-components";
 import { parseDependencies } from "../parse-dependencies/parse-dependencies";
-import { TsHtmlPluginStore } from "../state/store";
+import { Config } from "../state/config";
+import { TsLitPluginStore } from "../state/store";
 import { changedSourceFileIterator } from "../util/changed-source-file-iterator";
 import { getHtmlPositionInHtmlDocument } from "../util/get-html-position";
+import { logger } from "../util/logger";
 import { flatten } from "../util/util";
 import { validateHTMLDocuments } from "../validate-html-document/validate-html-document";
 import { parseVirtualDocuments } from "../virtual-document/parse-virtual-documents";
@@ -30,10 +32,19 @@ import { getDefinitionAndBoundSpanFromHtmlDocument } from "./definition-and-boun
 import { getQuickInfoFromHtmlDocument } from "./quick-info/get-quick-info-from-html-document";
 import { getDiagnosticsFromHtmlDocuments } from "./semantic-diagnostics/get-diagnostics-from-html-documents";
 
-export class Plugin {
+export class TsLitPlugin {
 	currentPrimarySourceFile: SourceFile | undefined;
 	primarySourceFileIterator = changedSourceFileIterator();
 	secondarySourceFileIterator = changedSourceFileIterator();
+
+	get config() {
+		return this.store.config;
+	}
+
+	set config(config: Config) {
+		logger.verbose("Updating the config", config);
+		this.store.config = config;
+	}
 
 	private get program(): Program {
 		return this.prevLangService.getProgram()!;
@@ -43,7 +54,7 @@ export class Plugin {
 		return this.program.getTypeChecker();
 	}
 
-	constructor(private prevLangService: LanguageService, private store: TsHtmlPluginStore) {}
+	constructor(private prevLangService: LanguageService, private store: TsLitPluginStore) {}
 
 	getCompletionsAtPosition(fileName: string, position: number, options: GetCompletionsAtPositionOptions | undefined): CompletionInfo | undefined {
 		this.updateFromFile(fileName);

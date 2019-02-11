@@ -1,12 +1,12 @@
 import { Expression, Node, TaggedTemplateExpression, TypeChecker } from "typescript";
-import { TsHtmlPluginStore } from "../state/store";
+import { TsLitPluginStore } from "../state/store";
 import { leadingCommentsIncludes } from "../util/util";
 import { VirtualDocument } from "./virtual-document";
 
 const TS_IGNORE_FLAG = "@ts-ignore";
 
 export interface VisitContext {
-	store: TsHtmlPluginStore;
+	store: TsLitPluginStore;
 	checker: TypeChecker;
 	parent?: VirtualDocument;
 	emitTextDocument(document: VirtualDocument): void;

@@ -1,16 +1,16 @@
 import { Type, TypeChecker } from "typescript";
-import { TsHtmlPluginStore } from "../state/store";
+import { TsLitPluginStore } from "../state/store";
 import { VirtualDocument } from "../virtual-document/virtual-document";
 import { HTMLDocument } from "./html-document";
 import { parseHtmlNodes } from "./parse-html-node/parse-html-node";
 import { ParseHtmlContext } from "./parse-html-node/types/parse-html-context";
 import { parseHtml } from "./parse-html-p5/parse-html";
 
-export function parseHTMLDocuments(virtualDocuments: VirtualDocument[], checker: TypeChecker, store: TsHtmlPluginStore): HTMLDocument[] {
+export function parseHTMLDocuments(virtualDocuments: VirtualDocument[], checker: TypeChecker, store: TsLitPluginStore): HTMLDocument[] {
 	return virtualDocuments.map(textDocument => parseHTMLDocument(textDocument, checker, store));
 }
 
-export function parseHTMLDocument(virtualDocument: VirtualDocument, checker: TypeChecker, store: TsHtmlPluginStore): HTMLDocument {
+export function parseHTMLDocument(virtualDocument: VirtualDocument, checker: TypeChecker, store: TsLitPluginStore): HTMLDocument {
 	const html = virtualDocument.text;
 	const htmlAst = parseHtml(html);
 

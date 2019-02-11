@@ -5,11 +5,11 @@ import { HtmlAttrAssignmentType, IHtmlAttrAssignment } from "../html-document/ty
 import { IHtmlAttrBase } from "../html-document/types/html-attr-types";
 import { IHtmlNodeBase } from "../html-document/types/html-node-types";
 import { IHtmlReportBase } from "../html-document/types/html-report-types";
-import { TsHtmlPluginStore } from "../state/store";
+import { TsLitPluginStore } from "../state/store";
 import { Omit } from "../util/util";
 
 export interface ITsHtmlExtensionBaseContext {
-	store: TsHtmlPluginStore;
+	store: TsLitPluginStore;
 }
 
 export interface ITsHtmlExtensionParseHtmlNodeContext extends ITsHtmlExtensionBaseContext {

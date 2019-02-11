@@ -1,6 +1,6 @@
 import { SourceFile } from "typescript";
 import { IComponentsInFile } from "../parse-components/component-types";
-import { TsHtmlPluginStore } from "../state/store";
+import { TsLitPluginStore } from "../state/store";
 import { visitDependencies } from "./visit-dependencies";
 
 /**
@@ -8,7 +8,7 @@ import { visitDependencies } from "./visit-dependencies";
  * @param sourceFile
  * @param store
  */
-export function parseDependencies(sourceFile: SourceFile, store: TsHtmlPluginStore): Map<string, IComponentsInFile[]> {
+export function parseDependencies(sourceFile: SourceFile, store: TsLitPluginStore): Map<string, IComponentsInFile[]> {
 	const importedComponentsInFile = new Map(store.importedComponentsInFile);
 	const project = store.info.project;
 	const program = store.info.languageService.getProgram()!;

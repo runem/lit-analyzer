@@ -1,6 +1,6 @@
 import { JsxClosingTagInfo } from "typescript";
 import { HtmlDocumentCollection } from "../../html-document/html-document-collection";
-import { TsHtmlPluginStore } from "../../state/store";
+import { TsLitPluginStore } from "../../state/store";
 import { VscodeHtmlServiceWrapper } from "../../vscode-html-languageservice/vscode-html-service-wrapper";
 
 /**
@@ -9,7 +9,7 @@ import { VscodeHtmlServiceWrapper } from "../../vscode-html-languageservice/vsco
  * @param position
  * @param store
  */
-export function getClosingTagFromHtmlDocuments(documentCollection: HtmlDocumentCollection, position: number, store: TsHtmlPluginStore): JsxClosingTagInfo | undefined {
+export function getClosingTagFromHtmlDocuments(documentCollection: HtmlDocumentCollection, position: number, store: TsLitPluginStore): JsxClosingTagInfo | undefined {
 	const htmlDocument = documentCollection.intersectingHtmlDocument(position);
 	if (htmlDocument == null) return;
 
