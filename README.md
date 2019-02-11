@@ -15,7 +15,7 @@
 
 </div>
 
-## Overview
+## Feature overview
 
 -   [Attribute type checking](#attribute-type-checking)
 -   [Automatically pick up on lit-element custom elements](#automatically-pick-up-on-lit-element-custom-elements)
@@ -75,9 +75,11 @@ See [Configuring the plugin](#configuring-the-plugin) for more information regar
 -   Warning if you assign a complex type without using the `.` modifier.
 -   Warning if you use the `?` modifier on a non-boolean type.
 
-### Automatically pick up on lit-element custom elements
+### Automatically pick up on lit-elements
 
 If you define a `lit-element` custom element somewhere in your code `lit-plugin` will automatically pick up on it. Then it will provide auto-import functionality, type checking and code completion out of the box by looking at `@property` decorators on the element.
+
+I'm also working on picking up "non-lit-element" custom elements by looking at the `observedAttributes` method.
 
 ### Support for dependencies that extend the global HTMLElementTagNameMap
 
