@@ -59,6 +59,9 @@ export class TsLitPlugin {
 	getCompletionsAtPosition(fileName: string, position: number, options: GetCompletionsAtPositionOptions | undefined): CompletionInfo | undefined {
 		this.updateFromFile(fileName);
 
+		const prevResult = this.prevLangService.getCompletionsAtPosition(fileName, position, options);
+		if (this.config.disable) return prevResult;
+
 		// Calculates the neighborhood of the cursors position in the html.
 		const sourceFile = this.program.getSourceFile(fileName)!;
 		const collection = this.store.getDocumentsCollectionForFile(sourceFile);
@@ -71,7 +74,7 @@ export class TsLitPlugin {
 			if (completionInfo != null) return completionInfo;
 		}
 
-		return this.prevLangService.getCompletionsAtPosition(fileName, position, options);
+		return prevResult;
 	}
 
 	getCodeFixesAtPosition(
@@ -84,20 +87,23 @@ export class TsLitPlugin {
 	): ReadonlyArray<CodeFixAction> {
 		this.updateFromFile(fileName);
 
+		const prevResult = this.prevLangService.getCodeFixesAtPosition(fileName, start, end, errorCodes, formatOptions, preferences) || [];
+		if (this.config.disable) return prevResult;
+
 		const sourceFile = this.program.getSourceFile(fileName)!;
 		const collection = this.store.getDocumentsCollectionForFile(sourceFile);
 		const htmlDocument = collection.intersectingHtmlDocument({ start, end });
 
 		const codeFixes = htmlDocument == null ? [] : getCodeFixFromHtmlDocument(start, end, htmlDocument, this.store);
 
-		const prev = this.prevLangService.getCodeFixesAtPosition(fileName, start, end, errorCodes, formatOptions, preferences) || [];
-		return [...prev, ...codeFixes];
+		return [...prevResult, ...codeFixes];
 	}
 
 	getJsxClosingTagAtPosition(fileName: string, position: number): JsxClosingTagInfo | undefined {
 		this.updateFromFile(fileName);
 
 		const prevResult = this.prevLangService.getJsxClosingTagAtPosition(fileName, position);
+		if (this.config.disable) return prevResult;
 
 		const sourceFile = this.program.getSourceFile(fileName)!;
 		const collection = this.store.getDocumentsCollectionForFile(sourceFile);
@@ -113,6 +119,7 @@ export class TsLitPlugin {
 		this.updateFromFile(fileName);
 
 		const prevResult = this.prevLangService.getDefinitionAndBoundSpan(fileName, position);
+		if (this.config.disable) return prevResult;
 
 		const sourceFile = this.program.getSourceFile(fileName)!;
 		const collection = this.store.getDocumentsCollectionForFile(sourceFile);
@@ -127,7 +134,7 @@ export class TsLitPlugin {
 		const prev = this.prevLangService.getFormattingEditsForRange(fileName, start, end, settings);
 
 		// Return previous result if we need to skip formatting.
-		if (this.store.config.format.disable) {
+		if (this.config.disable || this.config.format.disable) {
 			return prev;
 		}
 
@@ -144,7 +151,8 @@ export class TsLitPlugin {
 	getQuickInfoAtPosition(fileName: string, position: number): QuickInfo | undefined {
 		this.updateFromFile(fileName);
 
-		const prevResults = this.prevLangService.getQuickInfoAtPosition(fileName, position);
+		const prevResult = this.prevLangService.getQuickInfoAtPosition(fileName, position);
+		if (this.config.disable) return prevResult;
 
 		// Get quick info from extensions.
 		const sourceFile = this.program.getSourceFile(fileName)!;
@@ -153,16 +161,18 @@ export class TsLitPlugin {
 		if (htmlDocument == null) return;
 
 		const quickInfo = getQuickInfoFromHtmlDocument(position, htmlDocument, this.checker, this.store);
-		return quickInfo || prevResults;
+		return quickInfo || prevResult;
 	}
 
 	getSemanticDiagnostics(fileName: string) {
 		this.updateFromFile(fileName);
 
+		const prevResult = this.prevLangService.getSemanticDiagnostics(fileName);
+		if (this.config.disable) return prevResult;
+
 		const sourceFile = this.program.getSourceFile(fileName)!;
 		const collection = this.store.getDocumentsCollectionForFile(sourceFile);
 		const diagnostics = getDiagnosticsFromHtmlDocuments(collection, this.store);
-		const prevResult = this.prevLangService.getSemanticDiagnostics(fileName);
 
 		return [...(prevResult || []), ...diagnostics];
 	}
