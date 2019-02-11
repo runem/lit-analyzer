@@ -208,11 +208,11 @@ If you are using the vscode plugin you can configure these options directly from
 -   **Default**: ["html", "raw"]
 -   **Description**: List of template tags to enable html support in.
 
-### externalHtmlTags
+### externalHtmlTagNames
 
 -   **Type**: string[]
 -   **Default**: []
--   **Description**: List of html tag names that you expect to be present at all times. These tag names including its attributes are not checked at all.
+-   **Description**: List of html tag names that you expect to be present at all times. These tag names, including its attributes, are not checked at all.
 
 ### skipMissingImports
 

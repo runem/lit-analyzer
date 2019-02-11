@@ -1,7 +1,7 @@
 export interface Config {
 	verbose: boolean;
 	htmlTemplateTags: string[];
-	externalHtmlTags: string[];
+	externalHtmlTagNames: string[];
 	skipMissingImports: boolean;
 	skipUnknownHtmlTags: boolean;
 	skipUnknownHtmlAttributes: boolean;
@@ -15,7 +15,7 @@ export function makeConfig(userConfig: Partial<Config>): Config {
 	return {
 		verbose: userConfig.verbose || false,
 		htmlTemplateTags: userConfig.htmlTemplateTags || ["html", "raw"],
-		externalHtmlTags: userConfig.externalHtmlTags || [],
+		externalHtmlTagNames: userConfig.externalHtmlTagNames || [],
 		skipMissingImports: userConfig.skipMissingImports || false,
 		skipUnknownHtmlTags: userConfig.skipUnknownHtmlTags || false,
 		skipUnknownHtmlAttributes: userConfig.skipUnknownHtmlAttributes || false

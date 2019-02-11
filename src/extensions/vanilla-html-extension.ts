@@ -79,7 +79,7 @@ export class VanillaHtmlExtension implements ITsHtmlExtension {
 	 * @param store
 	 */
 	completionsForHtmlNodes({ position, leftWord, rightWord, store }: ITsHtmlExtensionCompletionContext): CompletionEntry[] | undefined {
-		return [...getBuiltInTags(), ...store.config.externalHtmlTags].map(
+		return [...getBuiltInTags(), ...store.config.externalHtmlTagNames].map(
 			tagName =>
 				({
 					name: tagName,
