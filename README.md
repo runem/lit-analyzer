@@ -15,7 +15,7 @@
 
 </div>
 
-## Feature overview
+# Feature overview
 
 -   [Attribute type checking](#attribute-type-checking)
 -   [Automatically pick up on lit-element custom elements](#automatically-pick-up-on-lit-element-custom-elements)
@@ -31,9 +31,9 @@
 
 See [Features](#features) for a description of each feature.
 
-## Install
+# Install
 
-### Visual Studio Code
+## Visual Studio Code
 
 If you use Visual Studio Code you can simply install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension.
 
@@ -41,7 +41,7 @@ If you use Visual Studio Code you can simply install the [lit-plugin](https://ma
 code --install-extension runem.lit-plugin
 ```
 
-### Other
+## Other
 
 First, install the plugin:
 
@@ -66,22 +66,22 @@ Then add a `plugins` section to your [`tsconfig.json`](http://www.typescriptlang
 
 See [Configuring the plugin](#configuring-the-plugin) for more information regarding how to configure the plugin.
 
-## Features
+# Features
 
-### Attribute type checking
+## Attribute type checking
 
 `lit-plugin` type checks all attributes assignment, both on your own elements, library elements and built in elements. You will also get the following warnings:
 
 -   Warning if you assign a complex type without using the `.` modifier.
 -   Warning if you use the `?` modifier on a non-boolean type.
 
-### Automatically pick up on lit-elements
+## Automatically pick up on lit-elements
 
 If you define a `lit-element` custom element somewhere in your code `lit-plugin` will automatically pick up on it. Then it will provide auto-import functionality, type checking and code completion out of the box by looking at `@property` decorators on the element.
 
-I'm also working on picking up "non-lit-element" custom elements by looking at the `observedAttributes` method.
+I'm working on supporting `static get properties()` and picking up "non-lit-element" custom elements by looking at `static get observedAttributes()`.
 
-### Support for dependencies that extend the global HTMLElementTagNameMap
+## Support for dependencies that extend the global HTMLElementTagNameMap
 
 If a dependency extends the global `HTMLElementTagNameMap` this plugin will pick up on the map between the tag name and the class. Below you will see an example of what to add to your library typescript definition files if you want type checking support for a given html tag.
 
@@ -101,23 +101,23 @@ declare global {
 
 I'm working on integrating support for the proposed [web-components.json](https://github.com/w3c/webcomponents/issues/776) file.
 
-### Report missing imports of custom elements
+## Report missing imports of custom elements
 
 When using custom elements `lit-plugin` checks if the element has been imported and is available in the current context. It's considered imported if any file in the path of imports defines the custom element. You can disable this check by setting `skipMissingImports` to true in the configuration (see [Configuring the plugin](#configuring-the-plugin)). Be aware that dependencies need to extend the global `HTMLElementTagNameMap` in order for this plugin to pick up on them.
 
-### Goto definition for html tags and attributes
+## Goto definition for html tags and attributes
 
 `Cmd+Click (Mac)` / `Ctrl+Click (Windows)` on a tag name or an attribute name and goto the definition.
 
-### Code completions for html tags and attributes
+## Code completions for html tags and attributes
 
 Press `Ctrl+Space` in an html context and to get code completions for html tags and attributes.
 
-### Quick info on hover for html tags and attributes
+## Quick info on hover for html tags and attributes
 
 Hover above a html tag or attribute and see more information about the identifier such as type and jsdoc.
 
-### Warning if required attributes not included
+## Warning if required attributes not included
 
 `lit-plugin` will warn you if you forget to set any required attributes on a given html tag. Right now this is based on the assumption that the property is required if it doesn't have an initializer and isn't assignable to `undefined` or `null`. Be aware that right now the plugin doesn't check if you assign it else where (for example in the constructor).
 
@@ -131,7 +131,7 @@ export class MyElement extends LitElement {
 }
 ```
 
-### Support for @ts-ignore comments inside html
+## Support for @ts-ignore comments inside html
 
 Add "@ts-ignore" comments to make `lit-plugin` quiet.
 
@@ -161,7 +161,7 @@ return html`
 `;
 ```
 
-### Reformat html
+## Reformat html
 
 `lit-plugin` will reformat html when you reformat code using your IDE. Keep in mind that right now there is an issue where the plugin does not take the current indentation of the html template tag into account. This means that the especially nested html template tags will look weird.
 
@@ -196,57 +196,57 @@ return html`
   </div>`;
 ```
 
-### Auto close tags
+## Auto close tags
 
 When typing html inside a template tag `lit-plugin` auto-closes tags as you would expect.
 
-## Configuring the plugin
+# Configuring the plugin
 
 If you are using the vscode plugin you can configure these options directly from extension settings. If not you can add the options directly to the `compilerOptions.plugins` section of your `ts-config.json` file.
 
-### disable
+## disable
 
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Completely disable this plugin.
 
-### htmlTemplateTags
+## htmlTemplateTags
 
 -   **Type**: string[]
 -   **Default**: ["html", "raw"]
 -   **Description**: List of template tags to enable html support in.
 
-### externalHtmlTagNames
+## externalHtmlTagNames
 
 -   **Type**: string[]
 -   **Default**: []
 -   **Description**: List of html tag names that you expect to be present at all times. These tag names, including its attributes, are not checked at all.
 
-### skipMissingImports
+## skipMissingImports
 
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Skip reporting missing imports of custom elements.
 
-### skipUnknownHtmlTags
+## skipUnknownHtmlTags
 
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Skip reporting unknown html tags.
 
-### skipUnknownHtmlAttributes
+## skipUnknownHtmlAttributes
 
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Skip reporting unknown html attributes.
 
-### skipTypeChecking
+## skipTypeChecking
 
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Skip type checking of attributes.
 
-### format.disable
+## format.disable
 
 -   **Type**: boolean
 -   **Default**: false
