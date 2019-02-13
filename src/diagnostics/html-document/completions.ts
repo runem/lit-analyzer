@@ -1,9 +1,23 @@
 import { CompletionEntry } from "typescript";
 import { tsModule } from "../../ts-module";
+import { HtmlNodeAttr } from "../../types/html-node-attr-types";
 import { HtmlNode } from "../../types/html-node-types";
 import { DocumentPositionContext } from "../../util/get-html-position";
 import { caseInsensitiveCmp } from "../../util/util";
 import { DiagnosticsContext } from "../diagnostics-context";
+
+export function completionsForHtmlAttrValues(htmlNodeAttr: HtmlNodeAttr, positionContext: DocumentPositionContext, { store }: DiagnosticsContext): CompletionEntry[] {
+	const htmlTagAttrs = store.getHtmlTagAttrs(htmlNodeAttr.htmlNode);
+
+	const unusedAttrs = htmlTagAttrs.filter(htmlAttr => !(htmlNodeAttr.htmlNode.attributes.find(attr => caseInsensitiveCmp(htmlAttr.name, attr.name)) != null));
+
+	return unusedAttrs.map(htmlTagAttr => ({
+		name: `${htmlTagAttr.name}${htmlTagAttr.required ? "!" : ""}`,
+		insertText: htmlTagAttr.name,
+		kind: htmlTagAttr.hasProp ? tsModule.ts.ScriptElementKind.memberVariableElement : tsModule.ts.ScriptElementKind.label,
+		sortText: htmlTagAttr.hasProp ? "0" : "1"
+	}));
+}
 
 export function completionsForHtmlAttrs(htmlNode: HtmlNode, positionContext: DocumentPositionContext, { store }: DiagnosticsContext): CompletionEntry[] {
 	const htmlTagAttrs = store.getHtmlTagAttrs(htmlNode);

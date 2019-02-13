@@ -9,7 +9,7 @@ import { logger } from "../../util/logger";
 import { intersects } from "../../util/util";
 import { VscodeCssServiceWrapper } from "../css-document/vscode-css-languageservice/vscode-css-service-wrapper";
 import { DiagnosticsContext } from "../diagnostics-context";
-import { completionsForHtmlAttrs, completionsForHtmlNodes } from "../html-document/completions";
+import { completionsForHtmlAttrs, completionsForHtmlAttrValues, completionsForHtmlNodes } from "../html-document/completions";
 
 export function getCompletionInfoFromPosition(document: TextDocument, positionContext: DocumentPositionContext, context: DiagnosticsContext): CompletionInfo | undefined {
 	const { beforeWord, position } = positionContext;
@@ -37,6 +37,7 @@ export function getCompletionInfoFromPosition(document: TextDocument, positionCo
 			}
 		} else if (htmlAttrValue != null && ['"', "'", "="].includes(beforeWord)) {
 			logger.debug(htmlAttrValue);
+			entries = completionsForHtmlAttrValues(htmlAttrValue, positionContext, context);
 		} else if (insideAttrAreaNode != null) {
 			entries = completionsForHtmlAttrs(insideAttrAreaNode, positionContext, context);
 		} else if (beforeWord === "<") {

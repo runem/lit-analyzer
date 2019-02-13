@@ -12,7 +12,7 @@ const myApp = (text: string, disabled: boolean) => html`
 		}
 	</style>
 
-	<my-button></my-button>
+	<my-button size=""></my-button>
 `;
 
 render(myApp("Hello", false), document.body);
