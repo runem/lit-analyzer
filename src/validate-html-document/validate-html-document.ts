@@ -2,13 +2,13 @@ import { Node, TypeChecker } from "typescript";
 import { HTMLDocument } from "../html-document/html-document";
 import { HtmlAttr } from "../html-document/types/html-attr-types";
 import { HtmlNode } from "../html-document/types/html-node-types";
-import { IHtmlReportBase } from "../html-document/types/html-report-types";
+import { HtmlReport } from "../html-document/types/html-report-types";
 import { TsLitPluginStore } from "../state/store";
 import { iterateHtmlDocuments } from "../util/iterate-html-documents";
 import { makeValidateAttributeAssignmentContext } from "./validate-attribute-assignment-context";
 
 export function validateHTMLDocuments(htmlDocuments: HTMLDocument[], checker: TypeChecker, store: TsLitPluginStore) {
-	return iterateHtmlDocuments<{ source: HtmlNode | HtmlAttr; reports: IHtmlReportBase[] }>(htmlDocuments, {
+	return iterateHtmlDocuments<{ source: HtmlNode | HtmlAttr; reports: HtmlReport[] }>(htmlDocuments, {
 		getNodeItems(htmlNode: HtmlNode, astNode: Node) {
 			// Ask extensions for node reports
 			const reports = store.extension.validateHtmlNode(htmlNode, { file: astNode.getSourceFile(), store }) || [];

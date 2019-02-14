@@ -1,14 +1,14 @@
 import { Node } from "typescript";
 import { HTMLDocument } from "../html-document/html-document";
-import { IHtmlAttrBase } from "../html-document/types/html-attr-types";
-import { IHtmlNodeBase } from "../html-document/types/html-node-types";
+import { HtmlAttr } from "../html-document/types/html-attr-types";
+import { HtmlNode } from "../html-document/types/html-node-types";
 import { intersects } from "./util";
 
 export interface IContext<T> {
 	position?: { start: number; end: number };
 	stopOnNonEmpty?: boolean;
-	getNodeItems?(htmlNode: IHtmlNodeBase, node?: Node): T[] | T | undefined;
-	getAttrItems?(htmlAttr: IHtmlAttrBase, node?: Node): T[] | T | undefined;
+	getNodeItems?(htmlNode: HtmlNode, node?: Node): T[] | T | undefined;
+	getAttrItems?(htmlAttr: HtmlAttr, node?: Node): T[] | T | undefined;
 }
 
 /**
@@ -34,7 +34,7 @@ export function iterateHtmlDocuments<T>(htmlDocuments: HTMLDocument[] | HTMLDocu
  * @param htmlNode
  * @param ctx
  */
-function iterateHtmlNode<T>(node: Node, htmlNode: IHtmlNodeBase, ctx: IContext<T>): T[] {
+function iterateHtmlNode<T>(node: Node, htmlNode: HtmlNode, ctx: IContext<T>): T[] {
 	const results: T[] = [];
 	for (const htmlAttr of htmlNode.attributes) {
 		results.push(...iterateHtmlAttr(node, htmlAttr, ctx));
@@ -62,7 +62,7 @@ function iterateHtmlNode<T>(node: Node, htmlNode: IHtmlNodeBase, ctx: IContext<T
  * @param htmlAttr
  * @param ctx
  */
-function iterateHtmlAttr<T>(astNode: Node, htmlAttr: IHtmlAttrBase, ctx: IContext<T>): T[] {
+function iterateHtmlAttr<T>(astNode: Node, htmlAttr: HtmlAttr, ctx: IContext<T>): T[] {
 	const positionInside = ctx.position == null || intersects(ctx.position, htmlAttr.location.name);
 	const res = positionInside && ctx.getAttrItems != null ? ctx.getAttrItems(htmlAttr, astNode) : [];
 	return res ? [...res] : [];

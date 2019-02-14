@@ -1,6 +1,6 @@
 import { IComponentDeclaration } from "../../parse-components/component-types";
-import { IHtmlAttrBase } from "./html-attr-types";
 import { Range } from "../../types/range";
+import { HtmlAttr } from "./html-attr-types";
 
 export interface IHtmlNodeSourceCodeLocation extends Range {
 	name: Range;
@@ -17,8 +17,8 @@ export enum HtmlNodeKind {
 export interface IHtmlNodeBase {
 	tagName: string;
 	location: IHtmlNodeSourceCodeLocation;
-	attributes: IHtmlAttrBase[];
-	children: IHtmlNodeBase[];
+	attributes: HtmlAttr[];
+	children: HtmlNode[];
 	selfClosed: boolean;
 }
 

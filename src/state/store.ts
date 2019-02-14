@@ -3,9 +3,9 @@ import { SourceFile } from "typescript";
 import * as ts from "typescript/lib/tsserverlibrary";
 import { ExtensionCollectionExtension } from "../extensions/extension-collection-extension";
 import { HtmlDocumentCollection } from "../html-document/html-document-collection";
-import { IHtmlAttrBase } from "../html-document/types/html-attr-types";
-import { IHtmlNodeBase } from "../html-document/types/html-node-types";
-import { IHtmlReportBase } from "../html-document/types/html-report-types";
+import { HtmlAttr } from "../html-document/types/html-attr-types";
+import { HtmlNode } from "../html-document/types/html-node-types";
+import { HtmlReport } from "../html-document/types/html-report-types";
 import { ComponentTagName, IComponentDeclaration, IComponentsInFile } from "../parse-components/component-types";
 import { Config } from "./config";
 
@@ -21,16 +21,16 @@ export class TsLitPluginStore {
 	importedComponentsInFile = new Map<FileName, IComponentsInFile[]>();
 	allTagNameFileNames = new Map<ComponentTagName, FileName>();
 	allComponents = new Map<ComponentTagName, IComponentDeclaration>();
-	private htmlReportsForHtml = new Map<IHtmlNodeBase | IHtmlAttrBase, IHtmlReportBase[]>();
+	private htmlReportsForHtml = new Map<HtmlNode | HtmlAttr, HtmlReport[]>();
 	private htmlDocumentCache = new WeakMap<SourceFile, HtmlDocumentCollection>();
 
 	constructor(public ts: typeof tsModule, public info: ts.server.PluginCreateInfo) {}
 
-	getReportsForHtmlNodeOrAttr(source: IHtmlNodeBase | IHtmlAttrBase): IHtmlReportBase[] {
+	getReportsForHtmlNodeOrAttr(source: HtmlNode | HtmlAttr): HtmlReport[] {
 		return this.htmlReportsForHtml.get(source) || [];
 	}
 
-	absorbReports(source: IHtmlNodeBase | IHtmlAttrBase, reports: IHtmlReportBase[]) {
+	absorbReports(source: HtmlNode | HtmlAttr, reports: HtmlReport[]) {
 		this.htmlReportsForHtml.set(source, reports);
 	}
 

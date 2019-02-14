@@ -1,7 +1,7 @@
 import { logger } from "../../util/logger";
 import { isCommentNode, isTagNode } from "../parse-html-p5/parse-html";
 import { IP5TagNode, P5Node } from "../parse-html-p5/parse-html-types";
-import { IHtmlNodeBase, IHtmlNodeSourceCodeLocation } from "../types/html-node-types";
+import { HtmlNode, IHtmlNodeSourceCodeLocation } from "../types/html-node-types";
 import { parseHtmlNodeAttrs } from "./parse-html-attribute";
 import { ParseHtmlContext } from "./types/parse-html-context";
 
@@ -10,8 +10,8 @@ import { ParseHtmlContext } from "./types/parse-html-context";
  * @param p5Nodes
  * @param context
  */
-export function parseHtmlNodes(p5Nodes: P5Node[], context: ParseHtmlContext): IHtmlNodeBase[] {
-	const htmlNodes: IHtmlNodeBase[] = [];
+export function parseHtmlNodes(p5Nodes: P5Node[], context: ParseHtmlContext): HtmlNode[] {
+	const htmlNodes: HtmlNode[] = [];
 	let ignoreNextNode = false;
 	for (const p5Node of p5Nodes) {
 		// Check ts-ignore comments and indicate that we wan't to ignore the next node
@@ -42,7 +42,7 @@ export function parseHtmlNodes(p5Nodes: P5Node[], context: ParseHtmlContext): IH
  * @param p5Node
  * @param context
  */
-export function parseHtmlNode(p5Node: IP5TagNode, context: ParseHtmlContext): IHtmlNodeBase | undefined {
+export function parseHtmlNode(p5Node: IP5TagNode, context: ParseHtmlContext): HtmlNode | undefined {
 	// `sourceCodeLocation` will be undefined if the element was implicitly created by the parser.
 	if (p5Node.sourceCodeLocation == null) return undefined;
 

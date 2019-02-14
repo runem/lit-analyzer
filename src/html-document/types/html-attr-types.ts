@@ -1,7 +1,7 @@
 import { IComponentDeclaration, IComponentDeclarationProp } from "../../parse-components/component-types";
 import { Range } from "../../types/range";
 import { IHtmlAttrAssignment } from "./html-attr-assignment-types";
-import { IHtmlNodeBase } from "./html-node-types";
+import { HtmlNode } from "./html-node-types";
 
 export enum HtmlAttrKind {
 	CUSTOM_PROP = "CUSTOM_PROP",
@@ -18,7 +18,7 @@ export interface IHtmlAttrBase {
 	modifier?: string;
 	location: IHtmlAttrSourceCodeLocation;
 	assignment?: IHtmlAttrAssignment;
-	htmlNode: IHtmlNodeBase;
+	htmlNode: HtmlNode;
 }
 
 export interface IHtmlAttrCustomProp extends IHtmlAttrBase {

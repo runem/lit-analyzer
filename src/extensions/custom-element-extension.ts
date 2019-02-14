@@ -1,5 +1,6 @@
 import { basename, dirname, relative } from "path";
 import { CodeFixAction, CompletionEntry, DefinitionInfoAndBoundSpan, DiagnosticWithLocation, Node, QuickInfo, ScriptElementKind, SourceFile } from "typescript";
+import { DIAGNOSTIC_SOURCE } from "../constants";
 import { IP5NodeAttr, IP5TagNode } from "../html-document/parse-html-p5/parse-html-types";
 import { IHtmlAttrAssignment } from "../html-document/types/html-attr-assignment-types";
 import { HtmlAttr, HtmlAttrKind, IHtmlAttrCustomProp } from "../html-document/types/html-attr-types";
@@ -18,8 +19,6 @@ import {
 	ITsHtmlExtensionQuickInfoContext,
 	ITsHtmlExtensionValidateContext
 } from "./i-ts-html-extension";
-
-const DIAGNOSTIC_SOURCE = "lit-plugin";
 
 /**
  * An extension that adds custom element capabilities to the ts-html plugin.

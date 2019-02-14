@@ -1,14 +1,14 @@
 import { IP5NodeAttr, IP5TagNode } from "../parse-html-p5/parse-html-types";
-import { IHtmlAttrBase, IHtmlAttrSourceCodeLocation } from "../types/html-attr-types";
-import { ParseHtmlAttrContext } from "./types/parse-html-attr-context";
+import { HtmlAttr, IHtmlAttrSourceCodeLocation } from "../types/html-attr-types";
 import { parseHtmlAttrAssignment } from "./parse-html-attr-assignment";
+import { ParseHtmlAttrContext } from "./types/parse-html-attr-context";
 
 /**
  * Creates multiple html attributes based on multiple p5Attributes.
  * @param p5Node
  * @param context
  */
-export function parseHtmlNodeAttrs(p5Node: IP5TagNode, context: ParseHtmlAttrContext): IHtmlAttrBase[] {
+export function parseHtmlNodeAttrs(p5Node: IP5TagNode, context: ParseHtmlAttrContext): HtmlAttr[] {
 	return p5Node.attrs
 		.map(htmlAttr =>
 			parseHtmlNodeAttr(p5Node, htmlAttr, {
@@ -16,7 +16,7 @@ export function parseHtmlNodeAttrs(p5Node: IP5TagNode, context: ParseHtmlAttrCon
 				htmlNode: context.htmlNode
 			})
 		)
-		.filter((attr): attr is IHtmlAttrBase => attr != null);
+		.filter((attr): attr is HtmlAttr => attr != null);
 }
 
 /**
@@ -25,7 +25,7 @@ export function parseHtmlNodeAttrs(p5Node: IP5TagNode, context: ParseHtmlAttrCon
  * @param p5Attr
  * @param context
  */
-export function parseHtmlNodeAttr(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, context: ParseHtmlAttrContext): IHtmlAttrBase | undefined {
+export function parseHtmlNodeAttr(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, context: ParseHtmlAttrContext): HtmlAttr | undefined {
 	const { name, modifier } = context.store.extension.parseAttrName(p5Attr.name) || {
 		name: p5Attr.name,
 		modifier: undefined

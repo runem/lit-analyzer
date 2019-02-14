@@ -2,7 +2,7 @@ import { SimpleTypeKind } from "ts-simple-type";
 import { VirtualDocument } from "../../virtual-document/virtual-document";
 import { IP5NodeAttr, IP5TagNode } from "../parse-html-p5/parse-html-types";
 import { IHtmlAttrAssignment } from "../types/html-attr-assignment-types";
-import { IHtmlAttrBase } from "../types/html-attr-types";
+import { HtmlAttr } from "../types/html-attr-types";
 import { ParseHtmlContext } from "./types/parse-html-context";
 
 /**
@@ -12,7 +12,7 @@ import { ParseHtmlContext } from "./types/parse-html-context";
  * @param htmlAttr
  * @param context
  */
-export function parseHtmlAttrAssignment(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, htmlAttr: IHtmlAttrBase, context: ParseHtmlContext): IHtmlAttrAssignment | undefined {
+export function parseHtmlAttrAssignment(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, htmlAttr: HtmlAttr, context: ParseHtmlContext): IHtmlAttrAssignment | undefined {
 	const { ids, isMixed } = VirtualDocument.getSubstitutionIdsInText(p5Attr.value);
 
 	const typeB = ids.length === 1 && !isMixed ? context.getTypeFromExpressionId(ids[0]) : undefined;
@@ -41,7 +41,17 @@ export function parseHtmlAttrAssignment(p5Node: IP5TagNode, p5Attr: IP5NodeAttr,
 			value,
 			isBooleanAssignment,
 			isMixedExpression: isMixed,
-			typeB: typeB != null ? typeB : isBooleanAssignment ? { kind: SimpleTypeKind.BOOLEAN } : value != null ? { kind: SimpleTypeKind.STRING_LITERAL, value } : { kind: SimpleTypeKind.STRING }
+			typeB:
+				typeB != null
+					? typeB
+					: isBooleanAssignment
+					? { kind: SimpleTypeKind.BOOLEAN }
+					: value != null
+					? {
+							kind: SimpleTypeKind.STRING_LITERAL,
+							value
+					  }
+					: { kind: SimpleTypeKind.STRING }
 		}
 	});
 }

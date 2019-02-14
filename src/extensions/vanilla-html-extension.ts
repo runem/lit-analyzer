@@ -1,10 +1,11 @@
 import { SimpleTypeKind } from "ts-simple-type";
 import { CompletionEntry, DiagnosticWithLocation, QuickInfo, ScriptElementKind } from "typescript";
+import { DIAGNOSTIC_SOURCE } from "../constants";
 import { IP5NodeAttr, IP5TagNode } from "../html-document/parse-html-p5/parse-html-types";
 import { IHtmlAttrAssignment } from "../html-document/types/html-attr-assignment-types";
 import { HtmlAttr, HtmlAttrKind, IHtmlAttrBuiltIn } from "../html-document/types/html-attr-types";
-import { HtmlNode, HtmlNodeKind, IHtmlNodeBase, IHtmlNodeBuiltIn } from "../html-document/types/html-node-types";
-import { IHtmlReportBase } from "../html-document/types/html-report-types";
+import { HtmlNode, HtmlNodeKind, IHtmlNodeBuiltIn } from "../html-document/types/html-node-types";
+import { HtmlReport, HtmlReportKind } from "../html-document/types/html-report-types";
 import {
 	getBuiltInAttributeType,
 	getBuiltInAttrsForTag,
@@ -26,27 +27,6 @@ import {
 	ITsHtmlExtensionValidateContext,
 	ITsHtmlExtensionValidateExpressionContext
 } from "./i-ts-html-extension";
-
-const DIAGNOSTIC_SOURCE = "lit-plugin";
-
-export enum VanillaHtmlReportKind {
-	HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE = "HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE",
-	TAG_NOT_CLOSED = "TAG_NOT_CLOSED"
-}
-
-export interface IHtmlReportVanillaHtmlInvlAttrExprType extends IHtmlReportBase {
-	kind: VanillaHtmlReportKind.HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE;
-	typeAPrimitive: boolean;
-	typeBPrimitive: boolean;
-	typeA: string;
-	typeB: string;
-}
-
-export interface IHtmlReportVanillaHtmlTagNotClosed extends IHtmlReportBase {
-	kind: VanillaHtmlReportKind.TAG_NOT_CLOSED;
-}
-
-export type VanillaHtmlReport = IHtmlReportVanillaHtmlInvlAttrExprType | IHtmlReportVanillaHtmlTagNotClosed;
 
 /**
  * An extension that extends ts-html with basic html functionality.
@@ -168,9 +148,9 @@ export class VanillaHtmlExtension implements ITsHtmlExtension {
 		}
 	}
 
-	diagnosticsForHtmlNodeReport(htmlNode: IHtmlNodeBase, htmlReport: VanillaHtmlReport, { file, store: { ts } }: ITsHtmlExtensionDiagnosticContext): DiagnosticWithLocation[] | undefined {
+	diagnosticsForHtmlNodeReport(htmlNode: HtmlNode, htmlReport: HtmlReport, { file, store: { ts } }: ITsHtmlExtensionDiagnosticContext): DiagnosticWithLocation[] | undefined {
 		switch (htmlReport.kind) {
-			case VanillaHtmlReportKind.TAG_NOT_CLOSED:
+			case HtmlReportKind.TAG_NOT_CLOSED:
 				const messageText = "This tag isn't closed.";
 
 				return [
@@ -193,11 +173,11 @@ export class VanillaHtmlExtension implements ITsHtmlExtension {
 	 * @param file
 	 * @param store
 	 */
-	diagnosticsForHtmlAttrReport(htmlAttr: HtmlAttr, htmlReport: VanillaHtmlReport, { file, store }: ITsHtmlExtensionDiagnosticContext): DiagnosticWithLocation[] | undefined {
+	diagnosticsForHtmlAttrReport(htmlAttr: HtmlAttr, htmlReport: HtmlReport, { file, store }: ITsHtmlExtensionDiagnosticContext): DiagnosticWithLocation[] | undefined {
 		const { start, end } = htmlAttr.location.name;
 
 		switch (htmlReport.kind) {
-			case VanillaHtmlReportKind.HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE:
+			case HtmlReportKind.HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE:
 				const messageText = (() => {
 					if (!htmlReport.typeAPrimitive && !htmlReport.typeBPrimitive) {
 						return `Non-primitive type '${htmlReport.typeB}' cannot be assigned to non-primitive type '${htmlReport.typeA}'.`;
@@ -224,11 +204,11 @@ export class VanillaHtmlExtension implements ITsHtmlExtension {
 		}
 	}
 
-	validateHtmlNode(htmlNode: HtmlNode, context: ITsHtmlExtensionValidateContext): VanillaHtmlReport[] | undefined {
+	validateHtmlNode(htmlNode: HtmlNode, context: ITsHtmlExtensionValidateContext): HtmlReport[] | undefined {
 		if (!htmlNode.selfClosed && htmlNode.location.endTag == null) {
 			return [
 				{
-					kind: VanillaHtmlReportKind.TAG_NOT_CLOSED
+					kind: HtmlReportKind.TAG_NOT_CLOSED
 				}
 			];
 		}
@@ -246,7 +226,7 @@ export class VanillaHtmlExtension implements ITsHtmlExtension {
 	validateHtmlAttrAssignment(
 		htmlAttr: HtmlAttr,
 		{ isAssignableToValue, getTypeString, isAssignableTo, isAssignableToPrimitive }: ITsHtmlExtensionValidateExpressionContext
-	): VanillaHtmlReport[] | undefined {
+	): HtmlReport[] | undefined {
 		if (htmlAttr.assignment == null) return;
 
 		const {
@@ -259,7 +239,7 @@ export class VanillaHtmlExtension implements ITsHtmlExtension {
 		if (!typeAPrimitive || !typeBPrimitive || !isAssignableTo(typeA, typeB)) {
 			return [
 				{
-					kind: VanillaHtmlReportKind.HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE,
+					kind: HtmlReportKind.HTML_INVALID_ATTRIBUTE_EXPRESSION_TYPE,
 					typeAPrimitive,
 					typeBPrimitive,
 					typeA: getTypeString(typeA),

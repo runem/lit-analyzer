@@ -1,8 +1,8 @@
 import { Node } from "typescript";
 import { HTMLDocument } from "../html-document/html-document";
-import { HtmlAttr, IHtmlAttrBase } from "../html-document/types/html-attr-types";
-import { HtmlNode, IHtmlNodeBase } from "../html-document/types/html-node-types";
-import { IHtmlReportBase } from "../html-document/types/html-report-types";
+import { HtmlAttr } from "../html-document/types/html-attr-types";
+import { HtmlNode } from "../html-document/types/html-node-types";
+import { HtmlReport } from "../html-document/types/html-report-types";
 import { TsLitPluginStore } from "../state/store";
 import { iterateHtmlDocuments } from "./iterate-html-documents";
 import { flatten, intersects } from "./util";
@@ -10,8 +10,8 @@ import { flatten, intersects } from "./util";
 export interface IContext<T> {
 	position?: { start: number; end: number };
 	store: TsLitPluginStore;
-	getNodeItems(htmlNode: IHtmlNodeBase, htmlReport: IHtmlReportBase, astNode: Node): T[] | T | undefined;
-	getAttrItems(htmlAttr: IHtmlAttrBase, htmlReport: IHtmlReportBase, astNode: Node): T[] | T | undefined;
+	getNodeItems(htmlNode: HtmlNode, htmlReport: HtmlReport, astNode: Node): T[] | T | undefined;
+	getAttrItems(htmlAttr: HtmlAttr, htmlReport: HtmlReport, astNode: Node): T[] | T | undefined;
 }
 
 /**
@@ -41,7 +41,7 @@ export function iterateHtmlDocumentReports<T>(htmlDocuments: HTMLDocument[] | HT
  * @param htmlNode
  * @param ctx
  */
-function iterateHtmlNodeReports<T>(astNode: Node, htmlNode: IHtmlNodeBase, ctx: IContext<T>): T[] {
+function iterateHtmlNodeReports<T>(astNode: Node, htmlNode: HtmlNode, ctx: IContext<T>): T[] {
 	const positionInside = ctx.position == null || intersects(ctx.position, htmlNode.location.name);
 
 	return [
@@ -58,7 +58,7 @@ function iterateHtmlNodeReports<T>(astNode: Node, htmlNode: IHtmlNodeBase, ctx: 
  * @param report
  * @param ctx
  */
-function iterateHtmlNodeReport<T>(astNode: Node, htmlNode: IHtmlNodeBase, report: IHtmlReportBase, ctx: IContext<T>): T[] {
+function iterateHtmlNodeReport<T>(astNode: Node, htmlNode: HtmlNode, report: HtmlReport, ctx: IContext<T>): T[] {
 	const res = ctx.getNodeItems(htmlNode, report, astNode);
 	return res ? [...res] : [];
 }
@@ -69,7 +69,7 @@ function iterateHtmlNodeReport<T>(astNode: Node, htmlNode: IHtmlNodeBase, report
  * @param htmlAttr
  * @param ctx
  */
-function iterateHtmlAttrReports<T>(astNode: Node, htmlAttr: IHtmlAttrBase, ctx: IContext<T>): T[] {
+function iterateHtmlAttrReports<T>(astNode: Node, htmlAttr: HtmlAttr, ctx: IContext<T>): T[] {
 	const positionInside = ctx.position == null || intersects(ctx.position, htmlAttr.location.name);
 
 	return positionInside ? flatten((ctx.store.getReportsForHtmlNodeOrAttr(htmlAttr) || []).map(report => iterateHtmlAttrReport(astNode, htmlAttr, report, ctx))) : [];
@@ -82,7 +82,7 @@ function iterateHtmlAttrReports<T>(astNode: Node, htmlAttr: IHtmlAttrBase, ctx: 
  * @param report
  * @param ctx
  */
-function iterateHtmlAttrReport<T>(astNode: Node, htmlAttr: IHtmlAttrBase, report: IHtmlReportBase, ctx: IContext<T>): T[] {
+function iterateHtmlAttrReport<T>(astNode: Node, htmlAttr: HtmlAttr, report: HtmlReport, ctx: IContext<T>): T[] {
 	const res = ctx.getAttrItems(htmlAttr, report, astNode);
 	return res ? [...res] : [];
 }

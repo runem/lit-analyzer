@@ -1,7 +1,7 @@
 import { CompletionEntry, CompletionInfo } from "typescript";
 import { ITsHtmlExtensionCompletionContext } from "../../extensions/i-ts-html-extension";
 import { IHtmlAttrBase } from "../../html-document/types/html-attr-types";
-import { IHtmlNodeBase } from "../../html-document/types/html-node-types";
+import { HtmlNode } from "../../html-document/types/html-node-types";
 import { TsLitPluginStore } from "../../state/store";
 import { IHtmlPositionContext } from "../../util/get-html-position";
 import { intersects } from "../../util/util";
@@ -60,7 +60,7 @@ export function getCompletionInfoFromHtmlPosition(htmlPosition: IHtmlPositionCon
  * @param htmlNode
  * @param position
  */
-function getIntersectingHtmlNodeAttrArea(htmlNode: IHtmlNodeBase | IHtmlNodeBase[], position: number): IHtmlNodeBase | undefined {
+function getIntersectingHtmlNodeAttrArea(htmlNode: HtmlNode | HtmlNode[], position: number): HtmlNode | undefined {
 	if (Array.isArray(htmlNode)) {
 		// Loop through all nodes in the array. Stop if a result is encountered.
 		for (const childNode of htmlNode || []) {
@@ -92,7 +92,7 @@ function getIntersectingHtmlNodeAttrArea(htmlNode: IHtmlNodeBase | IHtmlNodeBase
  * @param htmlNode
  * @param position
  */
-function getIntersectingHtmlAttrName(htmlNode: IHtmlNodeBase | IHtmlNodeBase[], position: number): IHtmlAttrBase | undefined {
+function getIntersectingHtmlAttrName(htmlNode: HtmlNode | HtmlNode[], position: number): IHtmlAttrBase | undefined {
 	if (Array.isArray(htmlNode)) {
 		// Loop through all nodes in the array. Stop if a result is encountered.
 		for (const childNode of htmlNode || []) {
