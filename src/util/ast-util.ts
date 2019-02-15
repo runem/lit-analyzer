@@ -1,4 +1,5 @@
 import { Node } from "typescript";
+import { tsModule } from "../ts-module";
 import { Range } from "../types/range";
 import { intersects } from "./util";
 
@@ -23,4 +24,27 @@ export function getNodeAtPosition(node: Node, position: number | Range): Node | 
 	}
 
 	return node.forEachChild(child => getNodeAtPosition(child, position)) || node;
+}
+
+/**
+ * Checks whether a leading comment includes a given search string.
+ * @param text
+ * @param context
+ * @param pos
+ * @param needle
+ */
+export function leadingCommentsIncludes(text: string, pos: number, needle: string): boolean {
+	// Get the leading comments to the position.
+	const leadingComments = tsModule.ts.getLeadingCommentRanges(text, pos);
+
+	// If any leading comments exists, we check whether the needle matches the context of the comment.
+	if (leadingComments != null) {
+		for (const comment of leadingComments) {
+			const commentText = text.substring(comment.pos, comment.end);
+			if (commentText.includes(needle)) {
+				return true;
+			}
+		}
+	}
+	return false;
 }

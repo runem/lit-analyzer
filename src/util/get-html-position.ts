@@ -1,4 +1,4 @@
-import { HTMLDocument } from "../html-document/html-document";
+import { HTMLDocument } from "../parsing/html-document/html-document";
 
 export interface IHtmlPositionContext {
 	htmlDocument: HTMLDocument;

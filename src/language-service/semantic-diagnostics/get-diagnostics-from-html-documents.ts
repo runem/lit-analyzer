@@ -1,5 +1,6 @@
 import { DiagnosticWithLocation } from "typescript";
-import { HtmlDocumentCollection } from "../../html-document/html-document-collection";
+import { diagnosticsForHtmlAttrReport, diagnosticsForHtmlNodeReport } from "../../extensions/html/diagnostics";
+import { HtmlDocumentCollection } from "../../parsing/html-document/html-document-collection";
 import { TsLitPluginStore } from "../../state/store";
 import { flatten } from "../../util/util";
 
@@ -9,21 +10,16 @@ import { flatten } from "../../util/util";
  * @param store
  */
 export function getDiagnosticsFromHtmlDocuments(collection: HtmlDocumentCollection, store: TsLitPluginStore): DiagnosticWithLocation[] {
-	const context = {
-		file: collection.sourceFile,
-		store
-	};
-
 	return flatten(
 		collection.htmlDocuments.map(htmlDocument => {
 			return flatten(
 				htmlDocument.mapNodes(htmlNode => {
 					return [
-						...flatten(store.getReportsForHtmlNodeOrAttr(htmlNode).map(htmlReport => store.extension.diagnosticsForHtmlNodeReport(htmlNode, htmlReport, context) || [])),
+						...flatten(store.getReportsForHtmlNodeOrAttr(htmlNode).map(htmlReport => diagnosticsForHtmlNodeReport(htmlNode, htmlReport, collection.sourceFile, store))),
 
 						...flatten(
 							htmlNode.attributes.map(htmlAttr =>
-								flatten(store.getReportsForHtmlNodeOrAttr(htmlAttr).map(htmlReport => store.extension.diagnosticsForHtmlAttrReport(htmlAttr, htmlReport, context) || []))
+								flatten(store.getReportsForHtmlNodeOrAttr(htmlAttr).map(htmlReport => diagnosticsForHtmlAttrReport(htmlAttr, htmlReport, collection.sourceFile, store)))
 							)
 						)
 					];

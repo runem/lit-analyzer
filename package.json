@@ -34,8 +34,8 @@
 	"dependencies": {
 		"didyoumean2": "^2.0.2",
 		"parse5": "^5.1.0",
-		"ts-simple-type": "^0.2.20",
-		"vscode-html-languageservice": "^2.1.10"
+		"ts-simple-type": "^0.2.23",
+		"vscode-html-languageservice": "^2.1.11-next.10"
 	},
 	"devDependencies": {
 		"@types/node": "^10.12.24",

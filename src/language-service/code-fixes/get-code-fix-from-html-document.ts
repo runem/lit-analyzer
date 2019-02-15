@@ -1,8 +1,9 @@
 import { CodeFixAction } from "typescript";
-import { HTMLDocument } from "../../html-document/html-document";
-import { isHTMLAttr } from "../../html-document/types/html-attr-types";
-import { isHTMLNode } from "../../html-document/types/html-node-types";
+import { codeFixesForHtmlAttrReport, codeFixesForHtmlNodeReport } from "../../extensions/html/code-fixes";
+import { HTMLDocument } from "../../parsing/html-document/html-document";
 import { TsLitPluginStore } from "../../state/store";
+import { isHTMLAttr } from "../../types/html-node-attr-types";
+import { isHTMLNode } from "../../types/html-node-types";
 import { flatten } from "../../util/util";
 
 /**
@@ -18,18 +19,15 @@ export function getCodeFixFromHtmlDocument(start: number, end: number, htmlDocum
 
 	const reports = store.getReportsForHtmlNodeOrAttr(hit);
 
-	const context = {
-		file: htmlDocument.astNode.getSourceFile(),
-		store
-	};
+	const sourceFile = htmlDocument.astNode.getSourceFile();
 
 	return flatten(
 		reports
 			.map(htmlReport => {
 				if (isHTMLNode(hit)) {
-					return store.extension.codeFixesForHtmlNodeReport(hit, htmlReport, context);
+					return codeFixesForHtmlNodeReport(hit, htmlReport, sourceFile, store);
 				} else if (isHTMLAttr(hit)) {
-					return store.extension.codeFixesForHtmlAttrReport(hit, htmlReport, context);
+					return codeFixesForHtmlAttrReport(hit, htmlReport, sourceFile, store);
 				}
 			})
 			.filter((report): report is CodeFixAction[] => report != null)

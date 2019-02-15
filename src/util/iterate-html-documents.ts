@@ -1,14 +1,14 @@
 import { Node } from "typescript";
-import { HTMLDocument } from "../html-document/html-document";
-import { HtmlAttr } from "../html-document/types/html-attr-types";
-import { HtmlNode } from "../html-document/types/html-node-types";
+import { HTMLDocument } from "../parsing/html-document/html-document";
+import { HtmlNodeAttr } from "../types/html-node-attr-types";
+import { HtmlNode } from "../types/html-node-types";
 import { intersects } from "./util";
 
 export interface IContext<T> {
 	position?: { start: number; end: number };
 	stopOnNonEmpty?: boolean;
 	getNodeItems?(htmlNode: HtmlNode, node?: Node): T[] | T | undefined;
-	getAttrItems?(htmlAttr: HtmlAttr, node?: Node): T[] | T | undefined;
+	getAttrItems?(htmlAttr: HtmlNodeAttr, node?: Node): T[] | T | undefined;
 }
 
 /**
@@ -62,7 +62,7 @@ function iterateHtmlNode<T>(node: Node, htmlNode: HtmlNode, ctx: IContext<T>): T
  * @param htmlAttr
  * @param ctx
  */
-function iterateHtmlAttr<T>(astNode: Node, htmlAttr: HtmlAttr, ctx: IContext<T>): T[] {
+function iterateHtmlAttr<T>(astNode: Node, htmlAttr: HtmlNodeAttr, ctx: IContext<T>): T[] {
 	const positionInside = ctx.position == null || intersects(ctx.position, htmlAttr.location.name);
 	const res = positionInside && ctx.getAttrItems != null ? ctx.getAttrItems(htmlAttr, astNode) : [];
 	return res ? [...res] : [];

@@ -1,17 +1,17 @@
 import * as ts from "typescript";
 import * as vscode from "vscode-html-languageservice";
-import { HTMLDocument } from "../html-document/html-document";
-import { VirtualDocument } from "../virtual-document/virtual-document";
+import { HTMLDocument } from "../parsing/html-document/html-document";
+import { TextDocument } from "../parsing/text-document/text-document";
 
 export class VscodeHtmlServiceWrapper {
-	private virtualDocument: VirtualDocument;
+	private textDocument: TextDocument;
 
 	private wrappedHtmlService = vscode.getLanguageService();
 
 	private _vscTextDocument: vscode.TextDocument | undefined;
 	private get vscTextDocument(): vscode.TextDocument {
 		if (this._vscTextDocument == null) {
-			this._vscTextDocument = vscode.TextDocument.create("untitled://embedded.html", "html", 1, this.virtualDocument.text);
+			this._vscTextDocument = vscode.TextDocument.create("untitled://embedded.html", "html", 1, this.textDocument.text);
 		}
 		return this._vscTextDocument;
 	}
@@ -25,17 +25,17 @@ export class VscodeHtmlServiceWrapper {
 	}
 
 	constructor(htmlDocument: HTMLDocument);
-	constructor(virtualDocument: VirtualDocument);
-	constructor(document: HTMLDocument | VirtualDocument) {
-		if ("virtualDocument" in document) {
-			this.virtualDocument = document.virtualDocument;
+	constructor(textDocument: TextDocument);
+	constructor(document: HTMLDocument | TextDocument) {
+		if ("textDocument" in document) {
+			this.textDocument = document.textDocument;
 		} else {
-			this.virtualDocument = document;
+			this.textDocument = document;
 		}
 	}
 
 	doTagComplete(position: number): ts.JsxClosingTagInfo | undefined {
-		const positionInText = this.virtualDocument.offsetAtSourceCodePosition(position);
+		const positionInText = this.textDocument.offsetAtSourceCodePosition(position);
 		const htmlLSPosition = this.vscTextDocument.positionAt(positionInText);
 
 		const tagComplete = this.wrappedHtmlService.doTagComplete(this.vscTextDocument, htmlLSPosition, this.vscHtmlDocument);
@@ -66,13 +66,13 @@ export class VscodeHtmlServiceWrapper {
 		const newText = vscode.TextDocument.applyEdits(this.vscTextDocument, edits);
 		const split = newText.split(/\$\s*\{\s*(\d+_expression-placeholder)\s*\}/gm);
 
-		const node = this.virtualDocument.astNode.template;
+		const node = this.textDocument.astNode.template;
 
 		const res: ts.TextChange[] = [];
 		let prevIndex = node.getStart();
 		for (let i = 0; i < split.length; i += 2) {
 			if (i % 2 === 0) {
-				const nextExpressionNode = this.virtualDocument.getSubstitutionWithId(split[i + 1]);
+				const nextExpressionNode = this.textDocument.getSubstitutionWithId(split[i + 1]);
 
 				const startOffset = i !== 0 ? 1 : 0;
 				const endOffset = nextExpressionNode != null ? -2 : 0;

@@ -1,7 +1,7 @@
 import { DefinitionInfoAndBoundSpan } from "typescript";
-import { HTMLDocument } from "../../html-document/html-document";
-import { isHTMLAttr } from "../../html-document/types/html-attr-types";
-import { isHTMLNode } from "../../html-document/types/html-node-types";
+import { HTMLDocument } from "../../parsing/html-document/html-document";
+import { isHTMLAttr } from "../../types/html-node-attr-types";
+import { isHTMLNode } from "../../types/html-node-types";
 import { TsLitPluginStore } from "../../state/store";
 
 /**

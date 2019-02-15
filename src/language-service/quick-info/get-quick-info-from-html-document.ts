@@ -1,8 +1,9 @@
-import { QuickInfo, TypeChecker } from "typescript";
-import { HTMLDocument } from "../../html-document/html-document";
-import { isHTMLAttr } from "../../html-document/types/html-attr-types";
-import { isHTMLNode } from "../../html-document/types/html-node-types";
+import { QuickInfo } from "typescript";
+import { quickInfoForHtmlAttr, quickInfoForHtmlNode } from "../../extensions/html/quick-info";
+import { HTMLDocument } from "../../parsing/html-document/html-document";
 import { TsLitPluginStore } from "../../state/store";
+import { isHTMLAttr } from "../../types/html-node-attr-types";
+import { isHTMLNode } from "../../types/html-node-types";
 
 /**
  * Asks extensions for quick info at a specific position.
@@ -11,17 +12,15 @@ import { TsLitPluginStore } from "../../state/store";
  * @param checker
  * @param store
  */
-export function getQuickInfoFromHtmlDocument(position: number, htmlDocument: HTMLDocument, checker: TypeChecker, store: TsLitPluginStore): QuickInfo | undefined {
-	const context = { file: htmlDocument.astNode.getSourceFile(), store, position, checker };
-
+export function getQuickInfoFromHtmlDocument(position: number, htmlDocument: HTMLDocument, store: TsLitPluginStore): QuickInfo | undefined {
 	const hit = htmlDocument.htmlNodeOrAttrAtPosition(position);
 	if (hit == null) return;
 
 	if (isHTMLNode(hit)) {
-		return store.extension.quickInfoForHtmlNode(hit, context);
+		return quickInfoForHtmlNode(hit, store);
 	}
 
 	if (isHTMLAttr(hit)) {
-		return store.extension.quickInfoForHtmlAttr(hit, context);
+		return quickInfoForHtmlAttr(hit, store);
 	}
 }

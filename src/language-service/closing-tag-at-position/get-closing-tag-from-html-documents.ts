@@ -1,5 +1,5 @@
 import { JsxClosingTagInfo } from "typescript";
-import { HtmlDocumentCollection } from "../../html-document/html-document-collection";
+import { HtmlDocumentCollection } from "../../parsing/html-document/html-document-collection";
 import { TsLitPluginStore } from "../../state/store";
 import { VscodeHtmlServiceWrapper } from "../../vscode-html-languageservice/vscode-html-service-wrapper";
 

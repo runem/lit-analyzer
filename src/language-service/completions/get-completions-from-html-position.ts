@@ -1,32 +1,27 @@
 import { CompletionEntry, CompletionInfo } from "typescript";
-import { ITsHtmlExtensionCompletionContext } from "../../extensions/i-ts-html-extension";
-import { IHtmlAttrBase } from "../../html-document/types/html-attr-types";
-import { HtmlNode } from "../../html-document/types/html-node-types";
+import { completionsForHtmlAttrs, completionsForHtmlNodes } from "../../extensions/html/completions";
 import { TsLitPluginStore } from "../../state/store";
+import { IHtmlNodeAttrBase } from "../../types/html-node-attr-types";
+import { HtmlNode } from "../../types/html-node-types";
 import { IHtmlPositionContext } from "../../util/get-html-position";
 import { intersects } from "../../util/util";
 
 /**
  * Returns completion info based on the position of the cursor using extensions.
- * @param htmlPosition
+ * @param positionContext
  * @param store
  */
-export function getCompletionInfoFromHtmlPosition(htmlPosition: IHtmlPositionContext, store: TsLitPluginStore): CompletionInfo | undefined {
-	const { htmlDocument, beforeWord, position } = htmlPosition;
+export function getCompletionInfoFromHtmlPosition(positionContext: IHtmlPositionContext, store: TsLitPluginStore): CompletionInfo | undefined {
+	const { htmlDocument, beforeWord, position } = positionContext;
 
 	// Get possible intersecting html attribute or attribute area.
 	const htmlAttr = getIntersectingHtmlAttrName(htmlDocument.rootNodes, position) || undefined;
 	const insideAttrAreaNode = getIntersectingHtmlNodeAttrArea(htmlDocument.rootNodes, position);
 
-	const context: ITsHtmlExtensionCompletionContext = {
-		...htmlPosition,
-		store
-	};
-
 	// Get entries from the extensions
 	let entries: CompletionEntry[] | undefined = [];
 	if (htmlAttr != null) {
-		entries = store.extension.completionsForHtmlAttrs(htmlAttr.htmlNode, context);
+		entries = completionsForHtmlAttrs(htmlAttr.htmlNode, positionContext, store);
 
 		if (entries != null) {
 			// Make sure that every entry overwrites the entire attribute name.
@@ -37,9 +32,9 @@ export function getCompletionInfoFromHtmlPosition(htmlPosition: IHtmlPositionCon
 			}));
 		}
 	} else if (insideAttrAreaNode != null) {
-		entries = store.extension.completionsForHtmlAttrs(insideAttrAreaNode, context);
+		entries = completionsForHtmlAttrs(insideAttrAreaNode, positionContext, store);
 	} else if (beforeWord === "<") {
-		entries = store.extension.completionsForHtmlNodes(context);
+		entries = completionsForHtmlNodes(positionContext, store);
 	}
 
 	// Return completion info
@@ -92,7 +87,7 @@ function getIntersectingHtmlNodeAttrArea(htmlNode: HtmlNode | HtmlNode[], positi
  * @param htmlNode
  * @param position
  */
-function getIntersectingHtmlAttrName(htmlNode: HtmlNode | HtmlNode[], position: number): IHtmlAttrBase | undefined {
+function getIntersectingHtmlAttrName(htmlNode: HtmlNode | HtmlNode[], position: number): IHtmlNodeAttrBase | undefined {
 	if (Array.isArray(htmlNode)) {
 		// Loop through all nodes in the array. Stop if a result is encountered.
 		for (const childNode of htmlNode || []) {

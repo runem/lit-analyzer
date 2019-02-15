@@ -2,11 +2,12 @@ import * as tsModule from "typescript";
 import { SourceFile } from "typescript";
 import * as ts from "typescript/lib/tsserverlibrary";
 import { ExtensionCollectionExtension } from "../extensions/extension-collection-extension";
-import { HtmlDocumentCollection } from "../html-document/html-document-collection";
-import { HtmlAttr } from "../html-document/types/html-attr-types";
-import { HtmlNode } from "../html-document/types/html-node-types";
-import { HtmlReport } from "../html-document/types/html-report-types";
-import { ComponentTagName, IComponentDeclaration, IComponentsInFile } from "../parse-components/component-types";
+import { HtmlDocumentCollection } from "../parsing/html-document/html-document-collection";
+import { ComponentTagName, IComponentDeclaration, IComponentDeclarationProp, IComponentsInFile } from "../parsing/parse-components/component-types";
+import { HtmlTag, HtmlTagAttr } from "../parsing/parse-data/html-tag";
+import { HtmlNodeAttr } from "../types/html-node-attr-types";
+import { HtmlNode } from "../types/html-node-types";
+import { HtmlReport } from "../types/html-report-types";
 import { Config } from "./config";
 
 export type FileName = string;
@@ -16,21 +17,69 @@ export type FileName = string;
  */
 export class TsLitPluginStore {
 	config!: Config;
+
 	extension = new ExtensionCollectionExtension([]);
 	componentsInFile = new Map<FileName, IComponentsInFile>();
 	importedComponentsInFile = new Map<FileName, IComponentsInFile[]>();
 	allTagNameFileNames = new Map<ComponentTagName, FileName>();
 	allComponents = new Map<ComponentTagName, IComponentDeclaration>();
-	private htmlReportsForHtml = new Map<HtmlNode | HtmlAttr, HtmlReport[]>();
+
+	// NEW
+	declarations = new Map<HtmlTag, IComponentDeclaration>();
+	tags = new Map<string, HtmlTag>();
+	attributes = new Map<string, HtmlTagAttr>();
+
+	// Deprecated???
+	private htmlReportsForHtml = new WeakMap<HtmlNode | HtmlNodeAttr, HtmlReport[]>();
 	private htmlDocumentCache = new WeakMap<SourceFile, HtmlDocumentCollection>();
+
+	get allHtmlTags(): HtmlTag[] {
+		return Array.from(this.tags.values());
+	}
+
+	get allGlobalHtmlTagAttrs(): HtmlTagAttr[] {
+		return Array.from(this.attributes.values());
+	}
 
 	constructor(public ts: typeof tsModule, public info: ts.server.PluginCreateInfo) {}
 
-	getReportsForHtmlNodeOrAttr(source: HtmlNode | HtmlAttr): HtmlReport[] {
+	getComponentDeclarationProp(htmlAttr: HtmlNodeAttr): IComponentDeclarationProp | undefined {
+		return undefined;
+	}
+
+	getComponentDeclaration(tagName: string): IComponentDeclaration | undefined {
+		return undefined;
+	}
+
+	getHtmlTagAttrs(htmlNode: HtmlNode): HtmlTagAttr[] {
+		const htmlTag = this.getHtmlTag(htmlNode);
+
+		return [...((htmlTag != null ? htmlTag.attributes : []) || []), ...this.allGlobalHtmlTagAttrs];
+	}
+
+	getHtmlTag(htmlNode: HtmlNode): HtmlTag | undefined {
+		return this.tags.get(htmlNode.tagName);
+	}
+
+	getHtmlTagAttr(htmlAttr: HtmlNodeAttr): HtmlTagAttr | undefined {
+		const htmlTag = this.tags.get(htmlAttr.htmlNode.tagName);
+
+		if (htmlTag != null) {
+			const result = htmlTag.attributes.find(htmlTagAttr => htmlTagAttr.name === htmlAttr.name);
+
+			if (result != null) {
+				return result;
+			}
+		}
+
+		return this.attributes.get(htmlAttr.name);
+	}
+
+	getReportsForHtmlNodeOrAttr(source: HtmlNode | HtmlNodeAttr): HtmlReport[] {
 		return this.htmlReportsForHtml.get(source) || [];
 	}
 
-	absorbReports(source: HtmlNode | HtmlAttr, reports: HtmlReport[]) {
+	absorbReports(source: HtmlNode | HtmlNodeAttr, reports: HtmlReport[]) {
 		this.htmlReportsForHtml.set(source, reports);
 	}
 
