@@ -19,8 +19,8 @@
 ## ➤ Table of Contents
 
 * [➤ Installation](#-installation)
-* [➤ Visual Studio Code](#-visual-studio-code)
-	* [Other](#other)
+	* [Visual Studio Code](#visual-studio-code)
+		* [Other](#other)
 * [➤ Features](#-features)
 	* [Attribute type checking](#attribute-type-checking)
 	* [Automatically pick up on lit-elements](#automatically-pick-up-on-lit-elements)
@@ -51,10 +51,7 @@
 
 ## ➤ Installation
 
-
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)
-
-## ➤ Visual Studio Code
+### Visual Studio Code
 
 If you use Visual Studio Code you can simply install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension.
 
@@ -62,7 +59,7 @@ If you use Visual Studio Code you can simply install the [lit-plugin](https://ma
 code --install-extension runem.lit-plugin
 ```
 
-### Other
+#### Other
 
 First, install the plugin:
 
