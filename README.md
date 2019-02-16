@@ -11,7 +11,9 @@
 	</p>
 
 
-![](documentation/asset/lit-plugin.gif)
+<p align="center">
+  <img src="documentation/asset/lit-plugin.gif" alt="Lit plugin GIF"/>
+</p>
 
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)

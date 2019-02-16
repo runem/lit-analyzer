@@ -2,7 +2,9 @@
 {{ template:title }}
 {{ template:badges }}
 
-![](documentation/asset/lit-plugin.gif)
+<p align="center">
+  <img src="documentation/asset/lit-plugin.gif" alt="Lit plugin GIF"/>
+</p>
 
 {{ template:toc }}
 
