@@ -1,9 +1,41 @@
+import { isSimpleTypeLiteral, SimpleType, SimpleTypeKind } from "ts-simple-type";
 import { CompletionEntry } from "typescript";
 import { tsModule } from "../../ts-module";
+import { HtmlNodeAttr } from "../../types/html-node-attr-types";
 import { HtmlNode } from "../../types/html-node-types";
 import { DocumentPositionContext } from "../../util/get-html-position";
 import { caseInsensitiveCmp } from "../../util/util";
 import { DiagnosticsContext } from "../diagnostics-context";
+
+export function completionsForHtmlAttrValues(htmlNodeAttr: HtmlNodeAttr, positionContext: DocumentPositionContext, { store }: DiagnosticsContext): CompletionEntry[] {
+	const htmlTagAttr = store.getHtmlTagAttr(htmlNodeAttr);
+	if (htmlTagAttr == null) return [];
+
+	const options = getOptionsFromType(htmlTagAttr.type);
+
+	return options.map((option, i) => ({
+		name: option,
+		insertText: option,
+		kind: tsModule.ts.ScriptElementKind.label,
+		sortText: i.toString()
+	}));
+}
+
+function getOptionsFromType(type: SimpleType): string[] {
+	switch (type.kind) {
+		case SimpleTypeKind.UNION:
+			return type.types.filter(isSimpleTypeLiteral).map(t => t.value.toString());
+		case SimpleTypeKind.ENUM:
+			return type.types
+				.map(m => m.type)
+				.filter(isSimpleTypeLiteral)
+				.map(t => t.value.toString());
+		case SimpleTypeKind.ALIAS:
+			return getOptionsFromType(type.target);
+	}
+
+	return [];
+}
 
 export function completionsForHtmlAttrs(htmlNode: HtmlNode, positionContext: DocumentPositionContext, { store }: DiagnosticsContext): CompletionEntry[] {
 	const htmlTagAttrs = store.getHtmlTagAttrs(htmlNode);

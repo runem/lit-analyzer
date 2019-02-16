@@ -95,7 +95,7 @@ export class TsLitPluginStore {
 		const htmlTag = this.tags.get(htmlAttr.htmlNode.tagName);
 
 		if (htmlTag != null) {
-			const result = htmlTag.attributes.find(htmlTagAttr => htmlTagAttr.name === htmlAttr.name);
+			const result = htmlTag.attributes.find(htmlTagAttr => caseInsensitiveCmp(htmlTagAttr.name, htmlAttr.name));
 
 			if (result != null) {
 				return result;
