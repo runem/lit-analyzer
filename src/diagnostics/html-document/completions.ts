@@ -1,3 +1,4 @@
+import { isSimpleTypeLiteral, SimpleType, SimpleTypeKind } from "ts-simple-type";
 import { CompletionEntry } from "typescript";
 import { tsModule } from "../../ts-module";
 import { HtmlNodeAttr } from "../../types/html-node-attr-types";
@@ -7,16 +8,33 @@ import { caseInsensitiveCmp } from "../../util/util";
 import { DiagnosticsContext } from "../diagnostics-context";
 
 export function completionsForHtmlAttrValues(htmlNodeAttr: HtmlNodeAttr, positionContext: DocumentPositionContext, { store }: DiagnosticsContext): CompletionEntry[] {
-	const htmlTagAttrs = store.getHtmlTagAttrs(htmlNodeAttr.htmlNode);
+	const htmlTagAttr = store.getHtmlTagAttr(htmlNodeAttr);
+	if (htmlTagAttr == null) return [];
 
-	const unusedAttrs = htmlTagAttrs.filter(htmlAttr => !(htmlNodeAttr.htmlNode.attributes.find(attr => caseInsensitiveCmp(htmlAttr.name, attr.name)) != null));
+	const options = getOptionsFromType(htmlTagAttr.type);
 
-	return unusedAttrs.map(htmlTagAttr => ({
-		name: `${htmlTagAttr.name}${htmlTagAttr.required ? "!" : ""}`,
-		insertText: htmlTagAttr.name,
-		kind: htmlTagAttr.hasProp ? tsModule.ts.ScriptElementKind.memberVariableElement : tsModule.ts.ScriptElementKind.label,
-		sortText: htmlTagAttr.hasProp ? "0" : "1"
+	return options.map((option, i) => ({
+		name: option,
+		insertText: option,
+		kind: tsModule.ts.ScriptElementKind.label,
+		sortText: i.toString()
 	}));
+}
+
+function getOptionsFromType(type: SimpleType): string[] {
+	switch (type.kind) {
+		case SimpleTypeKind.UNION:
+			return type.types.filter(isSimpleTypeLiteral).map(t => t.value.toString());
+		case SimpleTypeKind.ENUM:
+			return type.types
+				.map(m => m.type)
+				.filter(isSimpleTypeLiteral)
+				.map(t => t.value.toString());
+		case SimpleTypeKind.ALIAS:
+			return getOptionsFromType(type.target);
+	}
+
+	return [];
 }
 
 export function completionsForHtmlAttrs(htmlNode: HtmlNode, positionContext: DocumentPositionContext, { store }: DiagnosticsContext): CompletionEntry[] {

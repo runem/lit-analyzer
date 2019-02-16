@@ -7,7 +7,7 @@ import { Range } from "../types/range";
  * @param strB
  */
 export function caseInsensitiveCmp(strA: string, strB: string): boolean {
-	return strA.match(new RegExp(`^${strB}$`, "i")) != null;
+	return strA.toLowerCase() === strB.toLowerCase();
 }
 
 /**

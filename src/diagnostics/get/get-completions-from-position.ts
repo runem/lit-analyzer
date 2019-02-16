@@ -36,7 +36,6 @@ export function getCompletionInfoFromPosition(document: TextDocument, positionCo
 				}));
 			}
 		} else if (htmlAttrValue != null && ['"', "'", "="].includes(beforeWord)) {
-			logger.debug(htmlAttrValue);
 			entries = completionsForHtmlAttrValues(htmlAttrValue, positionContext, context);
 		} else if (insideAttrAreaNode != null) {
 			entries = completionsForHtmlAttrs(insideAttrAreaNode, positionContext, context);

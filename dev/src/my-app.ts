@@ -12,7 +12,9 @@ const myApp = (text: string, disabled: boolean) => html`
 		}
 	</style>
 
-	<my-button size=""></my-button>
+	<input type="week" accept="" aria-checked="true" aria-expanded="false" />
+
+	<my-button size="medium"></my-button>
 `;
 
 render(myApp("Hello", false), document.body);
