@@ -14,7 +14,7 @@ export function validateHtmlNode(htmlNode: HtmlNode, sourceFile: SourceFile, sto
 	}
 
 	const htmlTag = store.getHtmlTag(htmlNode);
-	const declaration = store.getComponentDeclaration(htmlNode.tagName);
+	const declaration = store.getComponentDeclaration(htmlNode);
 
 	if (htmlTag == null) {
 		if (store.config.externalHtmlTagNames.includes(htmlNode.tagName)) return [];

@@ -38,6 +38,12 @@ export interface IComponentDeclaration {
 	location: ICustomElementSourceCodeLocation;
 }
 
+export interface IComponentDefinition {
+	fileName: string;
+	tagName: string;
+	declaration: IComponentDeclaration;
+}
+
 export interface IComponentsInFile {
 	fileName: string;
 	components: Map<ComponentTagName, IComponentDeclaration>;

@@ -1,5 +1,5 @@
 import { Node } from "typescript";
-import { HTMLDocument } from "../parsing/html-document/html-document";
+import { HtmlDocument } from "../parsing/text-document/html-document/html-document";
 import { HtmlNodeAttr } from "../types/html-node-attr-types";
 import { HtmlNode } from "../types/html-node-types";
 import { intersects } from "./util";
@@ -16,11 +16,11 @@ export interface IContext<T> {
  * @param htmlDocuments
  * @param ctx
  */
-export function iterateHtmlDocuments<T>(htmlDocuments: HTMLDocument[] | HTMLDocument, ctx: IContext<T>): T[] {
+export function iterateHtmlDocuments<T>(htmlDocuments: HtmlDocument[] | HtmlDocument, ctx: IContext<T>): T[] {
 	const results: T[] = [];
 	for (const htmlDocument of Array.isArray(htmlDocuments) ? htmlDocuments : [htmlDocuments]) {
 		for (const childNode of htmlDocument.rootNodes) {
-			results.push(...iterateHtmlNode(htmlDocument.astNode, childNode, ctx));
+			results.push(...iterateHtmlNode(htmlDocument.virtualDocument.astNode, childNode, ctx));
 			if (results.length > 0 && ctx.stopOnNonEmpty) return results;
 		}
 	}

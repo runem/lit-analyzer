@@ -1,26 +1,15 @@
-import { Node, TypeChecker } from "typescript";
-import { TsLitPluginStore } from "../../state/store";
+import { ParsingContext } from "../parsing-context";
+import { VirtualDocument } from "../virtual-document/virtual-document";
+import { CssDocument } from "./css-document/css-document";
+import { parseHtmlDocument } from "./html-document/parse-html-document";
 import { TextDocument } from "./text-document";
-import { visitTaggedTemplateNodes } from "./visit-tagged-template-nodes";
 
-/**
- * Returns all text documents in a given file.
- * @param astNode
- * @param checker
- * @param store
- */
-export function parseTextDocuments(astNode: Node, checker: TypeChecker, store: TsLitPluginStore): TextDocument[] {
-	const textDocuments: TextDocument[] = [];
-
-	visitTaggedTemplateNodes(astNode, {
-		checker,
-		shouldCheckTemplateTag(templateTag: string) {
-			return store.config.htmlTemplateTags.includes(templateTag);
-		},
-		emitTextDocument(document: TextDocument) {
-			textDocuments.push(document);
+export function parseTextDocuments(virtualDocuments: VirtualDocument[], context: ParsingContext): TextDocument[] {
+	return virtualDocuments.map(document => {
+		if (document.templateTag === "css") {
+			return new CssDocument(document);
 		}
-	});
 
-	return textDocuments;
+		return parseHtmlDocument(document, context);
+	});
 }

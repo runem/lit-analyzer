@@ -1,5 +1,5 @@
 import { Node } from "typescript";
-import { HTMLDocument } from "../parsing/html-document/html-document";
+import { HtmlDocument } from "../parsing/text-document/html-document/html-document";
 import { HtmlNodeAttr } from "../types/html-node-attr-types";
 import { HtmlNode } from "../types/html-node-types";
 import { HtmlReport } from "../types/html-report-types";
@@ -19,7 +19,7 @@ export interface IContext<T> {
  * @param htmlDocuments
  * @param ctx
  */
-export function iterateHtmlDocumentReports<T>(htmlDocuments: HTMLDocument[] | HTMLDocument, ctx: IContext<T>): T[] {
+export function iterateHtmlDocumentReports<T>(htmlDocuments: HtmlDocument[] | HtmlDocument, ctx: IContext<T>): T[] {
 	htmlDocuments = Array.isArray(htmlDocuments) ? htmlDocuments : [htmlDocuments];
 
 	iterateHtmlDocuments(htmlDocuments, {
@@ -32,7 +32,7 @@ export function iterateHtmlDocumentReports<T>(htmlDocuments: HTMLDocument[] | HT
 		}
 	});
 
-	return flatten(flatten(htmlDocuments.map(htmlDocument => htmlDocument.rootNodes.map(childNode => iterateHtmlNodeReports(htmlDocument.astNode, childNode, ctx)))));
+	return flatten(flatten(htmlDocuments.map(htmlDocument => htmlDocument.rootNodes.map(childNode => iterateHtmlNodeReports(htmlDocument.virtualDocument.astNode, childNode, ctx)))));
 }
 
 /**

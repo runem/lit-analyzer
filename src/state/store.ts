@@ -1,16 +1,15 @@
 import * as tsModule from "typescript";
 import { SourceFile } from "typescript";
 import * as ts from "typescript/lib/tsserverlibrary";
-import { ExtensionCollectionExtension } from "../extensions/extension-collection-extension";
-import { HtmlDocumentCollection } from "../parsing/html-document/html-document-collection";
-import { ComponentTagName, IComponentDeclaration, IComponentDeclarationProp, IComponentsInFile } from "../parsing/parse-components/component-types";
+import { ComponentTagName, IComponentDeclaration, IComponentDeclarationProp, IComponentDefinition } from "../parsing/parse-components/component-types";
 import { HtmlTag, HtmlTagAttr } from "../parsing/parse-data/html-tag";
+import { TextDocument } from "../parsing/text-document/text-document";
+import { AttrName, FileName, TagName } from "../types/alias";
 import { HtmlNodeAttr } from "../types/html-node-attr-types";
 import { HtmlNode } from "../types/html-node-types";
 import { HtmlReport } from "../types/html-report-types";
+import { caseInsensitiveCmp } from "../util/util";
 import { Config } from "./config";
-
-export type FileName = string;
 
 /**
  * The main store that this ts-plugin uses.
@@ -18,20 +17,13 @@ export type FileName = string;
 export class TsLitPluginStore {
 	config!: Config;
 
-	extension = new ExtensionCollectionExtension([]);
-	componentsInFile = new Map<FileName, IComponentsInFile>();
-	importedComponentsInFile = new Map<FileName, IComponentsInFile[]>();
-	allTagNameFileNames = new Map<ComponentTagName, FileName>();
-	allComponents = new Map<ComponentTagName, IComponentDeclaration>();
-
-	// NEW
-	declarations = new Map<HtmlTag, IComponentDeclaration>();
-	tags = new Map<string, HtmlTag>();
-	attributes = new Map<string, HtmlTagAttr>();
-
-	// Deprecated???
+	importedComponentDefinitionsInFile = new Map<FileName, IComponentDefinition[]>();
+	definitionsInFile = new Map<FileName, IComponentDefinition[]>();
+	private definitions = new Map<TagName, IComponentDefinition>();
+	private tags = new Map<TagName, HtmlTag>();
+	private attributes = new Map<AttrName, HtmlTagAttr>();
+	private documents = new WeakMap<SourceFile, TextDocument[]>();
 	private htmlReportsForHtml = new WeakMap<HtmlNode | HtmlNodeAttr, HtmlReport[]>();
-	private htmlDocumentCache = new WeakMap<SourceFile, HtmlDocumentCollection>();
 
 	get allHtmlTags(): HtmlTag[] {
 		return Array.from(this.tags.values());
@@ -43,12 +35,50 @@ export class TsLitPluginStore {
 
 	constructor(public ts: typeof tsModule, public info: ts.server.PluginCreateInfo) {}
 
-	getComponentDeclarationProp(htmlAttr: HtmlNodeAttr): IComponentDeclarationProp | undefined {
-		return undefined;
+	absorbHtmlDefinitions(sourceFile: SourceFile, definitions: IComponentDefinition[]) {
+		this.definitionsInFile.set(sourceFile.fileName, definitions);
+
+		definitions.forEach(definition => {
+			this.definitions.set(definition.tagName, definition);
+		});
 	}
 
-	getComponentDeclaration(tagName: string): IComponentDeclaration | undefined {
-		return undefined;
+	absorbHtmlTags(htmlTags: HtmlTag[]) {
+		htmlTags.forEach(htmlTag => {
+			this.tags.set(htmlTag.name, htmlTag);
+		});
+	}
+
+	absorbGlobalHtmlAttributes(htmlAttrs: HtmlTagAttr[]) {
+		htmlAttrs.forEach(htmlAttr => {
+			this.attributes.set(htmlAttr.name, htmlAttr);
+		});
+	}
+
+	absorbDocumentsForFile(sourceFile: SourceFile, documents: TextDocument[]) {
+		this.documents.set(sourceFile, documents);
+	}
+
+	absorbReports(source: HtmlNode | HtmlNodeAttr, reports: HtmlReport[]) {
+		this.htmlReportsForHtml.set(source, reports);
+	}
+
+	getDefinitionsWithDeclarationInFile(sourceFile: SourceFile): IComponentDefinition[] {
+		return Array.from(this.definitions.values()).filter(d => d.declaration.fileName === sourceFile.fileName);
+	}
+
+	getDefinitionForTagName(tagName: TagName): IComponentDefinition | undefined {
+		return this.definitions.get(tagName);
+	}
+
+	getComponentDeclarationProp(htmlNodeAttr: HtmlNodeAttr): IComponentDeclarationProp | undefined {
+		const decl = this.getComponentDeclaration(htmlNodeAttr.htmlNode);
+		return decl == null ? undefined : decl.props.find(prop => caseInsensitiveCmp(prop.name, htmlNodeAttr.name));
+	}
+
+	getComponentDeclaration(htmlNode: HtmlNode): IComponentDeclaration | undefined {
+		const htmlTag = this.getHtmlTag(htmlNode);
+		return htmlTag == null ? undefined : this.definitions.has(htmlTag.name) ? this.definitions.get(htmlTag.name)!.declaration : undefined;
 	}
 
 	getHtmlTagAttrs(htmlNode: HtmlNode): HtmlTagAttr[] {
@@ -79,16 +109,17 @@ export class TsLitPluginStore {
 		return this.htmlReportsForHtml.get(source) || [];
 	}
 
-	absorbReports(source: HtmlNode | HtmlNodeAttr, reports: HtmlReport[]) {
-		this.htmlReportsForHtml.set(source, reports);
+	getDocumentsForFile(file: SourceFile): TextDocument[] {
+		return this.documents.get(file) || [];
 	}
 
-	/**
-	 * Returns all html documents in a specific file.
-	 * @param file
-	 */
-	getDocumentsCollectionForFile(file: SourceFile): HtmlDocumentCollection {
-		return this.htmlDocumentCache.get(file) || new HtmlDocumentCollection(file, [], this.ts);
+	invalidateTagsDefinedInFile(sourceFile: SourceFile) {
+		const definitions = this.definitionsInFile.get(sourceFile.fileName) || [];
+
+		definitions.forEach(definition => {
+			this.tags.delete(definition.tagName);
+			this.definitions.delete(definition.tagName);
+		});
 	}
 
 	/**
@@ -97,51 +128,12 @@ export class TsLitPluginStore {
 	 * @param tagName
 	 */
 	hasTagNameBeenImported(fileName: string, tagName: ComponentTagName): boolean {
-		for (const file of this.importedComponentsInFile.get(fileName) || []) {
-			if (file.components.has(tagName)) {
+		for (const file of this.importedComponentDefinitionsInFile.get(fileName) || []) {
+			if (file.tagName === tagName) {
 				return true;
 			}
 		}
 
 		return false;
-	}
-
-	/**
-	 * Saves html documents for a specific source file.
-	 * @param sourceFile
-	 * @param documentCollection
-	 */
-	absorbHtmlDocumentCollection(sourceFile: SourceFile, documentCollection: HtmlDocumentCollection) {
-		this.htmlDocumentCache.set(sourceFile, documentCollection);
-	}
-
-	/**
-	 * Saves components for a specific source file.
-	 * @param sourceFile
-	 * @param result
-	 */
-	absorbComponentsInFile(sourceFile: SourceFile, result: IComponentsInFile) {
-		// Absorb the new file result and elements
-		this.componentsInFile.set(sourceFile.fileName, result);
-		Array.from(result.components.entries()).forEach(([tagName, element]) => {
-			this.allComponents.set(tagName, element);
-			this.allTagNameFileNames.set(tagName, sourceFile.fileName);
-		});
-	}
-
-	/**
-	 * Removes all information about a source file in order to clear the cache.
-	 * @param sourceFile
-	 */
-	invalidateSourceFile(sourceFile: SourceFile) {
-		this.importedComponentsInFile.delete(sourceFile.fileName);
-
-		const existingResult = this.componentsInFile.get(sourceFile.fileName);
-		if (existingResult != null) {
-			Array.from(existingResult.components.entries()).forEach(([tagName]) => {
-				this.allComponents.delete(tagName);
-				this.allTagNameFileNames.delete(tagName);
-			});
-		}
 	}
 }

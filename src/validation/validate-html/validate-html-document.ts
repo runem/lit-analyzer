@@ -1,5 +1,5 @@
 import { Node, TypeChecker } from "typescript";
-import { HTMLDocument } from "../../parsing/html-document/html-document";
+import { HtmlDocument } from "../../parsing/text-document/html-document/html-document";
 import { TsLitPluginStore } from "../../state/store";
 import { HtmlNodeAttr } from "../../types/html-node-attr-types";
 import { HtmlNode } from "../../types/html-node-types";
@@ -9,7 +9,7 @@ import { validateHtmlNode } from "./validate-html-node";
 import { validateHtmlAttr } from "./validate-html-node-attr";
 import { validateHtmlAttrAssignment } from "./validate-html-node-attr-assignment";
 
-export function validateHTMLDocuments(htmlDocuments: HTMLDocument[], checker: TypeChecker, store: TsLitPluginStore) {
+export function validateHTMLDocuments(htmlDocuments: HtmlDocument[], checker: TypeChecker, store: TsLitPluginStore) {
 	return iterateHtmlDocuments<{ source: HtmlNode | HtmlNodeAttr; reports: HtmlReport[] }>(htmlDocuments, {
 		getNodeItems(htmlNode: HtmlNode, astNode: Node) {
 			// Ask extensions for node reports

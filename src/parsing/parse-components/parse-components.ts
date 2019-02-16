@@ -1,6 +1,6 @@
 import * as tsModule from "typescript";
 import { Node, TypeChecker } from "typescript";
-import { IComponentDeclaration, IComponentDeclarationMeta, IComponentDeclarationProp, IComponentsInFile } from "./component-types";
+import { IComponentDeclaration, IComponentDeclarationMeta, IComponentDeclarationProp, IComponentDefinition } from "./component-types";
 import { CustomElementFlavor } from "./flavors/custom-element-flavor";
 import { LitElementFlavor } from "./flavors/lit-element-flavor";
 
@@ -24,31 +24,37 @@ export interface IParseComponentFlavor {
 
 const allFlavors: IParseComponentFlavor[] = [new LitElementFlavor(), new CustomElementFlavor()];
 
+const cache = new WeakMap<Node, IComponentDeclaration>();
+
 /**
  * Visits and parse component definitions and corresponding declarations.
  * @param node
  * @param checker
  * @param flavors
  */
-export function parseComponents(node: Node, checker: TypeChecker, flavors = allFlavors): IComponentsInFile {
-	const sourceFile = node.getSourceFile();
-	const result: IComponentsInFile = {
-		fileName: sourceFile.fileName,
-		components: new Map()
-	};
+export function parseComponents(node: Node, checker: TypeChecker, flavors = allFlavors): IComponentDefinition[] {
+	const components: IComponentDefinition[] = [];
 
 	for (const flavor of flavors) {
 		flavor.visitComponentDefinitions(node, {
 			checker,
 			ts: tsModule,
 			addComponentDefinition(tagName: string, declarationNode: Node) {
-				const element = parseComponent(declarationNode, checker, flavors);
-				result.components.set(tagName, element);
+				// Always return the same component declaration result for the same node
+				// This makes it possible for multiple tag names to share the same component declaration.
+				const declaration = cache.get(declarationNode) || parseComponent(declarationNode, checker, flavors);
+				cache.set(declarationNode, declaration);
+
+				components.push({
+					fileName: node.getSourceFile().fileName,
+					tagName,
+					declaration
+				});
 			}
 		});
 	}
 
-	return result;
+	return components;
 }
 
 /**

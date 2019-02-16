@@ -1,17 +1,17 @@
 import * as tsModule from "typescript";
-import { Node, Program } from "typescript";
-import { IComponentsInFile } from "../parse-components/component-types";
+import { Node, Program, SourceFile } from "typescript";
 import { logger } from "../../util/logger";
+import { IComponentDefinition } from "../parse-components/component-types";
 
 interface IVisitDependenciesContext {
 	program: Program;
 	ts: typeof tsModule;
 	project: ts.server.Project;
 	lockedFiles: string[];
-	getComponentsInFile(fileName: string): IComponentsInFile | undefined;
-	getImportedComponentsInFile(fileName: string): IComponentsInFile[] | undefined;
-	addComponentsForFile(fileName: string, results: IComponentsInFile[], isCircular: boolean): void;
-	addCircularReference(fromFileName: string, toFileName: string): void;
+	getDefinitionsInFile(file: SourceFile): IComponentDefinition[] | undefined;
+	getImportedDefinitionsInFile(file: SourceFile): IComponentDefinition[] | undefined;
+	addDefinitionsForFile(file: SourceFile, results: IComponentDefinition[], isCircular: boolean): void;
+	addCircularReference(fromFile: SourceFile, toFile: SourceFile): void;
 }
 
 /**
@@ -21,14 +21,13 @@ interface IVisitDependenciesContext {
  */
 export function visitDependencies(node: Node, context: IVisitDependenciesContext) {
 	if (context.ts.isSourceFile(node)) {
-		let components = context.getImportedComponentsInFile(node.fileName);
+		const existingResult = context.getImportedDefinitionsInFile(node);
 
-		if (components != null) {
+		if (existingResult != null) {
 			// It's already cached
-			context.addComponentsForFile(node.fileName, components, false);
+			context.addDefinitionsForFile(node, existingResult, false);
 		} else {
-			const resultForFile = context.getComponentsInFile(node.fileName);
-			components = resultForFile != null ? [resultForFile] : [];
+			const result = [...(context.getDefinitionsInFile(node) || [])];
 			let isCircular = false;
 
 			// Pick up all new components and add them to the scope of this file.
@@ -38,9 +37,9 @@ export function visitDependencies(node: Node, context: IVisitDependenciesContext
 				// Expand locked files with this file
 				lockedFiles: [...context.lockedFiles, node.fileName],
 
-				addComponentsForFile(fileName: string, newResults: IComponentsInFile[], isCircular: boolean): void {
-					context.addComponentsForFile(fileName, newResults, isCircular);
-					components!.push(...newResults);
+				addDefinitionsForFile(file: SourceFile, newResults: IComponentDefinition[], isCircular: boolean): void {
+					context.addDefinitionsForFile(file, newResults, isCircular);
+					result.push(...newResults);
 				},
 				addCircularReference() {
 					isCircular = true;
@@ -50,34 +49,31 @@ export function visitDependencies(node: Node, context: IVisitDependenciesContext
 			node.forEachChild(child => visitDependencies(child, newContext));
 
 			// Filter out duplicates in the "components" array. Eg two files depend on the same elements.
-			const uniqueResults = components.filter((v, i, a) => a.indexOf(v) === i);
+			const uniqueResults = Array.from(new Set(result));
 
-			context.addComponentsForFile(node.fileName, uniqueResults, isCircular);
+			context.addDefinitionsForFile(node, uniqueResults, isCircular);
 		}
 	} else if (context.ts.isImportDeclaration(node) || context.ts.isExportDeclaration(node)) {
 		if (node.moduleSpecifier != null && context.ts.isStringLiteral(node.moduleSpecifier)) {
 			// Resolve the imported string
-			const res = context.project.getResolvedModuleWithFailedLookupLocationsFromCache(node.moduleSpecifier.text, node.getSourceFile().fileName);
-			const mod = res != null ? res.resolvedModule : res;
+			const result = context.project.getResolvedModuleWithFailedLookupLocationsFromCache(node.moduleSpecifier.text, node.getSourceFile().fileName);
+			const mod = result != null ? result.resolvedModule : undefined;
 
 			if (mod != null) {
-				const moduleFileName = mod.resolvedFileName;
-				const isCircularImport = context.lockedFiles.includes(moduleFileName);
+				const isCircularImport = context.lockedFiles.includes(mod.resolvedFileName);
+				const sourceFile = context.program.getSourceFile(mod.resolvedFileName);
 
 				if (!isCircularImport) {
-					const sourceFile = context.program.getSourceFile(moduleFileName);
-
 					if (sourceFile != null) {
 						// Visit dependencies in the import recursively
 						visitDependencies(sourceFile, context);
 					}
-				} else {
+				} else if (sourceFile != null) {
 					// Stop! Prevent infinite loop due to circular imports
-					context.addCircularReference(node.getSourceFile().fileName, moduleFileName);
+					context.addCircularReference(node.getSourceFile(), sourceFile);
 				}
 			} else {
-				// The module doesn't exists.
-				logger.error("Couldn't find module for ", node.moduleSpecifier.text);
+				logger.error("Couldn't find module for ", node.moduleSpecifier.text, "from", node.getSourceFile().fileName);
 			}
 		}
 	}
