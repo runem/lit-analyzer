@@ -1,96 +1,4 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/runem/ts-lit-plugin/master/documentation/asset/lit-plugin@256w.png" alt="Logo" width="200" height="auto" />
-</p>
-<h1 align="center">ts-lit-plugin</h1>
-<p align="center">
-		<a href="https://npmcharts.com/compare/ts-lit-plugin?minimal=true"><img alt="Downloads per month" src="https://img.shields.io/npm/dm/ts-lit-plugin.svg" height="20"/></a>
-<a href="https://www.npmjs.com/package/ts-lit-plugin"><img alt="NPM Version" src="https://img.shields.io/npm/v/ts-lit-plugin.svg" height="20"/></a>
-<a href="https://david-dm.org/runebm/ts-lit-plugin"><img alt="Dependencies" src="https://img.shields.io/david/runebm/ts-lit-plugin.svg" height="20"/></a>
-<a href="https://github.com/runebm/ts-lit-plugin/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/runebm/ts-lit-plugin.svg" height="20"/></a>
-<a href="https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin"><img alt="Publish at vscode marketplace" src="https://vsmarketplacebadge.apphb.com/version/runem.lit-plugin.svg" height="20"/></a>
-	</p>
-
-
-![](documentation/asset/lit-plugin.gif)
-
-
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)
-
-## ➤ Table of Contents
-
-* [➤ Installation](#-installation)
-* [➤ Visual Studio Code](#-visual-studio-code)
-	* [Other](#other)
-* [➤ Features](#-features)
-	* [Attribute type checking](#attribute-type-checking)
-	* [Automatically pick up on lit-elements](#automatically-pick-up-on-lit-elements)
-	* [Support for dependencies that extend the global HTMLElementTagNameMap](#support-for-dependencies-that-extend-the-global-htmlelementtagnamemap)
-	* [Report missing imports of custom elements](#report-missing-imports-of-custom-elements)
-	* [Goto definition for html tags and attributes](#goto-definition-for-html-tags-and-attributes)
-	* [Code completions for html tags and attributes](#code-completions-for-html-tags-and-attributes)
-	* [Quick info on hover for html tags and attributes](#quick-info-on-hover-for-html-tags-and-attributes)
-	* [Warning if required attributes not included](#warning-if-required-attributes-not-included)
-	* [Support for @ts-ignore comments inside html](#support-for-ts-ignore-comments-inside-html)
-	* [Reformat html](#reformat-html)
-	* [Auto close tags](#auto-close-tags)
-* [➤ Configuring the plugin](#-configuring-the-plugin)
-	* [disable](#disable)
-	* [htmlTemplateTags](#htmltemplatetags)
-	* [cssTemplateTags](#csstemplatetags)
-	* [globalHtmlTags](#globalhtmltags)
-	* [globalHtmlAttributes](#globalhtmlattributes)
-	* [skipMissingImports](#skipmissingimports)
-	* [skipUnknownHtmlTags](#skipunknownhtmltags)
-	* [skipUnknownHtmlAttributes](#skipunknownhtmlattributes)
-	* [skipTypeChecking](#skiptypechecking)
-	* [format.disable](#formatdisable)
-* [➤ License](#-license)
-
-
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)
-
-## ➤ Installation
-
-
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)
-
-## ➤ Visual Studio Code
-
-If you use Visual Studio Code you can simply install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension.
-
-```bash
-code --install-extension runem.lit-plugin
-```
-
-### Other
-
-First, install the plugin:
-
-```bash
-npm install ts-lit-plugin -D
-```
-
-Then add a `plugins` section to your [`tsconfig.json`](http://www.typescriptlang.org/docs/handbook/tsconfig-json.html):
-
-<!-- prettier-ignore -->
-```json
-{
-  "compilerOptions": {
-    "plugins": [
-      {
-        "name": "ts-lit-plugin"
-      }
-    ]
-  }
-}
-```
-
-See [Configuring the plugin](#configuring-the-plugin) for more information regarding how to configure the plugin.
-
-
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)
-
-## ➤ Features
+## Features
 
 ### Attribute type checking
 
@@ -224,10 +132,7 @@ return html`
 
 When typing html inside a template tag `lit-plugin` auto-closes tags as you would expect.
 
-
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)
-
-## ➤ Configuring the plugin
+## Configuring the plugin
 
 If you are using the vscode plugin you can configure these options directly from extension settings. If not you can add the options directly to the `compilerOptions.plugins` section of your `ts-config.json` file.
 
@@ -290,11 +195,3 @@ If you are using the vscode plugin you can configure these options directly from
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Disable formatting the HTML on code reformat.
-
-
-
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)
-
-## ➤ License
-	
-Licensed under [MIT](https://opensource.org/licenses/MIT).
