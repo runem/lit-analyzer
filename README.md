@@ -61,6 +61,7 @@ If you use Visual Studio Code you can simply install the [lit-plugin](https://ma
 ```bash
 code --install-extension runem.lit-plugin
 ```
+
 ### Other
 
 First, install the plugin:

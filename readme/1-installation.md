@@ -1,13 +1,14 @@
 ## Installation
 
-## Visual Studio Code
+### Visual Studio Code
 
 If you use Visual Studio Code you can simply install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension.
 
 ```bash
 code --install-extension runem.lit-plugin
 ```
-### Other
+
+#### Other
 
 First, install the plugin:
 
