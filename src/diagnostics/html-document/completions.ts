@@ -1,11 +1,11 @@
 import { CompletionEntry } from "typescript";
 import { tsModule } from "../../ts-module";
 import { HtmlNode } from "../../types/html-node-types";
-import { IHtmlPositionContext } from "../../util/get-html-position";
+import { DocumentPositionContext } from "../../util/get-html-position";
 import { caseInsensitiveCmp } from "../../util/util";
 import { DiagnosticsContext } from "../diagnostics-context";
 
-export function completionsForHtmlAttrs(htmlNode: HtmlNode, positionContext: IHtmlPositionContext, { store }: DiagnosticsContext): CompletionEntry[] {
+export function completionsForHtmlAttrs(htmlNode: HtmlNode, positionContext: DocumentPositionContext, { store }: DiagnosticsContext): CompletionEntry[] {
 	const htmlTagAttrs = store.getHtmlTagAttrs(htmlNode);
 
 	const unusedAttrs = htmlTagAttrs.filter(htmlAttr => !(htmlNode.attributes.find(attr => caseInsensitiveCmp(htmlAttr.name, attr.name)) != null));
@@ -18,7 +18,7 @@ export function completionsForHtmlAttrs(htmlNode: HtmlNode, positionContext: IHt
 	}));
 }
 
-export function completionsForHtmlNodes({ position, leftWord, rightWord }: IHtmlPositionContext, { store }: DiagnosticsContext): CompletionEntry[] {
+export function completionsForHtmlNodes({ position, leftWord, rightWord }: DocumentPositionContext, { store }: DiagnosticsContext): CompletionEntry[] {
 	const htmlTags = store.allHtmlTags;
 
 	return htmlTags.map(

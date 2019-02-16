@@ -1,6 +1,6 @@
 import { TextDocument } from "../parsing/text-document/text-document";
 
-export interface IHtmlPositionContext {
+export interface DocumentPositionContext {
 	html: string;
 	positionInText: number;
 	position: number;
@@ -16,7 +16,7 @@ export interface IHtmlPositionContext {
  * @param document
  * @param position
  */
-export function getPositionContextInDocument(document: TextDocument, position: number): IHtmlPositionContext {
+export function getPositionContextInDocument(document: TextDocument, position: number): DocumentPositionContext {
 	const html = document.virtualDocument.astNode.getText();
 	const start = document.virtualDocument.astNode.getStart();
 	const positionInHtml = position - start;

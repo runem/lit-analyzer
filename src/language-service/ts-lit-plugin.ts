@@ -128,9 +128,13 @@ export class TsLitPlugin {
 
 		// Get quick info from extensions.
 		const document = this.getIntersectingDocument(sourceFile, position);
-		const quickInfo = document == null ? undefined : getQuickInfoFromDocument(document, position, this.diagnosticContext(sourceFile));
+		if (document != null) {
+			const positionContext = getPositionContextInDocument(document, position);
+			const quickInfo = getQuickInfoFromDocument(document, positionContext, this.diagnosticContext(sourceFile));
+			if (quickInfo != null) return quickInfo;
+		}
 
-		return quickInfo || this.prevLangService.getQuickInfoAtPosition(fileName, position);
+		return this.prevLangService.getQuickInfoAtPosition(fileName, position);
 	}
 
 	getSemanticDiagnostics(fileName: string) {
@@ -151,7 +155,8 @@ export class TsLitPlugin {
 	private diagnosticContext(sourceFile: SourceFile): DiagnosticsContext {
 		return {
 			sourceFile,
-			store: this.store
+			store: this.store,
+			checker: this.program.getTypeChecker()
 		};
 	}
 }

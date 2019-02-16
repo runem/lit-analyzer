@@ -1,9 +1,10 @@
-import { CompletionEntry, CompletionInfo, DiagnosticCategory, DiagnosticWithLocation } from "typescript";
+import { CompletionEntry, CompletionInfo, DiagnosticCategory, DiagnosticWithLocation, QuickInfo, SymbolDisplayPart } from "typescript";
 import * as vscode from "vscode-css-languageservice";
 import { DIAGNOSTIC_SOURCE } from "../../../constants";
 import { CssDocument } from "../../../parsing/text-document/css-document/css-document";
 import { VirtualDocument } from "../../../parsing/virtual-document/virtual-document";
 import { tsModule } from "../../../ts-module";
+import { logger } from "../../../util/logger";
 
 const cssService = vscode.getCSSLanguageService();
 
@@ -52,6 +53,37 @@ export class VscodeCssServiceWrapper {
 						code: 2322
 					} as DiagnosticWithLocation)
 			);
+	}
+
+	getQuickInfoAtPosition(positionInText: number): QuickInfo | undefined {
+		const position = this.vscTextDocument.positionAt(positionInText);
+		const hover = cssService.doHover(this.vscTextDocument, position, this.vscStylesheet);
+		if (hover == null || hover.range == null) return;
+
+		const contents = Array.isArray(hover.contents) ? hover.contents : [hover.contents];
+		const displayParts: SymbolDisplayPart[] = [];
+		const documentation: SymbolDisplayPart[] = [];
+		for (const content of contents) {
+			const text = typeof content === "string" ? content : content.value;
+
+			if (typeof content === "object" && "language" in content) {
+				if (content.language === "html") {
+					if (displayParts.length > 0) displayParts.push({ kind: "text", text: "\n\n" });
+					displayParts.push({ kind: "text", text });
+				}
+			} else {
+				documentation.push({ kind: "text", text });
+			}
+		}
+
+		logger.debug(contents);
+		return {
+			kind: tsModule.ts.ScriptElementKind.label,
+			kindModifiers: "",
+			textSpan: this.rangeToTsSpan(hover.range),
+			displayParts,
+			documentation
+		};
 	}
 
 	getCompletionInfoAtPosition(positionInText: number): CompletionInfo | undefined {

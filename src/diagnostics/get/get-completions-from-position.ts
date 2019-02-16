@@ -4,13 +4,13 @@ import { HtmlDocument } from "../../parsing/text-document/html-document/html-doc
 import { TextDocument } from "../../parsing/text-document/text-document";
 import { IHtmlNodeAttrBase } from "../../types/html-node-attr-types";
 import { HtmlNode } from "../../types/html-node-types";
-import { IHtmlPositionContext } from "../../util/get-html-position";
+import { DocumentPositionContext } from "../../util/get-html-position";
 import { intersects } from "../../util/util";
 import { VscodeCssServiceWrapper } from "../css-document/vscode-css-languageservice/vscode-css-service-wrapper";
 import { DiagnosticsContext } from "../diagnostics-context";
 import { completionsForHtmlAttrs, completionsForHtmlNodes } from "../html-document/completions";
 
-export function getCompletionInfoFromPosition(document: TextDocument, positionContext: IHtmlPositionContext, context: DiagnosticsContext): CompletionInfo | undefined {
+export function getCompletionInfoFromPosition(document: TextDocument, positionContext: DocumentPositionContext, context: DiagnosticsContext): CompletionInfo | undefined {
 	const { beforeWord, position } = positionContext;
 
 	if (document instanceof CssDocument) {

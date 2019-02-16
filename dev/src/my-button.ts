@@ -10,16 +10,19 @@ export class MyButton extends LitElement {
 	@property({ type: Boolean }) disabled: boolean = false;
 
 	static styles = css`
+		#hello.lol {
+		}
 		button {
 			flx: hejsa;
 			all: 1192;
 			lkdjf: hej;
+			color: ed;
 		}
 	`;
 
 	render() {
 		return html`
-			<my-button></my-button>
+			<my-button size=""></my-button>
 			<button aria-activedescendant>${this.text}</button>
 		`;
 	}
