@@ -2,7 +2,7 @@ import * as tsModule from "typescript";
 import { SourceFile } from "typescript";
 import * as ts from "typescript/lib/tsserverlibrary";
 import { ComponentTagName, IComponentDeclaration, IComponentDeclarationProp, IComponentDefinition } from "../parsing/parse-components/component-types";
-import { HtmlTag, HtmlTagAttr } from "../parsing/parse-data/html-tag";
+import { HtmlTag, HtmlTagAttr } from "../parsing/parse-html-data/html-tag";
 import { TextDocument } from "../parsing/text-document/text-document";
 import { AttrName, FileName, TagName } from "../types/alias";
 import { HtmlNodeAttr } from "../types/html-node-attr-types";

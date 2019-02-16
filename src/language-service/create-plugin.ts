@@ -1,7 +1,7 @@
 import { setTypescriptModule as setTsIsAssignableModule } from "ts-simple-type";
 import * as ts from "typescript/lib/tsserverlibrary";
 import { HTML5_GLOBAL_ATTRIBUTES, HTML5_TAGS, HTML5_VALUE_MAP } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5";
-import { parseData } from "../parsing/parse-data/parse-data";
+import { parseHtmlData } from "../parsing/parse-html-data/parse-html-data";
 import { makeConfig } from "../state/config";
 import { TsLitPluginStore } from "../state/store";
 import { setTypescriptModule } from "../ts-module";
@@ -29,7 +29,7 @@ export function createPlugin(typescript: typeof ts, info: ts.server.PluginCreate
 	logger.debug("Config", store.config);
 
 	// Add all HTML5 tags and attributes
-	const result = parseData({
+	const result = parseHtmlData({
 		version: 1,
 		tags: HTML5_TAGS,
 		globalAttributes: HTML5_GLOBAL_ATTRIBUTES,

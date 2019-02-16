@@ -1,8 +1,6 @@
-import { toSimpleType } from "ts-simple-type";
 import { LanguageService, Program, SourceFile, TypeChecker } from "typescript";
-import { IComponentDefinition } from "../parsing/parse-components/component-types";
+import { convertComponentDefinitionsToHtmlTags } from "../parsing/convert-component-definitions-to-html-tags";
 import { parseComponents } from "../parsing/parse-components/parse-components";
-import { HtmlTag } from "../parsing/parse-data/html-tag";
 import { parseDependencies } from "../parsing/parse-dependencies/parse-dependencies";
 import { ParsingContext } from "../parsing/parsing-context";
 import { HtmlDocument } from "../parsing/text-document/html-document/html-document";
@@ -89,7 +87,7 @@ export class StoreUpdater {
 		this.store.invalidateTagsDefinedInFile(sourceFile);
 		this.store.absorbHtmlDefinitions(sourceFile, componentDefinitions);
 
-		const htmlTags = componentDefinitions.map(definition => temp(definition, this.checker));
+		const htmlTags = componentDefinitions.map(definition => convertComponentDefinitionsToHtmlTags(definition, this.checker));
 		this.store.absorbHtmlTags(htmlTags);
 	}
 
@@ -100,21 +98,4 @@ export class StoreUpdater {
 			store: this.store
 		};
 	}
-}
-
-function temp(definition: IComponentDefinition, checker: TypeChecker): HtmlTag {
-	const decl = definition.declaration;
-
-	return {
-		hasDeclaration: true,
-		name: definition.tagName,
-		description: decl.meta.jsDoc != null ? decl.meta.jsDoc.comment : undefined,
-		attributes: decl.props.map(prop => ({
-			hasProp: true,
-			name: prop.name,
-			description: prop.jsDoc != null ? prop.jsDoc.comment : undefined,
-			required: prop.required,
-			type: toSimpleType(prop.type, checker)
-		}))
-	};
 }

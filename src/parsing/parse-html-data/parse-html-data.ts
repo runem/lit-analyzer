@@ -7,7 +7,7 @@ export type HtmlDataResult = {
 	globalAttrs: HtmlTagAttr[];
 };
 
-export function parseData(data: HtmlData) {
+export function parseHtmlData(data: HtmlData) {
 	switch (data.version) {
 		case 1:
 			return parseDataV1(data);
