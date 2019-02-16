@@ -61,7 +61,6 @@ If you use Visual Studio Code you can simply install the [lit-plugin](https://ma
 ```bash
 code --install-extension runem.lit-plugin
 ```
-
 ### Other
 
 First, install the plugin:
@@ -72,7 +71,6 @@ npm install ts-lit-plugin -D
 
 Then add a `plugins` section to your [`tsconfig.json`](http://www.typescriptlang.org/docs/handbook/tsconfig-json.html):
 
-<!-- prettier-ignore -->
 ```json
 {
   "compilerOptions": {
@@ -109,7 +107,6 @@ I'm working on supporting `static get properties()` and picking up "non-lit-elem
 
 If a dependency extends the global `HTMLElementTagNameMap` this plugin will pick up on the map between the tag name and the class. Below you will see an example of what to add to your library typescript definition files if you want type checking support for a given html tag.
 
-<!-- prettier-ignore -->
 ```typescript
 declare global {
   interface HTMLElementTagNameMap {
@@ -147,7 +144,6 @@ Hover above a html tag or attribute and see more information about the identifie
 
 **lit-plugin will think that the following is a required property**:
 
-<!-- prettier-ignore -->
 ```typescript
 @customElement("my-element")
 export class MyElement extends LitElement {
@@ -162,7 +158,6 @@ Add "@ts-ignore" comments to make `lit-plugin` quiet.
 **In front of html template tags:**
 This will make `lit-plugin` opt out of any checking inside the html template tag, but not the nested html template tags.
 
-<!-- prettier-ignore -->
 ```javascript
 // @ts-ignore
 html`this is not checked ${html`this is checked`} `;
@@ -171,7 +166,6 @@ html`this is not checked ${html`this is checked`} `;
 **Inside HTML:**
 This will make `lit-plugin` opt out of any checking inside the div tag.
 
-<!-- prettier-ignore -->
 ```javascript
 return html`
   <h1>Foo</h1>
@@ -191,14 +185,12 @@ return html`
 
 **For example**:
 
-<!-- prettier-ignore -->
 ```javascript
 return html`<div>${html`<h1>Foo</h1> <h2>Bar</h2>`}</div>`;
 ```
 
 **Will become**:
 
-<!-- prettier-ignore -->
 ```javascript
 return html`
 <div>
@@ -209,7 +201,6 @@ return html`
 
 **And not:**:
 
-<!-- prettier-ignore -->
 ```javascript
 return html`
   <div>

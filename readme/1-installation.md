@@ -7,7 +7,6 @@ If you use Visual Studio Code you can simply install the [lit-plugin](https://ma
 ```bash
 code --install-extension runem.lit-plugin
 ```
-
 ### Other
 
 First, install the plugin:
@@ -18,7 +17,6 @@ npm install ts-lit-plugin -D
 
 Then add a `plugins` section to your [`tsconfig.json`](http://www.typescriptlang.org/docs/handbook/tsconfig-json.html):
 
-<!-- prettier-ignore -->
 ```json
 {
   "compilerOptions": {
