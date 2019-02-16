@@ -1,13 +1,13 @@
+import { LitHtmlAttributeModifier } from "../constants";
+import { Range } from "../types/range";
+
 /**
  * Compares two strings case insensitive.
  * @param strA
  * @param strB
  */
-import { Range } from "../types/range";
-import { VisitContext } from "../virtual-document/visit-tagged-template-nodes";
-
 export function caseInsensitiveCmp(strA: string, strB: string): boolean {
-	return strA.match(new RegExp(`^${strB}$`, "i")) != null;
+	return strA.toLowerCase() === strB.toLowerCase();
 }
 
 /**
@@ -45,24 +45,14 @@ export type Newable<T> = { new (...args: any[]): T };
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 /**
- * Checks whether a leading comment includes a given search string.
- * @param text
- * @param context
- * @param pos
- * @param needle
+ * Parses an attribute name returning a name and eg. a modifier.
+ * Examples:
+ *  - ?disabled="..."
+ *  - .myProp="..."
+ *  - @click="..."
+ * @param attributeName
  */
-export function leadingCommentsIncludes(text: string, pos: number, needle: string, context: VisitContext): boolean {
-	// Get the leading comments to the position.
-	const leadingComments = context.store.ts.getLeadingCommentRanges(text, pos);
-
-	// If any leading comments exists, we check whether the needle matches the context of the comment.
-	if (leadingComments != null) {
-		for (const comment of leadingComments) {
-			const commentText = text.substring(comment.pos, comment.end);
-			if (commentText.includes(needle)) {
-				return true;
-			}
-		}
-	}
-	return false;
+export function parseLitAttrName(attributeName: string): { name: string; modifier?: LitHtmlAttributeModifier } {
+	const [, modifier, name] = attributeName.match(/^([.?@])?(.*)/);
+	return { name, modifier: modifier as LitHtmlAttributeModifier };
 }

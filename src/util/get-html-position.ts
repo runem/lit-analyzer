@@ -1,9 +1,8 @@
-import { HTMLDocument } from "../html-document/html-document";
+import { TextDocument } from "../parsing/text-document/text-document";
 
-export interface IHtmlPositionContext {
-	htmlDocument: HTMLDocument;
+export interface DocumentPositionContext {
 	html: string;
-	positionInHtml: number;
+	positionInText: number;
 	position: number;
 	word: string;
 	leftWord: string;
@@ -13,13 +12,13 @@ export interface IHtmlPositionContext {
 }
 
 /**
- * Returns information about the position in a html document.
- * @param htmlDocument
+ * Returns information about the position in a document.
+ * @param document
  * @param position
  */
-export function getHtmlPositionInHtmlDocument(htmlDocument: HTMLDocument, position: number): IHtmlPositionContext {
-	const html = htmlDocument.astNode.getText();
-	const start = htmlDocument.astNode.getStart();
+export function getPositionContextInDocument(document: TextDocument, position: number): DocumentPositionContext {
+	const html = document.virtualDocument.astNode.getText();
+	const start = document.virtualDocument.astNode.getStart();
 	const positionInHtml = position - start;
 
 	const leftWord = grabWordInDirection({
@@ -42,9 +41,8 @@ export function getHtmlPositionInHtmlDocument(htmlDocument: HTMLDocument, positi
 	const afterWord = html[Math.min(html.length, positionInHtml - leftWord.length)];
 
 	return {
-		positionInHtml,
+		positionInText: positionInHtml,
 		html,
-		htmlDocument,
 		position,
 		word,
 		leftWord,

@@ -1,10 +1,10 @@
 import { setTypescriptModule as setTsIsAssignableModule } from "ts-simple-type";
 import * as ts from "typescript/lib/tsserverlibrary";
-import { CustomElementExtension } from "../extensions/custom-element-extension";
-import { LitHtmlExtension } from "../extensions/lit-html-extension";
-import { UnknownElementExtension } from "../extensions/unknown-element-extension";
+import { HTML5_GLOBAL_ATTRIBUTES, HTML5_TAGS, HTML5_VALUE_MAP } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5";
+import { parseHtmlData } from "../parsing/parse-html-data/parse-html-data";
 import { makeConfig } from "../state/config";
 import { TsLitPluginStore } from "../state/store";
+import { setTypescriptModule } from "../ts-module";
 import { logger, LoggingLevel } from "../util/logger";
 import { TsLitPlugin } from "./ts-lit-plugin";
 
@@ -16,6 +16,7 @@ import { TsLitPlugin } from "./ts-lit-plugin";
 export function createPlugin(typescript: typeof ts, info: ts.server.PluginCreateInfo): TsLitPlugin {
 	// Cache the typescript module
 	setTsIsAssignableModule(typescript);
+	setTypescriptModule(typescript);
 
 	// Create the store
 	const store = new TsLitPluginStore(typescript, info);
@@ -27,7 +28,16 @@ export function createPlugin(typescript: typeof ts, info: ts.server.PluginCreate
 	logger.verbose("CreateLitTsPlugin called");
 	logger.debug("Config", store.config);
 
-	store.extension.addExtension(new UnknownElementExtension(), new CustomElementExtension(), new LitHtmlExtension());
+	// Add all HTML5 tags and attributes
+	const result = parseHtmlData({
+		version: 1,
+		tags: HTML5_TAGS,
+		globalAttributes: HTML5_GLOBAL_ATTRIBUTES,
+		valueSets: HTML5_VALUE_MAP
+	});
+
+	store.absorbHtmlTags(result.tags);
+	store.absorbGlobalHtmlAttributes(result.globalAttrs);
 
 	const prevLanguageService = info.languageService;
 

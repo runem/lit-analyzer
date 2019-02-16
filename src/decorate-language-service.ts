@@ -14,14 +14,29 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 		getJsxClosingTagAtPosition: plugin.getJsxClosingTagAtPosition.bind(plugin)
 	};
 
+	// Make sure to call the old service if config.disable === true
+	for (const methodName of Object.getOwnPropertyNames(nextLanguageService)) {
+		const newMethod = (nextLanguageService as any)[methodName];
+		const oldMethod = (languageService as any)[methodName];
+
+		if (newMethod !== oldMethod) {
+			(nextLanguageService as any)[methodName] = function() {
+				if (plugin.config.disable && oldMethod != null) {
+					return oldMethod(...arguments);
+				}
+
+				return wrapTryCatch(newMethod)(...arguments);
+			};
+		}
+	}
+
 	// Wrap all method called to the service in tryCatch and logging.
 	if (plugin.config.verbose) {
 		for (const methodName of Object.getOwnPropertyNames(nextLanguageService)) {
 			const method = (nextLanguageService as any)[methodName];
-			(nextLanguageService as any)[methodName] = wrapTryCatch(wrapLog(methodName, method));
+			(nextLanguageService as any)[methodName] = wrapLog(methodName, method);
 		}
 	}
-
 	return nextLanguageService;
 }
 
@@ -35,7 +50,7 @@ function wrapTryCatch<T extends Function>(proxy: T): T {
 		try {
 			return proxy(...args);
 		} catch (e) {
-			logger.error(`Error (${e.stack}) ${e.message}`);
+			logger.error(`Error: (${e.stack}) ${e.message}`, e);
 		}
 	}) as unknown) as T;
 }
@@ -47,7 +62,13 @@ function wrapTryCatch<T extends Function>(proxy: T): T {
  */
 function wrapLog<T extends Function>(name: string, proxy: T): T {
 	return (((...args: unknown[]) => {
-		//logger.verbose(`Typescript called ${name}`);
+		/**
+		logger.verbose(`Typescript called ${name}`);
+		const result = proxy(...args);
+		logger.verbose("- result: ", result == null ? "nothing" : Array.isArray(result) ? `Length: ${result.length}` : "defined");
+		return result;
+		/*/
 		return proxy(...args);
+		/**/
 	}) as unknown) as T;
 }
