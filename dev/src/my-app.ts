@@ -12,7 +12,7 @@ const myApp = (text: string, disabled: boolean) => html`
 		}
 	</style>
 
-	<input type="week" accept="" aria-checked="true" aria-expanded="false" />
+	<input class="" contenteditable="true" type="week" accept="" aria-checked="true" aria-expanded="false" />
 
 	<my-button size="small"></my-button>
 `;
