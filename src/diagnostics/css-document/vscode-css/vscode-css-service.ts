@@ -2,14 +2,14 @@ import { CompletionEntry, CompletionInfo, DiagnosticCategory, DiagnosticWithLoca
 import * as vscode from "vscode-css-languageservice";
 import { DIAGNOSTIC_SOURCE } from "../../../constants";
 import { CssDocument } from "../../../parsing/text-document/css-document/css-document";
-import { VirtualDocument } from "../../../parsing/virtual-document/virtual-document";
 import { tsModule } from "../../../ts-module";
-import { logger } from "../../../util/logger";
 
 const cssService = vscode.getCSSLanguageService();
 
-export class VscodeCssServiceWrapper {
-	private virtualDocument: VirtualDocument;
+export class VscodeCssService {
+	private get virtualDocument() {
+		return this.cssDocument.virtualDocument;
+	}
 
 	private _vscTextDocument: vscode.TextDocument | undefined;
 	private get vscTextDocument(): vscode.TextDocument {
@@ -27,15 +27,7 @@ export class VscodeCssServiceWrapper {
 		return this._vscStylesheet;
 	}
 
-	constructor(cssDocument: CssDocument);
-	constructor(virtualDocument: VirtualDocument);
-	constructor(document: CssDocument | VirtualDocument) {
-		if ("virtualDocument" in document) {
-			this.virtualDocument = document.virtualDocument;
-		} else {
-			this.virtualDocument = document;
-		}
-	}
+	constructor(private cssDocument: CssDocument) {}
 
 	getDiagnostics(): DiagnosticWithLocation[] {
 		const diagnostics = cssService.doValidation(this.vscTextDocument, this.vscStylesheet);
@@ -76,7 +68,6 @@ export class VscodeCssServiceWrapper {
 			}
 		}
 
-		logger.debug(contents);
 		return {
 			kind: tsModule.ts.ScriptElementKind.label,
 			kindModifiers: "",

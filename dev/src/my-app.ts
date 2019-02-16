@@ -14,7 +14,7 @@ const myApp = (text: string, disabled: boolean) => html`
 
 	<input type="week" accept="" aria-checked="true" aria-expanded="false" />
 
-	<my-button size="medium"></my-button>
+	<my-button size="small"></my-button>
 `;
 
 render(myApp("Hello", false), document.body);

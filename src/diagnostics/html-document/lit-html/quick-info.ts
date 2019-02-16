@@ -1,10 +1,10 @@
 import { toTypeString } from "ts-simple-type";
 import { QuickInfo } from "typescript";
-import { LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../constants";
-import { tsModule } from "../../ts-module";
-import { HtmlNodeAttr } from "../../types/html-node-attr-types";
-import { HtmlNode } from "../../types/html-node-types";
-import { DiagnosticsContext } from "../diagnostics-context";
+import { LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../../constants";
+import { tsModule } from "../../../ts-module";
+import { HtmlNodeAttr } from "../../../types/html-node-attr-types";
+import { HtmlNode } from "../../../types/html-node-types";
+import { DiagnosticsContext } from "../../diagnostics-context";
 
 export function quickInfoForHtmlNode(htmlNode: HtmlNode, { store }: DiagnosticsContext): QuickInfo | undefined {
 	const { start, end } = htmlNode.location.name;

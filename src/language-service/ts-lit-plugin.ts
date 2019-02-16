@@ -13,24 +13,17 @@ import {
 	UserPreferences
 } from "typescript";
 import { DiagnosticsContext } from "../diagnostics/diagnostics-context";
-import { getClosingTagFromDocument } from "../diagnostics/get/get-closing-tag-from-document";
-import { getCodeFixFromDocument } from "../diagnostics/get/get-code-fix-from-document";
-import { getCompletionInfoFromPosition } from "../diagnostics/get/get-completions-from-position";
-import { getDefinitionAndBoundSpanFromDocument } from "../diagnostics/get/get-definition-and-bound-span-from-document";
-import { getDiagnosticsFromDocument } from "../diagnostics/get/get-diagnostics-from-document";
-import { getFormattingEditsFromDocument } from "../diagnostics/get/get-formatting-edits-from-document";
-import { getQuickInfoFromDocument } from "../diagnostics/get/get-quick-info-from-document";
+import { DiagnosticsService } from "../diagnostics/diagnostics-service";
 import { intersectingDocument, TextDocument } from "../parsing/text-document/text-document";
 import { Config } from "../state/config";
 import { TsLitPluginStore } from "../state/store";
 import { Range } from "../types/range";
-import { getPositionContextInDocument } from "../util/get-html-position";
 import { logger } from "../util/logger";
-import { flatten } from "../util/util";
 import { StoreUpdater } from "./store-updater";
 
 export class TsLitPlugin {
 	private storeUpdater!: StoreUpdater;
+	private diagnostics = new DiagnosticsService();
 
 	get config() {
 		return this.store.config;
@@ -55,15 +48,9 @@ export class TsLitPlugin {
 
 		// Calculates the neighborhood of the cursors position in the html.
 		const document = this.getIntersectingDocument(sourceFile, position);
-		if (document != null) {
-			const positionContext = getPositionContextInDocument(document, position);
+		const completionInfo = document == null ? undefined : this.diagnostics.getCompletionInfoFromDocument(document, position, this.diagnosticContext(sourceFile));
 
-			// Get completion info from the document
-			const completionInfo = getCompletionInfoFromPosition(document, positionContext, this.diagnosticContext(sourceFile));
-			if (completionInfo != null) return completionInfo;
-		}
-
-		return this.prevLangService.getCompletionsAtPosition(fileName, position, options);
+		return completionInfo || this.prevLangService.getCompletionsAtPosition(fileName, position, options);
 	}
 
 	getCodeFixesAtPosition(
@@ -78,7 +65,7 @@ export class TsLitPlugin {
 		this.storeUpdater.update(sourceFile);
 
 		const document = this.getIntersectingDocument(sourceFile, { start, end });
-		const codeFixes = document == null ? [] : getCodeFixFromDocument(start, end, document, this.diagnosticContext(sourceFile));
+		const codeFixes = document == null ? [] : this.diagnostics.getCodeFixesFromDocument(document, start, end, this.diagnosticContext(sourceFile));
 
 		const prevResult = this.prevLangService.getCodeFixesAtPosition(fileName, start, end, errorCodes, formatOptions, preferences) || [];
 
@@ -90,7 +77,7 @@ export class TsLitPlugin {
 		this.storeUpdater.update(sourceFile, ["docs"]);
 
 		const document = this.getIntersectingDocument(sourceFile, position);
-		const closingTag = document == null ? undefined : getClosingTagFromDocument(document, position, this.diagnosticContext(sourceFile));
+		const closingTag = document == null ? undefined : this.diagnostics.getClosingTagFromDocument(document, position);
 
 		return closingTag || this.prevLangService.getJsxClosingTagAtPosition(fileName, position);
 	}
@@ -100,7 +87,7 @@ export class TsLitPlugin {
 		this.storeUpdater.update(sourceFile, ["cmps", "docs"]);
 
 		const document = this.getIntersectingDocument(sourceFile, position);
-		const definition = document == null ? undefined : getDefinitionAndBoundSpanFromDocument(document, position, this.diagnosticContext(sourceFile));
+		const definition = document == null ? undefined : this.diagnostics.getDefinitionAndBoundSpanFromDocument(document, position, this.diagnosticContext(sourceFile));
 
 		return definition || this.prevLangService.getDefinitionAndBoundSpan(fileName, position);
 	}
@@ -117,7 +104,7 @@ export class TsLitPlugin {
 		this.storeUpdater.update(sourceFile, ["docs"]);
 
 		const documents = this.store.getDocumentsForFile(sourceFile);
-		const edits = flatten(documents.map(document => getFormattingEditsFromDocument(document, settings, this.diagnosticContext(sourceFile))));
+		const edits = this.diagnostics.getFormattingEditsFromDocuments(documents, settings);
 
 		return [...prev, ...edits];
 	}
@@ -128,13 +115,9 @@ export class TsLitPlugin {
 
 		// Get quick info from extensions.
 		const document = this.getIntersectingDocument(sourceFile, position);
-		if (document != null) {
-			const positionContext = getPositionContextInDocument(document, position);
-			const quickInfo = getQuickInfoFromDocument(document, positionContext, this.diagnosticContext(sourceFile));
-			if (quickInfo != null) return quickInfo;
-		}
+		const quickInfo = document == null ? undefined : this.diagnostics.getQuickInfoFromDocument(document, position, this.diagnosticContext(sourceFile));
 
-		return this.prevLangService.getQuickInfoAtPosition(fileName, position);
+		return quickInfo || this.prevLangService.getQuickInfoAtPosition(fileName, position);
 	}
 
 	getSemanticDiagnostics(fileName: string) {
@@ -142,7 +125,7 @@ export class TsLitPlugin {
 		this.storeUpdater.update(sourceFile);
 
 		const documents = this.store.getDocumentsForFile(sourceFile);
-		const diagnostics = flatten(documents.map(document => getDiagnosticsFromDocument(document, this.diagnosticContext(sourceFile))));
+		const diagnostics = this.diagnostics.getDiagnosticsFromDocuments(documents, this.diagnosticContext(sourceFile));
 
 		const prevResult = this.prevLangService.getSemanticDiagnostics(fileName) || [];
 		return [...prevResult, ...diagnostics];

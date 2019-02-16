@@ -1,14 +1,15 @@
 import { DiagnosticWithLocation } from "typescript";
-import { DIAGNOSTIC_SOURCE } from "../../constants";
-import { tsModule } from "../../ts-module";
-import { HtmlNodeAttr } from "../../types/html-node-attr-types";
-import { HtmlNode } from "../../types/html-node-types";
-import { HtmlReport, HtmlReportKind } from "../../types/html-report-types";
-import { rangeToTSSpan } from "../../util/util";
-import { DiagnosticsContext } from "../diagnostics-context";
+import { DIAGNOSTIC_SOURCE } from "../../../constants";
+import { TsLitPluginStore } from "../../../state/store";
+import { tsModule } from "../../../ts-module";
+import { HtmlNodeAttr } from "../../../types/html-node-attr-types";
+import { HtmlNode } from "../../../types/html-node-types";
+import { HtmlReport, HtmlReportKind } from "../../../types/html-report-types";
+import { rangeToTSSpan } from "../../../util/util";
+import { DiagnosticsContext } from "../../diagnostics-context";
 
 export function diagnosticsForHtmlNodeReport(htmlNode: HtmlNode, htmlReport: HtmlReport, { sourceFile, store }: DiagnosticsContext): DiagnosticWithLocation[] {
-	const messageText = getMessageTextFromHtmlReportOnNode(htmlNode, htmlReport);
+	const messageText = getMessageTextFromHtmlReportOnNode(htmlNode, htmlReport, store);
 	if (messageText == null) return [];
 
 	return [
@@ -23,7 +24,7 @@ export function diagnosticsForHtmlNodeReport(htmlNode: HtmlNode, htmlReport: Htm
 	];
 }
 
-function getMessageTextFromHtmlReportOnNode(htmlNode: HtmlNode, htmlReport: HtmlReport): string | undefined {
+function getMessageTextFromHtmlReportOnNode(htmlNode: HtmlNode, htmlReport: HtmlReport, store: TsLitPluginStore): string | undefined {
 	switch (htmlReport.kind) {
 		case HtmlReportKind.UNKNOWN:
 			return `Unknown tag "${htmlNode.tagName}"${htmlReport.suggestedName ? `. Did you mean '${htmlReport.suggestedName}'?` : ""}`;
@@ -32,8 +33,13 @@ function getMessageTextFromHtmlReportOnNode(htmlNode: HtmlNode, htmlReport: Html
 		case HtmlReportKind.MISSING_PROPS:
 			return `Missing required properties: ${htmlReport.props.map(p => `${p.name}`).join(", ")}`;
 		case HtmlReportKind.MISSING_IMPORT:
-			return `Missing import`; // <${htmlNode.tagName}>: ${htmlNode.component.meta.className}`;
-		//return `Missing import <${htmlNode.tagName}>: ${htmlNode.component.meta.className}`;
+			const declaration = store.getComponentDeclaration(htmlNode);
+
+			if (declaration == null) {
+				return `Missing import <${htmlNode.tagName}>`;
+			} else {
+				return `Missing import <${htmlNode.tagName}>: ${declaration.meta.className}`;
+			}
 	}
 
 	return undefined;

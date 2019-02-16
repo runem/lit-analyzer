@@ -1,8 +1,8 @@
 import { DefinitionInfoAndBoundSpan } from "typescript";
-import { tsModule } from "../../ts-module";
-import { HtmlNodeAttr } from "../../types/html-node-attr-types";
-import { HtmlNode } from "../../types/html-node-types";
-import { DiagnosticsContext } from "../diagnostics-context";
+import { tsModule } from "../../../ts-module";
+import { HtmlNodeAttr } from "../../../types/html-node-attr-types";
+import { HtmlNode } from "../../../types/html-node-types";
+import { DiagnosticsContext } from "../../diagnostics-context";
 
 export function definitionAndBoundSpanForHtmlNode(htmlNode: HtmlNode, { sourceFile, store }: DiagnosticsContext): DefinitionInfoAndBoundSpan | undefined {
 	const { start: sourceStart, end: sourceEnd } = htmlNode.location.name;

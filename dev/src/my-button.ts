@@ -10,8 +10,12 @@ export class MyButton extends LitElement {
 	@property({ type: Boolean }) disabled: boolean = false;
 
 	static styles = css`
-		#hello.lol {
+		:host([foo="hello"]) {
 		}
+
+		#foo.foo[bar="hello"] {
+		}
+
 		button {
 			flx: hejsa;
 			all: 1192;
@@ -22,7 +26,10 @@ export class MyButton extends LitElement {
 
 	render() {
 		return html`
-			<my-button size=""></my-button>
+			<my-button size="medium"></my-button>
+			<hejsa aria-expanded="true">
+				<hheheh></hheheh>
+			</hejsa>
 			<button aria-activedescendant>${this.text}</button>
 		`;
 	}

@@ -1,11 +1,11 @@
 import { basename, dirname, relative } from "path";
 import { isAssignableToPrimitiveType } from "ts-simple-type";
 import { CodeFixAction, Node, SourceFile } from "typescript";
-import { HtmlNodeAttr } from "../../types/html-node-attr-types";
-import { HtmlNode } from "../../types/html-node-types";
-import { HtmlReport, HtmlReportKind } from "../../types/html-report-types";
-import { rangeToTSSpan } from "../../util/util";
-import { DiagnosticsContext } from "../diagnostics-context";
+import { HtmlNodeAttr } from "../../../types/html-node-attr-types";
+import { HtmlNode } from "../../../types/html-node-types";
+import { HtmlReport, HtmlReportKind } from "../../../types/html-report-types";
+import { rangeToTSSpan } from "../../../util/util";
+import { DiagnosticsContext } from "../../diagnostics-context";
 
 export function codeFixesForHtmlNodeReport(htmlNode: HtmlNode, htmlReport: HtmlReport, { sourceFile, store }: DiagnosticsContext): CodeFixAction[] {
 	switch (htmlReport.kind) {

@@ -89,7 +89,7 @@ export class StoreUpdater {
 		this.store.invalidateTagsDefinedInFile(sourceFile);
 		this.store.absorbHtmlDefinitions(sourceFile, componentDefinitions);
 
-		const htmlTags = componentDefinitions.map(definition => hej(definition, this.checker));
+		const htmlTags = componentDefinitions.map(definition => temp(definition, this.checker));
 		this.store.absorbHtmlTags(htmlTags);
 	}
 
@@ -102,7 +102,7 @@ export class StoreUpdater {
 	}
 }
 
-function hej(definition: IComponentDefinition, checker: TypeChecker): HtmlTag {
+function temp(definition: IComponentDefinition, checker: TypeChecker): HtmlTag {
 	const decl = definition.declaration;
 
 	return {

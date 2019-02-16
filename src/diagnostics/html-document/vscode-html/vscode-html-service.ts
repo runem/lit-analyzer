@@ -1,12 +1,13 @@
 import * as ts from "typescript";
 import * as vscode from "vscode-html-languageservice";
 import { HtmlDocument } from "../../../parsing/text-document/html-document/html-document";
-import { VirtualDocument } from "../../../parsing/virtual-document/virtual-document";
 
 const htmlService = vscode.getLanguageService();
 
-export class VscodeHtmlServiceWrapper {
-	private virtualDocument: VirtualDocument;
+export class VscodeHtmlService {
+	private get virtualDocument() {
+		return this.htmlDocument.virtualDocument;
+	}
 
 	private _vscTextDocument: vscode.TextDocument | undefined;
 	private get vscTextDocument(): vscode.TextDocument {
@@ -24,15 +25,7 @@ export class VscodeHtmlServiceWrapper {
 		return this._vscHtmlDocument;
 	}
 
-	constructor(htmlDocument: HtmlDocument);
-	constructor(virtualDocument: VirtualDocument);
-	constructor(document: HtmlDocument | VirtualDocument) {
-		if ("virtualDocument" in document) {
-			this.virtualDocument = document.virtualDocument;
-		} else {
-			this.virtualDocument = document;
-		}
-	}
+	constructor(private htmlDocument: HtmlDocument) {}
 
 	doTagComplete(position: number): ts.JsxClosingTagInfo | undefined {
 		const positionInText = this.virtualDocument.offsetAtSourceCodePosition(position);
