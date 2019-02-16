@@ -8,7 +8,7 @@ If you use Visual Studio Code you can simply install the [lit-plugin](https://ma
 code --install-extension runem.lit-plugin
 ```
 
-#### Other
+### Other
 
 First, install the plugin:
 

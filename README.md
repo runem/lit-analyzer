@@ -20,7 +20,7 @@
 
 * [➤ Installation](#-installation)
 	* [Visual Studio Code](#visual-studio-code)
-		* [Other](#other)
+	* [Other](#other)
 * [➤ Features](#-features)
 	* [Attribute type checking](#attribute-type-checking)
 	* [Automatically pick up on lit-elements](#automatically-pick-up-on-lit-elements)
@@ -59,7 +59,7 @@ If you use Visual Studio Code you can simply install the [lit-plugin](https://ma
 code --install-extension runem.lit-plugin
 ```
 
-#### Other
+### Other
 
 First, install the plugin:
 
@@ -279,7 +279,6 @@ If you are using the vscode plugin you can configure these options directly from
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Disable formatting the HTML on code reformat.
-
 
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)
