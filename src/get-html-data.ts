@@ -20,6 +20,23 @@ export function getHtmlData(config: Config): HtmlDataResult {
 		description: ""
 	});
 
+	result.tags.push({
+		attributes: [
+			{
+				name: "name",
+				type: { kind: SimpleTypeKind.STRING }
+			}
+		],
+		name: "slot",
+		hasDeclaration: false,
+		description: ""
+	});
+
+	result.globalAttrs.push({
+		name: "slot",
+		type: { kind: SimpleTypeKind.STRING }
+	});
+
 	result.tags.push(
 		...config.globalHtmlTags.map(
 			tagName =>
