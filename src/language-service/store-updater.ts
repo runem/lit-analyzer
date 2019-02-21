@@ -2,15 +2,10 @@ import { LanguageService, Program, SourceFile, TypeChecker } from "typescript";
 import { convertComponentDefinitionsToHtmlTags } from "../parsing/convert-component-definitions-to-html-tags";
 import { parseComponents } from "../parsing/parse-components/parse-components";
 import { parseDependencies } from "../parsing/parse-dependencies/parse-dependencies";
-import { ParsingContext } from "../parsing/parsing-context";
-import { HtmlDocument } from "../parsing/text-document/html-document/html-document";
-import { parseTextDocuments } from "../parsing/text-document/parse-text-documents";
-import { parseVirtualDocuments } from "../parsing/virtual-document/parse-virtual-documents";
 import { TsLitPluginStore } from "../state/store";
 import { changedSourceFileIterator } from "../util/changed-source-file-iterator";
-import { validateHTMLDocuments } from "../validation/validate-html/validate-html-document";
 
-export type UpdateType = "cmps" | "deps" | "docs" | "validate";
+export type UpdateType = "cmps" | "deps";
 
 export class StoreUpdater {
 	componentSourceFileIterator = changedSourceFileIterator();
@@ -25,11 +20,9 @@ export class StoreUpdater {
 
 	constructor(private prevLangService: LanguageService, private store: TsLitPluginStore) {}
 
-	update(sourceFile: SourceFile, updates: UpdateType[] = ["cmps", "deps", "docs", "validate"]) {
+	update(sourceFile: SourceFile, updates: UpdateType[] = ["cmps", "deps"]) {
 		if (updates.includes("cmps")) this.findInvalidatedComponents();
 		if (updates.includes("deps")) this.findDependencies(sourceFile);
-		if (updates.includes("docs")) this.findDocuments(sourceFile);
-		if (updates.includes("validate")) this.validateHtmlDocuments(sourceFile);
 	}
 
 	private findInvalidatedComponents() {
@@ -57,22 +50,6 @@ export class StoreUpdater {
 		}
 	}
 
-	private validateHtmlDocuments(sourceFile: SourceFile) {
-		const documents = this.store.getDocumentsForFile(sourceFile);
-		const htmlDocuments = documents.filter((doc): doc is HtmlDocument => doc instanceof HtmlDocument);
-
-		for (const { source, reports } of validateHTMLDocuments(htmlDocuments, this.checker, this.store)) {
-			this.store.absorbReports(source, reports);
-		}
-	}
-
-	private findDocuments(sourceFile: SourceFile) {
-		// Parse html tags in the relevant source file
-		const virtualDocuments = parseVirtualDocuments(sourceFile, this.parsingContext(sourceFile));
-		const documents = parseTextDocuments(virtualDocuments, this.parsingContext(sourceFile));
-		this.store.absorbDocumentsForFile(sourceFile, documents);
-	}
-
 	private findDependencies(sourceFile: SourceFile) {
 		if (this.store.config.skipMissingImports) return;
 
@@ -89,13 +66,5 @@ export class StoreUpdater {
 
 		const htmlTags = componentDefinitions.map(definition => convertComponentDefinitionsToHtmlTags(definition, this.checker));
 		this.store.absorbHtmlTags(htmlTags);
-	}
-
-	private parsingContext(sourceFile: SourceFile): ParsingContext {
-		return {
-			sourceFile,
-			checker: this.checker,
-			store: this.store
-		};
 	}
 }

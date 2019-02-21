@@ -1,5 +1,5 @@
 import { TS_IGNORE_FLAG } from "../../../../constants";
-import { HtmlNode, HtmlNodeKind, IHtmlNodeBase, IHtmlNodeSourceCodeLocation } from "../../../../types/html-node-types";
+import { HtmlNode, HtmlNodeKind, IHtmlNodeBase, IHtmlNodeSourceCodeLocation } from "./types/html-node-types";
 import { isCommentNode, isTagNode } from "../parse-html-p5/parse-html";
 import { IP5TagNode, P5Node } from "../parse-html-p5/parse-html-types";
 import { parseHtmlNodeAttrs } from "./parse-html-attribute";
@@ -78,25 +78,24 @@ function isSelfClosed(p5Node: IP5TagNode, context: ParseHtmlContext) {
  */
 function makeHtmlNodeLocation(p5Node: IP5TagNode, context: ParseHtmlContext): IHtmlNodeSourceCodeLocation {
 	const loc = p5Node.sourceCodeLocation;
-	const get = context.getSourceCodeLocation;
 
 	return {
-		start: get(loc.startOffset),
-		end: get(loc.endOffset),
+		start: loc.startOffset,
+		end: loc.endOffset,
 		name: {
-			start: get(loc.startTag.startOffset) + 1, // take '<' into account
-			end: get(loc.startTag.startOffset) + 1 + p5Node.tagName.length
+			start: loc.startTag.startOffset + 1, // take '<' into account
+			end: loc.startTag.startOffset + 1 + p5Node.tagName.length
 		},
 		startTag: {
-			start: get(loc.startTag.startOffset),
-			end: get(loc.startTag.endOffset)
+			start: loc.startTag.startOffset,
+			end: loc.startTag.endOffset
 		},
 		endTag:
 			loc.endTag == null
 				? undefined
 				: {
-						start: get(loc.endTag.startOffset),
-						end: get(loc.endTag.endOffset)
+						start: loc.endTag.startOffset,
+						end: loc.endTag.endOffset
 				  }
 	};
 }
@@ -111,7 +110,7 @@ function parseHtmlNodeBase(htmlNodeBase: IHtmlNodeBase): HtmlNode {
 	} else if (htmlNodeBase.tagName === "svg") {
 		// Ignore children of "svg" for now
 		return {
-			kind: HtmlNodeKind.NODE,
+			kind: HtmlNodeKind.SVG,
 			children: [],
 			...htmlNodeBase
 		};

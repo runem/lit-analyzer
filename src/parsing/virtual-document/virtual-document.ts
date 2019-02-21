@@ -1,117 +1,30 @@
-import { Expression, Node, TaggedTemplateExpression } from "typescript";
+import { Expression } from "typescript";
 import { Range } from "../../types/range";
-import { intersects } from "../../util/util";
 
-export class VirtualDocument {
-	public location: Range;
-	private literalParts: Node[];
-	private expressionParts: Expression[];
+export interface VirtualDocument {
+	fileName: string;
+	location: Range;
+	text: string;
+	getPartsAtOffsetRange(range?: Range): (Expression | string)[];
+	scPositionToOffset(position: number): number;
+	offsetToSCPosition(offset: number): number;
+}
 
-	static get placeholderMark() {
-		return "expression-placeholder";
-	}
+export function textPartsToRanges(parts: (Expression | string)[]): Range[] {
+	let offset = 0;
 
-	get rawText() {
-		return this.astNode.getText();
-	}
-
-	private _text?: string;
-
-	get text() {
-		if (this._text == null) {
-			let str = "";
-
-			this.literalParts.forEach((literalPart, i) => {
-				const nextExpressionPart = this.expressionParts[i];
-				str += literalPart.getText() + (nextExpressionPart != null ? this.getSubstituionId(nextExpressionPart) : "");
-			});
-
-			this._text = str;
-		}
-
-		return this._text;
-	}
-
-	constructor(public templateTag: string, public astNode: TaggedTemplateExpression, { expressionParts, literalParts }: { literalParts: Node[]; expressionParts: Expression[] }) {
-		this.literalParts = literalParts;
-		this.expressionParts = expressionParts;
-
-		this.location = {
-			start: astNode.getStart(),
-			end: astNode.getEnd()
-		};
-	}
-
-	static getSubstitutionIdsInText(text: string): { ids: string[]; isMixed: boolean } {
-		const ids: string[] = [];
-		const regex = /\$\{(\d+_expression-placeholder)\}/gm;
-
-		let match = regex.exec(text);
-		while (match != null) {
-			ids.push(match[1]);
-			match = regex.exec(text);
-		}
-
-		// checks if the text is "${...}" or "abc${}abc"
-		const isMixed = ids.length > 0 && text.match(/^\$.*_expression-placeholder}$/) == null;
-
-		return { ids, isMixed };
-	}
-
-	getSubstitutionWithId(id: string): Expression | undefined {
-		return this.expressionParts.find(expression => this.getSubstituionId(expression) === id);
-	}
-
-	offsetAtSourceCodePosition(position: number): number {
-		let offset = 0;
-
-		for (let i = 0; i < this.literalParts.length; i++) {
-			const literalPart = this.literalParts[i];
-			const nextExpressionPart = this.expressionParts[i];
-
-			if (intersects(position, { start: literalPart.pos, end: literalPart.end })) {
-				offset += position - literalPart.getFullStart();
-				break;
-			}
-
-			if (nextExpressionPart != null) {
-				if (intersects(position, { start: nextExpressionPart.pos, end: nextExpressionPart.end })) {
-					offset += position - literalPart.getFullStart();
-					break;
-				}
-			}
-
-			offset += literalPart.getText().length;
-
-			if (nextExpressionPart != null) {
-				offset += this.getSubstituionId(nextExpressionPart).length;
-			}
-		}
-
-		return offset;
-	}
-
-	sourceCodePositionAtOffset(offset: number): number {
-		for (let i = 0; i < this.literalParts.length; i++) {
-			const literalPart = this.literalParts[i];
-			const nextExpressionPart = this.expressionParts[i];
-
-			const text = literalPart.getText();
-			if (offset - text.length < 0) {
-				return literalPart.getStart() + offset;
+	return parts
+		.map(p => {
+			if (typeof p === "string") {
+				const startOffset = offset;
+				offset += p.length;
+				return {
+					start: startOffset,
+					end: offset
+				} as Range;
 			} else {
-				offset -= text.length;
+				offset += p.getText().length + 3;
 			}
-
-			if (nextExpressionPart != null) {
-				offset -= this.getSubstituionId(nextExpressionPart).length;
-			}
-		}
-
-		return offset;
-	}
-
-	private getSubstituionId(expression: Expression): string {
-		return `${expression.getStart().toString()}_${VirtualDocument.placeholderMark}`;
-	}
+		})
+		.filter((r): r is Range => r != null);
 }

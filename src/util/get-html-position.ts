@@ -1,9 +1,8 @@
 import { TextDocument } from "../parsing/text-document/text-document";
 
 export interface DocumentPositionContext {
-	html: string;
-	positionInText: number;
-	position: number;
+	text: string;
+	offset: number;
 	word: string;
 	leftWord: string;
 	rightWord: string;
@@ -14,36 +13,33 @@ export interface DocumentPositionContext {
 /**
  * Returns information about the position in a document.
  * @param document
- * @param position
+ * @param offset
  */
-export function getPositionContextInDocument(document: TextDocument, position: number): DocumentPositionContext {
-	const html = document.virtualDocument.astNode.getText();
-	const start = document.virtualDocument.astNode.getStart();
-	const positionInHtml = position - start;
+export function getPositionContextInDocument(document: TextDocument, offset: number): DocumentPositionContext {
+	const text = document.virtualDocument.text;
 
 	const leftWord = grabWordInDirection({
 		stopChar: /[\/=<>\s"${}]/,
 		direction: "left",
-		text: html,
-		startPosition: positionInHtml
+		text,
+		startOffset: offset
 	});
 
 	const rightWord = grabWordInDirection({
 		stopChar: /[\/=<>\s"${}]/,
 		direction: "right",
-		text: html,
-		startPosition: positionInHtml
+		text,
+		startOffset: offset
 	});
 
 	const word = leftWord + rightWord;
 
-	const beforeWord = html[Math.max(0, positionInHtml - leftWord.length - 1)];
-	const afterWord = html[Math.min(html.length, positionInHtml - leftWord.length)];
+	const beforeWord = text[Math.max(0, offset - leftWord.length - 1)];
+	const afterWord = text[Math.min(text.length, offset - leftWord.length)];
 
 	return {
-		positionInText: positionInHtml,
-		html,
-		position,
+		offset,
+		text,
 		word,
 		leftWord,
 		rightWord,
@@ -60,9 +56,9 @@ export function getPositionContextInDocument(document: TextDocument, position: n
  * @param direction
  * @param text
  */
-function grabWordInDirection({ startPosition, stopChar, direction, text }: { stopChar: RegExp; direction: "left" | "right"; text: string; startPosition: number }): string {
+function grabWordInDirection({ startOffset, stopChar, direction, text }: { stopChar: RegExp; direction: "left" | "right"; text: string; startOffset: number }): string {
 	const dir = direction === "left" ? -1 : 1;
-	let curPosition = startPosition - (dir < 0 ? 1 : 0);
+	let curPosition = startOffset - (dir < 0 ? 1 : 0);
 	while (curPosition > 0 && curPosition < text.length) {
 		if (text[curPosition].match(stopChar)) break;
 		curPosition += dir;
@@ -70,6 +66,6 @@ function grabWordInDirection({ startPosition, stopChar, direction, text }: { sto
 	}
 
 	const a = curPosition;
-	const b = startPosition;
+	const b = startOffset;
 	return text.substring(Math.min(a, b) + (dir < 0 ? 1 : 0), Math.max(a, b));
 }

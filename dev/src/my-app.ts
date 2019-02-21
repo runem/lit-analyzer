@@ -1,20 +1,17 @@
 import { html, render } from "lit-html";
+import { ifDefined } from "lit-html/directives/if-defined";
 import "./my-button";
 
 const myApp = (text: string, disabled: boolean) => html`
 	<style>
-		.page {
-			display: none;
-		}
-
-		.page[active] {
-			display: block;
+		my-button {
+			color: ${"green"};
 		}
 	</style>
 
-	<input class="" contenteditable="true" type="week" accept="" aria-checked="true" aria-expanded="false" />
-
-	<my-button size="small"></my-button>
+	<div>
+		<my-button disabled size="large" text="Hello"></my-button>
+	</div>
 `;
 
 render(myApp("Hello", false), document.body);

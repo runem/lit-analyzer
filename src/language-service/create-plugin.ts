@@ -1,14 +1,11 @@
-import { setTypescriptModule as setTsIsAssignableModule, SimpleTypeKind } from "ts-simple-type";
+import { setTypescriptModule as setTsIsAssignableModule } from "ts-simple-type";
 import * as ts from "typescript/lib/tsserverlibrary";
-import { HTML5_GLOBAL_ATTRIBUTES, HTML5_TAGS, HTML5_VALUE_MAP } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5";
-import { html5TagAttrType } from "../html-5-data";
-import { HtmlTagAttr } from "../parsing/parse-html-data/html-tag";
-import { HtmlDataResult, parseHtmlData } from "../parsing/parse-html-data/parse-html-data";
 import { makeConfig } from "../state/config";
 import { TsLitPluginStore } from "../state/store";
 import { setTypescriptModule } from "../ts-module";
 import { logger, LoggingLevel } from "../util/logger";
 import { TsLitPlugin } from "./ts-lit-plugin";
+import { getHtmlData } from "../get-html-data";
 
 /**
  * Creates the custom plugin.
@@ -31,43 +28,11 @@ export function createPlugin(typescript: typeof ts, info: ts.server.PluginCreate
 	logger.debug("Config", store.config);
 
 	// Add all HTML5 tags and attributes
-	const result = parseHtml5Data();
+	const result = getHtmlData(store.config);
 	store.absorbHtmlTags(result.tags);
 	store.absorbGlobalHtmlAttributes(result.globalAttrs);
 
 	const prevLanguageService = info.languageService;
 
 	return new TsLitPlugin(prevLanguageService, store);
-}
-
-function parseHtml5Data(): HtmlDataResult {
-	const result = parseHtmlData({
-		version: 1,
-		tags: HTML5_TAGS,
-		globalAttributes: HTML5_GLOBAL_ATTRIBUTES,
-		valueSets: HTML5_VALUE_MAP
-	});
-
-	const resultExtended: HtmlDataResult = {
-		...result,
-		tags: result.tags.map(tag => ({
-			...tag,
-			attributes: tag.attributes.map(
-				attr =>
-					({
-						...attr,
-						type: attr.type.kind === SimpleTypeKind.ANY ? html5TagAttrType(attr.name) : attr.type
-					} as HtmlTagAttr)
-			)
-		})),
-		globalAttrs: result.globalAttrs.map(
-			attr =>
-				({
-					...attr,
-					type: attr.type.kind === SimpleTypeKind.ANY ? html5TagAttrType(attr.name) : attr.type
-				} as HtmlTagAttr)
-		)
-	};
-
-	return resultExtended;
 }

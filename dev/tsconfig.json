@@ -4,7 +4,8 @@
 			{
 				"name": "ts-lit-plugin",
 				"verbose": true,
-				"externalHtmlTagNames": ["my-external-tag"]
+				"globalHtmlTags": ["my-external-tag"],
+				"globalHtmlAttributes": ["my-attribute"]
 			}
 		],
 		"experimentalDecorators": true,

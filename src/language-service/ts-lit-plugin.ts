@@ -13,17 +13,18 @@ import {
 	UserPreferences
 } from "typescript";
 import { DiagnosticsContext } from "../diagnostics/diagnostics-context";
-import { DiagnosticsService } from "../diagnostics/diagnostics-service";
-import { intersectingDocument, TextDocument } from "../parsing/text-document/text-document";
+import { LitTsService } from "../diagnostics/lit-ts-service";
+import { getHtmlData } from "../get-html-data";
+import { parseDocumentsInSourceFile } from "../parsing/parse-documents-in-source-file";
+import { TextDocument } from "../parsing/text-document/text-document";
 import { Config } from "../state/config";
 import { TsLitPluginStore } from "../state/store";
-import { Range } from "../types/range";
 import { logger } from "../util/logger";
 import { StoreUpdater } from "./store-updater";
 
 export class TsLitPlugin {
 	private storeUpdater!: StoreUpdater;
-	private diagnostics = new DiagnosticsService();
+	private litService = new LitTsService();
 
 	get config() {
 		return this.store.config;
@@ -32,6 +33,11 @@ export class TsLitPlugin {
 	set config(config: Config) {
 		logger.debug("Updating the config", config);
 		this.store.config = config;
+
+		// Add all HTML5 tags and attributes
+		const result = getHtmlData(config);
+		this.store.absorbHtmlTags(result.tags);
+		this.store.absorbGlobalHtmlAttributes(result.globalAttrs);
 	}
 
 	private get program(): Program {
@@ -43,14 +49,32 @@ export class TsLitPlugin {
 	}
 
 	getCompletionsAtPosition(fileName: string, position: number, options: GetCompletionsAtPositionOptions | undefined): CompletionInfo | undefined {
-		const sourceFile = this.program.getSourceFile(fileName)!;
-		this.storeUpdater.update(sourceFile, ["cmps", "docs"]);
+		const file = this.program.getSourceFile(fileName)!;
+		this.storeUpdater.update(file, ["cmps"]);
 
 		// Calculates the neighborhood of the cursors position in the html.
-		const document = this.getIntersectingDocument(sourceFile, position);
-		const completionInfo = document == null ? undefined : this.diagnostics.getCompletionInfoFromDocument(document, position, this.diagnosticContext(sourceFile));
+		const completionInfo = this.litService.getCompletions(file, position, this.diagnosticContext(file));
 
 		return completionInfo || this.prevLangService.getCompletionsAtPosition(fileName, position, options);
+	}
+
+	getSemanticDiagnostics(fileName: string) {
+		const file = this.program.getSourceFile(fileName)!;
+		this.storeUpdater.update(file);
+
+		const diagnostics = this.litService.getDiagnostics(file, this.diagnosticContext(file));
+		const prevResult = this.prevLangService.getSemanticDiagnostics(fileName) || [];
+
+		return [...prevResult, ...diagnostics];
+	}
+
+	getDefinitionAndBoundSpan(fileName: string, position: number): DefinitionInfoAndBoundSpan | undefined {
+		const file = this.program.getSourceFile(fileName)!;
+		this.storeUpdater.update(file, ["cmps"]);
+
+		const definition = this.litService.getDefinition(file, position, this.diagnosticContext(file));
+
+		return definition || this.prevLangService.getDefinitionAndBoundSpan(fileName, position);
 	}
 
 	getCodeFixesAtPosition(
@@ -61,35 +85,30 @@ export class TsLitPlugin {
 		formatOptions: FormatCodeSettings,
 		preferences: UserPreferences
 	): ReadonlyArray<CodeFixAction> {
-		const sourceFile = this.program.getSourceFile(fileName)!;
-		this.storeUpdater.update(sourceFile);
-
-		const document = this.getIntersectingDocument(sourceFile, { start, end });
-		const codeFixes = document == null ? [] : this.diagnostics.getCodeFixesFromDocument(document, start, end, this.diagnosticContext(sourceFile));
+		const file = this.program.getSourceFile(fileName)!;
+		this.storeUpdater.update(file);
 
 		const prevResult = this.prevLangService.getCodeFixesAtPosition(fileName, start, end, errorCodes, formatOptions, preferences) || [];
+		const codeFixes = this.litService.getCodeFixes(file, { start, end }, this.diagnosticContext(file));
 
 		return [...prevResult, ...codeFixes];
 	}
 
-	getJsxClosingTagAtPosition(fileName: string, position: number): JsxClosingTagInfo | undefined {
-		const sourceFile = this.program.getSourceFile(fileName)!;
-		this.storeUpdater.update(sourceFile, ["docs"]);
+	getQuickInfoAtPosition(fileName: string, position: number): QuickInfo | undefined {
+		const file = this.program.getSourceFile(fileName)!;
+		this.storeUpdater.update(file);
 
-		const document = this.getIntersectingDocument(sourceFile, position);
-		const closingTag = document == null ? undefined : this.diagnostics.getClosingTagFromDocument(document, position);
+		const quickInfo = this.litService.getQuickInfo(file, position, this.diagnosticContext(file));
 
-		return closingTag || this.prevLangService.getJsxClosingTagAtPosition(fileName, position);
+		return quickInfo || this.prevLangService.getQuickInfoAtPosition(fileName, position);
 	}
 
-	getDefinitionAndBoundSpan(fileName: string, position: number): DefinitionInfoAndBoundSpan | undefined {
-		const sourceFile = this.program.getSourceFile(fileName)!;
-		this.storeUpdater.update(sourceFile, ["cmps", "docs"]);
+	getJsxClosingTagAtPosition(fileName: string, position: number): JsxClosingTagInfo | undefined {
+		const file = this.program.getSourceFile(fileName)!;
 
-		const document = this.getIntersectingDocument(sourceFile, position);
-		const definition = document == null ? undefined : this.diagnostics.getDefinitionAndBoundSpanFromDocument(document, position, this.diagnosticContext(sourceFile));
+		const closingTag = this.litService.getClosingTag(file, position, this.diagnosticContext(file));
 
-		return definition || this.prevLangService.getDefinitionAndBoundSpan(fileName, position);
+		return closingTag || this.prevLangService.getJsxClosingTagAtPosition(fileName, position);
 	}
 
 	getFormattingEditsForRange(fileName: string, start: number, end: number, settings: FormatCodeSettings): TextChange[] {
@@ -100,39 +119,52 @@ export class TsLitPlugin {
 			return prev;
 		}
 
-		const sourceFile = this.program.getSourceFile(fileName)!;
-		this.storeUpdater.update(sourceFile, ["docs"]);
-
-		const documents = this.store.getDocumentsForFile(sourceFile);
-		const edits = this.diagnostics.getFormattingEditsFromDocuments(documents, settings);
+		const file = this.program.getSourceFile(fileName)!;
+		const edits = this.litService.format(file, settings, this.diagnosticContext(file));
 
 		return [...prev, ...edits];
 	}
 
-	getQuickInfoAtPosition(fileName: string, position: number): QuickInfo | undefined {
-		const sourceFile = this.program.getSourceFile(fileName)!;
-		this.storeUpdater.update(sourceFile);
+	getDocumentAndOffsetAtPosition(sourceFile: SourceFile, position: number): { document: TextDocument | undefined; offset: number } {
+		const document = parseDocumentsInSourceFile(
+			sourceFile,
+			{
+				htmlTags: this.store.config.htmlTemplateTags,
+				cssTags: this.store.config.cssTemplateTags
+			},
+			position
+		);
 
-		// Get quick info from extensions.
-		const document = this.getIntersectingDocument(sourceFile, position);
-		const quickInfo = document == null ? undefined : this.diagnostics.getQuickInfoFromDocument(document, position, this.diagnosticContext(sourceFile));
-
-		return quickInfo || this.prevLangService.getQuickInfoAtPosition(fileName, position);
+		return {
+			document,
+			offset: document != null ? document.virtualDocument.scPositionToOffset(position) : -1
+		};
 	}
 
-	getSemanticDiagnostics(fileName: string) {
-		const sourceFile = this.program.getSourceFile(fileName)!;
-		this.storeUpdater.update(sourceFile);
+	/*
+	 private getDocumentAtPosition(sourceFile: SourceFile, position: number): TextDocument | undefined {
+	 return parseDocumentsInSourceFile(
+	 sourceFile,
+	 {
+	 htmlTags: this.store.config.htmlTemplateTags,
+	 cssTags: this.store.config.cssTemplateTags
+	 },
+	 position
+	 );
+	 }
 
-		const documents = this.store.getDocumentsForFile(sourceFile);
-		const diagnostics = this.diagnostics.getDiagnosticsFromDocuments(documents, this.diagnosticContext(sourceFile));
+	 private getDocumentsInFile(sourceFile: SourceFile) {
+	 return parseDocumentsInSourceFile(sourceFile, {
+	 htmlTags: this.store.config.htmlTemplateTags,
+	 cssTags: this.store.config.cssTemplateTags
+	 });
+	 }*/
 
-		const prevResult = this.prevLangService.getSemanticDiagnostics(fileName) || [];
-		return [...prevResult, ...diagnostics];
-	}
-
-	private getIntersectingDocument(file: SourceFile, position: number | Range): TextDocument | undefined {
-		return intersectingDocument(this.store.getDocumentsForFile(file), position);
+	getDocumentsInFile(sourceFile: SourceFile): TextDocument[] {
+		return parseDocumentsInSourceFile(sourceFile, {
+			htmlTags: this.store.config.htmlTemplateTags,
+			cssTags: this.store.config.cssTemplateTags
+		});
 	}
 
 	private diagnosticContext(sourceFile: SourceFile): DiagnosticsContext {

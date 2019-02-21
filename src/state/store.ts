@@ -3,11 +3,9 @@ import { SourceFile } from "typescript";
 import * as ts from "typescript/lib/tsserverlibrary";
 import { ComponentTagName, IComponentDeclaration, IComponentDeclarationProp, IComponentDefinition } from "../parsing/parse-components/component-types";
 import { HtmlTag, HtmlTagAttr } from "../parsing/parse-html-data/html-tag";
-import { TextDocument } from "../parsing/text-document/text-document";
+import { HtmlNodeAttr } from "../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
+import { HtmlNode } from "../parsing/text-document/html-document/parse-html-node/types/html-node-types";
 import { AttrName, FileName, TagName } from "../types/alias";
-import { HtmlNodeAttr } from "../types/html-node-attr-types";
-import { HtmlNode } from "../types/html-node-types";
-import { HtmlReport } from "../types/html-report-types";
 import { caseInsensitiveCmp } from "../util/util";
 import { Config } from "./config";
 
@@ -22,8 +20,6 @@ export class TsLitPluginStore {
 	private definitions = new Map<TagName, IComponentDefinition>();
 	private tags = new Map<TagName, HtmlTag>();
 	private attributes = new Map<AttrName, HtmlTagAttr>();
-	private documents = new WeakMap<SourceFile, TextDocument[]>();
-	private htmlReportsForHtml = new WeakMap<HtmlNode | HtmlNodeAttr, HtmlReport[]>();
 
 	get allHtmlTags(): HtmlTag[] {
 		return Array.from(this.tags.values());
@@ -55,14 +51,6 @@ export class TsLitPluginStore {
 		});
 	}
 
-	absorbDocumentsForFile(sourceFile: SourceFile, documents: TextDocument[]) {
-		this.documents.set(sourceFile, documents);
-	}
-
-	absorbReports(source: HtmlNode | HtmlNodeAttr, reports: HtmlReport[]) {
-		this.htmlReportsForHtml.set(source, reports);
-	}
-
 	getDefinitionsWithDeclarationInFile(sourceFile: SourceFile): IComponentDefinition[] {
 		return Array.from(this.definitions.values()).filter(d => d.declaration.fileName === sourceFile.fileName);
 	}
@@ -79,6 +67,11 @@ export class TsLitPluginStore {
 	getComponentDeclaration(htmlNode: HtmlNode): IComponentDeclaration | undefined {
 		const htmlTag = this.getHtmlTag(htmlNode);
 		return htmlTag == null ? undefined : this.definitions.has(htmlTag.name) ? this.definitions.get(htmlTag.name)!.declaration : undefined;
+	}
+
+	getComponentDefinition(htmlNode: HtmlNode): IComponentDefinition | undefined {
+		const htmlTag = this.getHtmlTag(htmlNode);
+		return htmlTag == null ? undefined : this.definitions.get(htmlTag.name);
 	}
 
 	getHtmlTagAttrs(htmlNode: HtmlNode): HtmlTagAttr[] {
@@ -103,14 +96,6 @@ export class TsLitPluginStore {
 		}
 
 		return this.attributes.get(htmlAttr.name);
-	}
-
-	getReportsForHtmlNodeOrAttr(source: HtmlNode | HtmlNodeAttr): HtmlReport[] {
-		return this.htmlReportsForHtml.get(source) || [];
-	}
-
-	getDocumentsForFile(file: SourceFile): TextDocument[] {
-		return this.documents.get(file) || [];
 	}
 
 	invalidateTagsDefinedInFile(sourceFile: SourceFile) {

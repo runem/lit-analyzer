@@ -1,21 +1,21 @@
-import { HtmlNodeAttr } from "../../../types/html-node-attr-types";
-import { HtmlNode } from "../../../types/html-node-types";
 import { Range } from "../../../types/range";
 import { intersects } from "../../../util/util";
-import { VirtualDocument } from "../../virtual-document/virtual-document";
+import { VirtualAstHtmlDocument } from "../../virtual-document/virtual-html-document";
 import { TextDocument } from "../text-document";
+import { HtmlNodeAttr } from "./parse-html-node/types/html-node-attr-types";
+import { HtmlNode } from "./parse-html-node/types/html-node-types";
 
 export class HtmlDocument extends TextDocument {
-	constructor(virtualDocument: VirtualDocument, public rootNodes: HtmlNode[]) {
+	constructor(virtualDocument: VirtualAstHtmlDocument, public rootNodes: HtmlNode[]) {
 		super(virtualDocument);
 	}
 
-	htmlAttrAreaAtPosition(position: number | Range): HtmlNode | undefined {
+	htmlAttrAreaAtOffset(offset: number | Range): HtmlNode | undefined {
 		return this.mapFindOne(node => {
-			if (position > node.location.name.end && intersects(position, node.location.startTag)) {
+			if (offset > node.location.name.end && intersects(offset, node.location.startTag)) {
 				// Check if the position intersects any attributes. Break if so.
 				for (const htmlAttr of node.attributes) {
-					if (intersects(position, htmlAttr.location)) {
+					if (intersects(offset, htmlAttr.location)) {
 						return undefined;
 					}
 				}
@@ -25,23 +25,23 @@ export class HtmlDocument extends TextDocument {
 		});
 	}
 
-	htmlAttrAssignmentAtPosition(position: number | Range): HtmlNodeAttr | undefined {
-		return this.findAttr(attr => intersects(position, attr.location) && !intersects(position, attr.location.name));
+	htmlAttrAssignmentAtOffset(offset: number | Range): HtmlNodeAttr | undefined {
+		return this.findAttr(attr => (attr.assignment != null && attr.assignment.location != null ? intersects(offset, attr.assignment.location) : false));
 	}
 
-	htmlAttrAtPosition(position: number | Range): HtmlNodeAttr | undefined {
-		return this.findAttr(attr => intersects(position, attr.location.name));
+	htmlAttrNameAtOffset(offset: number | Range): HtmlNodeAttr | undefined {
+		return this.findAttr(attr => intersects(offset, attr.location.name));
 	}
 
-	htmlNodeAtPosition(position: number | Range): HtmlNode | undefined {
-		return this.findNode(node => intersects(position, node.location.name) || (node.location.endTag != null && intersects(position, node.location.endTag)));
+	htmlNodeNameAtOffset(offset: number | Range): HtmlNode | undefined {
+		return this.findNode(node => intersects(offset, node.location.name) || (node.location.endTag != null && intersects(offset, node.location.endTag)));
 	}
 
-	htmlNodeOrAttrAtPosition(position: number | Range): HtmlNode | HtmlNodeAttr | undefined {
-		const htmlNode = this.htmlNodeAtPosition(position);
+	htmlNodeOrAttrAtOffset(offset: number | Range): HtmlNode | HtmlNodeAttr | undefined {
+		const htmlNode = this.htmlNodeNameAtOffset(offset);
 		if (htmlNode != null) return htmlNode;
 
-		const htmlAttr = this.htmlAttrAtPosition(position);
+		const htmlAttr = this.htmlAttrNameAtOffset(offset);
 		if (htmlAttr != null) return htmlAttr;
 	}
 

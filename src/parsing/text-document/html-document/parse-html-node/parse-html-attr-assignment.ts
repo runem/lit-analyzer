@@ -1,8 +1,7 @@
-import { SimpleTypeKind } from "ts-simple-type";
-import { HtmlNodeAttrAssignment } from "../../../../types/html-node-attr-assignment-types";
-import { HtmlNodeAttr } from "../../../../types/html-node-attr-types";
-import { VirtualDocument } from "../../../virtual-document/virtual-document";
+import { Range } from "../../../../types/range";
 import { IP5NodeAttr, IP5TagNode } from "../parse-html-p5/parse-html-types";
+import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "./types/html-node-attr-assignment-types";
+import { HtmlNodeAttr } from "./types/html-node-attr-types";
 import { ParseHtmlContext } from "./types/parse-html-context";
 
 /**
@@ -13,64 +12,70 @@ import { ParseHtmlContext } from "./types/parse-html-context";
  * @param context
  */
 export function parseHtmlAttrAssignment(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, htmlAttr: HtmlNodeAttr, context: ParseHtmlContext): HtmlNodeAttrAssignment | undefined {
-	const { ids, isMixed } = VirtualDocument.getSubstitutionIdsInText(p5Attr.value);
+	const location = getAssignmentLocation(p5Node, p5Attr, htmlAttr, context);
 
-	const typeB = ids.length === 1 && !isMixed ? context.getTypeFromExpressionId(ids[0]) : undefined;
+	if (location == null) {
+		return { kind: HtmlNodeAttrAssignmentKind.BOOLEAN };
+	}
 
-	const isBooleanAssignment = (() => {
-		if (p5Attr.value.length === 0) {
-			const htmlAttrLocation = (p5Node.sourceCodeLocation.startTag.attrs || {})[p5Attr.name];
-			if (htmlAttrLocation == null) return false;
-			const equalsSignPosition = htmlAttrLocation.startOffset + p5Attr.name.length;
-			if (context.html[equalsSignPosition] !== "=") {
-				return true;
-			}
+	const values = context.getPartsAtOffsetRange(location);
+
+	if (values.length === 0) {
+		return undefined;
+	} else if (values.length === 1) {
+		const value = values[0];
+		if (typeof value === "string") {
+			return {
+				kind: HtmlNodeAttrAssignmentKind.STRING,
+				location,
+				value
+			};
+		} else {
+			return {
+				kind: HtmlNodeAttrAssignmentKind.EXPRESSION,
+				location,
+				expression: value
+			};
 		}
-
-		return false;
-	})();
-
-	const value = typeB == null && !isBooleanAssignment && !isMixed ? p5Attr.value : undefined;
-
-	return {
-		value,
-		isBooleanAssignment,
-		isMixedExpression: isMixed,
-		typeB:
-			typeB != null
-				? typeB
-				: isBooleanAssignment
-				? { kind: SimpleTypeKind.BOOLEAN }
-				: value != null
-				? {
-						kind: SimpleTypeKind.STRING_LITERAL,
-						value
-				  }
-				: { kind: SimpleTypeKind.STRING }
-	};
+	} else {
+		return {
+			kind: HtmlNodeAttrAssignmentKind.MIXED,
+			location,
+			values
+		};
+	}
 }
 
-/*export function parseHtmlAttrAssignmentBase(htmlAttr: HtmlNodeAttr, htmlAttrAssignmentBase: IHtmlNodeAttrAssignmentBase): HtmlNodeAttrAssignment {
- return {
- ...htmlAttrAssignmentBase
- };*/
+function getAssignmentLocation(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, htmlAttr: HtmlNodeAttr, context: ParseHtmlContext): Range | undefined {
+	const htmlAttrLocation = (p5Node.sourceCodeLocation.startTag.attrs || {})[p5Attr.name];
+	if (htmlAttrLocation == null) return undefined;
 
-/*if (htmlAttr.kind === HtmlNodeAttrKind.CUSTOM_PROP) {
- return {
- ...htmlAttrAssignmentBase,
- typeA: htmlAttr.prop.type
- };
- }
+	const nameEndOffset = htmlAttr.location.name.end;
 
- if (htmlAttr.kind === HtmlNodeAttrKind.BUILT_IN) {
- return {
- ...htmlAttrAssignmentBase,
- typeA: getBuiltInAttributeType(htmlAttr.name) || { kind: SimpleTypeKind.ANY }
- };
- }
+	const htmlAfterName = context.html.substring(nameEndOffset, htmlAttrLocation.endOffset);
 
- return {
- ...htmlAttrAssignmentBase,
- typeA: { kind: SimpleTypeKind.ANY }
- };*/
-//}
+	const firstQuote = htmlAfterName.indexOf('"');
+	const lastQuote = htmlAfterName.lastIndexOf('"');
+	const firstEquals = htmlAfterName.indexOf("=");
+
+	// Example: attr
+	if (firstEquals < 0) return undefined;
+
+	// Example: attr=myvalue
+	if (firstQuote < 0 && lastQuote < 0) {
+		return {
+			start: nameEndOffset + firstEquals + 1,
+			end: htmlAttrLocation.endOffset
+		};
+	}
+
+	// Example: attr="myvalue"
+	if (firstQuote >= 0 && lastQuote >= 0) {
+		return {
+			start: nameEndOffset + firstQuote + 1,
+			end: nameEndOffset + lastQuote
+		};
+	}
+
+	return undefined;
+}

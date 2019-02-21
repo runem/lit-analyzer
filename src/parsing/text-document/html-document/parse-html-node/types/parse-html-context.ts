@@ -1,9 +1,7 @@
-import { Type } from "typescript";
-import { TsLitPluginStore } from "../../../../../state/store";
+import { Expression } from "typescript";
+import { Range } from "../../../../../types/range";
 
 export interface ParseHtmlContext {
 	html: string;
-	store: TsLitPluginStore;
-	getSourceCodeLocation(htmlOffset: number): number;
-	getTypeFromExpressionId(id: string): Type | undefined;
+	getPartsAtOffsetRange(range: Range): (string | Expression)[];
 }

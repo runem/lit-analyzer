@@ -1,30 +1,24 @@
-import { Type } from "typescript";
-import { ParsingContext } from "../../parsing-context";
-import { VirtualDocument } from "../../virtual-document/virtual-document";
+import { Expression, TaggedTemplateExpression } from "typescript";
+import { Range } from "../../../types/range";
+import { VirtualAstHtmlDocument } from "../../virtual-document/virtual-html-document";
 import { HtmlDocument } from "./html-document";
 import { parseHtmlNodes } from "./parse-html-node/parse-html-node";
 import { ParseHtmlContext } from "./parse-html-node/types/parse-html-context";
 import { parseHtml } from "./parse-html-p5/parse-html";
 
-export function parseHtmlDocuments(virtualDocuments: VirtualDocument[], context: ParsingContext): HtmlDocument[] {
-	return virtualDocuments.map(virtualDocument => parseHtmlDocument(virtualDocument, context));
+export function parseHtmlDocuments(nodes: TaggedTemplateExpression[]): HtmlDocument[] {
+	return nodes.map(parseHtmlDocument);
 }
 
-export function parseHtmlDocument(virtualDocument: VirtualDocument, { checker, store }: ParsingContext): HtmlDocument {
+export function parseHtmlDocument(node: TaggedTemplateExpression): HtmlDocument {
+	const virtualDocument = new VirtualAstHtmlDocument(node);
 	const html = virtualDocument.text;
 	const htmlAst = parseHtml(html);
 
 	const context: ParseHtmlContext = {
-		store,
 		html,
-		getSourceCodeLocation(htmlOffset: number): number {
-			return virtualDocument.sourceCodePositionAtOffset(htmlOffset);
-		},
-		getTypeFromExpressionId(id: string): Type | undefined {
-			const node = virtualDocument.getSubstitutionWithId(id);
-			if (node != null) {
-				return checker.getTypeAtLocation(node);
-			}
+		getPartsAtOffsetRange(range: Range): (Expression | string)[] {
+			return virtualDocument.getPartsAtOffsetRange(range);
 		}
 	};
 

@@ -1,5 +1,5 @@
 import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../../../constants";
-import { HtmlNodeAttr, HtmlNodeAttrKind, IHtmlNodeAttrBase, IHtmlNodeAttrSourceCodeLocation } from "../../../../types/html-node-attr-types";
+import { HtmlNodeAttr, HtmlNodeAttrKind, IHtmlNodeAttrBase, IHtmlNodeAttrSourceCodeLocation } from "./types/html-node-attr-types";
 import { parseLitAttrName } from "../../../../util/util";
 import { IP5NodeAttr, IP5TagNode } from "../parse-html-p5/parse-html-types";
 import { parseHtmlAttrAssignment } from "./parse-html-attr-assignment";
@@ -55,8 +55,8 @@ function makeHtmlAttrLocation(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, context: 
 	const { name, modifier } = parseLitAttrName(p5Attr.name);
 
 	const htmlAttrLocation = (p5Node.sourceCodeLocation.startTag.attrs || {})[p5Attr.name];
-	const start = context.getSourceCodeLocation(htmlAttrLocation.startOffset);
-	const end = context.getSourceCodeLocation(htmlAttrLocation.endOffset);
+	const start = htmlAttrLocation.startOffset;
+	const end = htmlAttrLocation.endOffset;
 	return {
 		start,
 		end,

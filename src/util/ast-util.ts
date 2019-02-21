@@ -29,7 +29,6 @@ export function getNodeAtPosition(node: Node, position: number | Range): Node | 
 /**
  * Checks whether a leading comment includes a given search string.
  * @param text
- * @param context
  * @param pos
  * @param needle
  */

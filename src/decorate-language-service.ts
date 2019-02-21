@@ -6,12 +6,12 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 	const nextLanguageService: LanguageService = {
 		...languageService,
 		getCompletionsAtPosition: plugin.getCompletionsAtPosition.bind(plugin),
-		getCodeFixesAtPosition: plugin.getCodeFixesAtPosition.bind(plugin),
 		getSemanticDiagnostics: plugin.getSemanticDiagnostics.bind(plugin),
-		getQuickInfoAtPosition: plugin.getQuickInfoAtPosition.bind(plugin),
-		getFormattingEditsForRange: plugin.getFormattingEditsForRange.bind(plugin),
 		getDefinitionAndBoundSpan: plugin.getDefinitionAndBoundSpan.bind(plugin),
-		getJsxClosingTagAtPosition: plugin.getJsxClosingTagAtPosition.bind(plugin)
+		getCodeFixesAtPosition: plugin.getCodeFixesAtPosition.bind(plugin),
+		getQuickInfoAtPosition: plugin.getQuickInfoAtPosition.bind(plugin),
+		getJsxClosingTagAtPosition: plugin.getJsxClosingTagAtPosition.bind(plugin),
+		getFormattingEditsForRange: plugin.getFormattingEditsForRange.bind(plugin)
 	};
 
 	// Make sure to call the old service if config.disable === true
@@ -63,11 +63,11 @@ function wrapTryCatch<T extends Function>(proxy: T): T {
 function wrapLog<T extends Function>(name: string, proxy: T): T {
 	return (((...args: unknown[]) => {
 		/**
-		logger.verbose(`Typescript called ${name}`);
-		const result = proxy(...args);
-		logger.verbose("- result: ", result == null ? "nothing" : Array.isArray(result) ? `Length: ${result.length}` : "defined");
-		return result;
-		/*/
+		 logger.verbose(`Typescript called ${name}`);
+		 const result = proxy(...args);
+		 logger.verbose("- result: ", result == null ? "nothing" : Array.isArray(result) ? `Length: ${result.length}` : "defined");
+		 return result;
+		 /*/
 		return proxy(...args);
 		/**/
 	}) as unknown) as T;
