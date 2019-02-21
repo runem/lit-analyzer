@@ -1,4 +1,5 @@
 import { customElement, property, html, LitElement, css, unsafeCSS } from "lit-element";
+import "@material/mwc-button";
 
 /**
  * This is my button
@@ -24,6 +25,7 @@ export class MyButton extends LitElement {
 	render() {
 		return html`
 			<button @click="${this.onClick}">${this.text}</button>
+			<mwc-button dense></mwc-button>
 		`;
 	}
 }

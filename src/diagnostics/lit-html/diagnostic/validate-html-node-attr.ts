@@ -24,20 +24,26 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, store: TsLitPluginStore
 		if (store.config.skipUnknownHtmlAttributes) return [];
 
 		const htmlTag = store.getHtmlTag(htmlAttr.htmlNode);
+		const declaration = store.getComponentDeclaration(htmlAttr.htmlNode);
 		const htmlTagAttrs = store.getHtmlTagAttrs(htmlAttr.htmlNode);
 		const suggestedName = findBestMatch(htmlAttr.name, htmlTagAttrs.map(attr => attr.name));
+
+		const isCustomElement = htmlTag != null && htmlTag.hasDeclaration;
+		const fromModule = declaration != null && declaration.fileName.includes("node_modules");
+
+		const tip =
+			suggestedName != null
+				? `Did you mean '${suggestedName}'? `
+				: fromModule
+				? `If you are not the author of this component please consider using a "data-*" attribute or add it to 'globalHtmlAttributes'.`
+				: isCustomElement
+				? `Please consider using a "data-*" attribute or add it as a property/attribute to the component.`
+				: `Please consider using a "data-*" attribute instead.`;
 
 		return [
 			{
 				kind: LitHtmlDiagnosticKind.UNKNOWN_ATTRIBUTE,
-				message: `Unknown attribute "${htmlAttr.name}"${suggestedName ? `. Did you mean '${suggestedName}'? ` : ""}`,
-				tips: [
-					`Please consider one of these options:
-- 1: Use "data-${htmlAttr.name}" attribute instead.
-- 2: Add "${htmlAttr.name} to the 'globalHtmlAttributes' configuration.
-${htmlTag != null && htmlTag.hasDeclaration ? `- 3: Add "${htmlAttr.name}" as a property on the component.` : ""}
-`
-				],
+				message: `Unknown attribute "${htmlAttr.name}".${tip != null ? ` ${tip}` : ""}`,
 				severity: "warning",
 				location: htmlAttr.location.name,
 				htmlAttr,

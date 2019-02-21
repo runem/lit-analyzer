@@ -100,10 +100,10 @@ const HTML_5_ATTR_TYPES: { [key: string]: string | string[] } = {
 	formaction: "",
 	formtarget: ["_self", "_blank", "_parent", "_top"],
 	list: "string",
-	max: "",
-	maxlength: "",
-	min: "",
-	minlength: "",
+	max: "number",
+	maxlength: "number",
+	min: "number",
+	minlength: "number",
 	pattern: "",
 	placeholder: "",
 	size: "",
@@ -116,7 +116,7 @@ const HTML_5_ATTR_TYPES: { [key: string]: string | string[] } = {
 };
 
 export function html5TagAttrType(attrName: string, name?: string): SimpleType {
-	return stringToSimpleType(HTML_5_ATTR_TYPES[attrName] || "");
+	return stringToSimpleType(HTML_5_ATTR_TYPES[attrName] || "", attrName);
 }
 
 function stringToSimpleType(typeString: string | string[], name?: string): SimpleType {

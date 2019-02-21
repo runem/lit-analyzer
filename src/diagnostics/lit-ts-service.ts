@@ -59,7 +59,7 @@ function translateDiagnostic(report: LitDiagnostic, file: SourceFile, document: 
 	return {
 		...span,
 		file,
-		messageText: report.tips != null ? [report.message, ...report.tips].join("\n\n") : report.message,
+		messageText: report.message,
 		category: report.severity === "error" ? tsModule.ts.DiagnosticCategory.Error : tsModule.ts.DiagnosticCategory.Warning,
 		source: DIAGNOSTIC_SOURCE,
 		code: 2322
