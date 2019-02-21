@@ -151,6 +151,18 @@ export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, checker: Type
 			) {
 				return [];
 			}
+
+			// Take into account that assignments like maxlength="50" is allowed even though "50" is a string literal in this case.
+			else if (isAssignableToSimpleTypeKind(typeA, SimpleTypeKind.NUMBER)) {
+				if (typeB.kind !== SimpleTypeKind.STRING_LITERAL) {
+					break;
+				}
+
+				// Test if a potential string literal is a Number
+				if (!isNaN(typeB.value as any)) {
+					return [];
+				}
+			}
 	}
 
 	if (!isAssignableToType(typeA, typeB, checker)) {
