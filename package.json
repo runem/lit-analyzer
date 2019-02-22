@@ -66,10 +66,6 @@
 			"width": 200
 		},
 		"line": "rainbow",
-		"headingPrefix": {
-			"1": "🔥 ",
-			"2": "🔥 "
-		},
 		"ids": {
 			"npm": "ts-lit-plugin",
 			"github": "runebm/ts-lit-plugin"
