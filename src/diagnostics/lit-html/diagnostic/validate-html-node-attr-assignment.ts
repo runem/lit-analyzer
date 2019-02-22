@@ -80,11 +80,12 @@ export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, checker: Type
 
 		 if (!isAssignableToType(typeA, returnType, checker)) {
 		 logger.debug(`${functionName}: ${simpleTypeToString(returnType)} not assignable to ${simpleTypeToString(typeA)}`);
+		 } else {
+		 logger.debug("is assignable!");
 		 }
 		 }
 		 break;
 		 }
-
 		 }*/
 		return [];
 	}

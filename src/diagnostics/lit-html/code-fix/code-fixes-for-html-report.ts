@@ -8,7 +8,7 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { store }:
 		case LitHtmlDiagnosticKind.UNKNOWN_ATTRIBUTE:
 			const dataAttrCodeFix: LitCodeFix = {
 				kind: CodeFixKind.RENAME,
-				message: "Make this attribute a data attribute.",
+				message: `Change attribute to 'data-${htmlReport.htmlAttr.name}'`,
 				htmlReport,
 				actions: [
 					{

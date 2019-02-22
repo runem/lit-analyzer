@@ -1,5 +1,5 @@
 import { isAssignableToSimpleTypeKind, SimpleTypeKind } from "ts-simple-type";
-import { ClassLikeDeclaration, InterfaceDeclaration, Node, PropertyDeclaration } from "typescript";
+import { ClassLikeDeclaration, InterfaceDeclaration, Node, PropertyDeclaration, PropertySignature } from "typescript";
 import { IComponentDeclarationJsDoc, IComponentDeclarationJsDocTag, IComponentDeclarationMeta, IComponentDeclarationProp } from "../component-types";
 import { IComponentDeclarationVisitContext, IComponentDefinitionVisitContext, IParseComponentFlavor } from "../parse-components";
 
@@ -28,7 +28,8 @@ export class LitElementFlavor implements IParseComponentFlavor {
 								const symbol = checker.getSymbolAtLocation(typeName);
 
 								if (symbol != null) {
-									const declaration = symbol.valueDeclaration || context.checker.getAliasedSymbol(symbol).valueDeclaration;
+									const decl = (symbol.getDeclarations() || [])[0];
+									const declaration = symbol.valueDeclaration || decl || context.checker.getAliasedSymbol(symbol).valueDeclaration;
 
 									context.addComponentDefinition(tagName, declaration);
 								}
@@ -76,7 +77,7 @@ export class LitElementFlavor implements IParseComponentFlavor {
 	 * @param context
 	 */
 	visitComponentDeclaration(node: Node, context: IComponentDeclarationVisitContext): void {
-		if (context.ts.isClassLike(node)) {
+		if (context.ts.isClassLike(node) || context.ts.isInterfaceDeclaration(node)) {
 			const thisJsDoc = visitJsDoc(node, context) || {};
 			const superJsDocTags = this.visitSuperClass(node, context);
 
@@ -90,7 +91,7 @@ export class LitElementFlavor implements IParseComponentFlavor {
 			};
 
 			context.addMeta(meta);
-		} else if (context.ts.isPropertyDeclaration(node)) {
+		} else if (context.ts.isPropertyDeclaration(node) || context.ts.isPropertySignature(node)) {
 			const propInfo = parsePropertyDeclaration(node, context);
 			if (propInfo != null) {
 				context.addProp(propInfo);
@@ -107,7 +108,7 @@ export class LitElementFlavor implements IParseComponentFlavor {
 	 * @param node
 	 * @param context
 	 */
-	private visitSuperClass(node: ClassLikeDeclaration, context: IComponentDeclarationVisitContext): IComponentDeclarationJsDocTag[] {
+	private visitSuperClass(node: ClassLikeDeclaration | InterfaceDeclaration, context: IComponentDeclarationVisitContext): IComponentDeclarationJsDocTag[] {
 		const superJsDocTags: IComponentDeclarationJsDocTag[] = [];
 		if (node.heritageClauses != null) {
 			for (const heritage of node.heritageClauses) {
@@ -142,7 +143,7 @@ export class LitElementFlavor implements IParseComponentFlavor {
  * @param node
  * @param context
  */
-function parsePropertyDeclaration(node: PropertyDeclaration, context: IComponentDeclarationVisitContext): IComponentDeclarationProp | undefined {
+function parsePropertyDeclaration(node: PropertyDeclaration | PropertySignature, context: IComponentDeclarationVisitContext): IComponentDeclarationProp | undefined {
 	const decoratorIdentifier = (() =>
 		(node.decorators || []).find(decorator => {
 			const expression = decorator.expression;

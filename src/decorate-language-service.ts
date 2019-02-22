@@ -26,7 +26,7 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 					return oldMethod(...arguments);
 				}
 
-				return wrapTryCatch(newMethod)(...arguments);
+				return wrapTryCatch(newMethod, oldMethod)(...arguments);
 			};
 		}
 	}
@@ -44,14 +44,19 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 /**
  * Wraps a function in try catch in order to debug the plugin.
  * If the function throws, this function logs the error.
- * @param proxy
+ * @param newMethod
+ * @param oldMethod
  */
-function wrapTryCatch<T extends Function>(proxy: T): T {
+function wrapTryCatch<T extends Function>(newMethod: T, oldMethod: T): T {
 	return (((...args: unknown[]) => {
 		try {
-			return proxy(...args);
+			return newMethod(...args);
 		} catch (e) {
 			logger.error(`Error: (${e.stack}) ${e.message}`, e);
+
+			// Always return the old method if anything fails
+			// Don't crash everything :-)
+			return oldMethod(...args);
 		}
 	}) as unknown) as T;
 }
