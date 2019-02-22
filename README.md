@@ -12,7 +12,7 @@
 
 
 <p align="center">
-  <img src="documentation/asset/lit-plugin.gif" alt="Lit plugin GIF"/>
+  <img src="https://raw.githubusercontent.com/runem/ts-lit-plugin/master/documentation/asset/lit-plugin.gif" alt="Lit plugin GIF"/>
 </p>
 
 
@@ -46,8 +46,8 @@
 	* [skipUnknownHtmlAttributes](#skipunknownhtmlattributes)
 	* [skipTypeChecking](#skiptypechecking)
 	* [format.disable](#formatdisable)
+* [➤ Contributors](#-contributors)
 * [➤ License](#-license)
-
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
@@ -282,6 +282,14 @@ If you are using the vscode plugin you can configure these options directly from
 -   **Default**: false
 -   **Description**: Disable formatting the HTML on code reformat.
 
+![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
+
+## ➤ Contributors
+	
+|[<img alt="Rune Mehlsen" src="https://avatars2.githubusercontent.com/u/5372940?s=460&v=4" width="100">](https://twitter.com/runemehlsen) | [<img alt="Andreas Mehlsen" src="https://avatars1.githubusercontent.com/u/6267397?s=460&v=4" width="100">](https://twitter.com/andreasmehlsen)|
+|:---: | :---:|
+|[Rune Mehlsen](https://twitter.com/runemehlsen) | [Andreas Mehlsen](https://twitter.com/andreasmehlsen)|
+|[runemehlsen@gmail.com](mailto:runemehlsen@gmail.com) | [andmehlsen@gmail.com](mailto:andmehlsen@gmail.com)|
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 

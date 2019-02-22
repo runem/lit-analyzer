@@ -60,6 +60,20 @@
 			"pre-commit": "pretty-quick --staged"
 		}
 	},
+	"contributors": [
+		{
+			"name": "Rune Mehlsen",
+			"email": "runemehlsen@gmail.com",
+			"url": "https://twitter.com/runemehlsen",
+			"img": "https://avatars2.githubusercontent.com/u/5372940?s=460&v=4"
+		},
+		{
+			"name": "Andreas Mehlsen",
+			"email": "andmehlsen@gmail.com",
+			"url": "https://twitter.com/andreasmehlsen",
+			"img": "https://avatars1.githubusercontent.com/u/6267397?s=460&v=4"
+		}
+	],
 	"readme": {
 		"logo": {
 			"url": "https://raw.githubusercontent.com/runem/ts-lit-plugin/master/documentation/asset/lit-plugin@256w.png",
