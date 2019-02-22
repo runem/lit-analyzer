@@ -42,18 +42,18 @@ When using custom elements `lit-plugin` checks if the element has been imported 
 
 `Cmd+Click (Mac)` / `Ctrl+Click (Windows)` on a tag name or an attribute name and goto the definition.
 
-### Code completions for css and html
+### ✏️ Code completions for css and html
 
 <img src="https://user-images.githubusercontent.com/5372940/53271979-4f2e5c00-36f0-11e9-98a6-f9b7996d841c.gif" width="500" />
 
 Press `Ctrl+Space` in an html or css context and to get code completions for html tags and attributes.
 
 
-### Quick info on hover for html tags and attributes
+### 📖 Quick info on hover for html tags and attributes
 
 Hover above a html tag or attribute and see more information about the identifier such as type and jsdoc.
 
-### Warning if required attributes are not included
+### ⚠️ Warning if required attributes are not included
 
 <img src="https://user-images.githubusercontent.com/5372940/53272219-f612f800-36f0-11e9-98d2-2810f8b14c60.gif" width="500" />
 
@@ -69,7 +69,7 @@ export class MyElement extends LitElement {
 }
 ```
 
-### Support for @ts-ignore comments inside html
+### 🙈 Support for @ts-ignore comments inside html
 
 Add "@ts-ignore" comments to make `lit-plugin` quiet.
 
@@ -97,7 +97,7 @@ return html`
 `;
 ```
 
-### Reformat html
+### 💅 Reformat html
 
 `lit-plugin` will reformat html when you reformat code using your IDE. Keep in mind that right now there is an issue where the plugin does not take the current indentation of the html template tag into account. This means that the especially nested html template tags will look weird.
 
@@ -129,6 +129,6 @@ return html`
   </div>`;
 ```
 
-### Auto close tags
+### 🚪 Auto close tags
 
 When typing html inside a template tag `lit-plugin` auto-closes tags as you would expect.
