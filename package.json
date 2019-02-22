@@ -65,6 +65,11 @@
 			"url": "https://raw.githubusercontent.com/runem/ts-lit-plugin/master/documentation/asset/lit-plugin@256w.png",
 			"width": 200
 		},
+		"line": "rainbow",
+		"headingPrefix": {
+			"1": "🔥 ",
+			"2": "🔥 "
+		},
 		"ids": {
 			"npm": "ts-lit-plugin",
 			"github": "runebm/ts-lit-plugin"

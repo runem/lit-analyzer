@@ -16,14 +16,14 @@
 </p>
 
 
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)
+![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
-## ➤ Table of Contents
+## 🔥 Table of Contents
 
-* [➤ Installation](#-installation)
+* [🔥 Installation](#-installation)
 	* [Visual Studio Code](#visual-studio-code)
 	* [Other](#other)
-* [➤ Features](#-features)
+* [🔥 Features](#-features)
 	* [Attribute type checking](#attribute-type-checking)
 	* [Automatically pick up on lit-elements](#automatically-pick-up-on-lit-elements)
 	* [Support for dependencies that extend the global HTMLElementTagNameMap](#support-for-dependencies-that-extend-the-global-htmlelementtagnamemap)
@@ -35,7 +35,7 @@
 	* [Support for @ts-ignore comments inside html](#support-for-ts-ignore-comments-inside-html)
 	* [Reformat html](#reformat-html)
 	* [Auto close tags](#auto-close-tags)
-* [➤ Configuring the plugin](#-configuring-the-plugin)
+* [🔥 Configuring the plugin](#-configuring-the-plugin)
 	* [disable](#disable)
 	* [htmlTemplateTags](#htmltemplatetags)
 	* [cssTemplateTags](#csstemplatetags)
@@ -46,12 +46,12 @@
 	* [skipUnknownHtmlAttributes](#skipunknownhtmlattributes)
 	* [skipTypeChecking](#skiptypechecking)
 	* [format.disable](#formatdisable)
-* [➤ License](#-license)
+* [🔥 License](#-license)
 
 
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)
+![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
-## ➤ Installation
+## 🔥 Installation
 
 ### Visual Studio Code
 
@@ -86,9 +86,9 @@ Then add a `plugins` section to your [`tsconfig.json`](http://www.typescriptlang
 See [Configuring the plugin](#configuring-the-plugin) for more information regarding how to configure the plugin.
 
 
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)
+![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
-## ➤ Features
+## 🔥 Features
 
 ### Attribute type checking
 
@@ -216,9 +216,9 @@ return html`
 When typing html inside a template tag `lit-plugin` auto-closes tags as you would expect.
 
 
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)
+![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
-## ➤ Configuring the plugin
+## 🔥 Configuring the plugin
 
 If you are using the vscode plugin you can configure these options directly from extension settings. If not you can add the options directly to the `compilerOptions.plugins` section of your `ts-config.json` file.
 
@@ -283,8 +283,8 @@ If you are using the vscode plugin you can configure these options directly from
 -   **Description**: Disable formatting the HTML on code reformat.
 
 
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)
+![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
-## ➤ License
+## 🔥 License
 	
 Licensed under [MIT](https://opensource.org/licenses/MIT).
