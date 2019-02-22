@@ -15,6 +15,8 @@ I'm working on supporting `static get properties()` and picking up "non-lit-elem
 
 ### Support for dependencies that extend the global HTMLElementTagNameMap
 
+<img src="https://user-images.githubusercontent.com/5372940/53271293-4fc5f300-36ee-11e9-9ed9-31f1e50f898c.gif" />
+
 If a dependency extends the global `HTMLElementTagNameMap` this plugin will pick up on the map between the tag name and the class. Below you will see an example of what to add to your library typescript definition files if you want type checking support for a given html tag.
 
 ```typescript
@@ -40,15 +42,21 @@ When using custom elements `lit-plugin` checks if the element has been imported 
 
 `Cmd+Click (Mac)` / `Ctrl+Click (Windows)` on a tag name or an attribute name and goto the definition.
 
-### Code completions for html tags and attributes
+### Code completions for css and html
 
-Press `Ctrl+Space` in an html context and to get code completions for html tags and attributes.
+<img src="https://user-images.githubusercontent.com/5372940/53271979-4f2e5c00-36f0-11e9-98a6-f9b7996d841c.gif" />
+
+Press `Ctrl+Space` in an html or css context and to get code completions for html tags and attributes.
+
 
 ### Quick info on hover for html tags and attributes
 
 Hover above a html tag or attribute and see more information about the identifier such as type and jsdoc.
 
-### Warning if required attributes not included
+### Warning if required attributes are not included
+
+<img src="https://user-images.githubusercontent.com/5372940/53272219-f612f800-36f0-11e9-98d2-2810f8b14c60.gif" />
+
 
 `lit-plugin` will warn you if you forget to set any required attributes on a given html tag. Right now this is based on the assumption that the property is required if it doesn't have an initializer and isn't assignable to `undefined` or `null`. Be aware that right now the plugin doesn't check if you assign it else where (for example in the constructor).
 

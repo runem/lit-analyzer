@@ -7,16 +7,16 @@ import "@material/mwc-button";
 @customElement("my-button")
 export class MyButton extends LitElement {
 	@property({ type: String }) size: "small" | "medium" | "large" = "medium";
-	@property({ type: Number }) text: string = "";
+	@property({ type: Number }) text!: string;
 	@property({ type: Boolean }) disabled: boolean = false;
 
 	static styles = css`
-		div {
-			${unsafeCSS("color: red")};
+		button {
+			color: red;
 		}
 
-		my-button {
-			color: red;
+		div {
+			${unsafeCSS("color: red")};
 		}
 	`;
 
