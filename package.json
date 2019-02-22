@@ -40,7 +40,7 @@
 		"vscode-html-languageservice": "^2.1.11-next.10"
 	},
 	"devDependencies": {
-		"@appnest/readme": "^1.0.4",
+		"@appnest/readme": "^1.0.21",
 		"@types/node": "^10.12.24",
 		"husky": "^1.3.1",
 		"prettier": "^1.16.4",
@@ -63,15 +63,18 @@
 	"contributors": [
 		{
 			"name": "Rune Mehlsen",
-			"email": "runemehlsen@gmail.com",
 			"url": "https://twitter.com/runemehlsen",
 			"img": "https://avatars2.githubusercontent.com/u/5372940?s=460&v=4"
 		},
 		{
 			"name": "Andreas Mehlsen",
-			"email": "andmehlsen@gmail.com",
 			"url": "https://twitter.com/andreasmehlsen",
 			"img": "https://avatars1.githubusercontent.com/u/6267397?s=460&v=4"
+		},
+		{
+			"name": "You?",
+			"img": "https://joeschmoe.io/api/v1/random",
+			"url": "https://github.com/andreasbm/readme/blob/master/CONTRIBUTING.md"
 		}
 	],
 	"readme": {
@@ -82,7 +85,7 @@
 		"line": "rainbow",
 		"ids": {
 			"npm": "ts-lit-plugin",
-			"github": "runebm/ts-lit-plugin"
+			"github": "runem/ts-lit-plugin"
 		},
 		"badges": [
 			{

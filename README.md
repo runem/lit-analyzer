@@ -5,8 +5,8 @@
 <p align="center">
 		<a href="https://npmcharts.com/compare/ts-lit-plugin?minimal=true"><img alt="Downloads per month" src="https://img.shields.io/npm/dm/ts-lit-plugin.svg" height="20"/></a>
 <a href="https://www.npmjs.com/package/ts-lit-plugin"><img alt="NPM Version" src="https://img.shields.io/npm/v/ts-lit-plugin.svg" height="20"/></a>
-<a href="https://david-dm.org/runebm/ts-lit-plugin"><img alt="Dependencies" src="https://img.shields.io/david/runebm/ts-lit-plugin.svg" height="20"/></a>
-<a href="https://github.com/runebm/ts-lit-plugin/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/runebm/ts-lit-plugin.svg" height="20"/></a>
+<a href="https://david-dm.org/runem/ts-lit-plugin"><img alt="Dependencies" src="https://img.shields.io/david/runem/ts-lit-plugin.svg" height="20"/></a>
+<a href="https://github.com/runem/ts-lit-plugin/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/runem/ts-lit-plugin.svg" height="20"/></a>
 <a href="https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin"><img alt="Publish at vscode marketplace" src="https://vsmarketplacebadge.apphb.com/version/runem.lit-plugin.svg" height="20"/></a>
 	</p>
 
@@ -286,10 +286,9 @@ If you are using the vscode plugin you can configure these options directly from
 
 ## ➤ Contributors
 	
-|[<img alt="Rune Mehlsen" src="https://avatars2.githubusercontent.com/u/5372940?s=460&v=4" width="100">](https://twitter.com/runemehlsen) | [<img alt="Andreas Mehlsen" src="https://avatars1.githubusercontent.com/u/6267397?s=460&v=4" width="100">](https://twitter.com/andreasmehlsen)|
-|:---: | :---:|
-|[Rune Mehlsen](https://twitter.com/runemehlsen) | [Andreas Mehlsen](https://twitter.com/andreasmehlsen)|
-|[runemehlsen@gmail.com](mailto:runemehlsen@gmail.com) | [andmehlsen@gmail.com](mailto:andmehlsen@gmail.com)|
+|[<img alt="Rune Mehlsen" src="https://avatars2.githubusercontent.com/u/5372940?s=460&v=4" width="100">](https://twitter.com/runemehlsen) | [<img alt="Andreas Mehlsen" src="https://avatars1.githubusercontent.com/u/6267397?s=460&v=4" width="100">](https://twitter.com/andreasmehlsen) | [<img alt="You?" src="https://joeschmoe.io/api/v1/random" width="100">](https://github.com/andreasbm/readme/blob/master/CONTRIBUTING.md)|
+|:---: | :---: | :---:|
+|[Rune Mehlsen](https://twitter.com/runemehlsen) | [Andreas Mehlsen](https://twitter.com/andreasmehlsen) | [You?](https://github.com/andreasbm/readme/blob/master/CONTRIBUTING.md)|
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
