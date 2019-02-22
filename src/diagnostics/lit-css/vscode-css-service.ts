@@ -1,11 +1,11 @@
 import * as vscode from "vscode-css-languageservice";
 import { CssDocument } from "../../parsing/text-document/css-document/css-document";
 import { DiagnosticsContext } from "../diagnostics-context";
-import { LitCompletion } from "../types/lit-completion";
+import { LitCompletion, LitCompletionKind } from "../types/lit-completion";
 import { LitCssDiagnostic } from "../types/lit-diagnostic";
 import { LitQuickInfo } from "../types/lit-quick-info";
 
-//const cssService = vscode.getCSSLanguageService();
+const cssService = vscode.getCSSLanguageService();
 const scssService = vscode.getSCSSLanguageService();
 
 function makeVscTextDocument(cssDocument: CssDocument): vscode.TextDocument {
@@ -74,16 +74,57 @@ export class VscodeCssService {
 		const vscTextDocument = makeVscTextDocument(document);
 		const vscStylesheet = makeVscStylesheet(vscTextDocument);
 		const vscPosition = vscTextDocument.positionAt(offset);
-		const items = scssService.doComplete(vscTextDocument, vscPosition, vscStylesheet);
+		const items = cssService.doComplete(vscTextDocument, vscPosition, vscStylesheet);
 
 		return items.items.map(
 			i =>
 				({
-					kind: "member",
+					kind: i.kind == null ? "unknown" : translateCompletionItemKind(i.kind),
 					insert: i.label,
 					name: i.label,
+					kindModifiers: i.kind === vscode.CompletionItemKind.Color ? "color" : undefined,
+					documentation: typeof i.documentation === "string" || i.documentation == null ? i.documentation : i.documentation.value,
 					importance: i.label.startsWith("@") || i.label.startsWith("-") ? "low" : i.label.startsWith(":") ? "medium" : "high"
 				} as LitCompletion)
 		);
+	}
+}
+
+function translateCompletionItemKind(kind: vscode.CompletionItemKind): LitCompletionKind {
+	switch (kind) {
+		case vscode.CompletionItemKind.Method:
+			return "memberFunctionElement";
+		case vscode.CompletionItemKind.Function:
+			return "functionElement";
+		case vscode.CompletionItemKind.Constructor:
+			return "constructorImplementationElement";
+		case vscode.CompletionItemKind.Field:
+		case vscode.CompletionItemKind.Variable:
+			return "variableElement";
+		case vscode.CompletionItemKind.Class:
+			return "classElement";
+		case vscode.CompletionItemKind.Interface:
+			return "interfaceElement";
+		case vscode.CompletionItemKind.Module:
+			return "moduleElement";
+		case vscode.CompletionItemKind.Property:
+			return "memberVariableElement";
+		case vscode.CompletionItemKind.Unit:
+		case vscode.CompletionItemKind.Value:
+			return "constElement";
+		case vscode.CompletionItemKind.Enum:
+			return "enumElement";
+		case vscode.CompletionItemKind.Keyword:
+			return "keyword";
+		case vscode.CompletionItemKind.Color:
+			return "constElement";
+		case vscode.CompletionItemKind.Reference:
+			return "alias";
+		case vscode.CompletionItemKind.File:
+			return "moduleElement";
+		case vscode.CompletionItemKind.Snippet:
+		case vscode.CompletionItemKind.Text:
+		default:
+			return "unknown";
 	}
 }

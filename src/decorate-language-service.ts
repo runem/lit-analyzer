@@ -6,6 +6,7 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 	const nextLanguageService: LanguageService = {
 		...languageService,
 		getCompletionsAtPosition: plugin.getCompletionsAtPosition.bind(plugin),
+		getCompletionEntryDetails: plugin.getCompletionEntryDetails.bind(plugin),
 		getSemanticDiagnostics: plugin.getSemanticDiagnostics.bind(plugin),
 		getDefinitionAndBoundSpan: plugin.getDefinitionAndBoundSpan.bind(plugin),
 		getCodeFixesAtPosition: plugin.getCodeFixesAtPosition.bind(plugin),

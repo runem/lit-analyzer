@@ -23,10 +23,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   More reliable type checking across all assignments.
 -   Better support for built in tag names and global attributes. These now directly use data from the vscode html language service.
 -   Values are now auto completed for attribute assignments where possible. For example an attribute with a string union type `"large" | "small"` will suggest these values.
+-   Inline documentation is now shown when listing completions.
 
 ### Fixed
 
 -   Fixed issue where components from libraries would be imported as `import "../../node_modules/my-component"` and not `import "my-component"`
+-   Added various missing global built in elements.
+-   Added various missing global built in attributes like 'aria-\*' attributes.
 
 ## [0.0.24] - 2019-02-08
 

@@ -14,7 +14,8 @@ export function completionsForHtmlAttrs(htmlNode: HtmlNode, { store }: Diagnosti
 				name: `${htmlTagAttr.name}${htmlTagAttr.required ? "!" : ""}`,
 				insert: htmlTagAttr.name,
 				kind: htmlTagAttr.hasProp ? "member" : "label",
-				importance: htmlTagAttr.hasProp ? "high" : "low"
+				importance: htmlTagAttr.hasProp ? "high" : "low",
+				documentation: htmlTagAttr.description
 			} as LitCompletion)
 	);
 }

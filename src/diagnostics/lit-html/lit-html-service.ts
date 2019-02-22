@@ -5,22 +5,36 @@ import { Range } from "../../types/range";
 import { flatten, intersects } from "../../util/util";
 import { DiagnosticsContext } from "../diagnostics-context";
 import { LitCodeFix } from "../types/lit-code-fix";
-import { codeFixesForHtmlReport } from "./code-fix/code-fixes-for-html-report";
 import { LitCompletion } from "../types/lit-completion";
-import { completionsAtOffset } from "./completion/completions-at-offset";
+import { LitCompletionDetails } from "../types/lit-completion-details";
 import { LitDefinition } from "../types/lit-definition";
-import { definitionForHtmlAttr } from "./definition/definition-for-html-attr";
-import { definitionForHtmlNode } from "./definition/definition-for-html-node";
+import { LitHtmlDiagnostic } from "../types/lit-diagnostic";
 import { LitFormatEdit } from "../types/lit-format-edit";
 import { LitQuickInfo } from "../types/lit-quick-info";
+import { codeFixesForHtmlReport } from "./code-fix/code-fixes-for-html-report";
+import { completionsAtOffset } from "./completion/completions-at-offset";
+import { definitionForHtmlAttr } from "./definition/definition-for-html-attr";
+import { definitionForHtmlNode } from "./definition/definition-for-html-node";
+import { validateHTMLDocument } from "./diagnostic/validate-html-document";
 import { quickInfoForHtmlAttr } from "./quick-info/quick-info-for-html-attr";
 import { quickInfoForHtmlNode } from "./quick-info/quick-info-for-html-node";
-import { LitHtmlDiagnostic } from "../types/lit-diagnostic";
-import { validateHTMLDocument } from "./diagnostic/validate-html-document";
 import { VscodeHtmlService } from "./vscode-html-service";
 
 export class LitHtmlService {
 	vscodeHtmlService = new VscodeHtmlService();
+
+	getCompletionDetails(document: HtmlDocument, offset: number, name: string, context: DiagnosticsContext): LitCompletionDetails | undefined {
+		const completionWithName = completionsAtOffset(document, offset, context).find(completion => completion.name === name);
+
+		if (completionWithName == null) return undefined;
+		if (completionWithName.documentation == null) return undefined;
+
+		return {
+			name,
+			kind: completionWithName.kind,
+			primaryInfo: completionWithName.documentation
+		};
+	}
 
 	getCompletions(document: HtmlDocument, offset: number, context: DiagnosticsContext): LitCompletion[] {
 		return completionsAtOffset(document, offset, context);

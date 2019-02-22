@@ -2,6 +2,7 @@ import { CssDocument } from "../../parsing/text-document/css-document/css-docume
 import { getPositionContextInDocument } from "../../util/get-html-position";
 import { DiagnosticsContext } from "../diagnostics-context";
 import { LitCompletion } from "../types/lit-completion";
+import { LitCompletionDetails } from "../types/lit-completion-details";
 import { DefinitionKind, LitDefinition } from "../types/lit-definition";
 import { LitCssDiagnostic } from "../types/lit-diagnostic";
 import { LitQuickInfo } from "../types/lit-quick-info";
@@ -9,6 +10,19 @@ import { VscodeCssService } from "./vscode-css-service";
 
 export class LitCssService {
 	vscodeCssService = new VscodeCssService();
+
+	getCompletionDetails(document: CssDocument, offset: number, name: string, context: DiagnosticsContext): LitCompletionDetails | undefined {
+		const completionWithName = this.vscodeCssService.getCompletions(document, offset).find(completion => completion.name === name);
+
+		if (completionWithName == null) return undefined;
+		if (completionWithName.documentation == null) return undefined;
+
+		return {
+			name,
+			kind: completionWithName.kind,
+			primaryInfo: completionWithName.documentation
+		};
+	}
 
 	getCompletions(document: CssDocument, offset: number, context: DiagnosticsContext): LitCompletion[] {
 		return this.vscodeCssService.getCompletions(document, offset);

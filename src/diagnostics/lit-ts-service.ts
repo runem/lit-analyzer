@@ -12,7 +12,8 @@ import { LitCssService } from "./lit-css/lit-css-service";
 import { LitHtmlService } from "./lit-html/lit-html-service";
 import { LitCodeFix } from "./types/lit-code-fix";
 import { CodeActionKind, LitCodeFixAction } from "./types/lit-code-fix-action";
-import { LitCompletion } from "./types/lit-completion";
+import { LitCompletion, LitCompletionKind } from "./types/lit-completion";
+import { LitCompletionDetails } from "./types/lit-completion-details";
 import { LitDefinition } from "./types/lit-definition";
 import { LitDiagnostic } from "./types/lit-diagnostic";
 import { LitFormatEdit } from "./types/lit-format-edit";
@@ -28,12 +29,47 @@ function translateRange(range: Range, document: TextDocument): ts.TextSpan {
 	};
 }
 
+function translateCompletionKind(kind: LitCompletionKind): ts.ScriptElementKind {
+	switch (kind) {
+		case "memberFunctionElement":
+			return tsModule.ts.ScriptElementKind.memberFunctionElement;
+		case "functionElement":
+			return tsModule.ts.ScriptElementKind.functionElement;
+		case "constructorImplementationElement":
+			return tsModule.ts.ScriptElementKind.constructorImplementationElement;
+		case "variableElement":
+			return tsModule.ts.ScriptElementKind.variableElement;
+		case "classElement":
+			return tsModule.ts.ScriptElementKind.classElement;
+		case "interfaceElement":
+			return tsModule.ts.ScriptElementKind.interfaceElement;
+		case "moduleElement":
+			return tsModule.ts.ScriptElementKind.moduleElement;
+		case "memberVariableElement":
+		case "member":
+			return tsModule.ts.ScriptElementKind.memberVariableElement;
+		case "constElement":
+			return tsModule.ts.ScriptElementKind.constElement;
+		case "enumElement":
+			return tsModule.ts.ScriptElementKind.enumElement;
+		case "keyword":
+			return tsModule.ts.ScriptElementKind.keyword;
+		case "alias":
+			return tsModule.ts.ScriptElementKind.alias;
+		case "label":
+			return tsModule.ts.ScriptElementKind.label;
+		default:
+			return tsModule.ts.ScriptElementKind.unknown;
+	}
+}
+
 function translateCompletion(completion: LitCompletion, document: TextDocument): ts.CompletionEntry {
 	const { importance, kind, insert, name, range } = completion;
 
 	return {
 		name,
-		kind: kind === "member" ? tsModule.ts.ScriptElementKind.memberVariableElement : tsModule.ts.ScriptElementKind.label,
+		kind: translateCompletionKind(kind),
+		kindModifiers: completion.kindModifiers,
 		sortText: importance === "high" ? "0" : importance === "medium" ? "1" : "2",
 		insertText: insert,
 		...(range != null ? { replacementSpan: translateRange(range, document) } : {})
@@ -51,6 +87,29 @@ function translateCompletions(completions: LitCompletion[], document: TextDocume
 			entries
 		};
 	}
+}
+
+function translateCompletionDetails(completionDetails: LitCompletionDetails, document: TextDocument): ts.CompletionEntryDetails {
+	return {
+		name: completionDetails.name,
+		kind: tsModule.ts.ScriptElementKind.label,
+		kindModifiers: "",
+		displayParts: [
+			{
+				text: completionDetails.primaryInfo,
+				kind: "text"
+			}
+		],
+		documentation:
+			completionDetails.secondaryInfo == null
+				? []
+				: [
+						{
+							kind: "text",
+							text: completionDetails.secondaryInfo
+						}
+				  ]
+	};
 }
 
 function translateDiagnostic(report: LitDiagnostic, file: SourceFile, document: CssDocument): ts.DiagnosticWithLocation {
@@ -187,6 +246,20 @@ function translateCodeFixes(codeFixes: LitCodeFix[], file: SourceFile, document:
 export class LitTsService {
 	private litHtmlService = new LitHtmlService();
 	private litCssService = new LitCssService();
+
+	getCompletionDetails(file: SourceFile, position: number, name: string, context: DiagnosticsContext): ts.CompletionEntryDetails | undefined {
+		const { document, offset } = this.getDocumentAndOffsetAtPosition(file, position, context);
+
+		if (document instanceof CssDocument) {
+			const result = this.litCssService.getCompletionDetails(document, offset, name, context);
+			if (result == null) return undefined;
+			return translateCompletionDetails(result, document);
+		} else if (document instanceof HtmlDocument) {
+			const result = this.litHtmlService.getCompletionDetails(document, offset, name, context);
+			if (result == null) return undefined;
+			return translateCompletionDetails(result, document);
+		}
+	}
 
 	getCompletions(file: SourceFile, position: number, context: DiagnosticsContext): ts.CompletionInfo | undefined {
 		const { document, offset } = this.getDocumentAndOffsetAtPosition(file, position, context);

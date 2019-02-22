@@ -1,7 +1,9 @@
 import {
 	CodeFixAction,
+	CompletionEntryDetails,
 	CompletionInfo,
 	DefinitionInfoAndBoundSpan,
+	FormatCodeOptions,
 	FormatCodeSettings,
 	GetCompletionsAtPositionOptions,
 	JsxClosingTagInfo,
@@ -48,11 +50,23 @@ export class TsLitPlugin {
 		this.storeUpdater = new StoreUpdater(prevLangService, store);
 	}
 
+	getCompletionEntryDetails(
+		fileName: string,
+		position: number,
+		name: string,
+		formatOptions: FormatCodeOptions | FormatCodeSettings | undefined,
+		source: string | undefined,
+		preferences: UserPreferences | undefined
+	): CompletionEntryDetails | undefined {
+		const file = this.program.getSourceFile(fileName)!;
+		const completionDetails = this.litService.getCompletionDetails(file, position, name, this.diagnosticContext(file));
+		return completionDetails || this.prevLangService.getCompletionEntryDetails(fileName, position, name, formatOptions, source, preferences);
+	}
+
 	getCompletionsAtPosition(fileName: string, position: number, options: GetCompletionsAtPositionOptions | undefined): CompletionInfo | undefined {
 		const file = this.program.getSourceFile(fileName)!;
 		this.storeUpdater.update(file, ["cmps"]);
 
-		// Calculates the neighborhood of the cursors position in the html.
 		const completionInfo = this.litService.getCompletions(file, position, this.diagnosticContext(file));
 
 		return completionInfo || this.prevLangService.getCompletionsAtPosition(fileName, position, options);

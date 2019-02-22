@@ -15,7 +15,8 @@ export function completionsForHtmlNodes({ offset, leftWord, rightWord }: Documen
 				range: {
 					start: offset - leftWord.length,
 					end: offset + rightWord.length
-				}
+				},
+				documentation: htmlTag.description
 			} as LitCompletion)
 	);
 }
