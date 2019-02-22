@@ -1,19 +1,19 @@
 ## Features
 
-### Attribute type checking
+### ✅ Attribute type checking
 
 `lit-plugin` type checks all attributes assignment, both on your own elements, library elements and built in elements. You will also get the following warnings:
 
 -   Warning if you assign a complex type without using the `.` modifier.
 -   Warning if you use the `?` modifier on a non-boolean type.
 
-### Automatically pick up on lit-elements
+### 🔍 Automatically pick up on lit-elements
 
 If you define a `lit-element` custom element somewhere in your code `lit-plugin` will automatically pick up on it. Then it will provide auto-import functionality, type checking and code completion out of the box by looking at `@property` decorators on the element.
 
 I'm working on supporting `static get properties()` and picking up "non-lit-element" custom elements by looking at `static get observedAttributes()`.
 
-### Support for dependencies that extend the global HTMLElementTagNameMap
+### 🌎 Support for dependencies that extend the global HTMLElementTagNameMap
 
 <img src="https://user-images.githubusercontent.com/5372940/53271293-4fc5f300-36ee-11e9-9ed9-31f1e50f898c.gif" width="500" />
 
@@ -34,11 +34,11 @@ declare global {
 
 I'm working on integrating support for the proposed [web-components.json](https://github.com/w3c/webcomponents/issues/776) file.
 
-### Report missing imports of custom elements
+### 📣 Report missing imports of custom elements
 
 When using custom elements `lit-plugin` checks if the element has been imported and is available in the current context. It's considered imported if any file in the path of imports defines the custom element. You can disable this check by setting `skipMissingImports` to true in the configuration (see [Configuring the plugin](#configuring-the-plugin)). Be aware that dependencies need to extend the global `HTMLElementTagNameMap` in order for this plugin to pick up on them.
 
-### Goto definition for html tags and attributes
+### 📖 Goto definition for html tags and attributes
 
 `Cmd+Click (Mac)` / `Ctrl+Click (Windows)` on a tag name or an attribute name and goto the definition.
 
