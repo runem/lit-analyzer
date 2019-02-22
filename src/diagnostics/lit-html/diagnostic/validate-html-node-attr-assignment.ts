@@ -112,8 +112,8 @@ export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, checker: Type
 
 		default:
 			// In this case there is no modifier. Therefore:
-			// Only primitive types should be allowed as "typeB" and "typeA".
 
+			// Only primitive types should be allowed as "typeB" and "typeA".
 			if (!isAssignableToPrimitiveType(typeA)) {
 				const message = (() => {
 					if (assignment != null) {
@@ -138,6 +138,18 @@ export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, checker: Type
 						typeB: toTypeString(typeB)
 					}
 				];
+			} else if (!isAssignableToPrimitiveType(typeB)) {
+				return [
+					{
+						kind: LitHtmlDiagnosticKind.COMPLEX_NOT_ASSIGNABLE_TO_PRIMITIVE,
+						severity: "error",
+						message: `You are assigning a non-primitive type '${toTypeString(typeB)}' to a primitive type '${toTypeString(typeA)}'`,
+						location: htmlAttr.location.name,
+						htmlAttr,
+						typeA: toTypeString(typeA),
+						typeB: toTypeString(typeB)
+					}
+				];
 			}
 
 			// Take into account that 'disabled=""' is equal to true
@@ -155,7 +167,7 @@ export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, checker: Type
 			// Take into account that assignments like maxlength="50" is allowed even though "50" is a string literal in this case.
 			else if (isAssignableToSimpleTypeKind(typeA, SimpleTypeKind.NUMBER)) {
 				if (typeB.kind !== SimpleTypeKind.STRING_LITERAL) {
-					break;
+					return [];
 				}
 
 				// Test if a potential string literal is a Number

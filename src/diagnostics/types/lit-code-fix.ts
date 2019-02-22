@@ -1,12 +1,12 @@
+import { LitCodeFixAction } from "./lit-code-fix-action";
 import {
 	LitHtmlDiagnostic,
 	LitHtmlDiagnosticHtmlBoolMod,
-	LitHtmlDiagnosticPrimitiveNotAssignableToComplex,
 	LitHtmlDiagnosticMissingImport,
+	LitHtmlDiagnosticPrimitiveNotAssignableToComplex,
 	LitHtmlDiagnosticUnknownAttribute,
 	LitHtmlDiagnosticUnknownTag
 } from "./lit-diagnostic";
-import { LitCodeFixAction } from "./lit-code-fix-action";
 
 export enum CodeFixKind {
 	RENAME = "RENAME",

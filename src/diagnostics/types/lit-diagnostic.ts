@@ -13,6 +13,7 @@ export enum LitHtmlDiagnosticKind {
 	BOOL_MOD_ON_NON_BOOL = "BOOL_MOD_ON_NON_BOOL",
 	NO_EVENT_LISTENER_FUNCTION = "NO_EVENT_LISTENER_FUNCTION",
 	PRIMITIVE_NOT_ASSIGNABLE_TO_COMPLEX = "PRIMITIVE_NOT_ASSIGNABLE_TO_COMPLEX",
+	COMPLEX_NOT_ASSIGNABLE_TO_PRIMITIVE = "COMPLEX_NOT_ASSIGNABLE_TO_PRIMITIVE",
 	INVALID_ATTRIBUTE_EXPRESSION_TYPE = "INVALID_ATTRIBUTE_EXPRESSION_TYPE"
 }
 
@@ -78,6 +79,13 @@ export interface LitHtmlDiagnosticHtmlInvalidAttributeExpressionType extends Lit
 	typeB: string;
 }
 
+export interface LitHtmlDiagnosticComplexNotAssignableToPrimitive extends LitDiagnosticBase {
+	kind: LitHtmlDiagnosticKind.COMPLEX_NOT_ASSIGNABLE_TO_PRIMITIVE;
+	htmlAttr: HtmlNodeAttr;
+	typeA: string;
+	typeB: string;
+}
+
 export type LitHtmlDiagnostic =
 	| LitHtmlDiagnosticUnknownTag
 	| LitHtmlDiagnosticMissingImport
@@ -87,6 +95,7 @@ export type LitHtmlDiagnostic =
 	| LitHtmlDiagnosticPrimitiveNotAssignableToComplex
 	| LitHtmlDiagnosticHtmlInvalidAttributeExpressionType
 	| LitHtmlDiagnosticHtmlNoEventListenerFunction
+	| LitHtmlDiagnosticComplexNotAssignableToPrimitive
 	| LitHtmlDiagnosticTagNotClosed;
 
 export interface LitCssDiagnostic extends LitDiagnosticBase {}

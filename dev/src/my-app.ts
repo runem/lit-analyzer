@@ -9,10 +9,10 @@ const myApp = (text: string, disabled: boolean) => html`
 	</style>
 
 	<div role="heading">
-		<my-button disabled size="large" text="Hello"></my-button>
+		<my-button disabled size="medium" text="Hello"></my-button>
 	</div>
 
-	<input type="email" maxlength="123" />
+	<input type="email" maxlength="1" tabindex="${true ? "-1" : "0"}" />
 `;
 
 render(myApp("Hello", false), document.body);

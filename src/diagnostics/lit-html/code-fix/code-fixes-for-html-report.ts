@@ -1,4 +1,3 @@
-import { isAssignableToPrimitiveType } from "ts-simple-type";
 import { DiagnosticsContext } from "../../diagnostics-context";
 import { CodeFixKind, LitCodeFix } from "../../types/lit-code-fix";
 import { CodeActionKind, LitCodeFixAction } from "../../types/lit-code-fix-action";
@@ -89,12 +88,13 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { store }:
 			const existingModifierLength = htmlAttr.modifier ? htmlAttr.modifier.length : 0;
 
 			const htmlTagAttr = store.getHtmlTagAttr(htmlAttr);
-			const newModifier = htmlTagAttr == null ? "." : isAssignableToPrimitiveType(htmlTagAttr.type) ? "" : ".";
+
+			const newModifier = htmlTagAttr == null ? "." : htmlReport.kind === LitHtmlDiagnosticKind.BOOL_MOD_ON_NON_BOOL ? "" : ".";
 
 			return [
 				{
 					kind: CodeFixKind.CHANGE_LIT_MODIFIER,
-					message: newModifier.length === 0 ? `Remove '${htmlAttr.modifier}' modifier` : `Use '${newModifier}' modifier instead`,
+					message: newModifier.length === 0 ? `Remove '${htmlAttr.modifier || ""}' modifier` : `Use '${newModifier}' modifier instead`,
 					htmlReport,
 					actions: [
 						{
