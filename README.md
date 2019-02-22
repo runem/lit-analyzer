@@ -24,17 +24,17 @@
 	* [Visual Studio Code](#visual-studio-code)
 	* [Other](#other)
 * [➤ Features](#-features)
-	* [Attribute type checking](#attribute-type-checking)
-	* [Automatically pick up on lit-elements](#automatically-pick-up-on-lit-elements)
-	* [Support for dependencies that extend the global HTMLElementTagNameMap](#support-for-dependencies-that-extend-the-global-htmlelementtagnamemap)
-	* [Report missing imports of custom elements](#report-missing-imports-of-custom-elements)
-	* [Goto definition for html tags and attributes](#goto-definition-for-html-tags-and-attributes)
-	* [Code completions for css and html](#code-completions-for-css-and-html)
-	* [Quick info on hover for html tags and attributes](#quick-info-on-hover-for-html-tags-and-attributes)
-	* [Warning if required attributes are not included](#warning-if-required-attributes-are-not-included)
-	* [Support for @ts-ignore comments inside html](#support-for-ts-ignore-comments-inside-html)
-	* [Reformat html](#reformat-html)
-	* [Auto close tags](#auto-close-tags)
+	* [✅ Attribute type checking](#-attribute-type-checking)
+	* [🔍 Automatically pick up on lit-elements](#-automatically-pick-up-on-lit-elements)
+	* [🌎 Support for dependencies that extend the global HTMLElementTagNameMap](#-support-for-dependencies-that-extend-the-global-htmlelementtagnamemap)
+	* [📣 Report missing imports of custom elements](#-report-missing-imports-of-custom-elements)
+	* [📖 Goto definition for html tags and attributes](#-goto-definition-for-html-tags-and-attributes)
+	* [✏️ Code completions for css and html](#-code-completions-for-css-and-html)
+	* [📖 Quick info on hover for html tags and attributes](#-quick-info-on-hover-for-html-tags-and-attributes)
+	* [⚠️ Warning if required attributes are not included](#-warning-if-required-attributes-are-not-included)
+	* [🙈 Support for @ts-ignore comments inside html](#-support-for-ts-ignore-comments-inside-html)
+	* [💅 Reformat html](#-reformat-html)
+	* [🚪 Auto close tags](#-auto-close-tags)
 * [➤ Configuring the plugin](#-configuring-the-plugin)
 	* [disable](#disable)
 	* [htmlTemplateTags](#htmltemplatetags)
@@ -90,22 +90,22 @@ See [Configuring the plugin](#configuring-the-plugin) for more information regar
 
 ## ➤ Features
 
-### Attribute type checking
+### ✅ Attribute type checking
 
 `lit-plugin` type checks all attributes assignment, both on your own elements, library elements and built in elements. You will also get the following warnings:
 
 -   Warning if you assign a complex type without using the `.` modifier.
 -   Warning if you use the `?` modifier on a non-boolean type.
 
-### Automatically pick up on lit-elements
+### 🔍 Automatically pick up on lit-elements
 
 If you define a `lit-element` custom element somewhere in your code `lit-plugin` will automatically pick up on it. Then it will provide auto-import functionality, type checking and code completion out of the box by looking at `@property` decorators on the element.
 
 I'm working on supporting `static get properties()` and picking up "non-lit-element" custom elements by looking at `static get observedAttributes()`.
 
-### Support for dependencies that extend the global HTMLElementTagNameMap
+### 🌎 Support for dependencies that extend the global HTMLElementTagNameMap
 
-<img src="https://user-images.githubusercontent.com/5372940/53271293-4fc5f300-36ee-11e9-9ed9-31f1e50f898c.gif" />
+<img src="https://user-images.githubusercontent.com/5372940/53271293-4fc5f300-36ee-11e9-9ed9-31f1e50f898c.gif" width="500" />
 
 If a dependency extends the global `HTMLElementTagNameMap` this plugin will pick up on the map between the tag name and the class. Below you will see an example of what to add to your library typescript definition files if you want type checking support for a given html tag.
 
@@ -124,28 +124,28 @@ declare global {
 
 I'm working on integrating support for the proposed [web-components.json](https://github.com/w3c/webcomponents/issues/776) file.
 
-### Report missing imports of custom elements
+### 📣 Report missing imports of custom elements
 
 When using custom elements `lit-plugin` checks if the element has been imported and is available in the current context. It's considered imported if any file in the path of imports defines the custom element. You can disable this check by setting `skipMissingImports` to true in the configuration (see [Configuring the plugin](#configuring-the-plugin)). Be aware that dependencies need to extend the global `HTMLElementTagNameMap` in order for this plugin to pick up on them.
 
-### Goto definition for html tags and attributes
+### 📖 Goto definition for html tags and attributes
 
 `Cmd+Click (Mac)` / `Ctrl+Click (Windows)` on a tag name or an attribute name and goto the definition.
 
-### Code completions for css and html
+### ✏️ Code completions for css and html
 
-<img src="https://user-images.githubusercontent.com/5372940/53271979-4f2e5c00-36f0-11e9-98a6-f9b7996d841c.gif" />
+<img src="https://user-images.githubusercontent.com/5372940/53271979-4f2e5c00-36f0-11e9-98a6-f9b7996d841c.gif" width="500" />
 
 Press `Ctrl+Space` in an html or css context and to get code completions for html tags and attributes.
 
 
-### Quick info on hover for html tags and attributes
+### 📖 Quick info on hover for html tags and attributes
 
 Hover above a html tag or attribute and see more information about the identifier such as type and jsdoc.
 
-### Warning if required attributes are not included
+### ⚠️ Warning if required attributes are not included
 
-<img src="https://user-images.githubusercontent.com/5372940/53272219-f612f800-36f0-11e9-98d2-2810f8b14c60.gif" />
+<img src="https://user-images.githubusercontent.com/5372940/53272219-f612f800-36f0-11e9-98d2-2810f8b14c60.gif" width="500" />
 
 
 `lit-plugin` will warn you if you forget to set any required attributes on a given html tag. Right now this is based on the assumption that the property is required if it doesn't have an initializer and isn't assignable to `undefined` or `null`. Be aware that right now the plugin doesn't check if you assign it else where (for example in the constructor).
@@ -159,7 +159,7 @@ export class MyElement extends LitElement {
 }
 ```
 
-### Support for @ts-ignore comments inside html
+### 🙈 Support for @ts-ignore comments inside html
 
 Add "@ts-ignore" comments to make `lit-plugin` quiet.
 
@@ -187,7 +187,7 @@ return html`
 `;
 ```
 
-### Reformat html
+### 💅 Reformat html
 
 `lit-plugin` will reformat html when you reformat code using your IDE. Keep in mind that right now there is an issue where the plugin does not take the current indentation of the html template tag into account. This means that the especially nested html template tags will look weird.
 
@@ -219,7 +219,7 @@ return html`
   </div>`;
 ```
 
-### Auto close tags
+### 🚪 Auto close tags
 
 When typing html inside a template tag `lit-plugin` auto-closes tags as you would expect.
 
