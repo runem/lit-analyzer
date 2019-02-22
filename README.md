@@ -28,7 +28,7 @@
 	* [🔍 Automatically pick up on lit-elements](#-automatically-pick-up-on-lit-elements)
 	* [🌎 Support for dependencies that extend the global HTMLElementTagNameMap](#-support-for-dependencies-that-extend-the-global-htmlelementtagnamemap)
 	* [📣 Report missing imports of custom elements](#-report-missing-imports-of-custom-elements)
-	* [📖 Goto definition for html tags and attributes](#-goto-definition-for-html-tags-and-attributes)
+	* [🚶Goto definition for html tags and attributes](#goto-definition-for-html-tags-and-attributes)
 	* [✏️ Code completions for css and html](#-code-completions-for-css-and-html)
 	* [📖 Quick info on hover for html tags and attributes](#-quick-info-on-hover-for-html-tags-and-attributes)
 	* [⚠️ Warning if required attributes are not included](#-warning-if-required-attributes-are-not-included)
@@ -128,7 +128,7 @@ I'm working on integrating support for the proposed [web-components.json](https:
 
 When using custom elements `lit-plugin` checks if the element has been imported and is available in the current context. It's considered imported if any file in the path of imports defines the custom element. You can disable this check by setting `skipMissingImports` to true in the configuration (see [Configuring the plugin](#configuring-the-plugin)). Be aware that dependencies need to extend the global `HTMLElementTagNameMap` in order for this plugin to pick up on them.
 
-### 📖 Goto definition for html tags and attributes
+### 🚶Goto definition for html tags and attributes
 
 `Cmd+Click (Mac)` / `Ctrl+Click (Windows)` on a tag name or an attribute name and goto the definition.
 
