@@ -59,12 +59,16 @@ export class StoreUpdater {
 	}
 
 	private findComponents(sourceFile: SourceFile) {
-		const componentDefinitions = parseComponents(sourceFile, this.checker);
+		try {
+			const componentDefinitions = parseComponents(sourceFile, this.checker);
 
-		this.store.invalidateTagsDefinedInFile(sourceFile);
-		this.store.absorbHtmlDefinitions(sourceFile, componentDefinitions);
+			this.store.invalidateTagsDefinedInFile(sourceFile);
+			this.store.absorbHtmlDefinitions(sourceFile, componentDefinitions);
 
-		const htmlTags = componentDefinitions.map(definition => convertComponentDefinitionsToHtmlTags(definition, this.checker));
-		this.store.absorbHtmlTags(htmlTags);
+			const htmlTags = componentDefinitions.map(definition => convertComponentDefinitionsToHtmlTags(definition, this.checker));
+			this.store.absorbHtmlTags(htmlTags);
+		} catch (error) {
+			// Temporary fail safe
+		}
 	}
 }

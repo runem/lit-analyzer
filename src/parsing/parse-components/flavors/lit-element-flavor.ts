@@ -14,6 +14,7 @@ export class LitElementFlavor implements IParseComponentFlavor {
 	 */
 	visitComponentDefinitions(node: Node, context: IComponentDefinitionVisitContext): void {
 		const { ts, checker } = context;
+		if (node == null) return;
 
 		// Handle "declare global { interface HTMLElementTagNameMap { "my-button": MyButton; } }"
 		if (ts.isModuleBlock(node)) {
@@ -122,13 +123,15 @@ export class LitElementFlavor implements IParseComponentFlavor {
 						// Find the declaration of the super class symbol
 						const declaration = symbol.valueDeclaration || context.checker.getAliasedSymbol(symbol).valueDeclaration;
 
-						// Parse the super class
-						this.visitComponentDeclaration(declaration, {
-							...context,
-							addMeta(meta: IComponentDeclarationMeta): void {
-								superJsDocTags.push(...(meta.jsDoc && meta.jsDoc.tags ? meta.jsDoc.tags : []));
-							}
-						});
+						if (declaration != null) {
+							// Parse the super class
+							this.visitComponentDeclaration(declaration, {
+								...context,
+								addMeta(meta: IComponentDeclarationMeta): void {
+									superJsDocTags.push(...(meta.jsDoc && meta.jsDoc.tags ? meta.jsDoc.tags : []));
+								}
+							});
+						}
 					}
 				}
 			}
