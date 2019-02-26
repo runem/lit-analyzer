@@ -29,10 +29,17 @@ export class LitElementFlavor implements IParseComponentFlavor {
 								const symbol = checker.getSymbolAtLocation(typeName);
 
 								if (symbol != null) {
-									const decl = (symbol.getDeclarations() || [])[0];
-									const declaration = symbol.valueDeclaration || decl || context.checker.getAliasedSymbol(symbol).valueDeclaration;
+									const declaration = (() => {
+										try {
+											return symbol.valueDeclaration || context.checker.getAliasedSymbol(symbol).valueDeclaration;
+										} catch (error) {
+											return (symbol.getDeclarations() || [])[0];
+										}
+									})();
 
-									context.addComponentDefinition(tagName, declaration);
+									if (declaration != null) {
+										context.addComponentDefinition(tagName, declaration);
+									}
 								}
 							}
 						}
