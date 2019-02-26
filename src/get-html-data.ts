@@ -1,5 +1,8 @@
 import { SimpleTypeKind } from "ts-simple-type";
-import { HTML5_EVENTS, HTML5_GLOBAL_ATTRIBUTES, HTML5_TAGS, HTML5_VALUE_MAP } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5";
+import { HTML5_GLOBAL_ATTRIBUTES, HTML5_VALUE_MAP } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5";
+import { HTML5_EVENTS } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Events";
+import { HTML5_TAGS } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Tags";
+import { ARIA_ATTRIBUTES } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Aria";
 import { html5TagAttrType } from "./extra-html-data";
 import { HtmlTag, HtmlTagAttr } from "./parsing/parse-html-data/html-tag";
 import { HtmlDataResult, parseHtmlData } from "./parsing/parse-html-data/parse-html-data";
@@ -9,7 +12,7 @@ export function getHtmlData(config: Config): HtmlDataResult {
 	const result = parseHtmlData({
 		version: 1,
 		tags: HTML5_TAGS,
-		globalAttributes: [...HTML5_GLOBAL_ATTRIBUTES, ...HTML5_EVENTS],
+		globalAttributes: [...HTML5_GLOBAL_ATTRIBUTES, ...HTML5_EVENTS, ...ARIA_ATTRIBUTES],
 		valueSets: HTML5_VALUE_MAP
 	});
 
