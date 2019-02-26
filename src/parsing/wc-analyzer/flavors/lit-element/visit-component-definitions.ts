@@ -1,6 +1,6 @@
 import { findChild } from "../../../../util/ast-util";
 import { Node, StringLiteral } from "typescript";
-import { ParseVisitContextComponentDefinition } from "../../parse-component-flavor";
+import { ParseVisitContextComponentDefinition } from "../parse-component-flavor";
 
 export function visitComponentDefinitions(node: Node, context: ParseVisitContextComponentDefinition) {
 	const { ts } = context;

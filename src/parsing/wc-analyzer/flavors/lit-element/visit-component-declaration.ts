@@ -1,8 +1,8 @@
 import { isAssignableToType, SimpleType, SimpleTypeKind, toSimpleType, toTypeString } from "ts-simple-type";
 import { CallExpression, Node, ObjectLiteralExpression } from "typescript";
-import { ParseVisitContext, ParseVisitContextComponentDeclaration } from "../../parse-component-flavor";
-import { isValidAttributeName } from "../../sanitize-attribute-name";
-import { getRelevantSuperClassDeclarations, hasModifier, hasPublicSetter, isPropertyRequired } from "../../util";
+import { ParseVisitContext, ParseVisitContextComponentDeclaration } from "../parse-component-flavor";
+import { isValidAttributeName } from "../../util/sanitize-attribute-name";
+import { getRelevantSuperClassDeclarations, hasModifier, hasPublicSetter, isPropertyRequired } from "../../util/ast-util";
 
 interface LitPropertyConfiguration {
 	type?: SimpleType;
@@ -19,15 +19,13 @@ export function visitComponentDeclaration(node: Node, context: ParseVisitContext
 
 	// class Test extends LitElement implements MyBase
 	if (ts.isInterfaceDeclaration(node) || ts.isClassLike(node)) {
-		if (node.name != null) {
-			context.emitClassName(node.name.text);
-		}
+		context.emitDeclarationNode(node, node.name && node.name.text);
 
 		getRelevantSuperClassDeclarations(node, context).forEach(decl => {
 			context.emitExtends(decl);
 			visitComponentDeclaration(decl, {
 				...context,
-				emitClassName() {}
+				emitDeclarationNode() {}
 			});
 		});
 	}

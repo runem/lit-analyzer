@@ -1,8 +1,8 @@
 import { Node } from "typescript";
 import { ParseComponentFlavor, ParseVisitContextComponentDeclaration, ParseVisitContextComponentDefinition } from "../parse-component-flavor";
-import { visitComponentDeclaration } from "./custom-element/visit-component-declaration";
-import { visitComponentDefinitions } from "./custom-element/visit-component-definitions";
-import { visitEventDefinitions } from "./custom-element/visit-event-definitions";
+import { visitComponentDeclaration } from "./visit-component-declaration";
+import { visitComponentDefinitions } from "./visit-component-definitions";
+import { visitEventDefinitions } from "./visit-event-definitions";
 
 /**
  * Flavor that can parse custom elements.

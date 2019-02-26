@@ -1,6 +1,7 @@
 import * as tsModule from "typescript";
-import { Node, TypeChecker, SourceFile } from "typescript";
-import { parseComponentInFile } from "../wc-parser/parse-components";
+import { Node, SourceFile, TypeChecker } from "typescript";
+import { logger } from "../../util/logger";
+import { parseComponentsInFile } from "../wc-analyzer/parse-components-in-file";
 import { IComponentDeclaration, IComponentDeclarationMeta, IComponentDeclarationProp, IComponentDefinition } from "./component-types";
 import { CustomElementFlavor } from "./flavors/custom-element-flavor";
 import { LitElementFlavor } from "./flavors/lit-element-flavor";
@@ -34,7 +35,13 @@ const cache = new WeakMap<Node, IComponentDeclaration>();
  * @param flavors
  */
 export function parseComponents(node: Node, checker: TypeChecker, flavors = allFlavors): IComponentDefinition[] {
-	parseComponentInFile(node as SourceFile, checker);
+	const result = parseComponentsInFile(node as SourceFile, checker);
+	if (result.componentDefinitions.length > 0) {
+		logger.debug(result.componentDefinitions);
+		logger.debug(result.componentDefinitions[0].declaration.properties.map(p => p.name));
+		logger.debug(result.componentDefinitions[0].declaration.attributes.map(p => p.name));
+		logger.debug(result.componentDefinitions[0].declaration.jsDoc);
+	}
 
 	if (1 === 1) return [];
 	const components: IComponentDefinition[] = [];

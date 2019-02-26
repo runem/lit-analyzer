@@ -1,7 +1,7 @@
 import { Node } from "typescript";
 import { logger } from "../../../../util/logger";
-import { ParseVisitContext } from "../../parse-component-flavor";
-import { getExtendedModuleInterfaceKeys } from "../../util";
+import { ParseVisitContext } from "../parse-component-flavor";
+import { getExtendedModuleInterfaceKeys } from "../../util/ast-util";
 
 export function visitEventDefinitions(node: Node, context: ParseVisitContext): void {
 	const { ts } = context;

@@ -1,6 +1,7 @@
 import * as tsModule from "typescript";
 import { Node, TypeChecker } from "typescript";
-import { ComponentDeclarationAttr, ComponentDeclarationProp, ComponentParsingDiagnostic } from "./component-types";
+import { ComponentParsingDiagnostic } from "../types/component-diagnostics";
+import { ComponentDeclarationAttr, ComponentDeclarationProp } from "../types/component-types";
 
 export interface ParseVisitContext {
 	checker: TypeChecker;
@@ -13,8 +14,7 @@ export interface ParseVisitContextComponentDefinition extends ParseVisitContext 
 }
 
 export interface ParseVisitContextComponentDeclaration extends ParseVisitContext {
-	emitClassJsDoc(className: string): void;
-	emitClassName(className: string): void;
+	emitDeclarationNode(node: Node, name?: string): void;
 	emitProp(prop: ComponentDeclarationProp): void;
 	emitAttr(attr: ComponentDeclarationAttr): void;
 	emitExtends(node: Node): void;

@@ -1,17 +1,8 @@
 import * as tsModule from "typescript";
 import { Node } from "typescript";
+import { JsDoc } from "../types/js-doc";
 
-export interface ComponentDeclarationJsDocTag {
-	tag: string;
-	comment?: string;
-}
-
-export interface ComponentDeclarationJsDoc {
-	comment?: string;
-	tags?: ComponentDeclarationJsDocTag[];
-}
-
-export function visitJsDoc(node: Node, ts: typeof tsModule): ComponentDeclarationJsDoc | undefined {
+export function parseJsDoc(node: Node, ts: typeof tsModule): JsDoc | undefined {
 	const docs = ((node as any).jsDoc as any[]) || [];
 
 	for (const doc of docs) {

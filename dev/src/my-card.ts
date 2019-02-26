@@ -1,23 +1,35 @@
 import { LitElement, property } from "lit-element";
 import "@polymer/app-layout/app-drawer/app-drawer";
 
-export interface MyBase {
-	baseProp: string;
+/**
+ * hfhhdf
+ * @fire MyCustomEvent#my-event
+ * @attr color
+ * @attr size
+ */
+export class MyBase extends LitElement {
+	baseProp!: string;
 }
 
-export interface MyCard extends MyBase, HTMLElement {}
-
-export class Test extends LitElement implements MyBase {
+/**
+ * Hello
+ * @fire MyCustomEvent#my-event
+ * @attr disabled
+ */
+class Test extends MyBase {
 	sdlkfjsldkfj!: string;
 	@property() baseProp: string = "jek";
 	lol!: number;
 }
 
-customElements.define("hehe-hehe", Test);
+customElements.define("my-test", Test);
 
-/*declare global {
+declare global {
 	interface HTMLElementTagNameMap {
-		"my-card": MyCard;
+		"my-card": Test;
 	}
+
+	/*interface HTMLElementEventMap {
+		"my-event": CustomEvent<string>;
+	}*/
 }
-*/

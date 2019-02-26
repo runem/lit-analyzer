@@ -1,7 +1,7 @@
 import { Node } from "typescript";
 import { ParseComponentFlavor, ParseVisitContextComponentDeclaration, ParseVisitContextComponentDefinition } from "../parse-component-flavor";
-import { visitComponentDeclaration } from "./lit-element/visit-component-declaration";
-import { visitComponentDefinitions } from "./lit-element/visit-component-definitions";
+import { visitComponentDeclaration } from "./visit-component-declaration";
+import { visitComponentDefinitions } from "./visit-component-definitions";
 
 /**
  * Flavor that can parse lit-element.

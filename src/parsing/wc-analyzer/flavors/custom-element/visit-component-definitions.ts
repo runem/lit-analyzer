@@ -1,5 +1,5 @@
-import { ParseVisitContextComponentDefinition } from "../../parse-component-flavor";
-import { getDeclaration, getExtendedModuleInterfaceKeys } from "../../util";
+import { ParseVisitContextComponentDefinition } from "../parse-component-flavor";
+import { getDeclaration, getExtendedModuleInterfaceKeys } from "../../util/ast-util";
 import { Node } from "typescript";
 
 export function visitComponentDefinitions(node: Node, context: ParseVisitContextComponentDefinition) {
