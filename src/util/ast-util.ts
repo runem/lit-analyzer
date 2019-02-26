@@ -8,9 +8,15 @@ import { intersects } from "./util";
  * @param node
  * @param test
  */
-export function findParent(node: Node | undefined, test: (node: Node) => boolean): Node | undefined {
+export function findParent<T = Node>(node: Node | undefined, test: (node: Node) => boolean): T | undefined {
 	if (node == null) return;
-	return test(node) ? node : findParent(node.parent, test);
+	return test(node) ? ((node as unknown) as T) : findParent(node.parent, test);
+}
+
+export function findChild<T = Node>(node: Node | undefined, test: (node: Node) => boolean): T | undefined {
+	if (!node) return;
+	if (test(node)) return (node as unknown) as T;
+	return node.forEachChild(child => findChild(child, test));
 }
 
 /**
