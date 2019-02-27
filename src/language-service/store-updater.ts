@@ -1,7 +1,7 @@
 import { LanguageService, Program, SourceFile, TypeChecker } from "typescript";
 import { convertComponentDefinitionsToHtmlTags } from "../parsing/convert-component-definitions-to-html-tags";
-import { parseComponents } from "../parsing/parse-components/parse-components";
 import { parseDependencies } from "../parsing/parse-dependencies/parse-dependencies";
+import { parseComponentsInFile } from "../parsing/web-component-analyzer/parse-components-in-file";
 import { TsLitPluginStore } from "../state/store";
 import { changedSourceFileIterator } from "../util/changed-source-file-iterator";
 
@@ -34,7 +34,7 @@ export class StoreUpdater {
 			seenFiles.add(sourceFile);
 
 			this.store.getDefinitionsWithDeclarationInFile(sourceFile).forEach(definition => {
-				const sf = this.program.getSourceFile(definition.fileName);
+				const sf = this.program.getSourceFile(definition.node.getSourceFile().fileName);
 				if (sf != null) {
 					invalidatedFiles.add(sf);
 				}
@@ -59,16 +59,12 @@ export class StoreUpdater {
 	}
 
 	private findComponents(sourceFile: SourceFile) {
-		try {
-			const componentDefinitions = parseComponents(sourceFile, this.checker);
+		const componentDefinitions = parseComponentsInFile(sourceFile, this.checker);
 
-			this.store.invalidateTagsDefinedInFile(sourceFile);
-			this.store.absorbHtmlDefinitions(sourceFile, componentDefinitions);
+		this.store.invalidateTagsDefinedInFile(sourceFile);
+		this.store.absorbComponentDefinitions(sourceFile, componentDefinitions.componentDefinitions);
 
-			const htmlTags = componentDefinitions.map(definition => convertComponentDefinitionsToHtmlTags(definition, this.checker));
-			this.store.absorbHtmlTags(htmlTags);
-		} catch (error) {
-			// Temporary fail safe
-		}
+		const htmlTags = componentDefinitions.componentDefinitions.map(definition => convertComponentDefinitionsToHtmlTags(definition, this.checker));
+		this.store.absorbHtmlTags(htmlTags);
 	}
 }

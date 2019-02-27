@@ -4,7 +4,7 @@ import { HTML5_EVENTS } from "vscode-html-languageservice/lib/umd/languageFacts/
 import { HTML5_TAGS } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Tags";
 import { ARIA_ATTRIBUTES } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Aria";
 import { html5TagAttrType } from "./extra-html-data";
-import { HtmlTag, HtmlTagAttr } from "./parsing/parse-html-data/html-tag";
+import { HtmlTag, HtmlAttr } from "./parsing/parse-html-data/html-tag";
 import { HtmlDataResult, parseHtmlData } from "./parsing/parse-html-data/parse-html-data";
 import { Config } from "./state/config";
 
@@ -18,12 +18,16 @@ export function getHtmlData(config: Config): HtmlDataResult {
 
 	result.tags.push({
 		attributes: [],
+		properties: [],
+		events: [],
 		name: "svg",
 		hasDeclaration: false,
 		description: ""
 	});
 
 	result.tags.push({
+		properties: [],
+		events: [],
 		attributes: [
 			{
 				name: "name",
@@ -45,7 +49,9 @@ export function getHtmlData(config: Config): HtmlDataResult {
 			tagName =>
 				({
 					name: tagName,
-					attributes: []
+					attributes: [],
+					properties: [],
+					events: []
 				} as HtmlTag)
 		)
 	);
@@ -56,7 +62,7 @@ export function getHtmlData(config: Config): HtmlDataResult {
 				({
 					name: attrName,
 					type: { kind: SimpleTypeKind.ANY }
-				} as HtmlTagAttr)
+				} as HtmlAttr)
 		)
 	);
 
@@ -69,7 +75,7 @@ export function getHtmlData(config: Config): HtmlDataResult {
 					({
 						...attr,
 						type: attr.type.kind === SimpleTypeKind.ANY ? html5TagAttrType(attr.name) : attr.type
-					} as HtmlTagAttr)
+					} as HtmlAttr)
 			)
 		})),
 		globalAttrs: result.globalAttrs.map(
@@ -77,7 +83,7 @@ export function getHtmlData(config: Config): HtmlDataResult {
 				({
 					...attr,
 					type: attr.type.kind === SimpleTypeKind.ANY ? html5TagAttrType(attr.name) : attr.type
-				} as HtmlTagAttr)
+				} as HtmlAttr)
 		)
 	};
 }

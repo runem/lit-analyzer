@@ -1,11 +1,11 @@
 import { SourceFile } from "typescript";
 import { ComponentParsingDiagnostic } from "./component-diagnostics";
 import { ComponentDefinition } from "./component-types";
-import { EventDefinition } from "./event-types";
+import { EventDeclaration } from "./event-types";
 
 export interface ComponentParsingResult {
 	sourceFile: SourceFile;
 	componentDefinitions: ComponentDefinition[];
-	eventDefinitions: EventDefinition[];
+	globalEvents: EventDeclaration[];
 	diagnostics: ComponentParsingDiagnostic[];
 }

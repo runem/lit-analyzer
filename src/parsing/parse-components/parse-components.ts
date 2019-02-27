@@ -1,7 +1,7 @@
 import * as tsModule from "typescript";
 import { Node, SourceFile, TypeChecker } from "typescript";
 import { logger } from "../../util/logger";
-import { parseComponentsInFile } from "../wc-analyzer/parse-components-in-file";
+import { parseComponentsInFile } from "../web-component-analyzer/parse-components-in-file";
 import { IComponentDeclaration, IComponentDeclarationMeta, IComponentDeclarationProp, IComponentDefinition } from "./component-types";
 import { CustomElementFlavor } from "./flavors/custom-element-flavor";
 import { LitElementFlavor } from "./flavors/lit-element-flavor";

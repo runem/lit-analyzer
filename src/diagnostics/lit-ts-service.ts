@@ -130,21 +130,22 @@ function translateDiagnostics(reports: LitDiagnostic[], file: SourceFile, docume
 }
 
 function translateDefinition(definition: LitDefinition, document: CssDocument): ts.DefinitionInfoAndBoundSpan {
-	const cls = definition.targetClass;
-	const prop = definition.targetProp;
+	const targetNode = definition.target.node;
 
-	const { start: targetStart, end: targetEnd } = prop != null ? prop!.location : cls.location;
+	const targetStart = targetNode.getStart();
+	const targetEnd = targetNode.getEnd();
+	const targetFileName = targetNode.getSourceFile().fileName;
 
 	return {
 		definitions: [
 			{
-				name: (prop != null ? prop!.name : cls.meta.className) || "",
+				name: definition.target.name || "",
 				textSpan: {
 					start: targetStart,
 					length: targetEnd - targetStart
 				},
-				fileName: cls.fileName,
-				containerName: cls.fileName,
+				fileName: targetFileName,
+				containerName: targetFileName,
 				kind: tsModule.ts.ScriptElementKind.memberVariableElement,
 				containerKind: tsModule.ts.ScriptElementKind.functionElement
 			}

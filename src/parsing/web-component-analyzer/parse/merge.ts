@@ -1,15 +1,11 @@
 import { isAssignableToSimpleTypeKind, SimpleTypeKind } from "ts-simple-type";
 import { ParseVisitContext } from "../flavors/parse-component-flavor";
-import { ComponentDeclarationAttr, ComponentDeclarationProp } from "../types/component-types";
+import { AttributeDeclaration, PropertyDeclaration } from "../types/component-types";
 import { TypeChecker } from "typescript";
 
-function mergePropOrAttr(existing: ComponentDeclarationAttr, newest: ComponentDeclarationAttr, checker: TypeChecker): ComponentDeclarationAttr;
-function mergePropOrAttr(existing: ComponentDeclarationProp, newest: ComponentDeclarationProp, checker: TypeChecker): ComponentDeclarationProp;
-function mergePropOrAttr(
-	existing: ComponentDeclarationAttr | ComponentDeclarationProp,
-	newest: ComponentDeclarationAttr | ComponentDeclarationProp,
-	checker: TypeChecker
-): ComponentDeclarationAttr | ComponentDeclarationProp {
+function mergePropOrAttr(existing: AttributeDeclaration, newest: AttributeDeclaration, checker: TypeChecker): AttributeDeclaration;
+function mergePropOrAttr(existing: PropertyDeclaration, newest: PropertyDeclaration, checker: TypeChecker): PropertyDeclaration;
+function mergePropOrAttr(existing: AttributeDeclaration | PropertyDeclaration, newest: AttributeDeclaration | PropertyDeclaration, checker: TypeChecker): AttributeDeclaration | PropertyDeclaration {
 	const merged = {
 		...existing,
 		node: newest.node,
@@ -24,14 +20,14 @@ function mergePropOrAttr(
 	return merged;
 }
 
-export function mergeProps(existingProps: ComponentDeclarationProp[], newProp: ComponentDeclarationProp, context: ParseVisitContext): ComponentDeclarationProp[] {
+export function mergeProps(existingProps: PropertyDeclaration[], newProp: PropertyDeclaration, context: ParseVisitContext): PropertyDeclaration[] {
 	const existingProp = existingProps.find(attr => attr.name === newProp.name);
 	if (existingProp == null) return [...existingProps, newProp];
 	const merged = mergePropOrAttr(existingProp, newProp, context.checker);
 	return [...existingProps.filter(attr => attr !== existingProp), merged];
 }
 
-export function mergeAttributes(existingAttributes: ComponentDeclarationAttr[], newAttr: ComponentDeclarationAttr, context: ParseVisitContext): ComponentDeclarationAttr[] {
+export function mergeAttributes(existingAttributes: AttributeDeclaration[], newAttr: AttributeDeclaration, context: ParseVisitContext): AttributeDeclaration[] {
 	const existingAttr = existingAttributes.find(attr => attr.name.toLowerCase() === newAttr.name.toLowerCase());
 	if (existingAttr == null) return [...existingAttributes, newAttr];
 	const merged = mergePropOrAttr(existingAttr, newAttr, context.checker);

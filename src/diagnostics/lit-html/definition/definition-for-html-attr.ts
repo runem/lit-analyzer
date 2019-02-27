@@ -4,13 +4,12 @@ import { LitDefinition, DefinitionKind } from "../../types/lit-definition";
 
 export function definitionForHtmlAttr(htmlAttr: HtmlNodeAttr, { sourceFile, store }: DiagnosticsContext): LitDefinition | undefined {
 	const decl = store.getComponentDeclaration(htmlAttr.htmlNode);
-	const prop = store.getComponentDeclarationProp(htmlAttr);
+	const prop = store.getAttributeDeclaration(htmlAttr);
 	if (decl == null || prop == null) return undefined;
 
 	return {
-		kind: DefinitionKind.COMPONENT,
+		kind: DefinitionKind.ATTRIBUTE,
 		fromRange: htmlAttr.location.name,
-		targetClass: decl,
-		targetProp: prop
+		target: prop
 	};
 }

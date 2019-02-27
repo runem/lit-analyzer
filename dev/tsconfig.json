@@ -11,6 +11,7 @@
 		"experimentalDecorators": true,
 		"target": "es5",
 		"module": "commonjs",
+		"allowJs": true,
 		"lib": ["esnext", "dom"],
 		"strict": true,
 		"esModuleInterop": true

@@ -1,10 +1,11 @@
 import { SimpleType, SimpleTypeKind, SimpleTypeStringLiteral, SimpleTypeUnion } from "ts-simple-type";
-import { HtmlData, HtmlDataTag, HtmlDataTagAttr, HtmlDataTagAttrValue, HtmlDataTagValueSet, HtmlDataV1 } from "./html-data-tag";
-import { HtmlTag, HtmlTagAttr } from "./html-tag";
+import { HtmlData, HtmlDataAttr, HtmlDataAttrValue, HtmlDataTag, HtmlDataV1, HtmlDataValueSet } from "./html-data-tag";
+import { HtmlAttr, HtmlEvent, HtmlTag } from "./html-tag";
 
 export type HtmlDataResult = {
 	tags: HtmlTag[];
-	globalAttrs: HtmlTagAttr[];
+	globalAttrs: HtmlAttr[];
+	globalEvents: HtmlEvent[];
 };
 
 export function parseHtmlData(data: HtmlData): HtmlDataResult {
@@ -22,9 +23,12 @@ function parseDataV1(data: HtmlDataV1): HtmlDataResult {
 
 	const globalAttrs = (data.globalAttributes || []).map(tagDataAttr => tagDataToHtmlTagAttr(tagDataAttr, valueSetTypeMap));
 
+	const globalEvents: HtmlEvent[] = [];
+
 	return {
 		tags,
-		globalAttrs
+		globalAttrs,
+		globalEvents
 	};
 }
 
@@ -34,11 +38,13 @@ function tagDataToHtmlTag(tagData: HtmlDataTag, typeMap: ValueSetTypeMap): HtmlT
 	return {
 		name,
 		description,
-		attributes: tagData.attributes.map(tagDataAttr => tagDataToHtmlTagAttr(tagDataAttr, typeMap))
+		attributes: tagData.attributes.map(tagDataAttr => tagDataToHtmlTagAttr(tagDataAttr, typeMap)),
+		properties: [],
+		events: []
 	};
 }
 
-function tagDataToHtmlTagAttr(tagDataAttr: HtmlDataTagAttr, typeMap: ValueSetTypeMap): HtmlTagAttr {
+function tagDataToHtmlTagAttr(tagDataAttr: HtmlDataAttr, typeMap: ValueSetTypeMap): HtmlAttr {
 	const { name, description, valueSet, values } = tagDataAttr;
 
 	const type = valueSet != null ? typeMap.get(valueSet) : values != null ? attrValuesToUnion(values) : undefined;
@@ -52,13 +58,13 @@ function tagDataToHtmlTagAttr(tagDataAttr: HtmlDataTagAttr, typeMap: ValueSetTyp
 
 type ValueSetTypeMap = Map<string, SimpleType>;
 
-function valueSetsToTypeMap(valueSets: HtmlDataTagValueSet[]): ValueSetTypeMap {
+function valueSetsToTypeMap(valueSets: HtmlDataValueSet[]): ValueSetTypeMap {
 	const entries = valueSets.map(valueSet => [valueSet.name, attrValuesToUnion(valueSet.values)] as [string, SimpleTypeUnion]);
 
 	return new Map(entries);
 }
 
-function attrValuesToUnion(attrValues: HtmlDataTagAttrValue[]): SimpleTypeUnion {
+function attrValuesToUnion(attrValues: HtmlDataAttrValue[]): SimpleTypeUnion {
 	return {
 		kind: SimpleTypeKind.UNION,
 		types: attrValues.map(

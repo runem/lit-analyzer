@@ -9,6 +9,6 @@ export function definitionForHtmlNode(htmlNode: HtmlNode, { store }: Diagnostics
 	return {
 		kind: DefinitionKind.COMPONENT,
 		fromRange: htmlNode.location.name,
-		targetClass: decl
+		target: decl
 	};
 }

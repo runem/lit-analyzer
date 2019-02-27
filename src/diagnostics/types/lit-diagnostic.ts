@@ -1,7 +1,7 @@
-import { IComponentDefinition } from "../../parsing/parse-components/component-types";
-import { HtmlTagAttr } from "../../parsing/parse-html-data/html-tag";
+import { HtmlAttr } from "../../parsing/parse-html-data/html-tag";
 import { HtmlNodeAttr } from "../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
 import { HtmlNode } from "../../parsing/text-document/html-document/parse-html-node/types/html-node-types";
+import { ComponentDefinition } from "../../parsing/web-component-analyzer/types/component-types";
 import { Range } from "../../types/range";
 
 export enum LitHtmlDiagnosticKind {
@@ -38,13 +38,13 @@ export interface LitHtmlDiagnosticUnknownAttribute extends LitDiagnosticBase {
 export interface LitHtmlDiagnosticMissingImport extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.MISSING_IMPORT;
 	htmlNode: HtmlNode;
-	definition: IComponentDefinition;
+	definition: ComponentDefinition;
 	importPath: string;
 }
 
 export interface LitHtmlDiagnosticMissingProps extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.MISSING_REQUIRED_ATTRS;
-	attrs: HtmlTagAttr[];
+	attrs: HtmlAttr[];
 	htmlNode: HtmlNode;
 }
 

@@ -9,6 +9,7 @@ import {
 	PropertyDeclaration,
 	PropertySignature,
 	SetAccessorDeclaration,
+	SourceFile,
 	Symbol,
 	SyntaxKind,
 	TypeChecker
@@ -101,8 +102,8 @@ export function getGeneralType(simpleType: SimpleType) {
 	return { kind: SimpleTypeKind.ANY } as SimpleType;
 }
 
-export function isNodeInLib(node: Node): boolean {
-	return node.getSourceFile().fileName.endsWith("/lib/lib.dom.d.ts");
+export function isNodeInLib(node: Node | SourceFile): boolean {
+	return ("fileName" in node ? node.fileName : node.getSourceFile().fileName).endsWith("/lib/lib.dom.d.ts");
 }
 
 export function isPropertyRequired(property: PropertySignature | PropertyDeclaration, checker: TypeChecker): boolean {

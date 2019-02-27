@@ -1,8 +1,8 @@
 import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../../../constants";
-import { HtmlNodeAttr, HtmlNodeAttrKind, IHtmlNodeAttrBase, IHtmlNodeAttrSourceCodeLocation } from "./types/html-node-attr-types";
 import { parseLitAttrName } from "../../../../util/util";
 import { IP5NodeAttr, IP5TagNode } from "../parse-html-p5/parse-html-types";
 import { parseHtmlAttrAssignment } from "./parse-html-attr-assignment";
+import { HtmlNodeAttr, HtmlNodeAttrKind, IHtmlNodeAttrBase, IHtmlNodeAttrSourceCodeLocation } from "./types/html-node-attr-types";
 import { ParseHtmlAttrContext } from "./types/parse-html-attr-context";
 
 /**
@@ -68,35 +68,33 @@ function makeHtmlAttrLocation(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, context: 
 }
 
 function parseHtmlAttrBase(htmlAttrBase: IHtmlNodeAttrBase): HtmlNodeAttr {
-	const { name, modifier } = htmlAttrBase;
+	const { modifier } = htmlAttrBase;
 
 	switch (modifier) {
 		case LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER:
 			return {
 				kind: HtmlNodeAttrKind.EVENT_LISTENER,
-				...htmlAttrBase
+				...htmlAttrBase,
+				modifier
 			};
 		case LIT_HTML_PROP_ATTRIBUTE_MODIFIER:
 			return {
 				kind: HtmlNodeAttrKind.PROP,
-				...htmlAttrBase
+				...htmlAttrBase,
+				modifier
 			};
 		case LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER:
 			return {
 				kind: HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE,
-				...htmlAttrBase
+				...htmlAttrBase,
+				modifier
+			};
+
+		default:
+			return {
+				kind: HtmlNodeAttrKind.ATTRIBUTE,
+				...htmlAttrBase,
+				modifier: undefined
 			};
 	}
-
-	if (name.startsWith("on")) {
-		return {
-			kind: HtmlNodeAttrKind.EVENT_LISTENER,
-			...htmlAttrBase
-		};
-	}
-
-	return {
-		kind: HtmlNodeAttrKind.ATTRIBUTE,
-		...htmlAttrBase
-	};
 }

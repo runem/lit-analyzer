@@ -1,16 +1,16 @@
 import * as tsModule from "typescript";
 import { Node, Program, SourceFile } from "typescript";
 import { logger } from "../../util/logger";
-import { IComponentDefinition } from "../parse-components/component-types";
+import { ComponentDefinition } from "../web-component-analyzer/types/component-types";
 
 interface IVisitDependenciesContext {
 	program: Program;
 	ts: typeof tsModule;
 	project: ts.server.Project;
 	lockedFiles: string[];
-	getDefinitionsInFile(file: SourceFile): IComponentDefinition[] | undefined;
-	getImportedDefinitionsInFile(file: SourceFile): IComponentDefinition[] | undefined;
-	addDefinitionsForFile(file: SourceFile, results: IComponentDefinition[], isCircular: boolean): void;
+	getDefinitionsInFile(file: SourceFile): ComponentDefinition[] | undefined;
+	getImportedDefinitionsInFile(file: SourceFile): ComponentDefinition[] | undefined;
+	addDefinitionsForFile(file: SourceFile, results: ComponentDefinition[], isCircular: boolean): void;
 	addCircularReference(fromFile: SourceFile, toFile: SourceFile): void;
 }
 
@@ -37,7 +37,7 @@ export function visitDependencies(node: Node, context: IVisitDependenciesContext
 				// Expand locked files with this file
 				lockedFiles: [...context.lockedFiles, node.fileName],
 
-				addDefinitionsForFile(file: SourceFile, newResults: IComponentDefinition[], isCircular: boolean): void {
+				addDefinitionsForFile(file: SourceFile, newResults: ComponentDefinition[], isCircular: boolean): void {
 					context.addDefinitionsForFile(file, newResults, isCircular);
 					result.push(...newResults);
 				},

@@ -1,6 +1,5 @@
 import * as tsModule from "typescript";
 import { Node } from "typescript";
-import { logger } from "../../../util/logger";
 import { ComponentDeclaration } from "../types/component-types";
 import { JsDoc } from "../types/js-doc";
 import { parseJsDoc } from "./parse-js-doc";
@@ -10,7 +9,6 @@ export function extendComponentDeclarationWithJsDoc(declaration: ComponentDeclar
 	const map = new WeakMap<Node, JsDoc | undefined>();
 
 	let declarationJsDoc = parseJsDoc(declaration.node, ts);
-	logger.debug("HEHEHEHEHE", declaration.name, (declaration.extends || []).map(m => m.getText().substr(0, 19)));
 
 	// Merge jsdoc tags from prototype chain
 	for (const extendsNode of declaration.extends || []) {

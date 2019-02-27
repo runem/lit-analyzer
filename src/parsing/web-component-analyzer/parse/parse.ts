@@ -7,28 +7,34 @@ import {
 	VisitComponentDefinitionResult
 } from "../flavors/parse-component-flavor";
 import { extendComponentDeclarationWithJsDoc } from "../js-doc/extend-with-js-doc";
-import { ComponentDeclaration, ComponentDeclarationAttr, ComponentDeclarationProp, ComponentDefinition } from "../types/component-types";
-import { EventDefinition } from "../types/event-types";
+import { ComponentDeclaration, AttributeDeclaration, PropertyDeclaration, ComponentDefinition } from "../types/component-types";
+import { EventDeclaration } from "../types/event-types";
+import { isNodeInLib } from "../util/ast-util";
 import { mergeAttributes, mergeProps } from "./merge";
 
 export function parseComponentDeclaration(node: Node, flavors: ParseComponentFlavor[], context: ParseVisitContext): ComponentDeclaration {
 	const declaration: ComponentDeclaration = {
 		attributes: [],
 		properties: [],
+		events: [],
 		jsDoc: {},
 		node
 	};
 
 	const declarationContext: ParseVisitContextComponentDeclaration = {
 		...context,
+		emitEvent(event: EventDeclaration): void {
+			if (declaration.events.find(e => e.name === event.name)) return;
+			declaration.events = [...declaration.events, event];
+		},
 		emitDeclarationNode(node: Node, name?: string): void {
 			declaration.name = name;
 			declaration.node = node;
 		},
-		emitAttr(attr: ComponentDeclarationAttr): void {
+		emitAttr(attr: AttributeDeclaration): void {
 			declaration.attributes = mergeAttributes(declaration.attributes, attr, context);
 		},
-		emitProp(prop: ComponentDeclarationProp): void {
+		emitProp(prop: PropertyDeclaration): void {
 			declaration.properties = mergeProps(declaration.properties, prop, context);
 		},
 		emitExtends(node: Node): void {
@@ -44,13 +50,21 @@ export function parseComponentDeclaration(node: Node, flavors: ParseComponentFla
 	return extendComponentDeclarationWithJsDoc(declaration, context.ts);
 }
 
-export function parseEventDefinitions(node: Node, flavors: ParseComponentFlavor[], context: ParseVisitContext): EventDefinition[] {
-	for (const flavor of flavors) {
-		if (flavor.visitEventDefinitions == null) continue;
+export function parseGlobalEvents(node: Node, flavors: ParseComponentFlavor[], context: ParseVisitContext): EventDeclaration[] {
+	const globalEvents: EventDeclaration[] = [];
 
-		flavor.visitEventDefinitions(node, context);
+	for (const flavor of flavors) {
+		if (flavor.visitGlobalEvents == null) continue;
+
+		flavor.visitGlobalEvents(node, {
+			...context,
+			emitEvent(event: EventDeclaration): void {
+				globalEvents.push(event);
+			}
+		});
 	}
-	return [];
+
+	return globalEvents;
 }
 
 export function parseComponentDefinitions(sourceFile: SourceFile, flavors: ParseComponentFlavor[], context: ParseVisitContext): ComponentDefinition[] {
@@ -62,6 +76,7 @@ export function parseComponentDefinitions(sourceFile: SourceFile, flavors: Parse
 		const declaration = parseComponentDeclaration(definitionResult.declarationNode, flavors, context);
 
 		componentDefinitions.push({
+			fromLib: isNodeInLib(sourceFile),
 			tagName: definitionResult.name,
 			node: definitionResult.definitionNode,
 			declaration
@@ -77,7 +92,6 @@ export function parseComponentDefinitionResults(node: Node, flavors: ParseCompon
 	const definitionContext: ParseVisitContextComponentDefinition = {
 		...context,
 		emitDefinition(tagName: string, definitionNode: Node, declarationNode: Node): void {
-			if (tagName !== "my-test") return;
 			const existingDefinition = allResults.find(result => result.name === tagName);
 			if (existingDefinition == null) {
 				allResults.push({ declarationNode, definitionNode, name: tagName });

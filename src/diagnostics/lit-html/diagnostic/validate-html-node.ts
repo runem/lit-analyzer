@@ -63,11 +63,11 @@ export function validateHtmlNode(htmlDocument: HtmlDocument, htmlNode: HtmlNode,
 
 			if (!isDefinitionImported && definition != null) {
 				// Get the import path and the position where it can be placed
-				const importPath = getRelativePathForImport(fromFileName, definition.fileName);
+				const importPath = getRelativePathForImport(fromFileName, definition.node.getSourceFile().fileName);
 
 				reports.push({
 					kind: LitHtmlDiagnosticKind.MISSING_IMPORT,
-					message: `Missing import <${htmlNode.tagName}>: ${definition.declaration.meta.className}`,
+					message: `Missing import <${htmlNode.tagName}>: ${definition.declaration.name}`,
 					severity: "warning",
 					location: htmlNode.location.name,
 					htmlNode,

@@ -115,7 +115,7 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { store }:
 			return [
 				{
 					kind: CodeFixKind.IMPORT_COMPONENT,
-					message: `Import "${htmlReport.definition.declaration.meta.className}" from module "${htmlReport.importPath}"`,
+					message: `Import "${htmlReport.definition.declaration.name}" from module "${htmlReport.importPath}"`,
 					htmlReport,
 					actions: [
 						{

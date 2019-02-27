@@ -50,7 +50,7 @@ export class LitCssService {
 			return {
 				kind: DefinitionKind.COMPONENT,
 				fromRange: { start, end },
-				targetClass: definition.declaration
+				target: definition.declaration
 			};
 		}
 		return undefined;

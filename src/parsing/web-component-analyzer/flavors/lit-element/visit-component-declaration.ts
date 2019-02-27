@@ -60,7 +60,7 @@ export function visitComponentDeclaration(node: Node, context: ParseVisitContext
 					context.emitDiagnostics({
 						node: (config.node && config.node.type) || node,
 						message: `@property type '${toTypeString(simplePropType)}' is not assignable to '${toTypeString(config.type)}'`,
-						severity: "medium"
+						severity: "warning"
 					});
 				}
 			}
@@ -71,13 +71,13 @@ export function visitComponentDeclaration(node: Node, context: ParseVisitContext
 				} else if (isAssignableToType({ kind: SimpleTypeKind.NUMBER }, simplePropType, checker)) {
 					context.emitDiagnostics({
 						node,
-						severity: "medium",
+						severity: "warning",
 						message: `You need to add {type: NUMBER} to @property decorator for '${propName}''`
 					});
 				} else if (isAssignableToType({ kind: SimpleTypeKind.BOOLEAN }, simplePropType, checker)) {
 					context.emitDiagnostics({
 						node,
-						severity: "medium",
+						severity: "warning",
 						message: `You need to add {type: BOOLEAN} to @property decorator for '${propName}''`
 					});
 				} else if (
@@ -92,13 +92,13 @@ export function visitComponentDeclaration(node: Node, context: ParseVisitContext
 				) {
 					context.emitDiagnostics({
 						node,
-						severity: "medium",
+						severity: "warning",
 						message: `You need to add {type: ARRAY} to @property decorator for '${propName}''`
 					});
 				} else {
 					context.emitDiagnostics({
 						node,
-						severity: "medium",
+						severity: "warning",
 						message: `You need to add {type: OBJECT} to @property decorator for '${propName}''`
 					});
 				}
@@ -108,7 +108,7 @@ export function visitComponentDeclaration(node: Node, context: ParseVisitContext
 				if (!isValidAttributeName(config.attribute)) {
 					context.emitDiagnostics({
 						node,
-						severity: "high",
+						severity: "error",
 						message: `Invalid attribute name '${config.attribute}'`
 					});
 				}
@@ -157,7 +157,8 @@ function visitStaticProperties(node: Node, context: ParseVisitContextComponentDe
 					context.emitAttr({
 						name: attrName,
 						type: propConfig.type || { kind: SimpleTypeKind.ANY },
-						node: (propConfig.node != null && propConfig.node.attribute) || propNode
+						node: propNode
+						//node: (propConfig.node != null && propConfig.node.attribute) || propNode
 					});
 				}
 			}

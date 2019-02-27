@@ -24,12 +24,12 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, store: TsLitPluginStore
 		if (store.config.skipUnknownHtmlAttributes) return [];
 
 		const htmlTag = store.getHtmlTag(htmlAttr.htmlNode);
-		const declaration = store.getComponentDeclaration(htmlAttr.htmlNode);
+		const definition = store.getComponentDefinition(htmlAttr.htmlNode);
 		const htmlTagAttrs = store.getHtmlTagAttrs(htmlAttr.htmlNode);
 		const suggestedName = findBestMatch(htmlAttr.name, htmlTagAttrs.map(attr => attr.name));
 
 		const isCustomElement = htmlTag != null && htmlTag.hasDeclaration;
-		const fromModule = declaration != null && declaration.fileName.includes("node_modules");
+		const fromModule = definition != null && definition.fromLib;
 
 		const tip =
 			suggestedName != null

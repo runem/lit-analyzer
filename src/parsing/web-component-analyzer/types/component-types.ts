@@ -1,8 +1,9 @@
 import { SimpleType } from "ts-simple-type";
 import { Node, Type } from "typescript";
+import { EventDeclaration } from "./event-types";
 import { JsDoc } from "./js-doc";
 
-export interface ComponentDeclarationProp {
+export interface PropertyDeclaration {
 	name: string;
 	node: Node;
 	type: Type | SimpleType;
@@ -11,7 +12,7 @@ export interface ComponentDeclarationProp {
 	jsDoc?: JsDoc;
 }
 
-export interface ComponentDeclarationAttr {
+export interface AttributeDeclaration {
 	name: string;
 	node: Node;
 	type: Type | SimpleType;
@@ -23,13 +24,15 @@ export interface ComponentDeclarationAttr {
 export interface ComponentDeclaration {
 	node: Node;
 	extends?: Node[];
-	properties: ComponentDeclarationProp[];
-	attributes: ComponentDeclarationAttr[];
+	properties: PropertyDeclaration[];
+	attributes: AttributeDeclaration[];
+	events: EventDeclaration[];
 	name?: string;
 	jsDoc?: JsDoc;
 }
 
 export interface ComponentDefinition {
+	fromLib: boolean;
 	node: Node;
 	tagName: string;
 	declaration: ComponentDeclaration;

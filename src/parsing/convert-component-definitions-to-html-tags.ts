@@ -1,21 +1,23 @@
-import { toSimpleType } from "ts-simple-type";
+import { isSimpleType, toSimpleType } from "ts-simple-type";
 import { TypeChecker } from "typescript";
-import { IComponentDefinition } from "./parse-components/component-types";
 import { HtmlTag } from "./parse-html-data/html-tag";
+import { ComponentDefinition } from "./web-component-analyzer/types/component-types";
 
-export function convertComponentDefinitionsToHtmlTags(definition: IComponentDefinition, checker: TypeChecker): HtmlTag {
+export function convertComponentDefinitionsToHtmlTags(definition: ComponentDefinition, checker: TypeChecker): HtmlTag {
 	const decl = definition.declaration;
 
 	return {
 		hasDeclaration: true,
 		name: definition.tagName,
-		description: decl.meta.jsDoc != null ? decl.meta.jsDoc.comment : undefined,
-		attributes: decl.props.map(prop => ({
+		description: decl.jsDoc && decl.jsDoc.comment,
+		attributes: decl.attributes.map(attr => ({
 			hasProp: true,
-			name: prop.name,
-			description: prop.jsDoc != null ? prop.jsDoc.comment : undefined,
-			required: prop.required,
-			type: toSimpleType(prop.type, checker)
-		}))
+			name: attr.name,
+			description: attr.jsDoc != null ? attr.jsDoc.comment : undefined,
+			required: attr.required,
+			type: isSimpleType(attr.type) ? attr.type : toSimpleType(attr.type, checker)
+		})),
+		properties: [],
+		events: []
 	};
 }

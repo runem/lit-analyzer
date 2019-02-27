@@ -1,10 +1,12 @@
 import * as tsModule from "typescript";
 import { SourceFile } from "typescript";
 import * as ts from "typescript/lib/tsserverlibrary";
-import { ComponentTagName, IComponentDeclaration, IComponentDeclarationProp, IComponentDefinition } from "../parsing/parse-components/component-types";
-import { HtmlTag, HtmlTagAttr } from "../parsing/parse-html-data/html-tag";
-import { HtmlNodeAttr } from "../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
+import { ComponentTagName } from "../parsing/parse-components/component-types";
+import { HtmlAttr, HtmlTag } from "../parsing/parse-html-data/html-tag";
+import { HtmlNodeAttr, HtmlNodeAttrKind } from "../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
 import { HtmlNode } from "../parsing/text-document/html-document/parse-html-node/types/html-node-types";
+import { AttributeDeclaration, ComponentDeclaration, ComponentDefinition, PropertyDeclaration } from "../parsing/web-component-analyzer/types/component-types";
+import { EventDeclaration } from "../parsing/web-component-analyzer/types/event-types";
 import { AttrName, FileName, TagName } from "../types/alias";
 import { caseInsensitiveCmp } from "../util/util";
 import { Config } from "./config";
@@ -15,23 +17,26 @@ import { Config } from "./config";
 export class TsLitPluginStore {
 	config!: Config;
 
-	importedComponentDefinitionsInFile = new Map<FileName, IComponentDefinition[]>();
-	definitionsInFile = new Map<FileName, IComponentDefinition[]>();
-	private definitions = new Map<TagName, IComponentDefinition>();
-	private tags = new Map<TagName, HtmlTag>();
-	private attributes = new Map<AttrName, HtmlTagAttr>();
+	importedComponentDefinitionsInFile = new Map<FileName, ComponentDefinition[]>();
+	definitionsInFile = new Map<FileName, ComponentDefinition[]>();
+	private definitions = new Map<TagName, ComponentDefinition>();
+
+	private globalTags = new Map<TagName, HtmlTag>();
+	private globalAttributes = new Map<AttrName, HtmlAttr>();
+
+	//private globalEvents = new Map<EventName, HtmlAttr>();
 
 	get allHtmlTags(): HtmlTag[] {
-		return Array.from(this.tags.values());
+		return Array.from(this.globalTags.values());
 	}
 
-	get allGlobalHtmlTagAttrs(): HtmlTagAttr[] {
-		return Array.from(this.attributes.values());
+	get allGlobalHtmlTagAttrs(): HtmlAttr[] {
+		return Array.from(this.globalAttributes.values());
 	}
 
 	constructor(public ts: typeof tsModule, public info: ts.server.PluginCreateInfo) {}
 
-	absorbHtmlDefinitions(sourceFile: SourceFile, definitions: IComponentDefinition[]) {
+	absorbComponentDefinitions(sourceFile: SourceFile, definitions: ComponentDefinition[]) {
 		this.definitionsInFile.set(sourceFile.fileName, definitions);
 
 		definitions.forEach(definition => {
@@ -41,51 +46,61 @@ export class TsLitPluginStore {
 
 	absorbHtmlTags(htmlTags: HtmlTag[]) {
 		htmlTags.forEach(htmlTag => {
-			this.tags.set(htmlTag.name, htmlTag);
+			this.globalTags.set(htmlTag.name, htmlTag);
 		});
 	}
 
-	absorbGlobalHtmlAttributes(htmlAttrs: HtmlTagAttr[]) {
+	absorbGlobalHtmlAttributes(htmlAttrs: HtmlAttr[]) {
 		htmlAttrs.forEach(htmlAttr => {
-			this.attributes.set(htmlAttr.name, htmlAttr);
+			this.globalAttributes.set(htmlAttr.name, htmlAttr);
 		});
 	}
 
-	getDefinitionsWithDeclarationInFile(sourceFile: SourceFile): IComponentDefinition[] {
-		return Array.from(this.definitions.values()).filter(d => d.declaration.fileName === sourceFile.fileName);
+	getDefinitionsWithDeclarationInFile(sourceFile: SourceFile): ComponentDefinition[] {
+		return Array.from(this.definitions.values()).filter(d => [d.declaration.node, ...(d.declaration.extends || [])].map(n => n.getSourceFile()).find(sf => sf.fileName === sourceFile.fileName));
 	}
 
-	getDefinitionForTagName(tagName: TagName): IComponentDefinition | undefined {
+	getDefinitionForTagName(tagName: TagName): ComponentDefinition | undefined {
 		return this.definitions.get(tagName);
 	}
 
-	getComponentDeclarationProp(htmlNodeAttr: HtmlNodeAttr): IComponentDeclarationProp | undefined {
+	getAttributeDeclaration(htmlNodeAttr: HtmlNodeAttr): PropertyDeclaration | AttributeDeclaration | EventDeclaration | undefined {
 		const decl = this.getComponentDeclaration(htmlNodeAttr.htmlNode);
-		return decl == null ? undefined : decl.props.find(prop => caseInsensitiveCmp(prop.name, htmlNodeAttr.name));
+		if (decl == null) return undefined;
+
+		switch (htmlNodeAttr.kind) {
+			case HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE:
+			case HtmlNodeAttrKind.ATTRIBUTE:
+				return decl.attributes.find(attr => caseInsensitiveCmp(attr.name, htmlNodeAttr.name));
+			case HtmlNodeAttrKind.EVENT_LISTENER:
+				return decl.events.find(event => caseInsensitiveCmp(event.name, htmlNodeAttr.name));
+			case HtmlNodeAttrKind.PROP:
+				return decl.properties.find(prop => prop.name === htmlNodeAttr.name);
+		}
 	}
 
-	getComponentDeclaration(htmlNode: HtmlNode): IComponentDeclaration | undefined {
+	getComponentDeclaration(htmlNode: HtmlNode): ComponentDeclaration | undefined {
 		const htmlTag = this.getHtmlTag(htmlNode);
 		return htmlTag == null ? undefined : this.definitions.has(htmlTag.name) ? this.definitions.get(htmlTag.name)!.declaration : undefined;
 	}
 
-	getComponentDefinition(htmlNode: HtmlNode): IComponentDefinition | undefined {
+	getComponentDefinition(htmlNode: HtmlNode): ComponentDefinition | undefined {
 		const htmlTag = this.getHtmlTag(htmlNode);
 		return htmlTag == null ? undefined : this.definitions.get(htmlTag.name);
 	}
 
-	getHtmlTagAttrs(htmlNode: HtmlNode): HtmlTagAttr[] {
+	getHtmlTagAttrs(htmlNode: HtmlNode): HtmlAttr[] {
 		const htmlTag = this.getHtmlTag(htmlNode);
 
 		return [...((htmlTag != null ? htmlTag.attributes : []) || []), ...this.allGlobalHtmlTagAttrs];
 	}
 
 	getHtmlTag(htmlNode: HtmlNode): HtmlTag | undefined {
-		return this.tags.get(htmlNode.tagName);
+		return this.globalTags.get(htmlNode.tagName);
 	}
 
-	getHtmlTagAttr(htmlAttr: HtmlNodeAttr): HtmlTagAttr | undefined {
-		const htmlTag = this.tags.get(htmlAttr.htmlNode.tagName);
+	getHtmlTagAttr(htmlAttr: HtmlNodeAttr): HtmlAttr | undefined {
+		const htmlTag = this.globalTags.get(htmlAttr.htmlNode.tagName);
 
 		if (htmlTag != null) {
 			const result = htmlTag.attributes.find(htmlTagAttr => caseInsensitiveCmp(htmlTagAttr.name, htmlAttr.name));
@@ -95,14 +110,14 @@ export class TsLitPluginStore {
 			}
 		}
 
-		return this.attributes.get(htmlAttr.name);
+		return this.globalAttributes.get(htmlAttr.name);
 	}
 
 	invalidateTagsDefinedInFile(sourceFile: SourceFile) {
 		const definitions = this.definitionsInFile.get(sourceFile.fileName) || [];
 
 		definitions.forEach(definition => {
-			this.tags.delete(definition.tagName);
+			this.globalTags.delete(definition.tagName);
 			this.definitions.delete(definition.tagName);
 		});
 	}
