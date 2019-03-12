@@ -11,8 +11,8 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 		getDefinitionAndBoundSpan: plugin.getDefinitionAndBoundSpan.bind(plugin),
 		getCodeFixesAtPosition: plugin.getCodeFixesAtPosition.bind(plugin),
 		getQuickInfoAtPosition: plugin.getQuickInfoAtPosition.bind(plugin),
-		getJsxClosingTagAtPosition: plugin.getJsxClosingTagAtPosition.bind(plugin),
-		getFormattingEditsForRange: plugin.getFormattingEditsForRange.bind(plugin)
+		getJsxClosingTagAtPosition: plugin.getJsxClosingTagAtPosition.bind(plugin)
+		//getFormattingEditsForRange: plugin.getFormattingEditsForRange.bind(plugin)
 	};
 
 	// Make sure to call the old service if config.disable === true
