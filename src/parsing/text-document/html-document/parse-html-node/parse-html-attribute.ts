@@ -32,7 +32,7 @@ export function parseHtmlNodeAttr(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, conte
 	const { name, modifier } = parseLitAttrName(p5Attr.name);
 
 	const htmlAttrBase: IHtmlNodeAttrBase = {
-		name: name.toLowerCase(),
+		name: name.toLowerCase(), // Parse5 lowercases all attributes names. Therefore ".myAttr" becomes ".myattr"
 		modifier,
 		htmlNode,
 		location: makeHtmlAttrLocation(p5Node, p5Attr, context)
@@ -79,7 +79,7 @@ function parseHtmlAttrBase(htmlAttrBase: IHtmlNodeAttrBase): HtmlNodeAttr {
 			};
 		case LIT_HTML_PROP_ATTRIBUTE_MODIFIER:
 			return {
-				kind: HtmlNodeAttrKind.PROP,
+				kind: HtmlNodeAttrKind.PROPERTY,
 				...htmlAttrBase,
 				modifier
 			};

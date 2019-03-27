@@ -4,12 +4,19 @@ import "./my-button";
 /**
  * Hejsa
  */
-@customElement("my-test1")
+@customElement("my-component")
 export class MyTest extends LitElement {
 	/**
-	 * Hejsa
+	 * Hello, this is some documentation
+	 * @attr myProp1
 	 */
-	@property({ type: String }) foo: string = "hejsa";
+	myProp1: string = "foo";
+
+	myProp2: string = "bar";
 
 	@property({ type: Number }) bar!: number;
+
+	static get observedAttributes() {
+		return ["myProp"];
+	}
 }

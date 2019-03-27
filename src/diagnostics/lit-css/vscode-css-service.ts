@@ -1,5 +1,6 @@
 import * as vscode from "vscode-css-languageservice";
 import { CssDocument } from "../../parsing/text-document/css-document/css-document";
+import { lazy } from "../../util/util";
 import { DiagnosticsContext } from "../diagnostics-context";
 import { LitCompletion, LitCompletionKind } from "../types/lit-completion";
 import { LitCssDiagnostic } from "../types/lit-diagnostic";
@@ -83,8 +84,8 @@ export class VscodeCssService {
 					insert: i.label,
 					name: i.label,
 					kindModifiers: i.kind === vscode.CompletionItemKind.Color ? "color" : undefined,
-					documentation: typeof i.documentation === "string" || i.documentation == null ? i.documentation : i.documentation.value,
-					importance: i.label.startsWith("@") || i.label.startsWith("-") ? "low" : i.label.startsWith(":") ? "medium" : "high"
+					importance: i.label.startsWith("@") || i.label.startsWith("-") ? "low" : i.label.startsWith(":") ? "medium" : "high",
+					documentation: lazy(() => (typeof i.documentation === "string" || i.documentation == null ? i.documentation : i.documentation.value))
 				} as LitCompletion)
 		);
 	}

@@ -17,6 +17,7 @@ export interface IHtmlNodeBase {
 	tagName: string;
 	location: IHtmlNodeSourceCodeLocation;
 	attributes: HtmlNodeAttr[];
+	parent?: HtmlNode;
 	children: HtmlNode[];
 	selfClosed: boolean;
 }

@@ -73,7 +73,7 @@ export class Logger {
 			logPath,
 			`${prefix}${inspect(args, {
 				colors: true,
-				depth: 4,
+				depth: 6,
 				breakLength: 50,
 				maxArrayLength: 10
 			})}\n`

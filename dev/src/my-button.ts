@@ -3,12 +3,31 @@ import "@material/mwc-button";
 
 /**
  * This is my button
+ * @event submit - This is a nice event!
+ * @event change - This is a super nice event!
  */
 @customElement("my-button")
 export class MyButton extends LitElement {
+	/**
+	 * This is my size!
+	 */
 	@property({ type: String }) size: "small" | "medium" | "large" = "medium";
-	@property({ type: Number }) text!: string;
+
+	@property({ type: Number }) text!: number;
+
 	@property({ type: Boolean }) disabled: boolean = false;
+
+	static get properties() {
+		return {
+			myProprop: {
+				type: Boolean
+			}
+		};
+	}
+
+	static get observedAttributes() {
+		return ["this-is-an-attr"];
+	}
 
 	static styles = css`
 		button {
@@ -26,6 +45,8 @@ export class MyButton extends LitElement {
 		return html`
 			<button @click="${this.onClick}">${this.text}</button>
 			<mwc-button dense></mwc-button>
+
+			<my-button .myProprop="${true}"></my-button>
 		`;
 	}
 }

@@ -1,32 +1,174 @@
-import { SimpleType } from "ts-simple-type";
+import { isAssignableToSimpleTypeKind, SimpleType, SimpleTypeKind, toTypeString } from "ts-simple-type";
+import { ComponentDeclaration, ComponentMember, ComponentSlot, EventDeclaration } from "web-component-analyzer";
+
+export type HtmlDataCollection = {
+	tags: HtmlTag[];
+	attrs: HtmlAttr[];
+	events: HtmlEvent[];
+};
 
 export interface HtmlTag {
-	name: string;
+	tagName: string;
 	description?: string;
-	hasDeclaration?: boolean;
+	builtIn?: boolean;
+	global?: boolean;
+	declaration?: ComponentDeclaration;
 	attributes: HtmlAttr[];
 	properties: HtmlProp[];
 	events: HtmlEvent[];
+	slots: HtmlSlot[];
 }
 
-export interface HtmlAttr {
-	name: string;
-	description?: string;
+export type HtmlTagMemberKind = "attribute" | "property";
+
+export interface HtmlMemberBase {
+	kind?: HtmlTagMemberKind;
+	builtIn?: boolean;
 	required?: boolean;
-	hasProp?: boolean;
-	type: SimpleType;
+	description?: string;
+	declaration?: ComponentMember;
+	name?: string;
+	fromTagName?: string;
+	related?: HtmlMember[];
+	getType(): SimpleType;
 }
 
-export interface HtmlProp {
+export interface HtmlAttr extends HtmlMemberBase {
+	kind: "attribute";
 	name: string;
-	description?: string;
-	required?: boolean;
-	hasAttr?: boolean;
-	type: SimpleType;
+	related?: HtmlMember[];
 }
+
+export interface HtmlProp extends HtmlMemberBase {
+	kind: "property";
+	name: string;
+	related?: HtmlMember[];
+}
+
+export type HtmlMember = HtmlAttr | HtmlProp;
 
 export interface HtmlEvent {
 	name: string;
 	description?: string;
-	type: SimpleType;
+	declaration?: EventDeclaration;
+	builtIn?: boolean;
+	global?: boolean;
+	fromTagName?: string;
+	related?: HtmlEvent[];
+	getType(): SimpleType;
+}
+
+export interface HtmlSlot {
+	name: string;
+	fromTagName?: string;
+	description?: string;
+	declaration?: ComponentSlot;
+}
+
+export type HtmlAttrTarget = HtmlEvent | HtmlMember;
+
+export function isHtmlMember(target: HtmlAttrTarget): target is HtmlMember {
+	return "kind" in target;
+}
+
+export function isHtmlAttr(target: HtmlAttrTarget): target is HtmlAttr {
+	return isHtmlMember(target) && target.kind === "attribute";
+}
+
+export function isHtmlProp(target: HtmlAttrTarget): target is HtmlProp {
+	return isHtmlMember(target) && target.kind === "property";
+}
+
+export function isHtmlEvent(target: HtmlAttrTarget): target is HtmlEvent {
+	return !isHtmlMember(target);
+}
+
+export function documentationForTarget(target: HtmlAttrTarget, modifier?: string): string | undefined {
+	const typeText = targetKindAndTypeText(target, modifier);
+	const documentation = descriptionForTarget(target);
+
+	return `${typeText}${documentation != null ? ` \n\n${documentation}` : ""}`;
+}
+
+export function descriptionForTarget(target: HtmlAttrTarget): string | undefined {
+	if (target.related != null && target.related.length > 1) {
+		const subDocumentation = (target.related as HtmlAttrTarget[])
+			.map(t => `${t.fromTagName ? `<${t.fromTagName}>: ` : ""}${t.description || "[no documentation]"}`)
+			.map((doc, i) => `${i + 1}. ${doc}`);
+		return `Multiple declarations (best match first):\n${subDocumentation.join("\n")}`;
+	}
+
+	return target.description;
+}
+
+export function targetKindAndTypeText(target: HtmlAttrTarget, modifier?: string): string {
+	const prefix = `(${targetKindText(target)}) ${modifier || ""}${target.name}`;
+
+	if (isAssignableToSimpleTypeKind(target.getType(), SimpleTypeKind.ANY)) {
+		return `${prefix}`;
+	}
+
+	return `${prefix}: ${toTypeString(target.getType())}`;
+}
+
+export function targetKindText(target: HtmlAttrTarget): string {
+	if (isHtmlMember(target)) {
+		return target.kind === "property" ? "property" : "attribute";
+	} else if (isHtmlEvent(target)) {
+		return "event";
+	}
+
+	return "unknown";
+}
+
+function mergeFirstUnique<T>(items: T[], uniqueOn: (item: T) => any): T[] {
+	const unique = new Set<any>();
+	return items.filter(item => {
+		const identity = uniqueOn(item);
+		if (!unique.has(identity)) {
+			unique.add(identity);
+			return true;
+		}
+
+		return false;
+	});
+}
+
+export function mergeHtmlAttrs(attrs: HtmlAttr[]): HtmlAttr[] {
+	return mergeFirstUnique(attrs, attr => attr.name);
+}
+
+export function mergeHtmlProps(props: HtmlProp[]): HtmlProp[] {
+	return mergeFirstUnique(props, prop => prop.name);
+}
+
+export function mergeHtmlEvents(events: HtmlEvent[]): HtmlEvent[] {
+	return mergeFirstUnique(events, event => event.name);
+}
+
+export function mergeHtmlSlots(slots: HtmlSlot[]): HtmlSlot[] {
+	return mergeFirstUnique(slots, event => event.name);
+}
+
+export function mergeHtmlTags(tags: HtmlTag[]): HtmlTag[] {
+	const mergedTags = new Map<string, HtmlTag>();
+	for (const tag of tags) {
+		const existingTag = mergedTags.get(tag.tagName);
+		if (existingTag != null) {
+			mergedTags.set(tag.tagName, {
+				...tag,
+				builtIn: tag.builtIn || existingTag.builtIn,
+				global: tag.global || existingTag.global,
+				declaration: tag.declaration || existingTag.declaration,
+				description: tag.description || existingTag.description,
+				attributes: mergeHtmlAttrs([...tag.attributes, ...existingTag.attributes]),
+				properties: mergeHtmlProps([...tag.properties, ...existingTag.properties]),
+				events: mergeHtmlEvents([...tag.events, ...existingTag.events]),
+				slots: mergeHtmlSlots([...tag.slots, ...existingTag.slots])
+			});
+		} else {
+			mergedTags.set(tag.tagName, tag);
+		}
+	}
+	return Array.from(mergedTags.values());
 }

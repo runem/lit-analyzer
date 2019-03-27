@@ -6,8 +6,8 @@ import { Range } from "../types/range";
  * @param strA
  * @param strB
  */
-export function caseInsensitiveCmp(strA: string, strB: string): boolean {
-	return strA.toLowerCase() === strB.toLowerCase();
+export function caseInsensitiveEquals(strA: string, strB: string): boolean {
+	return strA.localeCompare(strB, undefined, { sensitivity: "accent" }) === 0;
 }
 
 /**
@@ -55,4 +55,18 @@ export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export function parseLitAttrName(attributeName: string): { name: string; modifier?: LitHtmlAttributeModifier } {
 	const [, modifier, name] = attributeName.match(/^([.?@])?(.*)/);
 	return { name, modifier: modifier as LitHtmlAttributeModifier };
+}
+
+export function lazy<T extends Function>(func: T): T {
+	let called = false;
+	let value: any;
+	return (((...args: any[]) => {
+		if (called) return value;
+		called = true;
+		return (value = func(...args));
+	}) as unknown) as T;
+}
+
+export function isCustomElementTagName(tagName: string): boolean {
+	return tagName.includes("-");
 }

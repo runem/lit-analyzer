@@ -18,7 +18,7 @@ export function completionsAtOffset(document: HtmlDocument, offset: number, cont
 
 	// Get entries from the extensions
 	if (intersectingAttr != null) {
-		const entries = completionsForHtmlAttrs(intersectingAttr.htmlNode, context);
+		const entries = completionsForHtmlAttrs(intersectingAttr.htmlNode, positionContext, context);
 
 		// Make sure that every entry overwrites the entire attribute name.
 		return entries.map(entry => ({
@@ -26,11 +26,11 @@ export function completionsAtOffset(document: HtmlDocument, offset: number, cont
 			range: intersectingAttr.location.name
 		}));
 	} else if (intersectingAttrAssignment != null) {
-		return completionsForHtmlAttrValues(intersectingAttrAssignment, context);
+		return completionsForHtmlAttrValues(intersectingAttrAssignment, positionContext, context);
 	} else if (intersectingAttrAreaNode != null) {
-		return completionsForHtmlAttrs(intersectingAttrAreaNode, context);
+		return completionsForHtmlAttrs(intersectingAttrAreaNode, positionContext, context);
 	} else if (beforeWord === "<") {
-		return completionsForHtmlNodes(positionContext, context);
+		return completionsForHtmlNodes(positionContext, positionContext, context);
 	}
 
 	return [];

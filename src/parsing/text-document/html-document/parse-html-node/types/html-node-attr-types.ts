@@ -7,7 +7,7 @@ export enum HtmlNodeAttrKind {
 	EVENT_LISTENER = "EVENT_LISTENER",
 	ATTRIBUTE = "ATTRIBUTE",
 	BOOLEAN_ATTRIBUTE = "ATTRIBUTE",
-	PROP = "PROP"
+	PROPERTY = "PROPERTY"
 }
 
 export interface IHtmlNodeAttrSourceCodeLocation extends Range {
@@ -28,7 +28,7 @@ export interface IHtmlNodeAttrEventListener extends IHtmlNodeAttrBase {
 }
 
 export interface IHtmlNodeAttrProp extends IHtmlNodeAttrBase {
-	kind: HtmlNodeAttrKind.PROP;
+	kind: HtmlNodeAttrKind.PROPERTY;
 	modifier: ".";
 }
 

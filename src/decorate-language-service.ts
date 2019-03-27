@@ -26,7 +26,7 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 					return oldMethod(...arguments);
 				}
 
-				return wrapTryCatch(newMethod, oldMethod)(...arguments);
+				return wrapTryCatch(newMethod, oldMethod, methodName)(...arguments);
 			};
 		}
 	}
@@ -46,13 +46,14 @@ export function decorateLanguageService(languageService: LanguageService, plugin
  * If the function throws, this function logs the error.
  * @param newMethod
  * @param oldMethod
+ * @param methodName
  */
-function wrapTryCatch<T extends Function>(newMethod: T, oldMethod: T): T {
+function wrapTryCatch<T extends Function>(newMethod: T, oldMethod: T, methodName: string): T {
 	return (((...args: unknown[]) => {
 		try {
 			return newMethod(...args);
 		} catch (e) {
-			logger.error(`Error: (${e.stack}) ${e.message}`, e);
+			logger.error(`Error [${methodName}]: (${e.stack}) ${e.message}`, e);
 
 			// Always return the old method if anything fails
 			// Don't crash everything :-)
@@ -69,9 +70,11 @@ function wrapTryCatch<T extends Function>(newMethod: T, oldMethod: T): T {
 function wrapLog<T extends Function>(name: string, proxy: T): T {
 	return (((...args: unknown[]) => {
 		/**
-		 logger.verbose(`Typescript called ${name}`);
+		 const startTime = Date.now();
+		 logger.verbose(`[${name}] Called`);
 		 const result = proxy(...args);
-		 logger.verbose("- result: ", result == null ? "nothing" : Array.isArray(result) ? `Length: ${result.length}` : "defined");
+		 const time = Date.now() - startTime;
+		 logger.verbose(`[${name}] Finished (${Math.round(time)}ms): Result: `, result == null ? "undefined" : Array.isArray(result) ? `Array: ${result.length} length` : "defined");
 		 return result;
 		 /*/
 		return proxy(...args);

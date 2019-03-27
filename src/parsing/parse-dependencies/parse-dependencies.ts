@@ -1,6 +1,6 @@
 import { SourceFile } from "typescript";
+import { ComponentDefinition } from "web-component-analyzer";
 import { TsLitPluginStore } from "../../state/store";
-import { ComponentDefinition } from "../web-component-analyzer/types/component-types";
 import { visitDependencies } from "./visit-dependencies";
 
 const map = new WeakMap<SourceFile, ComponentDefinition[]>();
@@ -34,7 +34,7 @@ export function parseDependencies(sourceFile: SourceFile, store: TsLitPluginStor
 			return map.get(file);
 		},
 		getDefinitionsInFile(file: SourceFile) {
-			return store.definitionsInFile.get(file.fileName);
+			return store.getDefinitionsInFile(file);
 		},
 		addCircularReference(fromFile: SourceFile, toFile: SourceFile): void {}
 	});

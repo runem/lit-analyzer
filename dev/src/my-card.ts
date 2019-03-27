@@ -1,10 +1,10 @@
-import { LitElement, property } from "lit-element";
-import "@polymer/app-layout/app-drawer/app-drawer";
+import { LitElement, property, html } from "lit-element";
 
 /**
  * hfhhdf
- * @emits submit
- * @attr color
+ * @customElement my-custom-element
+ * @event submit
+ * @attr {red|green} color
  * @attr size
  */
 export class MyBase extends LitElement {
@@ -15,20 +15,18 @@ export class MyBase extends LitElement {
 	}
 }
 
-html`
-	<my-element prop-et></my-element>
-	<my-external-tag ondrag="sdlfjf"></my-external-tag>
-`;
-
 /**
  * Hello
- * @element my-custom-element
- * @fires my-event
+ * @event my-event
  * @attr disabled
  */
-class Test extends MyBase {
+class Test extends LitElement {
 	sdlkfjsldkfj!: string;
-	@property() baseProp: string = "jek";
+
+	@property({ type: String }) text!: number;
+
+	@property({ type: Boolean }) hehehehe!: string;
+
 	mynumber!: number;
 }
 

@@ -1,7 +1,7 @@
 import * as tsModule from "typescript";
 import { Node, Program, SourceFile } from "typescript";
+import { ComponentDefinition } from "web-component-analyzer";
 import { logger } from "../../util/logger";
-import { ComponentDefinition } from "../web-component-analyzer/types/component-types";
 
 interface IVisitDependenciesContext {
 	program: Program;
@@ -20,6 +20,8 @@ interface IVisitDependenciesContext {
  * @param context
  */
 export function visitDependencies(node: Node, context: IVisitDependenciesContext) {
+	if (node == null) return;
+
 	if (context.ts.isSourceFile(node)) {
 		const existingResult = context.getImportedDefinitionsInFile(node);
 

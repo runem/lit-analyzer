@@ -1,15 +1,21 @@
+import { HtmlData } from "../parsing/parse-html-data/html-data-tag";
+
 export interface Config {
 	disable: boolean;
 	verbose: boolean;
 	format: { disable: boolean };
+
 	htmlTemplateTags: string[];
 	cssTemplateTags: string[];
-	globalHtmlTags: string[];
-	globalHtmlAttributes: string[];
+
 	skipMissingImports: boolean;
 	skipUnknownHtmlTags: boolean;
 	skipUnknownHtmlAttributes: boolean;
 	skipTypeChecking: boolean;
+
+	globalHtmlTags: string[];
+	globalHtmlAttributes: string[];
+	webComponents?: HtmlData;
 }
 
 /**
@@ -30,6 +36,7 @@ export function makeConfig(userConfig: Partial<Config>): Config {
 		skipMissingImports: userConfig.skipMissingImports || false,
 		skipUnknownHtmlTags: userConfig.skipUnknownHtmlTags || false,
 		skipUnknownHtmlAttributes: userConfig.skipUnknownHtmlAttributes || false,
-		skipTypeChecking: userConfig.skipTypeChecking || false
+		skipTypeChecking: userConfig.skipTypeChecking || false,
+		webComponents: userConfig.webComponents
 	};
 }

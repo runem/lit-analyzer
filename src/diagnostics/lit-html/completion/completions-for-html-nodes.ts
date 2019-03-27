@@ -1,22 +1,28 @@
 import { DocumentPositionContext } from "../../../util/get-html-position";
+import { isCustomElementTagName } from "../../../util/util";
 import { DiagnosticsContext } from "../../diagnostics-context";
 import { LitCompletion } from "../../types/lit-completion";
 
-export function completionsForHtmlNodes({ offset, leftWord, rightWord }: DocumentPositionContext, { store }: DiagnosticsContext): LitCompletion[] {
-	const htmlTags = store.allHtmlTags;
+export function completionsForHtmlNodes({ offset, leftWord, rightWord }: DocumentPositionContext, location: DocumentPositionContext, { store }: DiagnosticsContext): LitCompletion[] {
+	const htmlTags = Array.from(store.getGlobalTags());
 
-	return htmlTags.map(
-		htmlTag =>
-			({
-				name: htmlTag.name,
-				insert: htmlTag.name,
-				kind: htmlTag.hasDeclaration ? "member" : "label",
-				importance: htmlTag.hasDeclaration ? "high" : "low",
-				range: {
-					start: offset - leftWord.length,
-					end: offset + rightWord.length
-				},
-				documentation: htmlTag.description
-			} as LitCompletion)
-	);
+	return htmlTags.map(htmlTag => {
+		const isBuiltIn = !isCustomElementTagName(htmlTag.tagName);
+		const hasDeclaration = htmlTag.declaration != null;
+		//const fromDeclarationFile = htmlTag.declaration != null && htmlTag.declaration.node.getSourceFile().isDeclarationFile;
+		//const hasDeclaration = htmlTag.declaration != null;
+		//const sdlfkj = htmlTag.builtIn
+
+		return {
+			name: htmlTag.tagName,
+			insert: htmlTag.tagName,
+			kind: isBuiltIn ? "constElement" : hasDeclaration ? "member" : "label",
+			importance: isBuiltIn ? "low" : hasDeclaration ? "high" : "medium",
+			range: {
+				start: offset - leftWord.length,
+				end: offset + rightWord.length
+			},
+			documentation: () => htmlTag.description
+		} as LitCompletion;
+	});
 }
