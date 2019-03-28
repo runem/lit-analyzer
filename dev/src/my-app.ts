@@ -38,7 +38,7 @@ const myApp = (text: string, disabled: boolean) => html`
 		</my-element>
 	</div>
 
-	<input .disabled="${true}" type="email" maxlength="1" tabindex="${1 === 1 ? "-1" : "0"}" />
+	<input .value="${null}" .disabled="${true}" type="email" maxlength="1" tabindex="${1 === 1 ? "-1" : "0"}" />
 `;
 
 render(myApp("Hello", false), document.body);

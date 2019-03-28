@@ -90,6 +90,23 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 		builtIn: true
 	});
 
+	const inputElement = result.tags.find(t => t.tagName === "input");
+	if (inputElement != null) {
+		inputElement.properties.push({
+			kind: "property",
+			name: "value",
+			builtIn: true,
+			fromTagName: "input",
+			getType: lazy(
+				() =>
+					({
+						kind: SimpleTypeKind.UNION,
+						types: [{ kind: SimpleTypeKind.STRING }, { kind: SimpleTypeKind.NULL }]
+					} as SimpleType)
+			)
+		});
+	}
+
 	const videoElement = result.tags.find(t => t.tagName === "video");
 	if (videoElement != null) {
 		videoElement.attributes = [
