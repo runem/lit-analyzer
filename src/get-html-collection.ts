@@ -58,7 +58,8 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 				description:
 					"The slotchange event is fired on an HTMLSlotElement instance (<slot> element) when the node(s) contained in that slot change.\n\nNote: the slotchange event doesn't fire if the children of a slotted node change — only if you change (e.g. add or delete) the actual nodes themselves.",
 				getType: lazy(() => ({ kind: SimpleTypeKind.ANY } as SimpleType)),
-				fromTagName: "slot"
+				fromTagName: "slot",
+				builtIn: true
 			}
 		],
 		slots: [],
@@ -67,13 +68,15 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 				kind: "attribute",
 				name: "name",
 				getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
-				fromTagName: "slot"
+				fromTagName: "slot",
+				builtIn: true
 			},
 			{
 				kind: "attribute",
 				name: "onslotchange",
 				getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
-				fromTagName: "slot"
+				fromTagName: "slot",
+				builtIn: true
 			}
 		],
 		tagName: "slot",
@@ -83,7 +86,8 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 	result.attrs.push({
 		kind: "attribute",
 		name: "slot",
-		getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType))
+		getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
+		builtIn: true
 	});
 
 	const videoElement = result.tags.find(t => t.tagName === "video");
@@ -106,7 +110,8 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 		result.events.push({
 			name: globalEvent.name.replace(/^on/, ""),
 			description: globalEvent.description,
-			getType: lazy(() => ({ kind: SimpleTypeKind.ANY } as SimpleType))
+			getType: lazy(() => ({ kind: SimpleTypeKind.ANY } as SimpleType)),
+			builtIn: true
 		});
 	}
 

@@ -2,7 +2,10 @@ import { html, render } from "lit-html";
 import "./my-element";
 import "@material/mwc-button/mwc-button";
 import "./my-button";
-import "./my-card";
+
+(async () => {
+	await import("./my-card");
+})();
 
 const myApp = (text: string, disabled: boolean) => html`
 	<style>
@@ -11,7 +14,7 @@ const myApp = (text: string, disabled: boolean) => html`
 		}
 	</style>
 
-	<my-component bar></my-component>
+	<my-component bar @slo></my-component>
 
 	<my-test1 .myProp1></my-test1>
 
@@ -24,8 +27,6 @@ const myApp = (text: string, disabled: boolean) => html`
 	<div role="heading" .scrollTop="${123}">
 		<my-button this-is-an-attr size="${"small"}" text="123"></my-button>
 	</div>
-
-	<
 
 	<my-card></my-card>
 	<my-element></my-element>
