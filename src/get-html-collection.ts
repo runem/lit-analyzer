@@ -3,7 +3,7 @@ import { HTML5_GLOBAL_ATTRIBUTES, HTML5_VALUE_MAP } from "vscode-html-languagese
 import { ARIA_ATTRIBUTES } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Aria";
 import { HTML5_EVENTS } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Events";
 import { HTML5_TAGS } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Tags";
-import { html5TagAttrType } from "./extra-html-data";
+import { hasTypeForAttrName, html5TagAttrType } from "./extra-html-data";
 import { HtmlAttr, HtmlDataCollection, HtmlTag } from "./parsing/parse-html-data/html-tag";
 import { parseHtmlData } from "./parsing/parse-html-data/parse-html-data";
 import { Config } from "./state/config";
@@ -98,6 +98,13 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 				kind: "attribute",
 				fromTagName: "video",
 				builtIn: true,
+				name: "controlsList",
+				getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType))
+			} as HtmlAttr,
+			{
+				kind: "attribute",
+				fromTagName: "video",
+				builtIn: true,
 				name: "playsinline",
 				getType: lazy(() => ({ kind: SimpleTypeKind.BOOLEAN } as SimpleType)),
 				description:
@@ -127,7 +134,7 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 
 function addMissingAttrTypes(attrs: HtmlAttr[]): HtmlAttr[] {
 	return attrs.map(attr => {
-		if (attr.getType().kind === SimpleTypeKind.ANY) {
+		if (hasTypeForAttrName(attr.name) || attr.getType().kind === SimpleTypeKind.ANY) {
 			const newType = html5TagAttrType(attr.name);
 			return {
 				...attr,

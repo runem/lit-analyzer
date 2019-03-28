@@ -14,13 +14,7 @@ const myApp = (text: string, disabled: boolean) => html`
 		}
 	</style>
 
-	<my-component bar @slo></my-component>
-
-	<my-test1 .myProp1></my-test1>
-
-	<video playsinline muted preload="metadata" aria-pressed aria-readonly></video>
-
-	<input disabled .data-sdflskdjf="${12323}" type="email" .maxLength="123" .type="" role="status" .id="hejsa" .onmouseover="${() => console.log}" value="" />
+	<video playsinline muted preload="metadata" aria-pressed="undefined" aria-readonly="true"></video>
 
 	<mwc-button dense></mwc-button>
 
@@ -33,7 +27,7 @@ const myApp = (text: string, disabled: boolean) => html`
 
 	<mwc-button></mwc-button>
 
-	<my-external-tag></my-external-tag>
+	<my-external-tag draggable="true"></my-external-tag>
 
 	<mwc-button label="" dense role="math" aria-checked="true" .accessKey="${"hejsa"}" onsubmit="" .dlfkjsdlfkjsdlfkj="${"test"}" @my-event=""></mwc-button>
 

@@ -12,6 +12,7 @@ export function parseHtmlData(data: HtmlData): HtmlDataCollection {
 
 function parseDataV1(data: HtmlDataV1): HtmlDataCollection {
 	const valueSetTypeMap = valueSetsToTypeMap(data.valueSets || []);
+	valueSetTypeMap.set("v", { kind: SimpleTypeKind.BOOLEAN });
 
 	const tags = (data.tags || []).map(tagData => tagDataToHtmlTag(tagData, valueSetTypeMap));
 
@@ -62,10 +63,6 @@ function valueSetsToTypeMap(valueSets: HtmlDataValueSet[]): ValueSetTypeMap {
 }
 
 function attrValuesToUnion(attrValues: HtmlDataAttrValue[]): SimpleType {
-	if (attrValues.length === 2 && attrValues.find(v => v.name === "true") && attrValues.find(v => v.name === "false")) {
-		return { kind: SimpleTypeKind.BOOLEAN };
-	}
-
 	return {
 		kind: SimpleTypeKind.UNION,
 		types: attrValues.map(
