@@ -90,6 +90,23 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 		builtIn: true
 	});
 
+	const textareaElement = result.tags.find(t => t.tagName === "textarea");
+	if (textareaElement != null) {
+		textareaElement.properties.push({
+			kind: "property",
+			name: "value",
+			builtIn: true,
+			fromTagName: "textarea",
+			getType: lazy(
+				() =>
+					({
+						kind: SimpleTypeKind.UNION,
+						types: [{ kind: SimpleTypeKind.STRING }, { kind: SimpleTypeKind.NULL }]
+					} as SimpleType)
+			)
+		});
+	}
+
 	const inputElement = result.tags.find(t => t.tagName === "input");
 	if (inputElement != null) {
 		inputElement.properties.push({

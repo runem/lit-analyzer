@@ -37,7 +37,7 @@ export class VscodeHtmlService {
 		const originalHtml = parts.map(p => (typeof p === "string" ? p : `[#${"#".repeat(p.getText().length)}]`)).join("");
 		const vscTextDocument = vscode.TextDocument.create("untitled://embedded.html", "html", 1, originalHtml);
 
-		const vscodeSettings: vscode.HTMLFormatConfiguration = {
+		const edits = htmlService.format(vscTextDocument, undefined, {
 			tabSize: settings.tabSize,
 			insertSpaces: !!settings.convertTabsToSpaces,
 			wrapLineLength: 90,
@@ -50,9 +50,7 @@ export class VscodeHtmlService {
 			endWithNewline: false,
 			extraLiners: "head, body, /html",
 			wrapAttributes: "auto"
-		};
-
-		const edits = htmlService.format(vscTextDocument, undefined, vscodeSettings);
+		});
 
 		const hasLeadingNewline = originalHtml.startsWith("\n");
 		const hasTrailingNewline = originalHtml.endsWith("\n");

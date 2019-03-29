@@ -4,6 +4,7 @@ import { LitElement, property, html } from "lit-element";
  * hfhhdf
  * @customElement my-custom-element
  * @event submit
+ * @slot myslot - My Slot
  * @attr {red|green} color
  * @attr size
  */
@@ -19,8 +20,9 @@ export class MyBase extends LitElement {
  * Hello
  * @event my-event
  * @attr disabled
+ * @slot - Main content
  */
-class Test extends LitElement {
+class Test extends MyBase {
 	sdlkfjsldkfj!: string;
 
 	@property({ type: String }) text!: number;

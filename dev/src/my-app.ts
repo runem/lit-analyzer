@@ -2,6 +2,7 @@ import { html, render } from "lit-html";
 import "./my-element";
 import "@material/mwc-button/mwc-button";
 import "./my-button";
+import "@ideanote/atoms/lib/card";
 
 (async () => {
 	await import("./my-card");
@@ -14,7 +15,13 @@ const myApp = (text: string, disabled: boolean) => html`
 		}
 	</style>
 
+	<at-card></at-card>
+
 	<video playsinline muted preload="metadata" aria-pressed="undefined" aria-readonly="true"></video>
+
+	<my-test>
+		<div slot="myslot"></div>
+	</my-test>
 
 	<mwc-button dense></mwc-button>
 

@@ -6,6 +6,7 @@
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"dependencies": {
+		"@ideanote/atoms": "^3.0.308",
 		"@material/mwc-button": "^0.3.6",
 		"lit-element": "2.0.1",
 		"lit-html": "1.0.0",
