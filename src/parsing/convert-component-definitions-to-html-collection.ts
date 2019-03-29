@@ -94,7 +94,7 @@ export function convertComponentDeclarationToHtmlTag(
 				required: member.required
 			});
 
-			if (addDeclarationPropertiesAsAttributes && (definition != null && !definition.fromLib)) {
+			if (!("attrName" in member) && addDeclarationPropertiesAsAttributes && (definition != null && !definition.fromLib)) {
 				if (declaration.node.getSourceFile().isDeclarationFile) {
 					htmlTag.attributes.push({
 						...base,

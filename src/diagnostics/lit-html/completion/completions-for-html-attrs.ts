@@ -1,6 +1,6 @@
 import { isAssignableToSimpleTypeKind, SimpleType, SimpleTypeKind } from "ts-simple-type";
 import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../../constants";
-import { documentationForTarget, HtmlAttrTarget, isHtmlAttr, isHtmlEvent, isHtmlProp } from "../../../parsing/parse-html-data/html-tag";
+import { HtmlAttrTarget, isHtmlAttr, isHtmlEvent, isHtmlProp, documentationForTarget } from "../../../parsing/parse-html-data/html-tag";
 import { HtmlNode } from "../../../parsing/text-document/html-document/parse-html-node/types/html-node-types";
 import { DocumentPositionContext } from "../../../util/get-html-position";
 import { iterableFilter, iterableMap } from "../../../util/iterable-util";
@@ -67,6 +67,6 @@ function targetToCompletion(target: HtmlAttrTarget, { modifier, insertModifier }
 		insert: `${insertModifier ? modifier : ""}${target.name}`,
 		kind: isBuiltIn || isGlobal ? "constElement" : hasDeclaration ? "member" : "label",
 		importance: isBuiltIn || isGlobal ? "low" : hasDeclaration ? "high" : "medium",
-		documentation: lazy(() => documentationForTarget(target, modifier))
+		documentation: lazy(() => documentationForTarget(target, { modifier }))
 	};
 }

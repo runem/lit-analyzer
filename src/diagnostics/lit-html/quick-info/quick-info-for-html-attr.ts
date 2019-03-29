@@ -9,7 +9,7 @@ export function quickInfoForHtmlAttr(htmlAttr: HtmlNodeAttr, { store }: Diagnost
 
 	return {
 		range: htmlAttr.location.name,
-		primaryInfo: targetKindAndTypeText(target, htmlAttr.modifier),
-		secondaryInfo: descriptionForTarget(target)
+		primaryInfo: targetKindAndTypeText(target, { modifier: htmlAttr.modifier }),
+		secondaryInfo: descriptionForTarget(target, { markdown: true })
 	};
 }

@@ -1,5 +1,6 @@
+import { documentationForHtmlTag } from "../../../parsing/parse-html-data/html-tag";
 import { DocumentPositionContext } from "../../../util/get-html-position";
-import { isCustomElementTagName } from "../../../util/util";
+import { isCustomElementTagName, lazy } from "../../../util/util";
 import { DiagnosticsContext } from "../../diagnostics-context";
 import { LitCompletion } from "../../types/lit-completion";
 
@@ -22,7 +23,7 @@ export function completionsForHtmlNodes({ offset, leftWord, rightWord }: Documen
 				start: offset - leftWord.length,
 				end: offset + rightWord.length
 			},
-			documentation: () => htmlTag.description
+			documentation: lazy(() => documentationForHtmlTag(htmlTag))
 		} as LitCompletion;
 	});
 }

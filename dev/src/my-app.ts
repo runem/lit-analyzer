@@ -3,10 +3,13 @@ import "./my-element";
 import "@material/mwc-button/mwc-button";
 import "./my-button";
 import "@ideanote/atoms/lib/card";
+import { MyButton } from "./my-button";
 
 (async () => {
 	await import("./my-card");
 })();
+
+MyButton;
 
 const myApp = (text: string, disabled: boolean) => html`
 	<style>
@@ -14,6 +17,10 @@ const myApp = (text: string, disabled: boolean) => html`
 			color: ${"green"};
 		}
 	</style>
+
+	<at-card>
+		<slot></slot>
+	</at-card>
 
 	<at-card></at-card>
 

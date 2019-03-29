@@ -83,26 +83,59 @@ export function isHtmlEvent(target: HtmlAttrTarget): target is HtmlEvent {
 	return !isHtmlMember(target);
 }
 
-export function documentationForTarget(target: HtmlAttrTarget, modifier?: string): string | undefined {
-	const typeText = targetKindAndTypeText(target, modifier);
-	const documentation = descriptionForTarget(target);
+export interface DescriptionOptions {
+	markdown?: boolean;
+}
+
+function descriptionHeader(title: string, titleLevel: number = 0, { markdown }: DescriptionOptions) {
+	return markdown ? (titleLevel === 0 ? `**${title.trim()}**` : `${"#".repeat(titleLevel)} ${title}`) : title;
+}
+
+function descriptionListItem(item: string, { markdown }: DescriptionOptions) {
+	return markdown ? ` * ${item.replace("\n", " ")}` : ` * ${item}`;
+}
+
+function descriptionList<T>(title: string, items: T[], toString: (item: T) => string, options: DescriptionOptions) {
+	const itemsDesc = items.map(item => descriptionListItem(toString(item), options)).join("\n");
+	return `${descriptionHeader(`${title}:`, 0, options)}\n${itemsDesc}`;
+}
+
+export function documentationForHtmlTag(htmlTag: HtmlTag, options: DescriptionOptions = {}): string | undefined {
+	let desc = htmlTag.description || "";
+
+	if (htmlTag.slots.length > 0) {
+		const items = htmlTag.slots.sort((a, b) => a.name.localeCompare(b.name));
+		desc += `\n\n${descriptionList("Slots", items, slot => `${descriptionHeader(`@slot ${slot.name}`, 0, options)}${slot.description ? ` - ${slot.description}` : ""}`, options)}`;
+	}
+
+	if (htmlTag.events.length > 0) {
+		const items = htmlTag.events.sort((a, b) => a.name.localeCompare(b.name));
+		desc += `\n\n${descriptionList("Events", items, event => `${descriptionHeader(`@event ${event.name}`, 0, options)}${event.description ? ` - ${event.description}` : ""}`, options)}`;
+	}
+
+	return desc || undefined;
+}
+
+export function documentationForTarget(target: HtmlAttrTarget, options: DescriptionOptions & { modifier?: string } = {}): string | undefined {
+	const typeText = targetKindAndTypeText(target, options);
+	const documentation = descriptionForTarget(target, options);
 
 	return `${typeText}${documentation != null ? ` \n\n${documentation}` : ""}`;
 }
 
-export function descriptionForTarget(target: HtmlAttrTarget): string | undefined {
+export function descriptionForTarget(target: HtmlAttrTarget, options: DescriptionOptions = {}): string | undefined {
 	if (target.related != null && target.related.length > 1) {
 		const subDocumentation = (target.related as HtmlAttrTarget[])
 			.map(t => `${t.fromTagName ? `<${t.fromTagName}>: ` : ""}${t.description || "[no documentation]"}`)
 			.map((doc, i) => `${i + 1}. ${doc}`);
-		return `Multiple declarations (best match first):\n${subDocumentation.join("\n")}`;
+		return `${descriptionHeader("Multiple declarations (best match first):", 0, options)}\n${subDocumentation.join("\n")}`;
 	}
 
 	return target.description;
 }
 
-export function targetKindAndTypeText(target: HtmlAttrTarget, modifier?: string): string {
-	const prefix = `(${targetKindText(target)}) ${modifier || ""}${target.name}`;
+export function targetKindAndTypeText(target: HtmlAttrTarget, options: DescriptionOptions & { modifier?: string } = {}): string {
+	const prefix = `(${targetKindText(target)}) ${options.modifier || ""}${target.name}`;
 
 	if (isAssignableToSimpleTypeKind(target.getType(), SimpleTypeKind.ANY)) {
 		return `${prefix}`;
