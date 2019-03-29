@@ -49,25 +49,25 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, store: TsLitPluginStore
 				case HtmlNodeAttrKind.EVENT_LISTENER:
 					return suggestedMemberName != null
 						? `Did you mean '${suggestedMemberName}'? `
-						: `Please consider adding a '@event' tag to the jsdoc on a component class, adding it to 'globalHtmlEvents' or removing 'checkUnknownEvents' from the 'ts-lit-plugin'`;
+						: `Please consider adding a '@event' tag to the jsdoc on a component class, adding it to 'globalHtmlEvents' or removing 'checkUnknownEvents' from the plugin configuration.`;
 				case HtmlNodeAttrKind.PROPERTY:
 					return suggestedMemberName != null
 						? `Did you mean '${suggestedMemberName}'? `
 						: tagIsBuiltIn
-						? `This is a built in tag. Please consider adding "skipUnknownProperties" to the 'ts-lit-plugin' config.`
+						? `This is a built in tag. Please consider adding "skipUnknownProperties" to the plugin configuration.`
 						: tagIsFromLibrary
-						? `If you are not the author of this component please consider adding 'skipUnknownProperties' to the 'ts-lit-plugin' config.`
+						? `If you are not the author of this component please consider adding 'skipUnknownProperties' to the plugin configuration.`
 						: tagHasDeclaration
-						? `This plugin can't find all properties yet. Please consider adding a '@prop' tag to jsdoc on the component class or 'skipUnknownProperties' to the 'ts-lit-plugin' config.`
-						: `Please consider adding 'skipUnknownProperties' to the 'ts-lit-plugin' config.`;
+						? `This plugin can't find all properties yet. Please consider adding a '@prop' tag to jsdoc on the component class or 'skipUnknownProperties' to the plugin configuration.`
+						: `Please consider adding 'skipUnknownProperties' to the plugin configuration.`;
 				case HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE:
 				case HtmlNodeAttrKind.ATTRIBUTE:
 					return suggestedMemberName != null
 						? `Did you mean '${suggestedMemberName}'? `
 						: tagIsBuiltIn
-						? `This is a built in tag. Please consider using a 'data-*' attribute or adding 'globalHtmlAttributes' / 'skipUnknownAttributes' to the 'ts-lit-plugin' config.`
+						? `This is a built in tag. Please consider using a 'data-*' attribute or adding 'globalHtmlAttributes' / 'skipUnknownAttributes' to the plugin configuration.`
 						: tagIsFromLibrary
-						? `If you are not the author of this component please consider using a 'data-*' attribute or adding 'globalHtmlAttributes' / 'skipUnknownAttributes' to the 'ts-lit-plugin' config.`
+						? `If you are not the author of this component please consider using a 'data-*' attribute or adding 'globalHtmlAttributes' / 'skipUnknownAttributes' to the plugin configuration.`
 						: tagHasDeclaration
 						? `Please consider adding it as a attribute on the component, adding '@attr' tag to jsdoc on the component class or using a 'data-*' attribute instead.`
 						: `Please consider using a 'data-*' attribute instead.`;

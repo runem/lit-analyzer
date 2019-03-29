@@ -14,7 +14,7 @@ export function completionsForHtmlNodes({ offset, leftWord, rightWord }: Documen
 		return {
 			name: htmlTag.tagName,
 			insert: htmlTag.tagName,
-			kind: isBuiltIn ? "constElement" : hasDeclaration ? "member" : "label",
+			kind: isBuiltIn ? "enumElement" : hasDeclaration ? "member" : "label",
 			importance: isBuiltIn ? "low" : hasDeclaration ? "high" : "medium",
 			range: {
 				start: offset - leftWord.length,

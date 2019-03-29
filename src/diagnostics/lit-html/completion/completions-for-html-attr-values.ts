@@ -20,7 +20,7 @@ export function completionsForHtmlAttrValues(htmlNodeAttr: HtmlNodeAttr, locatio
 						name: slot.name || " ",
 						insert: slot.name || "",
 						documentation: () => slot.description,
-						kind: "label"
+						kind: "enumElement"
 					} as LitCompletion)
 			);
 		}
@@ -33,7 +33,7 @@ export function completionsForHtmlAttrValues(htmlNodeAttr: HtmlNodeAttr, locatio
 			({
 				name: option,
 				insert: option,
-				kind: "label"
+				kind: "enumElement"
 			} as LitCompletion)
 	);
 }

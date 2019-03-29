@@ -87,7 +87,7 @@ function targetToCompletion(target: HtmlAttrTarget, { modifier, insertModifier, 
 	return {
 		name: `${modifier || ""}${target.name}${"required" in target && target.required ? "!" : ""}`,
 		insert: `${insertModifier ? modifier : ""}${target.name}`,
-		kind: isBuiltIn ? "constElement" : isMember ? "member" : "label",
+		kind: isBuiltIn ? "enumElement" : isMember ? "member" : "label",
 		importance: isBuiltIn ? "low" : isMember ? "high" : "medium",
 		documentation: lazy(() => documentationForTarget(target, { modifier }))
 	};
