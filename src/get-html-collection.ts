@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "fs";
+import { join } from "path";
 import { SimpleType, SimpleTypeKind } from "ts-simple-type";
 import { HTML5_GLOBAL_ATTRIBUTES, HTML5_VALUE_MAP } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5";
 import { ARIA_ATTRIBUTES } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Aria";
@@ -17,6 +18,7 @@ export function getUserConfigHtmlCollection(config: Config): HtmlDataCollection 
 		let collection: HtmlDataCollection = { tags: [], events: [], attrs: [] };
 		for (const customHtmlData of Array.isArray(config.customHtmlData) ? config.customHtmlData : [config.customHtmlData]) {
 			try {
+				logger.debug(customHtmlData, typeof customHtmlData === "string" && join(process.cwd(), customHtmlData), process.cwd());
 				const data: HtmlData = typeof customHtmlData === "string" && existsSync(customHtmlData) ? JSON.parse(readFileSync(customHtmlData, "utf8").toString()) : customHtmlData;
 				const parsedCollection = parseHtmlData(data);
 				collection = {

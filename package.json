@@ -9,12 +9,16 @@
 		"url": "https://github.com/runem/ts-lit-plugin.git"
 	},
 	"keywords": [
-		"typescript",
-		"tagged",
-		"template",
 		"lit-html",
 		"lit",
-		"lit-element"
+		"lit-element",
+		"javascript",
+		"typescript",
+		"web components",
+		"web",
+		"components",
+		"tagged",
+		"template"
 	],
 	"scripts": {
 		"prepublish": "npm run build",
@@ -22,7 +26,7 @@
 		"build": "rm -rf lib && tsc",
 		"logs": "touch log.txt && tail -f log.txt",
 		"lint": "tslint --project ./",
-		"open": "TSS_LOG=\"-traceToConsole true -level verbose -file $(pwd)/ts-server-log.txt\" TSS_DEBUG=5999 code dev",
+		"open": "cd dev && TSS_LOG=\"-traceToConsole true -level verbose -file $(pwd)/ts-server-log.txt\" TSS_DEBUG=5999 code .",
 		"prettier:check": "prettier --list-different \"src/**/*.{ts,tsx}\"",
 		"prettier:write": "prettier --write \"src/**/*.{ts,tsx}\"",
 		"readme": "node node_modules/.bin/readme"

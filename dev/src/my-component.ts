@@ -1,4 +1,4 @@
-import { html, customElement, LitElement, property } from "lit-element";
+import { customElement, LitElement, property } from "lit-element";
 import "./my-button";
 
 /**

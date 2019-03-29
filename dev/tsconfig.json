@@ -9,38 +9,41 @@
 				"globalHtmlTags": ["my-external-tag"],
 				"globalHtmlAttributes": ["my-attribute"],
 				"globalHtmlEvents": ["my-event"],
-				"customHtmlData": {
-					"version": 1,
-					"tags": [
-						{
-							"name": "my-tsconfig-element",
-							"description": "Tag name from tsconfig",
-							"attributes": [
-								{
-									"name": "size",
-									"description": "Attribute from tsconfig",
-									"values": [
-										{
-											"name": "small"
-										},
-										{
-											"name": "medium"
-										},
-										{
-											"name": "large"
-										}
-									]
-								}
-							]
-						}
-					],
-					"globalAttributes": [
-						{
-							"name": "globalattribute",
-							"description": "Global attribute from tsconfig"
-						}
-					]
-				}
+				"customHtmlData": [
+					"./dev/html.json",
+					{
+						"version": 1,
+						"tags": [
+							{
+								"name": "my-tsconfig-element",
+								"description": "Tag name from tsconfig",
+								"attributes": [
+									{
+										"name": "size",
+										"description": "Attribute from tsconfig",
+										"values": [
+											{
+												"name": "small"
+											},
+											{
+												"name": "medium"
+											},
+											{
+												"name": "large"
+											}
+										]
+									}
+								]
+							}
+						],
+						"globalAttributes": [
+							{
+								"name": "globalattribute",
+								"description": "Global attribute from tsconfig"
+							}
+						]
+					}
+				]
 			}
 		],
 		"experimentalDecorators": true,
