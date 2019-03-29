@@ -124,6 +124,20 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 		});
 	}
 
+	const audioElement = result.tags.find(t => t.tagName === "audio");
+	if (audioElement != null) {
+		audioElement.attributes = [
+			...audioElement.attributes,
+			{
+				kind: "attribute",
+				fromTagName: "audio",
+				builtIn: true,
+				name: "controlslist",
+				getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType))
+			} as HtmlAttr
+		];
+	}
+
 	const videoElement = result.tags.find(t => t.tagName === "video");
 	if (videoElement != null) {
 		videoElement.attributes = [
@@ -132,7 +146,7 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 				kind: "attribute",
 				fromTagName: "video",
 				builtIn: true,
-				name: "controlsList",
+				name: "controlslist",
 				getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType))
 			} as HtmlAttr,
 			{
