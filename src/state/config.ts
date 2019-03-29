@@ -20,7 +20,7 @@ export interface Config {
 	globalHtmlTags: string[];
 	globalHtmlAttributes: string[];
 	globalHtmlEvents: string[];
-	customHtmlData?: HtmlData;
+	customHtmlData: (string | HtmlData)[] | string | HtmlData;
 }
 
 /**
@@ -41,7 +41,7 @@ export function makeConfig(userConfig: Partial<Config>): Config {
 		globalHtmlTags: userConfig.globalHtmlTags || (userConfig as any).externalHtmlTagNames || [],
 		globalHtmlAttributes: userConfig.globalHtmlAttributes || [],
 		globalHtmlEvents: userConfig.globalHtmlEvents || [],
-		customHtmlData: userConfig.customHtmlData,
+		customHtmlData: userConfig.customHtmlData || [],
 		// Skip
 		skipMissingImports: userConfig.skipMissingImports || false,
 		skipUnknownTags: userConfig.skipUnknownTags || false,

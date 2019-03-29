@@ -1,24 +1,35 @@
+import { existsSync, readFileSync } from "fs";
 import { SimpleType, SimpleTypeKind } from "ts-simple-type";
 import { HTML5_GLOBAL_ATTRIBUTES, HTML5_VALUE_MAP } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5";
 import { ARIA_ATTRIBUTES } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Aria";
 import { HTML5_EVENTS } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Events";
 import { HTML5_TAGS } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Tags";
 import { hasTypeForAttrName, html5TagAttrType } from "./extra-html-data";
-import { HtmlAttr, HtmlDataCollection, HtmlEvent, HtmlTag } from "./parsing/parse-html-data/html-tag";
+import { HtmlData } from "./parsing/parse-html-data/html-data-tag";
+import { HtmlAttr, HtmlDataCollection, HtmlEvent, HtmlTag, mergeHtmlAttrs, mergeHtmlEvents, mergeHtmlTags } from "./parsing/parse-html-data/html-tag";
 import { parseHtmlData } from "./parsing/parse-html-data/parse-html-data";
 import { Config } from "./state/config";
 import { logger } from "./util/logger";
 import { lazy } from "./util/util";
 
 export function getUserConfigHtmlCollection(config: Config): HtmlDataCollection {
-	const collection: HtmlDataCollection = (config.customHtmlData &&
-		(() => {
+	const collection = (() => {
+		let collection: HtmlDataCollection = { tags: [], events: [], attrs: [] };
+		for (const customHtmlData of Array.isArray(config.customHtmlData) ? config.customHtmlData : [config.customHtmlData]) {
 			try {
-				return parseHtmlData(config.customHtmlData!);
+				const data: HtmlData = typeof customHtmlData === "string" && existsSync(customHtmlData) ? JSON.parse(readFileSync(customHtmlData, "utf8").toString()) : customHtmlData;
+				const parsedCollection = parseHtmlData(data);
+				collection = {
+					tags: mergeHtmlTags([...collection.tags, ...parsedCollection.tags]),
+					attrs: mergeHtmlAttrs([...collection.attrs, ...parsedCollection.attrs]),
+					events: mergeHtmlEvents([...collection.events, ...parsedCollection.events])
+				};
 			} catch (e) {
 				logger.error("Error parsing user configuration 'customHtmlData'", e);
 			}
-		})()) || { tags: [], events: [], attrs: [] };
+		}
+		return collection;
+	})();
 
 	const tags = config.globalHtmlTags.map(
 		tagName =>
