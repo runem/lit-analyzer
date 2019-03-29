@@ -24,6 +24,8 @@ const myApp = (text: string, disabled: boolean) => html`
 
 	<mwc-button></mwc-button>
 
+	<sldkfjlskjdf></sldkfjlskjdf>
+
 	<my-tsconfig-element></my-tsconfig-element>
 	<at-card @change="${() => {}}" globalattribute>
 		<slot></slot>

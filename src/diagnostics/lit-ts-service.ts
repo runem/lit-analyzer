@@ -1,4 +1,4 @@
-import { DefinitionInfoAndBoundSpan, SourceFile } from "typescript";
+import { DefinitionInfoAndBoundSpan, DiagnosticMessageChain, SourceFile } from "typescript";
 import { DIAGNOSTIC_SOURCE } from "../constants";
 import { parseDocumentsInSourceFile } from "../parsing/parse-documents-in-source-file";
 import { CssDocument } from "../parsing/text-document/css-document/css-document";
@@ -112,21 +112,37 @@ function translateCompletionDetails(completionDetails: LitCompletionDetails, doc
 	};
 }
 
-function translateDiagnostic(report: LitDiagnostic, file: SourceFile, document: CssDocument): ts.DiagnosticWithLocation {
+function translateDiagnostic(report: LitDiagnostic, file: SourceFile, document: CssDocument, tips?: boolean): ts.DiagnosticWithLocation {
 	const span = translateRange(report.location, document);
+
+	const category = report.severity === "error" ? tsModule.ts.DiagnosticCategory.Error : tsModule.ts.DiagnosticCategory.Warning;
+	const code = 2322;
+	const messageText: string | DiagnosticMessageChain =
+		tips && report.tip
+			? {
+					messageText: report.message,
+					code,
+					category,
+					next: {
+						messageText: report.tip,
+						code: 0,
+						category: tsModule.ts.DiagnosticCategory.Suggestion
+					}
+			  }
+			: report.message;
 
 	return {
 		...span,
 		file,
-		messageText: report.message,
-		category: report.severity === "error" ? tsModule.ts.DiagnosticCategory.Error : tsModule.ts.DiagnosticCategory.Warning,
-		source: DIAGNOSTIC_SOURCE,
-		code: 2322
+		messageText,
+		category,
+		code,
+		source: DIAGNOSTIC_SOURCE
 	};
 }
 
-function translateDiagnostics(reports: LitDiagnostic[], file: SourceFile, document: CssDocument): ts.DiagnosticWithLocation[] {
-	return reports.map(report => translateDiagnostic(report, file, document));
+function translateDiagnostics(reports: LitDiagnostic[], file: SourceFile, document: CssDocument, tips?: boolean): ts.DiagnosticWithLocation[] {
+	return reports.map(report => translateDiagnostic(report, file, document, tips));
 }
 
 function translateDefinition(definition: LitDefinition, document: CssDocument): DefinitionInfoAndBoundSpan {
@@ -285,7 +301,7 @@ export class LitTsService {
 					return translateDiagnostics(results, context.sourceFile, document);
 				} else if (document instanceof HtmlDocument) {
 					const results = this.litHtmlService.getDiagnostics(document, context);
-					return translateDiagnostics(results, context.sourceFile, document);
+					return translateDiagnostics(results, context.sourceFile, document, !context.store.config.noTips);
 				}
 
 				return [];

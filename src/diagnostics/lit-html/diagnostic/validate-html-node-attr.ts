@@ -47,29 +47,23 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, store: TsLitPluginStore
 		const tip = (() => {
 			switch (htmlAttr.kind) {
 				case HtmlNodeAttrKind.EVENT_LISTENER:
-					return suggestedMemberName != null
-						? `Did you mean '${suggestedMemberName}'? `
-						: `Please consider adding a '@event' tag to the jsdoc on a component class, adding it to 'globalHtmlEvents' or removing 'checkUnknownEvents' from the plugin configuration.`;
+					return `Please consider adding a '@event' tag to the jsdoc on a component class, adding it to 'globalEvents' or removing 'checkUnknownEvents'.`;
 				case HtmlNodeAttrKind.PROPERTY:
-					return suggestedMemberName != null
-						? `Did you mean '${suggestedMemberName}'? `
-						: tagIsBuiltIn
-						? `This is a built in tag. Please consider adding "skipUnknownProperties" to the plugin configuration.`
+					return tagIsBuiltIn
+						? `This is a built in tag. Please consider using 'skipUnknownProperties'.`
 						: tagIsFromLibrary
-						? `If you are not the author of this component please consider adding 'skipUnknownProperties' to the plugin configuration.`
+						? `If you are not the author of this component please consider using 'skipUnknownProperties'.`
 						: tagHasDeclaration
-						? `This plugin can't find all properties yet. Please consider adding a '@prop' tag to jsdoc on the component class or 'skipUnknownProperties' to the plugin configuration.`
-						: `Please consider adding 'skipUnknownProperties' to the plugin configuration.`;
+						? `This plugin can't automatically find all properties yet. Please consider adding a '@prop' tag to jsdoc on the component class or using 'skipUnknownProperties'.`
+						: `Please consider adding 'skipUnknownProperties' to the plugin config.`;
 				case HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE:
 				case HtmlNodeAttrKind.ATTRIBUTE:
-					return suggestedMemberName != null
-						? `Did you mean '${suggestedMemberName}'? `
-						: tagIsBuiltIn
-						? `This is a built in tag. Please consider using a 'data-*' attribute or adding 'globalHtmlAttributes' / 'skipUnknownAttributes' to the plugin configuration.`
+					return tagIsBuiltIn
+						? `This is a built in tag. Please consider using a 'data-*' attribute, adding the attribute to 'globalAttributes' or using 'skipUnknownAttributes'.`
 						: tagIsFromLibrary
-						? `If you are not the author of this component please consider using a 'data-*' attribute or adding 'globalHtmlAttributes' / 'skipUnknownAttributes' to the plugin configuration.`
+						? `If you are not the author of this component please consider using a 'data-*' attribute, adding the attribute to 'globalAttributes' or using 'skipUnknownAttributes'.`
 						: tagHasDeclaration
-						? `Please consider adding it as a attribute on the component, adding '@attr' tag to jsdoc on the component class or using a 'data-*' attribute instead.`
+						? `Please consider adding it as an attribute on the component, adding '@attr' tag to jsdoc on the component class or using a 'data-*' attribute instead.`
 						: `Please consider using a 'data-*' attribute instead.`;
 			}
 		})();
@@ -89,7 +83,8 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, store: TsLitPluginStore
 		return [
 			{
 				kind: LitHtmlDiagnosticKind.UNKNOWN_TARGET,
-				message: `Unknown ${existingKind} "${htmlAttr.modifier || ""}${htmlAttr.name}".${tip != null ? ` ${tip}` : ""}`,
+				message: `Unknown ${existingKind} "${htmlAttr.modifier || ""}${htmlAttr.name}"${suggestedMemberName != null ? `. Did you mean '${suggestedMemberName}'?` : ""}`,
+				tip,
 				severity: "warning",
 				location: htmlAttr.location.name,
 				htmlAttr,

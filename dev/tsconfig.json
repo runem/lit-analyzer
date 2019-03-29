@@ -6,9 +6,9 @@
 				"verbose": true,
 				"skipUnknownTags": false,
 				"checkUnknownEvents": true,
-				"globalHtmlTags": ["my-external-tag"],
-				"globalHtmlAttributes": ["my-attribute"],
-				"globalHtmlEvents": ["my-event"],
+				"globalTags": ["my-external-tag"],
+				"globalAttributes": ["my-attribute"],
+				"globalEvents": ["my-event"],
 				"customHtmlData": [
 					"./dev/html.json",
 					{

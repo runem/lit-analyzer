@@ -4,6 +4,7 @@ export interface Config {
 	disable: boolean;
 	verbose: boolean;
 	format: { disable: boolean };
+	noTips: boolean;
 
 	htmlTemplateTags: string[];
 	cssTemplateTags: string[];
@@ -17,9 +18,9 @@ export interface Config {
 	skipTypeChecking: boolean;
 	skipMissingImports: boolean;
 
-	globalHtmlTags: string[];
-	globalHtmlAttributes: string[];
-	globalHtmlEvents: string[];
+	globalTags: string[];
+	globalAttributes: string[];
+	globalEvents: string[];
 	customHtmlData: (string | HtmlData)[] | string | HtmlData;
 }
 
@@ -31,6 +32,7 @@ export function makeConfig(userConfig: Partial<Config>): Config {
 	return {
 		disable: userConfig.disable || false,
 		verbose: userConfig.verbose || false,
+		noTips: userConfig.noTips || false,
 		format: {
 			disable: userConfig.format != null ? userConfig.format.disable : undefined || false
 		},
@@ -38,9 +40,9 @@ export function makeConfig(userConfig: Partial<Config>): Config {
 		htmlTemplateTags: userConfig.htmlTemplateTags || ["html", "raw"],
 		cssTemplateTags: userConfig.cssTemplateTags || ["css"],
 		// Global additions
-		globalHtmlTags: userConfig.globalHtmlTags || (userConfig as any).externalHtmlTagNames || [],
-		globalHtmlAttributes: userConfig.globalHtmlAttributes || [],
-		globalHtmlEvents: userConfig.globalHtmlEvents || [],
+		globalTags: userConfig.globalTags || (userConfig as any).externalHtmlTagNames || [],
+		globalAttributes: userConfig.globalAttributes || [],
+		globalEvents: userConfig.globalEvents || [],
 		customHtmlData: userConfig.customHtmlData || [],
 		// Skip
 		skipMissingImports: userConfig.skipMissingImports || false,

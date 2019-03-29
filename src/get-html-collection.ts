@@ -33,7 +33,7 @@ export function getUserConfigHtmlCollection(config: Config): HtmlDataCollection 
 		return collection;
 	})();
 
-	const tags = config.globalHtmlTags.map(
+	const tags = config.globalTags.map(
 		tagName =>
 			({
 				tagName: tagName,
@@ -44,7 +44,7 @@ export function getUserConfigHtmlCollection(config: Config): HtmlDataCollection 
 			} as HtmlTag)
 	);
 
-	const attrs = config.globalHtmlAttributes.map(
+	const attrs = config.globalAttributes.map(
 		attrName =>
 			({
 				name: attrName,
@@ -53,7 +53,7 @@ export function getUserConfigHtmlCollection(config: Config): HtmlDataCollection 
 			} as HtmlAttr)
 	);
 
-	const events = config.globalHtmlEvents.map(
+	const events = config.globalEvents.map(
 		eventName =>
 			({
 				name: eventName,
