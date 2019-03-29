@@ -95,8 +95,8 @@ export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, checker: Type
 						const validSlotNames = slots.map(s => s.name);
 						const message =
 							validSlotNames.length === 1 && validSlotNames[0].length === 0
-								? `Invalid slot name. Only the unnamed slot is valid for <${parentHtmlTag.tagName}>`
-								: `Invalid slot name. Valid slot names for <${parentHtmlTag.tagName}> are: ${validSlotNames.map(n => `'${n}'`).join(" | ")}`;
+								? `Invalid slot name '${slotName}'. Only the unnamed slot is valid for <${parentHtmlTag.tagName}>`
+								: `Invalid slot name '${slotName}'. Valid slot names for <${parentHtmlTag.tagName}> are: ${validSlotNames.map(n => `'${n}'`).join(" | ")}`;
 
 						return [
 							{
