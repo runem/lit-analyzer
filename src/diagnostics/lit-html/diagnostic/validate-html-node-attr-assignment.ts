@@ -93,12 +93,16 @@ export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, checker: Type
 
 					if (matchingSlot == null) {
 						const validSlotNames = slots.map(s => s.name);
+						const message =
+							validSlotNames.length === 1 && validSlotNames[0].length === 0
+								? `Invalid slot name. Only the unnamed slot is valid for <${parentHtmlTag.tagName}>`
+								: `Invalid slot name. Valid slot names for <${parentHtmlTag.tagName}> are: ${validSlotNames.map(n => `'${n}'`).join(" | ")}`;
 
 						return [
 							{
 								kind: LitHtmlDiagnosticKind.INVALID_SLOT_NAME,
+								message,
 								validSlotNames,
-								message: `Invalid slot name. Valid slot names for <${parentHtmlTag.tagName}> are: ${validSlotNames.map(n => `'${n}'`).join(" | ")}`,
 								severity: "error",
 								location: htmlAttr.location.name
 							}
