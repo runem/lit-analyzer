@@ -1,64 +1,68 @@
-import { SimpleType, SimpleTypeKind, SimpleTypeStringLiteral, SimpleTypeUnion } from "ts-simple-type";
-import { HtmlData, HtmlDataTag, HtmlDataTagAttr, HtmlDataTagAttrValue, HtmlDataTagValueSet, HtmlDataV1 } from "./html-data-tag";
-import { HtmlTag, HtmlTagAttr } from "./html-tag";
+import { SimpleType, SimpleTypeKind, SimpleTypeStringLiteral } from "ts-simple-type";
+import { lazy } from "../../util/util";
+import { HtmlData, HtmlDataAttr, HtmlDataAttrValue, HtmlDataTag, HtmlDataV1, HtmlDataValueSet } from "./html-data-tag";
+import { HtmlAttr, HtmlDataCollection, HtmlTag } from "./html-tag";
 
-export type HtmlDataResult = {
-	tags: HtmlTag[];
-	globalAttrs: HtmlTagAttr[];
-};
-
-export function parseHtmlData(data: HtmlData): HtmlDataResult {
+export function parseHtmlData(data: HtmlData): HtmlDataCollection {
 	switch (data.version) {
 		case 1:
 			return parseDataV1(data);
 	}
 }
 
-function parseDataV1(data: HtmlDataV1): HtmlDataResult {
+function parseDataV1(data: HtmlDataV1): HtmlDataCollection {
 	const valueSetTypeMap = valueSetsToTypeMap(data.valueSets || []);
 	valueSetTypeMap.set("v", { kind: SimpleTypeKind.BOOLEAN });
 
 	const tags = (data.tags || []).map(tagData => tagDataToHtmlTag(tagData, valueSetTypeMap));
 
-	const globalAttrs = (data.globalAttributes || []).map(tagDataAttr => tagDataToHtmlTagAttr(tagDataAttr, valueSetTypeMap));
+	const attrs = (data.globalAttributes || []).map(tagDataAttr => tagDataToHtmlTagAttr(tagDataAttr, valueSetTypeMap));
 
 	return {
 		tags,
-		globalAttrs
+		attrs,
+		events: []
 	};
 }
 
 function tagDataToHtmlTag(tagData: HtmlDataTag, typeMap: ValueSetTypeMap): HtmlTag {
 	const { name, description } = tagData;
 
+	const attributes = tagData.attributes.map(tagDataAttr => tagDataToHtmlTagAttr(tagDataAttr, typeMap, name));
+
 	return {
-		name,
+		tagName: name,
 		description,
-		attributes: tagData.attributes.map(tagDataAttr => tagDataToHtmlTagAttr(tagDataAttr, typeMap))
+		attributes,
+		properties: [],
+		events: [],
+		slots: []
 	};
 }
 
-function tagDataToHtmlTagAttr(tagDataAttr: HtmlDataTagAttr, typeMap: ValueSetTypeMap): HtmlTagAttr {
+function tagDataToHtmlTagAttr(tagDataAttr: HtmlDataAttr, typeMap: ValueSetTypeMap, fromTagName?: string): HtmlAttr {
 	const { name, description, valueSet, values } = tagDataAttr;
 
 	const type = valueSet != null ? typeMap.get(valueSet) : values != null ? attrValuesToUnion(values) : undefined;
 
 	return {
+		kind: "attribute",
 		name,
 		description,
-		type: type || { kind: SimpleTypeKind.ANY }
+		fromTagName,
+		getType: lazy(() => type || { kind: SimpleTypeKind.ANY })
 	};
 }
 
 type ValueSetTypeMap = Map<string, SimpleType>;
 
-function valueSetsToTypeMap(valueSets: HtmlDataTagValueSet[]): ValueSetTypeMap {
-	const entries = valueSets.map(valueSet => [valueSet.name, attrValuesToUnion(valueSet.values)] as [string, SimpleTypeUnion]);
+function valueSetsToTypeMap(valueSets: HtmlDataValueSet[]): ValueSetTypeMap {
+	const entries = valueSets.map(valueSet => [valueSet.name, attrValuesToUnion(valueSet.values)] as [string, SimpleType]);
 
 	return new Map(entries);
 }
 
-function attrValuesToUnion(attrValues: HtmlDataTagAttrValue[]): SimpleTypeUnion {
+function attrValuesToUnion(attrValues: HtmlDataAttrValue[]): SimpleType {
 	return {
 		kind: SimpleTypeKind.UNION,
 		types: attrValues.map(

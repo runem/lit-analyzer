@@ -105,7 +105,7 @@ const HTML_5_ATTR_TYPES: { [key: string]: string | string[] } = {
 	min: "number",
 	minlength: "number",
 	pattern: "",
-	placeholder: "",
+	placeholder: "string",
 	size: "",
 	step: "",
 	cols: "",
@@ -115,7 +115,11 @@ const HTML_5_ATTR_TYPES: { [key: string]: string | string[] } = {
 	optimum: ""
 };
 
-export function html5TagAttrType(attrName: string, name?: string): SimpleType {
+export function hasTypeForAttrName(attrName: string): boolean {
+	return HTML_5_ATTR_TYPES[attrName] != null && HTML_5_ATTR_TYPES[attrName].length > 0;
+}
+
+export function html5TagAttrType(attrName: string): SimpleType {
 	return stringToSimpleType(HTML_5_ATTR_TYPES[attrName] || "", attrName);
 }
 

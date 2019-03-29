@@ -1,4 +1,4 @@
-import { SourceFile } from "typescript";
+import { DefinitionInfoAndBoundSpan, SourceFile } from "typescript";
 import { DIAGNOSTIC_SOURCE } from "../constants";
 import { parseDocumentsInSourceFile } from "../parsing/parse-documents-in-source-file";
 import { CssDocument } from "../parsing/text-document/css-document/css-document";
@@ -129,22 +129,24 @@ function translateDiagnostics(reports: LitDiagnostic[], file: SourceFile, docume
 	return reports.map(report => translateDiagnostic(report, file, document));
 }
 
-function translateDefinition(definition: LitDefinition, document: CssDocument): ts.DefinitionInfoAndBoundSpan {
-	const cls = definition.targetClass;
-	const prop = definition.targetProp;
+function translateDefinition(definition: LitDefinition, document: CssDocument): DefinitionInfoAndBoundSpan {
+	const targetNode = definition.target.node;
 
-	const { start: targetStart, end: targetEnd } = prop != null ? prop!.location : cls.location;
+	const targetStart = targetNode.getStart();
+	const targetEnd = targetNode.getEnd();
+	const targetFileName = targetNode.getSourceFile().fileName;
+	const target = definition.target;
 
 	return {
 		definitions: [
 			{
-				name: (prop != null ? prop!.name : cls.meta.className) || "",
+				name: ("name" in target && target.name) || ("propName" in target && target.propName) || ("attrName" in target && target.attrName) || "",
 				textSpan: {
 					start: targetStart,
 					length: targetEnd - targetStart
 				},
-				fileName: cls.fileName,
-				containerName: cls.fileName,
+				fileName: targetFileName,
+				containerName: targetFileName,
 				kind: tsModule.ts.ScriptElementKind.memberVariableElement,
 				containerKind: tsModule.ts.ScriptElementKind.functionElement
 			}

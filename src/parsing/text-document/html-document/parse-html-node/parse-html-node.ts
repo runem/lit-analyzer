@@ -1,16 +1,17 @@
 import { TS_IGNORE_FLAG } from "../../../../constants";
-import { HtmlNode, HtmlNodeKind, IHtmlNodeBase, IHtmlNodeSourceCodeLocation } from "./types/html-node-types";
 import { isCommentNode, isTagNode } from "../parse-html-p5/parse-html";
 import { IP5TagNode, P5Node } from "../parse-html-p5/parse-html-types";
 import { parseHtmlNodeAttrs } from "./parse-html-attribute";
+import { HtmlNode, HtmlNodeKind, IHtmlNodeBase, IHtmlNodeSourceCodeLocation } from "./types/html-node-types";
 import { ParseHtmlContext } from "./types/parse-html-context";
 
 /**
  * Parses multiple p5Nodes into multiple html nodes.
  * @param p5Nodes
+ * @param parent
  * @param context
  */
-export function parseHtmlNodes(p5Nodes: P5Node[], context: ParseHtmlContext): HtmlNode[] {
+export function parseHtmlNodes(p5Nodes: P5Node[], parent: HtmlNode | undefined, context: ParseHtmlContext): HtmlNode[] {
 	const htmlNodes: HtmlNode[] = [];
 	let ignoreNextNode = false;
 	for (const p5Node of p5Nodes) {
@@ -23,7 +24,7 @@ export function parseHtmlNodes(p5Nodes: P5Node[], context: ParseHtmlContext): Ht
 
 		if (isTagNode(p5Node)) {
 			if (!ignoreNextNode) {
-				const htmlNode = parseHtmlNode(p5Node, context);
+				const htmlNode = parseHtmlNode(p5Node, parent, context);
 
 				if (htmlNode != null) {
 					htmlNodes.push(htmlNode);
@@ -39,9 +40,10 @@ export function parseHtmlNodes(p5Nodes: P5Node[], context: ParseHtmlContext): Ht
 /**
  * Parses a single p5Node into a html node.
  * @param p5Node
+ * @param parent
  * @param context
  */
-export function parseHtmlNode(p5Node: IP5TagNode, context: ParseHtmlContext): HtmlNode | undefined {
+export function parseHtmlNode(p5Node: IP5TagNode, parent: HtmlNode | undefined, context: ParseHtmlContext): HtmlNode | undefined {
 	// `sourceCodeLocation` will be undefined if the element was implicitly created by the parser.
 	if (p5Node.sourceCodeLocation == null) return undefined;
 
@@ -50,10 +52,13 @@ export function parseHtmlNode(p5Node: IP5TagNode, context: ParseHtmlContext): Ht
 		selfClosed: isSelfClosed(p5Node, context),
 		attributes: [],
 		location: makeHtmlNodeLocation(p5Node, context),
-		children: parseHtmlNodes(p5Node.childNodes || [], context)
+		children: [],
+		parent
 	};
 
 	const htmlNode = parseHtmlNodeBase(htmlNodeBase);
+
+	htmlNode.children = parseHtmlNodes(p5Node.childNodes || [], htmlNode, context);
 
 	htmlNode.attributes = parseHtmlNodeAttrs(p5Node, { ...context, htmlNode });
 

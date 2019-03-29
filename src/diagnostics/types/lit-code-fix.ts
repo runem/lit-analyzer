@@ -3,13 +3,15 @@ import {
 	LitHtmlDiagnostic,
 	LitHtmlDiagnosticHtmlBoolMod,
 	LitHtmlDiagnosticMissingImport,
+	LitHtmlDiagnosticMissingSlotAttr,
 	LitHtmlDiagnosticPrimitiveNotAssignableToComplex,
-	LitHtmlDiagnosticUnknownAttribute,
+	LitHtmlDiagnosticUnknownMember,
 	LitHtmlDiagnosticUnknownTag
 } from "./lit-diagnostic";
 
 export enum CodeFixKind {
 	RENAME = "RENAME",
+	ADD_TEXT = "ADD_TEXT",
 	CHANGE_LIT_MODIFIER = "CHANGE_LIT_MODIFIER",
 	IMPORT_COMPONENT = "IMPORT_COMPONENT"
 }
@@ -20,9 +22,14 @@ export interface CodeFixBase {
 	actions: LitCodeFixAction[];
 }
 
+export interface CodeFixAddText extends CodeFixBase {
+	kind: CodeFixKind.ADD_TEXT;
+	htmlReport: LitHtmlDiagnosticMissingSlotAttr;
+}
+
 export interface CodeFixRename extends CodeFixBase {
 	kind: CodeFixKind.RENAME;
-	htmlReport: LitHtmlDiagnosticUnknownAttribute | LitHtmlDiagnosticUnknownTag;
+	htmlReport: LitHtmlDiagnosticUnknownMember | LitHtmlDiagnosticUnknownTag;
 }
 
 export interface CodeFixChangeLitModifier extends CodeFixBase {
@@ -35,4 +42,4 @@ export interface CodeFixImportComponent extends CodeFixBase {
 	htmlReport: LitHtmlDiagnosticMissingImport;
 }
 
-export type LitCodeFix = CodeFixRename | CodeFixChangeLitModifier | CodeFixImportComponent;
+export type LitCodeFix = CodeFixRename | CodeFixChangeLitModifier | CodeFixImportComponent | CodeFixAddText;

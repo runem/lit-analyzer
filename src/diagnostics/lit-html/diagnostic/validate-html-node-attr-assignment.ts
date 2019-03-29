@@ -12,6 +12,7 @@ import {
 	toTypeString
 } from "ts-simple-type";
 import { Type, TypeChecker } from "typescript";
+import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../../constants";
 import { HtmlNodeAttrAssignmentKind } from "../../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-assignment-types";
 import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
 import { TsLitPluginStore } from "../../../state/store";
@@ -43,28 +44,75 @@ export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, checker: Type
 	const typeB = isSimpleType(typeBInferred) ? typeBInferred : toSimpleType(typeBInferred, checker);
 
 	// Temp ugly check until I refactor this section
-	if (htmlAttr.kind === HtmlNodeAttrKind.EVENT_LISTENER) {
-		// Make sure that there is a function as event listener value.
-		// Here we catch errors like: @click="onClick()"
-		if (!isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.FUNCTION) && !isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.METHOD)) {
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.NO_EVENT_LISTENER_FUNCTION,
-					message: `You are setting up an event listener with a non-callable type '${toTypeString(typeB)}'`,
-					severity: "error",
-					location: htmlAttr.location.name,
-					typeB: toTypeString(typeB)
-				}
-			];
-		}
+	switch (htmlAttr.kind) {
+		case HtmlNodeAttrKind.EVENT_LISTENER:
+			// Make sure that there is a function as event listener value.
+			// Here we catch errors like: @click="onClick()"
+			if (!isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.FUNCTION) && !isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.METHOD)) {
+				return [
+					{
+						kind: LitHtmlDiagnosticKind.NO_EVENT_LISTENER_FUNCTION,
+						message: `You are setting up an event listener with a non-callable type '${toTypeString(typeB)}'`,
+						severity: "error",
+						location: htmlAttr.location.name,
+						typeB: toTypeString(typeB)
+					}
+				];
+			}
 
-		return [];
+			return [];
+
+		// Check if we have a property assignment without a corresponding expression as value
+		case HtmlNodeAttrKind.PROPERTY:
+			switch (assignment.kind) {
+				case HtmlNodeAttrAssignmentKind.STRING:
+				case HtmlNodeAttrAssignmentKind.BOOLEAN:
+					return [
+						{
+							kind: LitHtmlDiagnosticKind.PROPERTY_NEEDS_EXPRESSION,
+							message: `You are using the property modifier without an expression`,
+							severity: "error",
+							location: htmlAttr.location.name
+						}
+					];
+			}
+			break;
 	}
 
-	const htmlTagAttr = store.getHtmlTagAttr(htmlAttr);
-	if (htmlTagAttr == null) return [];
+	if (htmlAttr.kind === HtmlNodeAttrKind.ATTRIBUTE && assignment.kind === HtmlNodeAttrAssignmentKind.STRING) {
+		// Check for slots
+		if (htmlAttr.name === "slot") {
+			const parent = htmlAttr.htmlNode.parent;
+			if (parent != null) {
+				const parentHtmlTag = store.getHtmlTag(parent.tagName);
 
-	const typeA = htmlTagAttr.type;
+				if (parentHtmlTag != null && parentHtmlTag.slots.length > 0) {
+					const slotName = assignment.value;
+					const slots = Array.from(store.getAllSlotsForTag(parentHtmlTag.tagName));
+					const matchingSlot = slots.find(slot => slot.name === slotName);
+
+					if (matchingSlot == null) {
+						const validSlotNames = slots.map(s => s.name);
+
+						return [
+							{
+								kind: LitHtmlDiagnosticKind.INVALID_SLOT_NAME,
+								validSlotNames,
+								message: `Invalid slot name. Valid slot names for <${parentHtmlTag.tagName}> are: ${validSlotNames.map(n => `'${n}'`).join(" | ")}`,
+								severity: "error",
+								location: htmlAttr.location.name
+							}
+						];
+					}
+				}
+			}
+		}
+	}
+
+	const htmlAttrTarget = store.getHtmlAttrTarget(htmlAttr);
+	if (htmlAttrTarget == null) return [];
+
+	const typeA = htmlAttrTarget.getType();
 
 	// Type check lit-html directives
 	if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.FUNCTION)) {
@@ -91,7 +139,7 @@ export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, checker: Type
 	}
 
 	switch (htmlAttr.modifier) {
-		case "?":
+		case LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER:
 			// Test if the user is trying to use the ? modifier on a non-boolean type.
 			if (!isAssignableToType(typeA, { kind: SimpleTypeKind.BOOLEAN })) {
 				return [
@@ -108,7 +156,7 @@ export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, checker: Type
 			}
 			break;
 
-		case ".":
+		case LIT_HTML_PROP_ATTRIBUTE_MODIFIER:
 			break;
 
 		default:

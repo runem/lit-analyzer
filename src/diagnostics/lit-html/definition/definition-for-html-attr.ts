@@ -1,16 +1,23 @@
+import { isHtmlEvent, isHtmlMember } from "../../../parsing/parse-html-data/html-tag";
 import { HtmlNodeAttr } from "../../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
 import { DiagnosticsContext } from "../../diagnostics-context";
-import { LitDefinition, DefinitionKind } from "../../types/lit-definition";
+import { DefinitionKind, LitDefinition } from "../../types/lit-definition";
 
 export function definitionForHtmlAttr(htmlAttr: HtmlNodeAttr, { sourceFile, store }: DiagnosticsContext): LitDefinition | undefined {
-	const decl = store.getComponentDeclaration(htmlAttr.htmlNode);
-	const prop = store.getComponentDeclarationProp(htmlAttr);
-	if (decl == null || prop == null) return undefined;
+	const target = store.getHtmlAttrTarget(htmlAttr);
+	if (target == null) return undefined;
 
-	return {
-		kind: DefinitionKind.COMPONENT,
-		fromRange: htmlAttr.location.name,
-		targetClass: decl,
-		targetProp: prop
-	};
+	if (isHtmlMember(target) && target.declaration != null) {
+		return {
+			kind: DefinitionKind.MEMBER,
+			fromRange: htmlAttr.location.name,
+			target: target.declaration
+		};
+	} else if (isHtmlEvent(target) && target.declaration != null) {
+		return {
+			kind: DefinitionKind.EVENT,
+			fromRange: htmlAttr.location.name,
+			target: target.declaration
+		};
+	}
 }

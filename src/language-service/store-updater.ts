@@ -1,14 +1,15 @@
 import { LanguageService, Program, SourceFile, TypeChecker } from "typescript";
-import { convertComponentDefinitionsToHtmlTags } from "../parsing/convert-component-definitions-to-html-tags";
-import { parseComponents } from "../parsing/parse-components/parse-components";
+import { analyzeComponents, analyzeLibDomHtmlElement } from "web-component-analyzer";
+import { convertAnalyzeResultToHtmlCollection, convertComponentDeclarationToHtmlTag } from "../parsing/convert-component-definitions-to-html-collection";
 import { parseDependencies } from "../parsing/parse-dependencies/parse-dependencies";
-import { TsLitPluginStore } from "../state/store";
+import { HtmlStoreDataSource, TsLitPluginStore } from "../state/store";
 import { changedSourceFileIterator } from "../util/changed-source-file-iterator";
 
 export type UpdateType = "cmps" | "deps";
 
 export class StoreUpdater {
 	componentSourceFileIterator = changedSourceFileIterator();
+	private analyzedHtmlElement = false;
 
 	private get program(): Program {
 		return this.prevLangService.getProgram()!;
@@ -23,6 +24,15 @@ export class StoreUpdater {
 	update(sourceFile: SourceFile, updates: UpdateType[] = ["cmps", "deps"]) {
 		if (updates.includes("cmps")) this.findInvalidatedComponents();
 		if (updates.includes("deps")) this.findDependencies(sourceFile);
+
+		if (!this.analyzedHtmlElement) {
+			const result = analyzeLibDomHtmlElement(this.program, this.store.ts);
+			if (result != null) {
+				const extension = convertComponentDeclarationToHtmlTag(result, undefined, { checker: this.checker });
+				this.store.absorbSubclassExtension("HTMLElement", extension);
+			}
+			this.analyzedHtmlElement = true;
+		}
 	}
 
 	private findInvalidatedComponents() {
@@ -34,7 +44,7 @@ export class StoreUpdater {
 			seenFiles.add(sourceFile);
 
 			this.store.getDefinitionsWithDeclarationInFile(sourceFile).forEach(definition => {
-				const sf = this.program.getSourceFile(definition.fileName);
+				const sf = this.program.getSourceFile(definition.node.getSourceFile().fileName);
 				if (sf != null) {
 					invalidatedFiles.add(sf);
 				}
@@ -59,16 +69,19 @@ export class StoreUpdater {
 	}
 
 	private findComponents(sourceFile: SourceFile) {
-		try {
-			const componentDefinitions = parseComponents(sourceFile, this.checker);
+		const analyzeResult = analyzeComponents(sourceFile, {
+			checker: this.checker,
+			ts: this.store.ts,
+			config: { /*diagnostics: true, */ analyzeLibDom: true, excludedDeclarationNames: ["HTMLElement"] }
+		});
 
-			this.store.invalidateTagsDefinedInFile(sourceFile);
-			this.store.absorbHtmlDefinitions(sourceFile, componentDefinitions);
+		this.store.forgetTagsDefinedInFile(sourceFile);
+		this.store.absorbAnalysisResult(sourceFile, analyzeResult);
 
-			const htmlTags = componentDefinitions.map(definition => convertComponentDefinitionsToHtmlTags(definition, this.checker));
-			this.store.absorbHtmlTags(htmlTags);
-		} catch (error) {
-			// Temporary fail safe
-		}
+		const htmlCollection = convertAnalyzeResultToHtmlCollection(analyzeResult, {
+			checker: this.checker,
+			addDeclarationPropertiesAsAttributes: true
+		});
+		this.store.absorbCollection(htmlCollection, HtmlStoreDataSource.DECLARED);
 	}
 }

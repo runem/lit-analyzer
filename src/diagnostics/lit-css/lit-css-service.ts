@@ -14,13 +14,15 @@ export class LitCssService {
 	getCompletionDetails(document: CssDocument, offset: number, name: string, context: DiagnosticsContext): LitCompletionDetails | undefined {
 		const completionWithName = this.vscodeCssService.getCompletions(document, offset).find(completion => completion.name === name);
 
-		if (completionWithName == null) return undefined;
-		if (completionWithName.documentation == null) return undefined;
+		if (completionWithName == null || completionWithName.documentation == null) return undefined;
+
+		const primaryInfo = completionWithName.documentation();
+		if (primaryInfo == null) return undefined;
 
 		return {
 			name,
 			kind: completionWithName.kind,
-			primaryInfo: completionWithName.documentation
+			primaryInfo
 		};
 	}
 
@@ -50,7 +52,7 @@ export class LitCssService {
 			return {
 				kind: DefinitionKind.COMPONENT,
 				fromRange: { start, end },
-				targetClass: definition.declaration
+				target: definition.declaration
 			};
 		}
 		return undefined;

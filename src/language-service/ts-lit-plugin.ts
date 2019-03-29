@@ -3,6 +3,7 @@ import {
 	CompletionEntryDetails,
 	CompletionInfo,
 	DefinitionInfoAndBoundSpan,
+	Diagnostic,
 	FormatCodeOptions,
 	FormatCodeSettings,
 	GetCompletionsAtPositionOptions,
@@ -16,11 +17,11 @@ import {
 } from "typescript";
 import { DiagnosticsContext } from "../diagnostics/diagnostics-context";
 import { LitTsService } from "../diagnostics/lit-ts-service";
-import { getHtmlData } from "../get-html-data";
+import { getUserConfigHtmlCollection } from "../get-html-collection";
 import { parseDocumentsInSourceFile } from "../parsing/parse-documents-in-source-file";
 import { TextDocument } from "../parsing/text-document/text-document";
 import { Config } from "../state/config";
-import { TsLitPluginStore } from "../state/store";
+import { HtmlStoreDataSource, TsLitPluginStore } from "../state/store";
 import { logger } from "../util/logger";
 import { StoreUpdater } from "./store-updater";
 
@@ -36,10 +37,9 @@ export class TsLitPlugin {
 		logger.debug("Updating the config", config);
 		this.store.config = config;
 
-		// Add all HTML5 tags and attributes
-		const result = getHtmlData(config);
-		this.store.absorbHtmlTags(result.tags);
-		this.store.absorbGlobalHtmlAttributes(result.globalAttrs);
+		// Add user configured HTML5 collection
+		const collection = getUserConfigHtmlCollection(config);
+		this.store.absorbCollection(collection, HtmlStoreDataSource.USER);
 	}
 
 	private get program(): Program {
@@ -77,9 +77,19 @@ export class TsLitPlugin {
 		this.storeUpdater.update(file);
 
 		const diagnostics = this.litService.getDiagnostics(file, this.diagnosticContext(file));
+		const analyzeDiagnostics = (this.store.sourceFileDiagnostics.get(file) || []).map(
+			diagnostic =>
+				({
+					file,
+					messageText: diagnostic.message,
+					category: diagnostic.severity === "warning" ? this.store.ts.DiagnosticCategory.Warning : this.store.ts.DiagnosticCategory.Error,
+					start: diagnostic.node.getStart(),
+					length: diagnostic.node.getEnd() - diagnostic.node.getStart()
+				} as Diagnostic)
+		);
 		const prevResult = this.prevLangService.getSemanticDiagnostics(fileName) || [];
 
-		return [...prevResult, ...diagnostics];
+		return [...prevResult, ...analyzeDiagnostics, ...diagnostics];
 	}
 
 	getDefinitionAndBoundSpan(fileName: string, position: number): DefinitionInfoAndBoundSpan | undefined {

@@ -2,7 +2,7 @@
 	"rules": {
 		"completed-docs": {
 			"options": ["classes", "functions"],
-			"severity": "warning"
+			"severity": "none"
 		},
 		"prefer-const": true,
 		"no-duplicate-variable": true,

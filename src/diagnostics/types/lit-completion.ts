@@ -26,5 +26,5 @@ export interface LitCompletion {
 	insert: string;
 	range?: Range;
 	importance?: "high" | "medium" | "low";
-	documentation?: string;
+	documentation?(): string | undefined;
 }

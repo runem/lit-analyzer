@@ -23,21 +23,25 @@ import { VscodeHtmlService } from "./vscode-html-service";
 export class LitHtmlService {
 	vscodeHtmlService = new VscodeHtmlService();
 
-	getCompletionDetails(document: HtmlDocument, offset: number, name: string, context: DiagnosticsContext): LitCompletionDetails | undefined {
-		const completionWithName = completionsAtOffset(document, offset, context).find(completion => completion.name === name);
+	private completionsCache: LitCompletion[] = [];
 
-		if (completionWithName == null) return undefined;
-		if (completionWithName.documentation == null) return undefined;
+	getCompletionDetails(document: HtmlDocument, offset: number, name: string, context: DiagnosticsContext): LitCompletionDetails | undefined {
+		const completionWithName = this.completionsCache.find(completion => completion.name === name);
+
+		if (completionWithName == null || completionWithName.documentation == null) return undefined;
+
+		const primaryInfo = completionWithName.documentation();
+		if (primaryInfo == null) return undefined;
 
 		return {
 			name,
 			kind: completionWithName.kind,
-			primaryInfo: completionWithName.documentation
+			primaryInfo
 		};
 	}
 
 	getCompletions(document: HtmlDocument, offset: number, context: DiagnosticsContext): LitCompletion[] {
-		return completionsAtOffset(document, offset, context);
+		return (this.completionsCache = completionsAtOffset(document, offset, context));
 	}
 
 	getCodeFixes(document: HtmlDocument, rangeOffset: Range, context: DiagnosticsContext): LitCodeFix[] {

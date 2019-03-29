@@ -1,16 +1,16 @@
 import * as tsModule from "typescript";
 import { Node, Program, SourceFile } from "typescript";
+import { ComponentDefinition } from "web-component-analyzer";
 import { logger } from "../../util/logger";
-import { IComponentDefinition } from "../parse-components/component-types";
 
 interface IVisitDependenciesContext {
 	program: Program;
 	ts: typeof tsModule;
 	project: ts.server.Project;
 	lockedFiles: string[];
-	getDefinitionsInFile(file: SourceFile): IComponentDefinition[] | undefined;
-	getImportedDefinitionsInFile(file: SourceFile): IComponentDefinition[] | undefined;
-	addDefinitionsForFile(file: SourceFile, results: IComponentDefinition[], isCircular: boolean): void;
+	getDefinitionsInFile(file: SourceFile): ComponentDefinition[] | undefined;
+	getImportedDefinitionsInFile(file: SourceFile): ComponentDefinition[] | undefined;
+	addDefinitionsForFile(file: SourceFile, results: ComponentDefinition[], isCircular: boolean): void;
 	addCircularReference(fromFile: SourceFile, toFile: SourceFile): void;
 }
 
@@ -20,6 +20,8 @@ interface IVisitDependenciesContext {
  * @param context
  */
 export function visitDependencies(node: Node, context: IVisitDependenciesContext) {
+	if (node == null) return;
+
 	if (context.ts.isSourceFile(node)) {
 		const existingResult = context.getImportedDefinitionsInFile(node);
 
@@ -37,7 +39,7 @@ export function visitDependencies(node: Node, context: IVisitDependenciesContext
 				// Expand locked files with this file
 				lockedFiles: [...context.lockedFiles, node.fileName],
 
-				addDefinitionsForFile(file: SourceFile, newResults: IComponentDefinition[], isCircular: boolean): void {
+				addDefinitionsForFile(file: SourceFile, newResults: ComponentDefinition[], isCircular: boolean): void {
 					context.addDefinitionsForFile(file, newResults, isCircular);
 					result.push(...newResults);
 				},
@@ -52,29 +54,41 @@ export function visitDependencies(node: Node, context: IVisitDependenciesContext
 			const uniqueResults = Array.from(new Set(result));
 
 			context.addDefinitionsForFile(node, uniqueResults, isCircular);
+			return;
 		}
 	} else if (context.ts.isImportDeclaration(node) || context.ts.isExportDeclaration(node)) {
 		if (node.moduleSpecifier != null && context.ts.isStringLiteral(node.moduleSpecifier)) {
-			// Resolve the imported string
-			const result = context.project.getResolvedModuleWithFailedLookupLocationsFromCache(node.moduleSpecifier.text, node.getSourceFile().fileName);
-			const mod = result != null ? result.resolvedModule : undefined;
-
-			if (mod != null) {
-				const isCircularImport = context.lockedFiles.includes(mod.resolvedFileName);
-				const sourceFile = context.program.getSourceFile(mod.resolvedFileName);
-
-				if (!isCircularImport) {
-					if (sourceFile != null) {
-						// Visit dependencies in the import recursively
-						visitDependencies(sourceFile, context);
-					}
-				} else if (sourceFile != null) {
-					// Stop! Prevent infinite loop due to circular imports
-					context.addCircularReference(node.getSourceFile(), sourceFile);
-				}
-			} else {
-				logger.error("Couldn't find module for ", node.moduleSpecifier.text, "from", node.getSourceFile().fileName);
-			}
+			visitModuleWithName(node.moduleSpecifier.text, node, context);
 		}
+	} else if (context.ts.isCallExpression(node) && node.expression.kind === context.ts.SyntaxKind.ImportKeyword) {
+		const moduleSpecifier = node.arguments[0];
+		if (moduleSpecifier != null && context.ts.isStringLiteralLike(moduleSpecifier)) {
+			visitModuleWithName(moduleSpecifier.text, node, context);
+		}
+	} else {
+		node.forEachChild(child => visitDependencies(child, context));
+	}
+}
+
+function visitModuleWithName(moduleSpecifier: string, node: Node, context: IVisitDependenciesContext) {
+	// Resolve the imported string
+	const result = context.project.getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, node.getSourceFile().fileName);
+	const mod = result != null ? result.resolvedModule : undefined;
+
+	if (mod != null) {
+		const isCircularImport = context.lockedFiles.includes(mod.resolvedFileName);
+		const sourceFile = context.program.getSourceFile(mod.resolvedFileName);
+
+		if (!isCircularImport) {
+			if (sourceFile != null) {
+				// Visit dependencies in the import recursively
+				visitDependencies(sourceFile, context);
+			}
+		} else if (sourceFile != null) {
+			// Stop! Prevent infinite loop due to circular imports
+			context.addCircularReference(node.getSourceFile(), sourceFile);
+		}
+	} else {
+		logger.error("Couldn't find module for ", moduleSpecifier, "from", node.getSourceFile().fileName);
 	}
 }

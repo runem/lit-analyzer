@@ -22,7 +22,7 @@ export function parseHtmlDocument(node: TaggedTemplateExpression): HtmlDocument 
 		}
 	};
 
-	const childNodes = parseHtmlNodes(htmlAst.childNodes, context);
+	const childNodes = parseHtmlNodes(htmlAst.childNodes, undefined, context);
 
 	return new HtmlDocument(virtualDocument, childNodes);
 }

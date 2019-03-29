@@ -1,3 +1,4 @@
+import { documentationForHtmlTag } from "../../../parsing/parse-html-data/html-tag";
 import { HtmlNode } from "../../../parsing/text-document/html-document/parse-html-node/types/html-node-types";
 import { DiagnosticsContext } from "../../diagnostics-context";
 import { LitQuickInfo } from "../../types/lit-quick-info";
@@ -9,6 +10,6 @@ export function quickInfoForHtmlNode(htmlNode: HtmlNode, { store }: DiagnosticsC
 	return {
 		range: htmlNode.location.name,
 		primaryInfo: `<${htmlNode.tagName}>`,
-		secondaryInfo: htmlTag.description
+		secondaryInfo: documentationForHtmlTag(htmlTag, { markdown: true })
 	};
 }
