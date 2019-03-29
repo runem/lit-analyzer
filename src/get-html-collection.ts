@@ -4,12 +4,22 @@ import { ARIA_ATTRIBUTES } from "vscode-html-languageservice/lib/umd/languageFac
 import { HTML5_EVENTS } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Events";
 import { HTML5_TAGS } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Tags";
 import { hasTypeForAttrName, html5TagAttrType } from "./extra-html-data";
-import { HtmlAttr, HtmlDataCollection, HtmlTag } from "./parsing/parse-html-data/html-tag";
+import { HtmlAttr, HtmlDataCollection, HtmlEvent, HtmlTag } from "./parsing/parse-html-data/html-tag";
 import { parseHtmlData } from "./parsing/parse-html-data/parse-html-data";
 import { Config } from "./state/config";
+import { logger } from "./util/logger";
 import { lazy } from "./util/util";
 
 export function getUserConfigHtmlCollection(config: Config): HtmlDataCollection {
+	const collection: HtmlDataCollection = (config.customHtmlData &&
+		(() => {
+			try {
+				return parseHtmlData(config.customHtmlData!);
+			} catch (e) {
+				logger.error("Error parsing user configuration 'customHtmlData'", e);
+			}
+		})()) || { tags: [], events: [], attrs: [] };
+
 	const tags = config.globalHtmlTags.map(
 		tagName =>
 			({
@@ -30,7 +40,20 @@ export function getUserConfigHtmlCollection(config: Config): HtmlDataCollection 
 			} as HtmlAttr)
 	);
 
-	return { tags, attrs, events: [] };
+	const events = config.globalHtmlEvents.map(
+		eventName =>
+			({
+				name: eventName,
+				kind: "event",
+				getType: lazy(() => ({ kind: SimpleTypeKind.ANY } as SimpleType))
+			} as HtmlEvent)
+	);
+
+	return {
+		tags: [...tags, ...collection.tags],
+		attrs: [...attrs, ...collection.attrs],
+		events: [...events, ...collection.events]
+	};
 }
 
 export function getBuiltInHtmlCollection(): HtmlDataCollection {
@@ -174,9 +197,11 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 		...result,
 		tags: result.tags.map(tag => ({
 			...tag,
-			attributes: addMissingAttrTypes(tag.attributes)
+			builtIn: true,
+			attributes: addMissingAttrTypes(tag.attributes.map(attr => ({ ...attr, builtIn: true })))
 		})),
-		attrs: addMissingAttrTypes(result.attrs)
+		attrs: addMissingAttrTypes(result.attrs.map(attr => ({ ...attr, builtIn: true }))),
+		events: result.events.map(event => ({ ...event, builtIn: true }))
 	};
 }
 

@@ -18,10 +18,7 @@ export function validateHTMLDocument(htmlDocument: HtmlDocument, context: Diagno
 			const iterateAttrs = (attrs: HtmlNodeAttr[]) => {
 				for (const attr of attrs) {
 					reports.push(...validateHtmlAttr(attr, store));
-
-					if (!store.config.skipTypeChecking) {
-						reports.push(...validateHtmlAttrAssignment(attr, checker, store));
-					}
+					reports.push(...validateHtmlAttrAssignment(attr, checker, store));
 				}
 			};
 

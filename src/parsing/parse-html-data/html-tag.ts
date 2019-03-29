@@ -1,5 +1,6 @@
 import { isAssignableToSimpleTypeKind, SimpleType, SimpleTypeKind, toTypeString } from "ts-simple-type";
 import { ComponentDeclaration, ComponentMember, ComponentSlot, EventDeclaration } from "web-component-analyzer";
+import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../constants";
 
 export type HtmlDataCollection = {
 	tags: HtmlTag[];
@@ -81,6 +82,19 @@ export function isHtmlProp(target: HtmlAttrTarget): target is HtmlProp {
 
 export function isHtmlEvent(target: HtmlAttrTarget): target is HtmlEvent {
 	return !isHtmlMember(target);
+}
+
+export function litAttributeModifierForTarget(target: HtmlAttrTarget): string {
+	if (isHtmlAttr(target)) {
+		if (isAssignableToSimpleTypeKind(target.getType(), SimpleTypeKind.BOOLEAN)) {
+			return LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER;
+		}
+		return "";
+	} else if (isHtmlProp(target)) {
+		return LIT_HTML_PROP_ATTRIBUTE_MODIFIER;
+	} else {
+		return LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER;
+	}
 }
 
 export interface DescriptionOptions {

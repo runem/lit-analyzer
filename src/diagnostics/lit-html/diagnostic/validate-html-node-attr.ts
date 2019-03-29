@@ -1,5 +1,4 @@
-import { LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../../constants";
-import { HtmlMember } from "../../../parsing/parse-html-data/html-tag";
+import { HtmlAttrTarget, litAttributeModifierForTarget } from "../../../parsing/parse-html-data/html-tag";
 import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
 import { HtmlNodeKind } from "../../../parsing/text-document/html-document/parse-html-node/types/html-node-types";
 import { TsLitPluginStore } from "../../../state/store";
@@ -15,67 +14,86 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, store: TsLitPluginStore
 	// Ignore "style" and "svg" attrs because I don't yet have all data for them.
 	if (htmlAttr.htmlNode.kind !== HtmlNodeKind.NODE) return [];
 
-	// Skip validating EVENT_LISTENERS for now
-	if (htmlAttr.kind === HtmlNodeAttrKind.EVENT_LISTENER) return [];
-
 	const htmlAttrTarget = store.getHtmlAttrTarget(htmlAttr);
 	if (htmlAttrTarget == null) {
+		// Check if we need to skip this check
+		switch (htmlAttr.kind) {
+			case HtmlNodeAttrKind.ATTRIBUTE:
+			case HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE:
+				if (store.config.skipUnknownAttributes) return [];
+				break;
+			case HtmlNodeAttrKind.PROPERTY:
+				if (!store.config.skipUnknownProperties) return [];
+				break;
+			case HtmlNodeAttrKind.EVENT_LISTENER:
+				if (!store.config.checkUnknownEvents) return [];
+				break;
+		}
+
 		// Ignore unknown "data-" attributes
 		if (htmlAttr.name.startsWith("data-")) return [];
 
-		if (store.config.skipUnknownHtmlAttributes) return [];
-
 		const htmlTag = store.getHtmlTag(htmlAttr.htmlNode);
 
-		const suggestedMember = (() => {
-			const properties = Array.from(store.getAllPropertiesForTag(htmlAttr.htmlNode));
-			const attributes = Array.from(store.getAllAttributesForTag(htmlAttr.htmlNode));
-
-			switch (htmlAttr.kind) {
-				case HtmlNodeAttrKind.PROPERTY:
-					return findSuggestedMember(htmlAttr.name, properties, attributes);
-				case HtmlNodeAttrKind.ATTRIBUTE:
-				case HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE:
-					return findSuggestedMember(htmlAttr.name, attributes, properties);
-			}
-		})();
-
-		const suggestedMemberName = (suggestedMember && `${suggestedMember.kind === "property" ? LIT_HTML_PROP_ATTRIBUTE_MODIFIER : ""}${suggestedMember.name}`) || undefined;
+		const suggestedTarget = suggestTargetForHtmlAttr(htmlAttr, store);
+		const suggestedMemberName = (suggestedTarget && `${litAttributeModifierForTarget(suggestedTarget)}${suggestedTarget.name}`) || undefined;
 
 		const definition = store.getDefinitionForTagName(htmlAttr.htmlNode.tagName);
 
-		const isCustomElement = htmlTag != null && htmlTag.declaration != null;
-		const isBuiltIn = htmlTag != null && htmlTag.builtIn;
-		const isFromModule = definition != null && definition.fromLib;
+		const tagHasDeclaration = htmlTag != null && htmlTag.declaration != null;
+		const tagIsBuiltIn = htmlTag != null && htmlTag.builtIn;
+		const tagIsFromLibrary = definition != null && definition.declaration.node.getSourceFile().isDeclarationFile;
 
 		const tip = (() => {
 			switch (htmlAttr.kind) {
+				case HtmlNodeAttrKind.EVENT_LISTENER:
+					return suggestedMemberName != null
+						? `Did you mean '${suggestedMemberName}'? `
+						: `Please consider adding a '@event' tag to the jsdoc on a component class, adding it to 'globalHtmlEvents' or removing 'checkUnknownEvents' from the 'ts-lit-plugin'`;
 				case HtmlNodeAttrKind.PROPERTY:
 					return suggestedMemberName != null
 						? `Did you mean '${suggestedMemberName}'? `
-						: `ts-lit-plugin can't find all properties yet. Please consider adding it as a '@prop' tag to the jsdoc on the component class.`;
+						: tagIsBuiltIn
+						? `This is a built in tag. Please consider adding "skipUnknownProperties" to the 'ts-lit-plugin' config.`
+						: tagIsFromLibrary
+						? `If you are not the author of this component please consider adding 'skipUnknownProperties' to the 'ts-lit-plugin' config.`
+						: tagHasDeclaration
+						? `This plugin can't find all properties yet. Please consider adding a '@prop' tag to jsdoc on the component class or 'skipUnknownProperties' to the 'ts-lit-plugin' config.`
+						: `Please consider adding 'skipUnknownProperties' to the 'ts-lit-plugin' config.`;
 				case HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE:
 				case HtmlNodeAttrKind.ATTRIBUTE:
 					return suggestedMemberName != null
 						? `Did you mean '${suggestedMemberName}'? `
-						: isBuiltIn
-						? `This is a built in tag. Please consider using a "data-*" attribute or add it to 'globalHtmlAttributes'.`
-						: isFromModule
-						? `If you are not the author of this component please consider using a "data-*" attribute or add it to 'globalHtmlAttributes'.`
-						: isCustomElement
-						? `Please consider either to add it as a attribute on the component, add '@attr' tag to jsdoc on the component class or use a "data-*" attribute.`
-						: `Please consider using a "data-*" attribute instead.`;
+						: tagIsBuiltIn
+						? `This is a built in tag. Please consider using a 'data-*' attribute or adding 'globalHtmlAttributes' / 'skipUnknownAttributes' to the 'ts-lit-plugin' config.`
+						: tagIsFromLibrary
+						? `If you are not the author of this component please consider using a 'data-*' attribute or adding 'globalHtmlAttributes' / 'skipUnknownAttributes' to the 'ts-lit-plugin' config.`
+						: tagHasDeclaration
+						? `Please consider adding it as a attribute on the component, adding '@attr' tag to jsdoc on the component class or using a 'data-*' attribute instead.`
+						: `Please consider using a 'data-*' attribute instead.`;
+			}
+		})();
+
+		const existingKind = (() => {
+			switch (htmlAttr.kind) {
+				case HtmlNodeAttrKind.PROPERTY:
+					return "property";
+				case HtmlNodeAttrKind.ATTRIBUTE:
+				case HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE:
+					return "attribute";
+				case HtmlNodeAttrKind.EVENT_LISTENER:
+					return "event listener";
 			}
 		})();
 
 		return [
 			{
-				kind: LitHtmlDiagnosticKind.UNKNOWN_MEMBER,
-				message: `Unknown ${htmlAttr.kind === HtmlNodeAttrKind.PROPERTY ? "property" : "attribute"} "${htmlAttr.name}".${tip != null ? ` ${tip}` : ""}`,
+				kind: LitHtmlDiagnosticKind.UNKNOWN_TARGET,
+				message: `Unknown ${existingKind} "${htmlAttr.modifier || ""}${htmlAttr.name}".${tip != null ? ` ${tip}` : ""}`,
 				severity: "warning",
 				location: htmlAttr.location.name,
 				htmlAttr,
-				suggestedMember
+				suggestedTarget
 			}
 		];
 	}
@@ -83,7 +101,23 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, store: TsLitPluginStore
 	return [];
 }
 
-function findSuggestedMember(name: string, ...tests: Iterable<HtmlMember>[]): HtmlMember | undefined {
+function suggestTargetForHtmlAttr(htmlNodeAttr: HtmlNodeAttr, store: TsLitPluginStore): HtmlAttrTarget | undefined {
+	const properties = store.getAllPropertiesForTag(htmlNodeAttr.htmlNode);
+	const attributes = store.getAllAttributesForTag(htmlNodeAttr.htmlNode);
+	const events = store.getAllEventsForTag(htmlNodeAttr.htmlNode);
+
+	switch (htmlNodeAttr.kind) {
+		case HtmlNodeAttrKind.EVENT_LISTENER:
+			return findSuggestedTarget(htmlNodeAttr.name, events);
+		case HtmlNodeAttrKind.PROPERTY:
+			return findSuggestedTarget(htmlNodeAttr.name, properties, attributes);
+		case HtmlNodeAttrKind.ATTRIBUTE:
+		case HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE:
+			return findSuggestedTarget(htmlNodeAttr.name, attributes, properties);
+	}
+}
+
+function findSuggestedTarget(name: string, ...tests: Iterable<HtmlAttrTarget>[]): HtmlAttrTarget | undefined {
 	for (const test of tests) {
 		const match = findBestMatch(name, [...test], { matchKey: "name", caseSensitive: false });
 		if (match != null) {

@@ -3,7 +3,7 @@ import * as tsServer from "typescript/lib/tsserverlibrary";
 import { decorateLanguageService } from "./decorate-language-service";
 import { createPlugin } from "./language-service/create-plugin";
 import { TsLitPlugin } from "./language-service/ts-lit-plugin";
-import { Config, makeConfig } from "./state/config";
+import { Config } from "./state/config";
 import { logger } from "./util/logger";
 
 const tsHtmlPluginSymbol = Symbol.for("__tsHtmlPlugin__");
@@ -43,7 +43,7 @@ function init(typescript: { typescript: typeof ts }): tsServer.server.PluginModu
 
 		onConfigurationChanged(config: Partial<Config>) {
 			if (plugin == null || config == null) return;
-			plugin.config = makeConfig(config);
+			//plugin.config = makeConfig(config);
 		}
 	};
 }

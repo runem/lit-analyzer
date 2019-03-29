@@ -8,14 +8,19 @@ export interface Config {
 	htmlTemplateTags: string[];
 	cssTemplateTags: string[];
 
-	skipMissingImports: boolean;
-	skipUnknownHtmlTags: boolean;
-	skipUnknownHtmlAttributes: boolean;
+	checkUnknownEvents: boolean;
+
+	skipUnknownTags: boolean;
+	skipUnknownAttributes: boolean;
+	skipUnknownProperties: boolean;
+	skipUnknownSlots: boolean;
 	skipTypeChecking: boolean;
+	skipMissingImports: boolean;
 
 	globalHtmlTags: string[];
 	globalHtmlAttributes: string[];
-	webComponents?: HtmlData;
+	globalHtmlEvents: string[];
+	customHtmlData?: HtmlData;
 }
 
 /**
@@ -29,14 +34,22 @@ export function makeConfig(userConfig: Partial<Config>): Config {
 		format: {
 			disable: userConfig.format != null ? userConfig.format.disable : undefined || false
 		},
+		// Template tags
 		htmlTemplateTags: userConfig.htmlTemplateTags || ["html", "raw"],
 		cssTemplateTags: userConfig.cssTemplateTags || ["css"],
+		// Global additions
 		globalHtmlTags: userConfig.globalHtmlTags || (userConfig as any).externalHtmlTagNames || [],
 		globalHtmlAttributes: userConfig.globalHtmlAttributes || [],
+		globalHtmlEvents: userConfig.globalHtmlEvents || [],
+		customHtmlData: userConfig.customHtmlData,
+		// Skip
 		skipMissingImports: userConfig.skipMissingImports || false,
-		skipUnknownHtmlTags: userConfig.skipUnknownHtmlTags || false,
-		skipUnknownHtmlAttributes: userConfig.skipUnknownHtmlAttributes || false,
+		skipUnknownTags: userConfig.skipUnknownTags || false,
+		skipUnknownAttributes: userConfig.skipUnknownAttributes || false,
+		skipUnknownProperties: userConfig.skipUnknownProperties || false,
+		skipUnknownSlots: userConfig.skipUnknownSlots || false,
 		skipTypeChecking: userConfig.skipTypeChecking || false,
-		webComponents: userConfig.webComponents
+		// Checks
+		checkUnknownEvents: userConfig.checkUnknownEvents || false
 	};
 }

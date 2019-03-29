@@ -25,7 +25,7 @@ export function validateHtmlNode(htmlDocument: HtmlDocument, htmlNode: HtmlNode,
 	const htmlTag = store.getHtmlTag(htmlNode);
 
 	if (htmlTag == null) {
-		if (store.config.skipUnknownHtmlTags) return [];
+		if (store.config.skipUnknownTags) return [];
 
 		const suggestedName = findBestStringMatch(htmlNode.tagName, Array.from(store.getGlobalTags()).map(tag => tag.tagName));
 

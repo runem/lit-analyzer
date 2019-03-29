@@ -10,9 +10,6 @@ export function completionsForHtmlNodes({ offset, leftWord, rightWord }: Documen
 	return htmlTags.map(htmlTag => {
 		const isBuiltIn = !isCustomElementTagName(htmlTag.tagName);
 		const hasDeclaration = htmlTag.declaration != null;
-		//const fromDeclarationFile = htmlTag.declaration != null && htmlTag.declaration.node.getSourceFile().isDeclarationFile;
-		//const hasDeclaration = htmlTag.declaration != null;
-		//const sdlfkj = htmlTag.builtIn
 
 		return {
 			name: htmlTag.tagName,

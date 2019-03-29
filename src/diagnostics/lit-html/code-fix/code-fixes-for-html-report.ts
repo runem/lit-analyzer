@@ -1,4 +1,4 @@
-import { LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../../constants";
+import { litAttributeModifierForTarget } from "../../../parsing/parse-html-data/html-tag";
 import { HtmlNodeAttrKind } from "../../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
 import { DiagnosticsContext } from "../../diagnostics-context";
 import { CodeFixKind, LitCodeFix } from "../../types/lit-code-fix";
@@ -7,34 +7,35 @@ import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../types/lit-diagno
 
 export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { store }: DiagnosticsContext): LitCodeFix[] {
 	switch (htmlReport.kind) {
-		case LitHtmlDiagnosticKind.UNKNOWN_MEMBER:
-			const dataAttrCodeFix: LitCodeFix = {
-				kind: CodeFixKind.RENAME,
-				message: `Change attribute to 'data-${htmlReport.htmlAttr.name}'`,
-				htmlReport,
-				actions: [
-					{
-						kind: CodeActionKind.DOCUMENT_TEXT_CHANGE,
-						change: {
-							range: {
-								start: htmlReport.htmlAttr.location.name.start,
-								end: htmlReport.htmlAttr.location.name.start
-							},
-							newText: "data-"
-						}
-					}
-				]
-			};
+		case LitHtmlDiagnosticKind.UNKNOWN_TARGET:
+			const fixes: LitCodeFix[] = [];
 
-			if (htmlReport.suggestedMember == null) {
-				return htmlReport.htmlAttr.kind === HtmlNodeAttrKind.PROPERTY ? [] : [dataAttrCodeFix];
+			switch (htmlReport.htmlAttr.kind) {
+				case HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE:
+				case HtmlNodeAttrKind.ATTRIBUTE:
+					fixes.push({
+						kind: CodeFixKind.RENAME,
+						message: `Change attribute to 'data-${htmlReport.htmlAttr.name}'`,
+						htmlReport,
+						actions: [
+							{
+								kind: CodeActionKind.DOCUMENT_TEXT_CHANGE,
+								change: {
+									range: {
+										start: htmlReport.htmlAttr.location.name.start,
+										end: htmlReport.htmlAttr.location.name.start
+									},
+									newText: "data-"
+								}
+							}
+						]
+					});
+					break;
 			}
 
-			const newText = `${htmlReport.suggestedMember.kind === "property" ? LIT_HTML_PROP_ATTRIBUTE_MODIFIER : ""}${htmlReport.suggestedMember.name}`;
-
-			return [
-				dataAttrCodeFix,
-				{
+			if (htmlReport.suggestedTarget != null) {
+				const newText = `${litAttributeModifierForTarget(htmlReport.suggestedTarget)}${htmlReport.suggestedTarget.name}`;
+				fixes.push({
 					kind: CodeFixKind.RENAME,
 					message: `Change ${htmlReport.htmlAttr.kind === HtmlNodeAttrKind.PROPERTY ? "property" : "attribute"} to '${newText}'`,
 					htmlReport,
@@ -51,8 +52,10 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { store }:
 							}
 						}
 					]
-				}
-			];
+				});
+			}
+
+			return fixes;
 
 		case LitHtmlDiagnosticKind.UNKNOWN_TAG:
 			if (htmlReport.suggestedName == null) break;

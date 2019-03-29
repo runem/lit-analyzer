@@ -1,5 +1,5 @@
 import { ComponentDefinition } from "web-component-analyzer";
-import { HtmlAttr, HtmlMember } from "../../parsing/parse-html-data/html-tag";
+import { HtmlAttr, HtmlAttrTarget } from "../../parsing/parse-html-data/html-tag";
 import { HtmlNodeAttr } from "../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
 import { HtmlNode } from "../../parsing/text-document/html-document/parse-html-node/types/html-node-types";
 import { Range } from "../../types/range";
@@ -7,7 +7,7 @@ import { Range } from "../../types/range";
 export enum LitHtmlDiagnosticKind {
 	MISSING_IMPORT = "MISSING_IMPORT",
 	MISSING_REQUIRED_ATTRS = "MISSING_REQUIRED_ATTRIBUTES",
-	UNKNOWN_MEMBER = "UNKNOWN_ATTRIBUTE",
+	UNKNOWN_TARGET = "UNKNOWN_TARGET",
 	UNKNOWN_TAG = "UNKNOWN_TAG",
 	TAG_NOT_CLOSED = "TAG_NOT_CLOSED",
 	BOOL_MOD_ON_NON_BOOL = "BOOL_MOD_ON_NON_BOOL",
@@ -33,9 +33,9 @@ export interface LitHtmlDiagnosticUnknownTag extends LitDiagnosticBase {
 }
 
 export interface LitHtmlDiagnosticUnknownMember extends LitDiagnosticBase {
-	kind: LitHtmlDiagnosticKind.UNKNOWN_MEMBER;
+	kind: LitHtmlDiagnosticKind.UNKNOWN_TARGET;
 	htmlAttr: HtmlNodeAttr;
-	suggestedMember?: HtmlMember;
+	suggestedTarget?: HtmlAttrTarget;
 }
 
 export interface LitHtmlDiagnosticMissingImport extends LitDiagnosticBase {

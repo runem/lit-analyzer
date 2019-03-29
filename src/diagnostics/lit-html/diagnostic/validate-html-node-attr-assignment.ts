@@ -25,6 +25,8 @@ import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../types/lit-diagno
  * @param store
  */
 export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, checker: TypeChecker, store: TsLitPluginStore): LitHtmlDiagnostic[] {
+	if (store.config.skipTypeChecking) return [];
+
 	const { assignment } = htmlAttr;
 	if (assignment == null) return [];
 
@@ -81,7 +83,7 @@ export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, checker: Type
 
 	if (htmlAttr.kind === HtmlNodeAttrKind.ATTRIBUTE && assignment.kind === HtmlNodeAttrAssignmentKind.STRING) {
 		// Check for slots
-		if (htmlAttr.name === "slot") {
+		if (htmlAttr.name === "slot" && !store.config.skipUnknownSlots) {
 			const parent = htmlAttr.htmlNode.parent;
 			if (parent != null) {
 				const parentHtmlTag = store.getHtmlTag(parent.tagName);
