@@ -24,10 +24,11 @@ export function parseDependencies(sourceFile: SourceFile, store: TsLitPluginStor
 			// Only set the result if this isn't a circular import and file is equal to the start file.
 			if (!isCircular) {
 				map.set(file, results);
+			}
 
-				if (file === sourceFile) {
-					definitions = results;
-				}
+			// Always safe the definitions if the results comes from this file
+			if (file === sourceFile) {
+				definitions = Array.from(new Set(results));
 			}
 		},
 		getImportedDefinitionsInFile(file: SourceFile) {
