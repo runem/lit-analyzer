@@ -44,7 +44,7 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, store: TsLitPluginStore
 		const tagIsBuiltIn = htmlTag != null && htmlTag.builtIn;
 		const tagIsFromLibrary = definition != null && definition.declaration.node.getSourceFile().isDeclarationFile;
 
-		const tip = (() => {
+		const suggestion = (() => {
 			switch (htmlAttr.kind) {
 				case HtmlNodeAttrKind.EVENT_LISTENER:
 					return `Please consider adding a '@event' tag to the jsdoc on a component class, adding it to 'globalEvents' or removing 'checkUnknownEvents'.`;
@@ -84,7 +84,7 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, store: TsLitPluginStore
 			{
 				kind: LitHtmlDiagnosticKind.UNKNOWN_TARGET,
 				message: `Unknown ${existingKind} "${htmlAttr.modifier || ""}${htmlAttr.name}"${suggestedMemberName != null ? `. Did you mean '${suggestedMemberName}'?` : ""}`,
-				tip,
+				suggestion,
 				severity: "warning",
 				location: htmlAttr.location.name,
 				htmlAttr,

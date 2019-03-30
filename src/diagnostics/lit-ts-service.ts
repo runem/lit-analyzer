@@ -112,19 +112,19 @@ function translateCompletionDetails(completionDetails: LitCompletionDetails, doc
 	};
 }
 
-function translateDiagnostic(report: LitDiagnostic, file: SourceFile, document: CssDocument, tips?: boolean): ts.DiagnosticWithLocation {
+function translateDiagnostic(report: LitDiagnostic, file: SourceFile, document: CssDocument, suggestions?: boolean): ts.DiagnosticWithLocation {
 	const span = translateRange(report.location, document);
 
 	const category = report.severity === "error" ? tsModule.ts.DiagnosticCategory.Error : tsModule.ts.DiagnosticCategory.Warning;
 	const code = 2322;
 	const messageText: string | DiagnosticMessageChain =
-		tips && report.tip
+		suggestions && report.suggestion
 			? {
 					messageText: report.message,
 					code,
 					category,
 					next: {
-						messageText: report.tip,
+						messageText: report.suggestion,
 						code: 0,
 						category: tsModule.ts.DiagnosticCategory.Suggestion
 					}
@@ -141,8 +141,8 @@ function translateDiagnostic(report: LitDiagnostic, file: SourceFile, document: 
 	};
 }
 
-function translateDiagnostics(reports: LitDiagnostic[], file: SourceFile, document: CssDocument, tips?: boolean): ts.DiagnosticWithLocation[] {
-	return reports.map(report => translateDiagnostic(report, file, document, tips));
+function translateDiagnostics(reports: LitDiagnostic[], file: SourceFile, document: CssDocument, suggestions?: boolean): ts.DiagnosticWithLocation[] {
+	return reports.map(report => translateDiagnostic(report, file, document, suggestions));
 }
 
 function translateDefinition(definition: LitDefinition, document: CssDocument): DefinitionInfoAndBoundSpan {
@@ -301,7 +301,7 @@ export class LitTsService {
 					return translateDiagnostics(results, context.sourceFile, document);
 				} else if (document instanceof HtmlDocument) {
 					const results = this.litHtmlService.getDiagnostics(document, context);
-					return translateDiagnostics(results, context.sourceFile, document, !context.store.config.noTips);
+					return translateDiagnostics(results, context.sourceFile, document, !context.store.config.noSuggestions);
 				}
 
 				return [];

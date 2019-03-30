@@ -4,7 +4,7 @@ export interface Config {
 	disable: boolean;
 	verbose: boolean;
 	format: { disable: boolean };
-	noTips: boolean;
+	noSuggestions: boolean;
 
 	htmlTemplateTags: string[];
 	cssTemplateTags: string[];
@@ -32,7 +32,7 @@ export function makeConfig(userConfig: Partial<Config>): Config {
 	return {
 		disable: userConfig.disable || false,
 		verbose: userConfig.verbose || false,
-		noTips: userConfig.noTips || false,
+		noSuggestions: userConfig.noSuggestions || false,
 		format: {
 			disable: userConfig.format != null ? userConfig.format.disable : undefined || false
 		},

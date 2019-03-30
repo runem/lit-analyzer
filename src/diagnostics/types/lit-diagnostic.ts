@@ -23,7 +23,7 @@ export enum LitHtmlDiagnosticKind {
 export interface LitDiagnosticBase {
 	location: Range;
 	message: string;
-	tip?: string;
+	suggestion?: string;
 	severity: "error" | "warning";
 }
 
