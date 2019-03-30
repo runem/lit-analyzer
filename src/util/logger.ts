@@ -2,7 +2,8 @@ import { appendFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { inspect } from "util";
 
-const logPath = join(__dirname, "../../log.txt");
+//const logPath = join(__dirname, "../../log.txt");
+const logPath = join(process.cwd(), "lit-plugin.log");
 
 export enum LoggingLevel {
 	NONE = 0,

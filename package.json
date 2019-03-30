@@ -24,7 +24,7 @@
 		"prepublish": "npm run build",
 		"watch": "tsc --watch",
 		"build": "rm -rf lib && tsc",
-		"logs": "touch log.txt && tail -f log.txt",
+		"logs": "touch log.txt && tail -f lit-plugin.log",
 		"lint": "tslint --project ./",
 		"open": "cd dev && TSS_LOG=\"-traceToConsole true -level verbose -file $(pwd)/ts-server-log.txt\" TSS_DEBUG=5999 code .",
 		"prettier:check": "prettier --list-different \"src/**/*.{ts,tsx}\"",
