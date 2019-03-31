@@ -258,9 +258,20 @@ export class TsLitPluginHtmlStore {
 		}
 
 		// All events on other tags (because they bubble)
-		for (const tag of this.globalTags.values()) {
-			if (tag.tagName !== tagName) {
-				yield* tag.events;
+		if (htmlTag == null || htmlTag.events.length === 0) {
+			for (const tag of this.globalTags.values()) {
+				if (tag.tagName !== tagName) {
+					yield* tag.events;
+				}
+			}
+		} else {
+			// If we emitted some events from the main html tag, don't emit these events again
+			const eventNameSet = new Set(htmlTag.events.map(e => e.name));
+
+			for (const tag of this.globalTags.values()) {
+				if (tag.tagName !== tagName) {
+					yield* tag.events.filter(e => !eventNameSet.has(e.name));
+				}
 			}
 		}
 
@@ -483,18 +494,18 @@ function mergeRelatedEvents(events: Iterable<HtmlEvent>): ReadonlyMap<string, Ht
 		// For now, lowercase all names because "parse5" doesn't distinguish between uppercase and lowercase
 		const name = event.name.toLowerCase();
 
-		const existingAttr = mergedAttrs.get(name);
-		if (existingAttr == null) {
+		const existingEvent = mergedAttrs.get(name);
+		if (existingEvent == null) {
 			mergedAttrs.set(name, event);
 		} else {
-			const prevType = existingAttr.getType;
+			const prevType = existingEvent.getType;
 			mergedAttrs.set(name, {
-				...existingAttr,
-				global: existingAttr.global && event.global,
+				...existingEvent,
+				global: existingEvent.global && event.global,
 				description: undefined,
 				getType: lazy(() => mergeRelatedTypeToUnion(prevType(), event.getType())),
-				related: existingAttr.related == null ? [existingAttr, event] : [...existingAttr.related, event],
-				fromTagName: existingAttr.fromTagName || event.fromTagName
+				related: existingEvent.related == null ? [existingEvent, event] : [...existingEvent.related, event],
+				fromTagName: existingEvent.fromTagName || event.fromTagName
 			});
 		}
 	}

@@ -140,7 +140,7 @@ export function documentationForTarget(target: HtmlAttrTarget, options: Descript
 export function descriptionForTarget(target: HtmlAttrTarget, options: DescriptionOptions = {}): string | undefined {
 	if (target.related != null && target.related.length > 1) {
 		const subDocumentation = (target.related as HtmlAttrTarget[])
-			.map(t => `${t.fromTagName ? `<${t.fromTagName}>: ` : ""}${t.description || "[no documentation]"}`)
+			.map(t => `${t.fromTagName ? `<${t.fromTagName}>: ` : "(global): "}${t.description || "[no documentation]"}`)
 			.map((doc, i) => `${i + 1}. ${doc}`);
 		return `${descriptionHeader("Multiple declarations (best match first):", 0, options)}\n${subDocumentation.join("\n")}`;
 	}

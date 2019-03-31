@@ -16,6 +16,16 @@ export class MyTest extends LitElement {
 
 	@property({ type: Number }) bar!: number;
 
+	static get properties() {
+		return {
+			/**
+			 * Heheh
+			 * @type {red|green}
+			 */
+			hello: { type: String }
+		};
+	}
+
 	static get observedAttributes() {
 		return ["myProp"];
 	}

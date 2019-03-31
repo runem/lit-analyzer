@@ -24,6 +24,8 @@ const myApp = (text: string, disabled: boolean) => html`
 
 	<mwc-button></mwc-button>
 
+	<my-component hello=""></my-component>
+
 	<sldkfjlskjdf></sldkfjlskjdf>
 
 	<my-tsconfig-element></my-tsconfig-element>

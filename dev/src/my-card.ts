@@ -19,6 +19,7 @@ export class MyBase extends LitElement {
 /**
  * Hello
  * @event my-event
+ * @event my-change-event
  * @attr disabled
  * @slot - Main content
  */
@@ -40,6 +41,6 @@ declare global {
 	}
 
 	interface HTMLElementEventMap {
-		"my-event": CustomEvent<string>;
+		"my-event-test": CustomEvent<string>;
 	}
 }
