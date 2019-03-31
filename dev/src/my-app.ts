@@ -57,7 +57,7 @@ const myApp = (text: string, disabled: boolean) => html`
 	<mwc-button label="" dense role="math" aria-checked="true" .accessKey="${"hejsa"}" onsubmit="" .dlfkjsdlfkjsdlfkj="${"test"}" @my-event=""></mwc-button>
 
 	<div @change="${() => {}}" @hello="${console.log}" @test-event="${() => {}}" @loadstart="${() => {}}" @hello="${() => {}}">
-		<my-element data-looolz="" onmy-event="" a b c .minSetter="${""}" .prop1="${"hello"}" my-attr-hehehe="" @change="${() => {}}" @test-event="${() => true}">
+		<my-element data-looolz="" onmy-change-event="" a b c .minSetter="${""}" .prop1="${"hello"}" my-attr-hehehe="" @test-event="${() => true}">
 			<div slot=""></div>
 			<div slot="hello"></div>
 		</my-element>

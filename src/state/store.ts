@@ -264,19 +264,30 @@ export class TsLitPluginHtmlStore {
 					yield* tag.events;
 				}
 			}
+
+			// Global events
+			yield* this.iterateGlobalEvents();
 		} else {
 			// If we emitted some events from the main html tag, don't emit these events again
 			const eventNameSet = new Set(htmlTag.events.map(e => e.name));
 
 			for (const tag of this.globalTags.values()) {
 				if (tag.tagName !== tagName) {
-					yield* tag.events.filter(e => !eventNameSet.has(e.name));
+					for (const evt of tag.events) {
+						if (!eventNameSet.has(evt.name)) {
+							yield evt;
+						}
+					}
+				}
+			}
+
+			// Global events
+			for (const evt of this.iterateGlobalEvents()) {
+				if (!eventNameSet.has(evt.name)) {
+					yield evt;
 				}
 			}
 		}
-
-		// Global events
-		yield* this.iterateGlobalEvents();
 	}
 
 	private *iterateAllAttributesForNode(tagName: string): Iterable<HtmlAttr> {
