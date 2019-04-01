@@ -1,4 +1,4 @@
-import { DefinitionInfoAndBoundSpan, DiagnosticMessageChain, SourceFile } from "typescript";
+import { DefinitionInfoAndBoundSpan, DiagnosticMessageChain, OutliningSpan, SourceFile } from "typescript";
 import { DIAGNOSTIC_SOURCE } from "../constants";
 import { parseDocumentsInSourceFile } from "../parsing/parse-documents-in-source-file";
 import { CssDocument } from "../parsing/text-document/css-document/css-document";
@@ -17,6 +17,7 @@ import { LitCompletionDetails } from "./types/lit-completion-details";
 import { LitDefinition } from "./types/lit-definition";
 import { LitDiagnostic } from "./types/lit-diagnostic";
 import { LitFormatEdit } from "./types/lit-format-edit";
+import { LitOutliningSpan } from "./types/lit-outlining-span";
 import { LitQuickInfo } from "./types/lit-quick-info";
 
 function translateRange(range: Range, document: TextDocument): ts.TextSpan {
@@ -145,6 +146,22 @@ function translateDiagnostics(reports: LitDiagnostic[], file: SourceFile, docume
 	return reports.map(report => translateDiagnostic(report, file, document, suggestions));
 }
 
+function translateOutliningSpan(outliningSpan: LitOutliningSpan, file: SourceFile, document: CssDocument): ts.OutliningSpan {
+	const span = translateRange(outliningSpan.location, document);
+
+	return {
+		autoCollapse: outliningSpan.autoCollapse || false,
+		textSpan: span,
+		hintSpan: span,
+		kind: (outliningSpan.kind as unknown) as ts.OutliningSpanKind,
+		bannerText: outliningSpan.bannerText
+	};
+}
+
+function translateOutliningSpans(outliningSpans: LitOutliningSpan[], file: SourceFile, document: CssDocument): ts.OutliningSpan[] {
+	return outliningSpans.map(outliningSpan => translateOutliningSpan(outliningSpan, file, document));
+}
+
 function translateDefinition(definition: LitDefinition, document: CssDocument): DefinitionInfoAndBoundSpan {
 	const targetNode = definition.target.node;
 
@@ -264,6 +281,23 @@ function translateCodeFixes(codeFixes: LitCodeFix[], file: SourceFile, document:
 export class LitTsService {
 	private litHtmlService = new LitHtmlService();
 	private litCssService = new LitCssService();
+
+	getOutliningSpans(file: SourceFile, context: DiagnosticsContext): OutliningSpan[] {
+		const documents = this.getDocumentsInFile(file, context);
+
+		return flatten(
+			documents.map(document => {
+				if (document instanceof CssDocument) {
+					return [];
+				} else if (document instanceof HtmlDocument) {
+					const results = this.litHtmlService.getOutliningSpans(document);
+					return translateOutliningSpans(results, context.sourceFile, document);
+				}
+
+				return [];
+			})
+		);
+	}
 
 	getCompletionDetails(file: SourceFile, position: number, name: string, context: DiagnosticsContext): ts.CompletionEntryDetails | undefined {
 		const { document, offset } = this.getDocumentAndOffsetAtPosition(file, position, context);

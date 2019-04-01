@@ -199,7 +199,6 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 	}
 
 	for (const globalEvent of ALL_HTML5_EVENTS) {
-		logger.debug(globalEvent.name);
 		result.events.push({
 			name: globalEvent.name.replace(/^on/, ""),
 			description: globalEvent.description,

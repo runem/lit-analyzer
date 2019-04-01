@@ -9,6 +9,7 @@ import {
 	GetCompletionsAtPositionOptions,
 	JsxClosingTagInfo,
 	LanguageService,
+	OutliningSpan,
 	Program,
 	QuickInfo,
 	SourceFile,
@@ -125,6 +126,17 @@ export class TsLitPlugin {
 		const quickInfo = this.litService.getQuickInfo(file, position, this.diagnosticContext(file));
 
 		return quickInfo || this.prevLangService.getQuickInfoAtPosition(fileName, position);
+	}
+
+	getOutliningSpans(fileName: string): OutliningSpan[] {
+		const prev = this.prevLangService.getOutliningSpans(fileName);
+
+		const file = this.program.getSourceFile(fileName)!;
+		this.storeUpdater.update(file);
+
+		const outliningSpans = this.litService.getOutliningSpans(file, this.diagnosticContext(file));
+
+		return [...prev, ...outliningSpans];
 	}
 
 	getJsxClosingTagAtPosition(fileName: string, position: number): JsxClosingTagInfo | undefined {

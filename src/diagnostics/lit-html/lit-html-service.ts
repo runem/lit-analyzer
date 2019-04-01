@@ -2,6 +2,7 @@ import { HtmlDocument } from "../../parsing/text-document/html-document/html-doc
 import { isHTMLAttr } from "../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
 import { isHTMLNode } from "../../parsing/text-document/html-document/parse-html-node/types/html-node-types";
 import { Range } from "../../types/range";
+import { iterableDefined } from "../../util/iterable-util";
 import { flatten, intersects } from "../../util/util";
 import { DiagnosticsContext } from "../diagnostics-context";
 import { LitCodeFix } from "../types/lit-code-fix";
@@ -10,6 +11,7 @@ import { LitCompletionDetails } from "../types/lit-completion-details";
 import { LitDefinition } from "../types/lit-definition";
 import { LitHtmlDiagnostic } from "../types/lit-diagnostic";
 import { LitFormatEdit } from "../types/lit-format-edit";
+import { LitOutliningSpan, LitOutliningSpanKind } from "../types/lit-outlining-span";
 import { LitQuickInfo } from "../types/lit-quick-info";
 import { codeFixesForHtmlReport } from "./code-fix/code-fixes-for-html-report";
 import { completionsAtOffset } from "./completion/completions-at-offset";
@@ -24,6 +26,33 @@ export class LitHtmlService {
 	vscodeHtmlService = new VscodeHtmlService();
 
 	private completionsCache: LitCompletion[] = [];
+
+	getOutliningSpans(document: HtmlDocument): LitOutliningSpan[] {
+		return iterableDefined(
+			document.mapNodes(node => {
+				if (node.location.endTag == null) return undefined;
+
+				// Calculate last index of the collapsed span.
+				// We don't want to include the last line because it will include the </endtag> in the collapsed region
+				const endIndex = (() => {
+					const lastChild = node.children[node.children.length - 1];
+
+					if (lastChild != null) {
+						return lastChild.location.endTag != null ? lastChild.location.endTag.start : lastChild.location.startTag.end;
+					}
+
+					return node.location.endTag.start;
+				})();
+
+				return {
+					autoCollapse: false,
+					bannerText: node.tagName,
+					kind: LitOutliningSpanKind.Code,
+					location: { start: node.location.startTag.end, end: endIndex }
+				} as LitOutliningSpan;
+			})
+		);
+	}
 
 	getCompletionDetails(document: HtmlDocument, offset: number, name: string, context: DiagnosticsContext): LitCompletionDetails | undefined {
 		const completionWithName = this.completionsCache.find(completion => completion.name === name);

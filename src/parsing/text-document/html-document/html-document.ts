@@ -62,12 +62,12 @@ export class HtmlDocument extends TextDocument {
 	mapNodes<T>(map: (node: HtmlNode) => T): T[] {
 		const items: T[] = [];
 
-		function innerTest(node: HtmlNode) {
+		function childrenLoop(node: HtmlNode) {
 			items.push(map(node));
-			node.children.forEach(childNode => innerTest(childNode));
+			node.children.forEach(childNode => childrenLoop(childNode));
 		}
 
-		this.rootNodes.forEach(rootNode => innerTest(rootNode));
+		this.rootNodes.forEach(rootNode => childrenLoop(rootNode));
 
 		return items;
 	}
