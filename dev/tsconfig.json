@@ -10,7 +10,7 @@
 				"globalAttributes": ["my-attribute"],
 				"globalEvents": ["my-event"],
 				"customHtmlData": [
-					"./dev/html.json",
+					"./html.json",
 					{
 						"version": 1,
 						"tags": [

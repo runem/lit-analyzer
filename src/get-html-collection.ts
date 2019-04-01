@@ -4,7 +4,7 @@ import { HTML5_GLOBAL_ATTRIBUTES, HTML5_VALUE_MAP } from "vscode-html-languagese
 import { ARIA_ATTRIBUTES } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Aria";
 import { HTML5_EVENTS } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Events";
 import { HTML5_TAGS } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Tags";
-import { hasTypeForAttrName, html5TagAttrType } from "./extra-html-data";
+import { EXTRA_HTML5_EVENTS, hasTypeForAttrName, html5TagAttrType } from "./extra-html-data";
 import { HtmlData } from "./parsing/parse-html-data/html-data-tag";
 import { HtmlAttr, HtmlDataCollection, HtmlEvent, HtmlTag, mergeHtmlAttrs, mergeHtmlEvents, mergeHtmlTags } from "./parsing/parse-html-data/html-tag";
 import { parseHtmlData } from "./parsing/parse-html-data/parse-html-data";
@@ -25,7 +25,7 @@ export function getUserConfigHtmlCollection(config: Config): HtmlDataCollection 
 					events: mergeHtmlEvents([...collection.events, ...parsedCollection.events])
 				};
 			} catch (e) {
-				logger.error("Error parsing user configuration 'customHtmlData'", e);
+				logger.error("Error parsing user configuration 'customHtmlData'", e, customHtmlData);
 			}
 		}
 		return collection;
@@ -68,10 +68,13 @@ export function getUserConfigHtmlCollection(config: Config): HtmlDataCollection 
 }
 
 export function getBuiltInHtmlCollection(): HtmlDataCollection {
+	// Combine data with extra html5 events because vscode-html-language-service hasn't included all events yet.
+	const ALL_HTML5_EVENTS: typeof HTML5_EVENTS = [...HTML5_EVENTS, ...EXTRA_HTML5_EVENTS.filter(evt => HTML5_EVENTS.find(existingEvt => existingEvt.name === evt.name) == null)];
+
 	const result = parseHtmlData({
 		version: 1,
 		tags: HTML5_TAGS,
-		globalAttributes: [...HTML5_GLOBAL_ATTRIBUTES, ...HTML5_EVENTS, ...ARIA_ATTRIBUTES],
+		globalAttributes: [...HTML5_GLOBAL_ATTRIBUTES, ...ALL_HTML5_EVENTS, ...ARIA_ATTRIBUTES],
 		valueSets: HTML5_VALUE_MAP
 	});
 
@@ -195,7 +198,8 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 		];
 	}
 
-	for (const globalEvent of HTML5_EVENTS) {
+	for (const globalEvent of ALL_HTML5_EVENTS) {
+		logger.debug(globalEvent.name);
 		result.events.push({
 			name: globalEvent.name.replace(/^on/, ""),
 			description: globalEvent.description,

@@ -20,11 +20,11 @@ const myApp = (text: string, disabled: boolean) => html`
 
 	<lkjsldkfj></lkjsldkfj>
 
-	<a target="_blank" download></a>
+	<a target="_blank" download="hello"></a>
 
 	<mwc-button></mwc-button>
 
-	<my-component hello=""></my-component>
+	<my-component @submit="" hello="" onsubmit=""></my-component>
 
 	<sldkfjlskjdf></sldkfjlskjdf>
 
