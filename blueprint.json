@@ -1,0 +1,18 @@
+{
+	"logo": {
+		"src": "https://raw.githubusercontent.com/runem/ts-lit-plugin/master/documentation/asset/lit-plugin@256w.png",
+		"width": 200
+	},
+	"line": "rainbow",
+	"ids": {
+		"npm": "ts-lit-plugin",
+		"github": "runem/ts-lit-plugin"
+	},
+	"badges": [
+		{
+			"alt": "Publish at vscode marketplace",
+			"url": "https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin",
+			"img": "https://vsmarketplacebadge.apphb.com/version/runem.lit-plugin.svg"
+		}
+	]
+}

@@ -29,7 +29,7 @@
 		"open": "cd dev && TSS_LOG=\"-traceToConsole true -level verbose -file $(pwd)/ts-server-log.txt\" TSS_DEBUG=5999 code .",
 		"prettier:check": "prettier --list-different \"src/**/*.{ts,tsx}\"",
 		"prettier:write": "prettier --write \"src/**/*.{ts,tsx}\"",
-		"readme": "node node_modules/.bin/readme"
+		"readme": "node node_modules/.bin/readme generate"
 	},
 	"main": "lib/index.js",
 	"files": [
@@ -81,23 +81,5 @@
 			"img": "https://joeschmoe.io/api/v1/random",
 			"url": "https://github.com/runem/ts-lit-plugin/blob/master/CONTRIBUTING.md"
 		}
-	],
-	"readme": {
-		"logo": {
-			"url": "https://raw.githubusercontent.com/runem/ts-lit-plugin/master/documentation/asset/lit-plugin@256w.png",
-			"width": 200
-		},
-		"line": "rainbow",
-		"ids": {
-			"npm": "ts-lit-plugin",
-			"github": "runem/ts-lit-plugin"
-		},
-		"badges": [
-			{
-				"alt": "Publish at vscode marketplace",
-				"url": "https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin",
-				"img": "https://vsmarketplacebadge.apphb.com/version/runem.lit-plugin.svg"
-			}
-		]
-	}
+	]
 }

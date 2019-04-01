@@ -10,11 +10,15 @@ code --install-extension runem.lit-plugin
 
 ### Other
 
+
+*This approach requires that you use Typescript.*
+
 First, install the plugin:
 
 ```bash
 npm install ts-lit-plugin -D
 ```
+
 
 Then add a `plugins` section to your [`tsconfig.json`](http://www.typescriptlang.org/docs/handbook/tsconfig-json.html):
 
