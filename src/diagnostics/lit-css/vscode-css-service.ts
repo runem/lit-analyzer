@@ -1,27 +1,35 @@
 import * as vscode from "vscode-css-languageservice";
+import { IAtDirectiveData, ICSSDataProvider, IPropertyData, IPseudoClassData, IPseudoElementData } from "vscode-css-languageservice";
 import { CssDocument } from "../../parsing/text-document/css-document/css-document";
+import { TsLitPluginStore } from "../../state/store";
+import { iterableFilter, iterableMap } from "../../util/iterable-util";
 import { lazy } from "../../util/util";
 import { DiagnosticsContext } from "../diagnostics-context";
 import { LitCompletion, LitCompletionKind } from "../types/lit-completion";
 import { LitCssDiagnostic } from "../types/lit-diagnostic";
 import { LitQuickInfo } from "../types/lit-quick-info";
 
-const cssService = vscode.getCSSLanguageService();
-const scssService = vscode.getSCSSLanguageService();
-
 function makeVscTextDocument(cssDocument: CssDocument): vscode.TextDocument {
 	return vscode.TextDocument.create("untitled://embedded.css", "css", 1, cssDocument.virtualDocument.text);
 }
 
-function makeVscStylesheet(vscTextDocument: vscode.TextDocument) {
-	return scssService.parseStylesheet(vscTextDocument);
-}
-
 export class VscodeCssService {
+	private dataProvider = new LitVscodeCSSDataProvider();
+
+	private get cssService() {
+		return vscode.getCSSLanguageService({ customDataProviders: [this.dataProvider.provider] });
+	}
+
+	private get scssService() {
+		return vscode.getSCSSLanguageService({ customDataProviders: [this.dataProvider.provider] });
+	}
+
 	getDiagnostics(document: CssDocument, context: DiagnosticsContext): LitCssDiagnostic[] {
+		this.dataProvider.update(context.store);
+
 		const vscTextDocument = makeVscTextDocument(document);
-		const vscStylesheet = makeVscStylesheet(vscTextDocument);
-		const diagnostics = scssService.doValidation(vscTextDocument, vscStylesheet);
+		const vscStylesheet = this.makeVscStylesheet(vscTextDocument);
+		const diagnostics = this.scssService.doValidation(vscTextDocument, vscStylesheet);
 
 		return diagnostics
 			.filter(diagnostic => diagnostic.range.start.line !== 0 && diagnostic.range.start.line < vscTextDocument.lineCount - 1)
@@ -38,11 +46,13 @@ export class VscodeCssService {
 			);
 	}
 
-	getQuickInfo(document: CssDocument, offset: number): LitQuickInfo | undefined {
+	getQuickInfo(document: CssDocument, offset: number, context: DiagnosticsContext): LitQuickInfo | undefined {
+		this.dataProvider.update(context.store);
+
 		const vscTextDocument = makeVscTextDocument(document);
-		const vscStylesheet = makeVscStylesheet(vscTextDocument);
+		const vscStylesheet = this.makeVscStylesheet(vscTextDocument);
 		const vscPosition = vscTextDocument.positionAt(offset);
-		const hover = scssService.doHover(vscTextDocument, vscPosition, vscStylesheet);
+		const hover = this.scssService.doHover(vscTextDocument, vscPosition, vscStylesheet);
 		if (hover == null || hover.range == null) return;
 
 		const contents = Array.isArray(hover.contents) ? hover.contents : [hover.contents];
@@ -71,11 +81,13 @@ export class VscodeCssService {
 		};
 	}
 
-	getCompletions(document: CssDocument, offset: number): LitCompletion[] {
+	getCompletions(document: CssDocument, offset: number, context: DiagnosticsContext): LitCompletion[] {
+		this.dataProvider.update(context.store);
+
 		const vscTextDocument = makeVscTextDocument(document);
-		const vscStylesheet = makeVscStylesheet(vscTextDocument);
+		const vscStylesheet = this.makeVscStylesheet(vscTextDocument);
 		const vscPosition = vscTextDocument.positionAt(offset);
-		const items = cssService.doComplete(vscTextDocument, vscPosition, vscStylesheet);
+		const items = this.cssService.doComplete(vscTextDocument, vscPosition, vscStylesheet);
 
 		return items.items.map(
 			i =>
@@ -88,6 +100,10 @@ export class VscodeCssService {
 					documentation: lazy(() => (typeof i.documentation === "string" || i.documentation == null ? i.documentation : i.documentation.value))
 				} as LitCompletion)
 		);
+	}
+
+	private makeVscStylesheet(vscTextDocument: vscode.TextDocument) {
+		return this.scssService.parseStylesheet(vscTextDocument);
 	}
 }
 
@@ -127,5 +143,46 @@ function translateCompletionItemKind(kind: vscode.CompletionItemKind): LitComple
 		case vscode.CompletionItemKind.Text:
 		default:
 			return "unknown";
+	}
+}
+
+class LitVscodeCSSDataProvider {
+	private pseudoElementData: IPseudoElementData[] = [];
+
+	private customDataProvider: ICSSDataProvider = (() => {
+		const provider = this;
+		return {
+			providePseudoElements(): IPseudoElementData[] {
+				return provider.pseudoElementData;
+			},
+			provideAtDirectives(): IAtDirectiveData[] {
+				return [];
+			},
+			providePseudoClasses(): IPseudoClassData[] {
+				return [];
+			},
+			provideProperties(): IPropertyData[] {
+				return [];
+			}
+		};
+	})();
+
+	get provider(): ICSSDataProvider {
+		return this.customDataProvider;
+	}
+
+	update(store: TsLitPluginStore) {
+		this.pseudoElementData = Array.from(
+			iterableMap(
+				iterableFilter(store.getGlobalTags(), tag => !tag.builtIn),
+				tag =>
+					({
+						browsers: [],
+						description: tag.description,
+						name: tag.tagName,
+						status: "standard"
+					} as IPseudoElementData)
+			)
+		);
 	}
 }

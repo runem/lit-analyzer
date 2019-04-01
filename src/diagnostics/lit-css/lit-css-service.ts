@@ -12,7 +12,7 @@ export class LitCssService {
 	vscodeCssService = new VscodeCssService();
 
 	getCompletionDetails(document: CssDocument, offset: number, name: string, context: DiagnosticsContext): LitCompletionDetails | undefined {
-		const completionWithName = this.vscodeCssService.getCompletions(document, offset).find(completion => completion.name === name);
+		const completionWithName = this.vscodeCssService.getCompletions(document, offset, context).find(completion => completion.name === name);
 
 		if (completionWithName == null || completionWithName.documentation == null) return undefined;
 
@@ -27,11 +27,11 @@ export class LitCssService {
 	}
 
 	getCompletions(document: CssDocument, offset: number, context: DiagnosticsContext): LitCompletion[] {
-		return this.vscodeCssService.getCompletions(document, offset);
+		return this.vscodeCssService.getCompletions(document, offset, context);
 	}
 
 	getQuickInfo(document: CssDocument, offset: number, context: DiagnosticsContext): LitQuickInfo | undefined {
-		return this.vscodeCssService.getQuickInfo(document, offset);
+		return this.vscodeCssService.getQuickInfo(document, offset, context);
 	}
 
 	getDiagnostics(document: CssDocument, context: DiagnosticsContext): LitCssDiagnostic[] {

@@ -29,15 +29,19 @@ export class MyButton extends LitElement {
 		return ["this-is-an-attr"];
 	}
 
-	static styles = css`
-		button {
-			color: red;
-		}
+	static get styles() {
+		return [
+			css`
+				button {
+					color: red;
+				}
 
-		div {
-			${unsafeCSS("color: red")};
-		}
-	`;
+				div {
+					${unsafeCSS("color: red")};
+				}
+			`
+		];
+	}
 
 	onClick() {}
 
