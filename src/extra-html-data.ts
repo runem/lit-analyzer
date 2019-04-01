@@ -68,7 +68,7 @@ const HTML_5_ATTR_TYPES: { [key: string]: string | string[] } = {
 	cite: "",
 	start: "",
 	value: "string",
-	download: "boolean",
+	download: "boolean|string",
 	ping: "",
 	datetime: "",
 	alt: "string",
@@ -128,6 +128,13 @@ function stringToSimpleType(typeString: string | string[], name?: string): Simpl
 		return {
 			kind: SimpleTypeKind.UNION,
 			types: typeString.map(value => ({ kind: SimpleTypeKind.STRING_LITERAL, value } as SimpleTypeStringLiteral))
+		};
+	}
+
+	if (typeString.includes("|")) {
+		return {
+			kind: SimpleTypeKind.UNION,
+			types: typeString.split("|").map(typeStr => stringToSimpleType(typeStr))
 		};
 	}
 
