@@ -4,7 +4,6 @@
 			{
 				"name": "ts-lit-plugin",
 				"verbose": true,
-				"cwd": "/Users/rune/Developer/js/ts-lit-plugin/dev",
 				"skipUnknownTags": false,
 				"checkUnknownEvents": true,
 				"globalTags": ["my-external-tag"],
