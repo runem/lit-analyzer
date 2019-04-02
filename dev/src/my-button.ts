@@ -43,7 +43,12 @@ export class MyButton extends LitElement {
 		];
 	}
 
-	onClick() {}
+	onClick() {
+		/**
+		 * Hello
+		 */
+		this.dispatchEvent(new CustomEvent("this-is-a-custom-event"));
+	}
 
 	render() {
 		return html`
