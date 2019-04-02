@@ -2,14 +2,14 @@ import { appendFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { inspect } from "util";
 
-//const logPath = join(__dirname, "../../lit-plugin.log");
-const logPath = join(process.cwd(), "lit-plugin.log");
+const LOG_FILE_NAME = "lit-plugin.log";
 
 export enum LoggingLevel {
 	NONE = 0,
-	DEBUG = 1,
-	VERBOSE = 2,
-	ERROR = 3
+	ERROR = 1,
+	WARN = 2,
+	DEBUG = 3,
+	VERBOSE = 4
 }
 
 /**
@@ -18,13 +18,18 @@ export enum LoggingLevel {
  */
 export class Logger {
 	level = LoggingLevel.NONE;
+	private logPath = join(process.cwd(), LOG_FILE_NAME);
+
+	set cwd(cwd: string) {
+		this.logPath = join(cwd, LOG_FILE_NAME);
+	}
 
 	/**
 	 * Resets the log file.
 	 */
 	resetLogs() {
 		if (this.level > LoggingLevel.NONE) {
-			writeFileSync(logPath, "");
+			writeFileSync(this.logPath, "");
 		}
 	}
 
@@ -42,6 +47,14 @@ export class Logger {
 	 */
 	error(...args: any[]) {
 		this.appendLogWithLevel(LoggingLevel.ERROR, ...args);
+	}
+
+	/**
+	 * Logs if level >= WARN
+	 * @param args
+	 */
+	warn(...args: any[]) {
+		this.appendLogWithLevel(LoggingLevel.WARN, ...args);
 	}
 
 	/**
@@ -71,7 +84,7 @@ export class Logger {
 	 */
 	private appendLog(prefix: string, ...args: any[]) {
 		appendFileSync(
-			logPath,
+			this.logPath,
 			`${prefix}${inspect(args, {
 				colors: true,
 				depth: 6,
@@ -84,9 +97,11 @@ export class Logger {
 	private getLogLevelPrefix(level: LoggingLevel) {
 		switch (level) {
 			case LoggingLevel.VERBOSE:
-				return "\x1b[36m DEBUG: \x1b[0m"; // CYAN
+				return "\x1b[36m VERBOSE: \x1b[0m"; // CYAN
 			case LoggingLevel.DEBUG:
-				return "\x1b[33m DEBUG: \x1b[0m"; // YELLOW
+				return "\x1b[35m DEBUG: \x1b[0m"; // PURPLE
+			case LoggingLevel.WARN:
+				return "\x1b[33m WARN: \x1b[0m"; // YELLOW
 			case LoggingLevel.ERROR:
 				return "\x1b[31m ERROR: \x1b[0m"; // RED
 			case LoggingLevel.NONE:

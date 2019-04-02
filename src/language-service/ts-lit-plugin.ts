@@ -23,7 +23,7 @@ import { parseDocumentsInSourceFile } from "../parsing/parse-documents-in-source
 import { TextDocument } from "../parsing/text-document/text-document";
 import { Config } from "../state/config";
 import { HtmlStoreDataSource, TsLitPluginStore } from "../state/store";
-import { logger } from "../util/logger";
+import { logger, LoggingLevel } from "../util/logger";
 import { StoreUpdater } from "./store-updater";
 
 export class TsLitPlugin {
@@ -36,7 +36,18 @@ export class TsLitPlugin {
 
 	set config(config: Config) {
 		logger.debug("Updating the config", config);
+
+		const hasChangedLogging = this.store.config.verbose !== config.verbose || this.store.config.cwd !== config.cwd;
+
 		this.store.config = config;
+
+		// Setup logging
+		logger.cwd = config.cwd;
+		logger.level = config.verbose ? LoggingLevel.VERBOSE : LoggingLevel.NONE;
+
+		if (hasChangedLogging) {
+			logger.resetLogs();
+		}
 
 		// Add user configured HTML5 collection
 		const collection = getUserConfigHtmlCollection(config);

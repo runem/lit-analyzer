@@ -23,7 +23,8 @@ export function createPlugin(typescript: typeof ts, info: tsServer.server.Plugin
 	store.config = makeConfig(info.config);
 
 	// Setup logging
-	logger.level = store.config.verbose ? LoggingLevel.ERROR : LoggingLevel.NONE;
+	logger.level = store.config.verbose ? LoggingLevel.VERBOSE : LoggingLevel.NONE;
+	logger.cwd = store.config.cwd;
 	logger.resetLogs();
 	logger.verbose("CreateLitTsPlugin called");
 	logger.debug("Config", store.config);
@@ -40,7 +41,3 @@ export function createPlugin(typescript: typeof ts, info: tsServer.server.Plugin
 
 	return new TsLitPlugin(prevLanguageService, store);
 }
-
-/*function getLibDomSourceFile(program: Program): SourceFile | undefined {
- return program.getSourceFiles().find(sourceFile => sourceFile.fileName.endsWith("lib.dom.d.ts"));
- }*/

@@ -19,8 +19,6 @@ const myApp = (text: string, disabled: boolean) => html`
 
 	<a target="_blank" download="hello"></a>
 
-	<mwc-button></mwc-button>
-
 	<my-component @submit="" hello="" onsubmit=""></my-component>
 
 	<sldkfjlskjdf></sldkfjlskjdf>

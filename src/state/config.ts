@@ -3,6 +3,7 @@ import { HtmlData } from "../parsing/parse-html-data/html-data-tag";
 export interface Config {
 	disable: boolean;
 	verbose: boolean;
+	cwd: string;
 	format: { disable: boolean };
 	noSuggestions: boolean;
 
@@ -32,6 +33,7 @@ export function makeConfig(userConfig: Partial<Config>): Config {
 	return {
 		disable: userConfig.disable || false,
 		verbose: userConfig.verbose || false,
+		cwd: userConfig.cwd || process.cwd(),
 		noSuggestions: userConfig.noSuggestions || false,
 		format: {
 			disable: userConfig.format != null ? userConfig.format.disable : undefined || false

@@ -1,5 +1,6 @@
 import { HtmlDocument } from "../../../parsing/text-document/html-document/html-document";
 import { getPositionContextInDocument } from "../../../util/get-html-position";
+import { logger } from "../../../util/logger";
 import { DiagnosticsContext } from "../../diagnostics-context";
 import { LitCompletion } from "../../types/lit-completion";
 import { completionsForHtmlAttrValues } from "./completions-for-html-attr-values";
@@ -15,6 +16,13 @@ export function completionsAtOffset(document: HtmlDocument, offset: number, cont
 	const intersectingAttr = document.htmlAttrNameAtOffset(offset);
 	const intersectingAttrAreaNode = document.htmlAttrAreaAtOffset(offset);
 	const intersectingAttrAssignment = document.htmlAttrAssignmentAtOffset(offset);
+
+	logger.verbose("completionsAtOffset", {
+		positionContext,
+		intersectingAttr,
+		intersectingAttrAreaNode,
+		intersectingAttrAssignment
+	});
 
 	// Get entries from the extensions
 	if (intersectingAttr != null) {
