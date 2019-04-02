@@ -14,6 +14,28 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- ### Removed -->
 <!-- ### Fixed -->
 
+## [1.0.0] - 2019-04-01
+
+### Added
+
+-   Added support for `observedAttributes`, `properties` and `jsdoc comments` as well as web component libraries built with stencil.
+-   Autocompletion and type checking for properties. Properties on built in elements are supported.
+-   Autocompletion and name checking for **slots**. Add slots to your component using `@slot myslot` jsdoc.
+-   Autocompletion and name checking for **events**. `new CustomEvent("myevent")` in the component is found automatically or you can choose to add events to your component using `@event myevent` jsdoc.
+-   Added check for using the property modifier without an expression as this is not support by lit-html to catch errors like `.myProp="hello"`.
+-   Added support for code folding
+-   Added support for vscode custom html data format.
+-   Support for declaring attributes and properties using `@attr myattr` and `@prop myprop` jsdoc.
+-   CSS autocompletion now includes all custom element tag names available.
+
+### Fixed
+
+-   The web component analyzer is now much more stable and won't crash on strange inputs.
+
+### Removed
+
+-   Temporarily disabled code formatting until issues with nested templates are solved.
+
 ## [0.1.0] - 2019-02-22
 
 ### Added
