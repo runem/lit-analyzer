@@ -5,13 +5,13 @@ export interface Config {
 	verbose: boolean;
 	cwd: string;
 	format: { disable: boolean };
-	noSuggestions: boolean;
 
 	htmlTemplateTags: string[];
 	cssTemplateTags: string[];
 
 	checkUnknownEvents: boolean;
 
+	skipSuggestions: boolean;
 	skipUnknownTags: boolean;
 	skipUnknownAttributes: boolean;
 	skipUnknownProperties: boolean;
@@ -34,7 +34,6 @@ export function makeConfig(userConfig: Partial<Config>): Config {
 		disable: userConfig.disable || false,
 		verbose: userConfig.verbose || false,
 		cwd: userConfig.cwd || process.cwd(),
-		noSuggestions: userConfig.noSuggestions || false,
 		format: {
 			disable: userConfig.format != null ? userConfig.format.disable : undefined || false
 		},
@@ -47,6 +46,7 @@ export function makeConfig(userConfig: Partial<Config>): Config {
 		globalEvents: userConfig.globalEvents || [],
 		customHtmlData: userConfig.customHtmlData || [],
 		// Skip
+		skipSuggestions: userConfig.skipSuggestions || false,
 		skipMissingImports: userConfig.skipMissingImports || false,
 		skipUnknownTags: userConfig.skipUnknownTags || false,
 		skipUnknownAttributes: userConfig.skipUnknownAttributes || false,

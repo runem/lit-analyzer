@@ -335,7 +335,7 @@ export class LitTsService {
 					return translateDiagnostics(results, context.sourceFile, document);
 				} else if (document instanceof HtmlDocument) {
 					const results = this.litHtmlService.getDiagnostics(document, context);
-					return translateDiagnostics(results, context.sourceFile, document, !context.store.config.noSuggestions);
+					return translateDiagnostics(results, context.sourceFile, document, !context.store.config.skipSuggestions);
 				}
 
 				return [];

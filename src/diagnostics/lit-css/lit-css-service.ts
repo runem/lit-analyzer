@@ -10,9 +10,10 @@ import { VscodeCssService } from "./vscode-css-service";
 
 export class LitCssService {
 	vscodeCssService = new VscodeCssService();
+	private completionsCache: LitCompletion[] = [];
 
 	getCompletionDetails(document: CssDocument, offset: number, name: string, context: DiagnosticsContext): LitCompletionDetails | undefined {
-		const completionWithName = this.vscodeCssService.getCompletions(document, offset, context).find(completion => completion.name === name);
+		const completionWithName = this.completionsCache.find(completion => completion.name === name);
 
 		if (completionWithName == null || completionWithName.documentation == null) return undefined;
 
@@ -27,7 +28,8 @@ export class LitCssService {
 	}
 
 	getCompletions(document: CssDocument, offset: number, context: DiagnosticsContext): LitCompletion[] {
-		return this.vscodeCssService.getCompletions(document, offset, context);
+		this.completionsCache = this.vscodeCssService.getCompletions(document, offset, context);
+		return this.completionsCache;
 	}
 
 	getQuickInfo(document: CssDocument, offset: number, context: DiagnosticsContext): LitQuickInfo | undefined {

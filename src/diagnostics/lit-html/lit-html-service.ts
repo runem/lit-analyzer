@@ -70,7 +70,8 @@ export class LitHtmlService {
 	}
 
 	getCompletions(document: HtmlDocument, offset: number, context: DiagnosticsContext): LitCompletion[] {
-		return (this.completionsCache = completionsAtOffset(document, offset, context));
+		this.completionsCache = completionsAtOffset(document, offset, context);
+		return completionsAtOffset(document, offset, context);
 	}
 
 	getCodeFixes(document: HtmlDocument, rangeOffset: Range, context: DiagnosticsContext): LitCodeFix[] {

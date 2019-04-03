@@ -8,12 +8,6 @@ If you are using the vscode plugin you can configure these options directly from
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Completely disable this plugin.
-
-#### noSuggestion
- 
--   **Type**: boolean
--   **Default**: false
--   **Description**: Don't attach suggestions alongside warnings and errors.
  
 #### htmlTemplateTags
  
@@ -46,6 +40,12 @@ If you are using the vscode plugin you can configure these options directly from
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Skip reporting missing imports of custom elements.
+
+#### skipSuggestions
+ 
+-   **Type**: boolean
+-   **Default**: false
+-   **Description**: Don't attach suggestions alongside warnings and errors.
 
 #### skipUnknownTags
  

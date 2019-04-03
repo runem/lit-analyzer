@@ -19,8 +19,6 @@ import {
 import { DiagnosticsContext } from "../diagnostics/diagnostics-context";
 import { LitTsService } from "../diagnostics/lit-ts-service";
 import { getUserConfigHtmlCollection } from "../get-html-collection";
-import { parseDocumentsInSourceFile } from "../parsing/parse-documents-in-source-file";
-import { TextDocument } from "../parsing/text-document/text-document";
 import { Config } from "../state/config";
 import { HtmlStoreDataSource, TsLitPluginStore } from "../state/store";
 import { logger, LoggingLevel } from "../util/logger";
@@ -35,8 +33,6 @@ export class TsLitPlugin {
 	}
 
 	set config(config: Config) {
-		logger.debug("Updating the config", config);
-
 		const hasChangedLogging = this.store.config.verbose !== config.verbose || this.store.config.cwd !== config.cwd;
 
 		this.store.config = config;
@@ -52,6 +48,8 @@ export class TsLitPlugin {
 		// Add user configured HTML5 collection
 		const collection = getUserConfigHtmlCollection(config);
 		this.store.absorbCollection(collection, HtmlStoreDataSource.USER);
+
+		logger.debug("Updating the config", config);
 	}
 
 	private get program(): Program {
@@ -140,13 +138,12 @@ export class TsLitPlugin {
 	}
 
 	getOutliningSpans(fileName: string): OutliningSpan[] {
-		const prev = this.prevLangService.getOutliningSpans(fileName);
-
 		const file = this.program.getSourceFile(fileName)!;
 		this.storeUpdater.update(file);
 
 		const outliningSpans = this.litService.getOutliningSpans(file, this.diagnosticContext(file));
 
+		const prev = this.prevLangService.getOutliningSpans(fileName);
 		return [...prev, ...outliningSpans];
 	}
 
@@ -170,48 +167,6 @@ export class TsLitPlugin {
 		const edits = this.litService.format(file, settings, this.diagnosticContext(file));
 
 		return [...prev, ...edits];
-	}
-
-	getDocumentAndOffsetAtPosition(sourceFile: SourceFile, position: number): { document: TextDocument | undefined; offset: number } {
-		const document = parseDocumentsInSourceFile(
-			sourceFile,
-			{
-				htmlTags: this.store.config.htmlTemplateTags,
-				cssTags: this.store.config.cssTemplateTags
-			},
-			position
-		);
-
-		return {
-			document,
-			offset: document != null ? document.virtualDocument.scPositionToOffset(position) : -1
-		};
-	}
-
-	/*
-	 private getDocumentAtPosition(sourceFile: SourceFile, position: number): TextDocument | undefined {
-	 return parseDocumentsInSourceFile(
-	 sourceFile,
-	 {
-	 htmlTags: this.store.config.htmlTemplateTags,
-	 cssTags: this.store.config.cssTemplateTags
-	 },
-	 position
-	 );
-	 }
-
-	 private getDocumentsInFile(sourceFile: SourceFile) {
-	 return parseDocumentsInSourceFile(sourceFile, {
-	 htmlTags: this.store.config.htmlTemplateTags,
-	 cssTags: this.store.config.cssTemplateTags
-	 });
-	 }*/
-
-	getDocumentsInFile(sourceFile: SourceFile): TextDocument[] {
-		return parseDocumentsInSourceFile(sourceFile, {
-			htmlTags: this.store.config.htmlTemplateTags,
-			cssTags: this.store.config.cssTemplateTags
-		});
 	}
 
 	private diagnosticContext(sourceFile: SourceFile): DiagnosticsContext {
