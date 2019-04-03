@@ -23,7 +23,8 @@ export class VirtualAstDocument implements VirtualDocument {
 					str += part.substring(i === 0 ? 0 : 1, part.length - (isLastPart ? 0 : 2));
 					prevPart = part;
 				} else {
-					const length = part.getEnd() - part.getStart() + 3;
+					const end = part.parent && tsModule.ts.isTemplateSpan(part.parent) ? part.parent.literal.getStart() : part.getEnd();
+					const length = end - part.getFullStart() + 3;
 					const substitution = this.substituteExpression(length, part, prevPart, this.parts[i + 1] as string);
 					str += substitution;
 				}
