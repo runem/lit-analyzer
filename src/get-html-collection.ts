@@ -144,6 +144,33 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 		});
 	}
 
+	const imageElement = result.tags.find(t => t.tagName === "img");
+	if (imageElement != null) {
+		imageElement.attributes.push({
+			kind: "attribute",
+			name: "loading",
+			builtIn: true,
+			fromTagName: "img",
+			getType: lazy(
+				() =>
+					({
+						kind: SimpleTypeKind.UNION,
+						types: [
+							{
+								kind: SimpleTypeKind.STRING_LITERAL,
+								value: "lazy"
+							},
+							{
+								kind: SimpleTypeKind.STRING_LITERAL,
+								value: "auto"
+							},
+							{ kind: SimpleTypeKind.STRING_LITERAL, value: "eager" }
+						]
+					} as SimpleType)
+			)
+		});
+	}
+
 	const inputElement = result.tags.find(t => t.tagName === "input");
 	if (inputElement != null) {
 		inputElement.properties.push({
