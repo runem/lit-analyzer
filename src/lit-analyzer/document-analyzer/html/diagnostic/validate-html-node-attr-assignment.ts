@@ -115,7 +115,7 @@ function validateHtmlAttrAssignmentRules(htmlAttr: HtmlNodeAttr, typeB: SimpleTy
 					return [
 						{
 							kind: LitHtmlDiagnosticKind.PROPERTY_NEEDS_EXPRESSION,
-							message: `You are using the property modifier without an expression`,
+							message: `You are using the property binding without an expression`,
 							severity: "error",
 							location: { document, ...htmlAttr.location.name }
 						}
@@ -182,7 +182,7 @@ function validateHtmlAttrAssignmentTypes(
 				return [
 					{
 						kind: LitHtmlDiagnosticKind.BOOL_MOD_ON_NON_BOOL,
-						message: `You are using a boolean attribute modifier on a non boolean type '${toTypeString(typeA)}'`,
+						message: `You are using a boolean binding on a non boolean type '${toTypeString(typeA)}'`,
 						severity: "error",
 						location: { document, ...htmlAttr.location.name },
 						htmlAttr,
@@ -207,12 +207,12 @@ function validateHtmlAttrAssignmentTypes(
 				const message = (() => {
 					if (assignment != null) {
 						if (assignment.kind === HtmlNodeAttrAssignmentKind.BOOLEAN) {
-							return `You are assigning a boolean to a non-primitive type '${toTypeString(typeA)}'. Use '.' modifier instead?`;
+							return `You are assigning a boolean to a non-primitive type '${toTypeString(typeA)}'. Use '.' binding instead?`;
 						} else if (assignment.kind === HtmlNodeAttrAssignmentKind.STRING && assignment.value.length > 0) {
-							return `You are assigning the string '${toTypeString(typeB)}' to a non-primitive type '${toTypeString(typeA)}'. Use '.' modifier instead?`;
+							return `You are assigning the string '${toTypeString(typeB)}' to a non-primitive type '${toTypeString(typeA)}'. Use '.' binding instead?`;
 						}
 					}
-					return `You are assigning the primitive '${toTypeString(typeB)}' to a non-primitive type '${toTypeString(typeA)}'. Use '.' modifier instead?`;
+					return `You are assigning the primitive '${toTypeString(typeB)}' to a non-primitive type '${toTypeString(typeA)}'. Use '.' binding instead?`;
 				})();
 
 				// Fail if the user is trying to assign a primitive value to a complex value.
