@@ -1,6 +1,6 @@
 import { SourceFile } from "typescript";
 import { ComponentDefinition } from "web-component-analyzer";
-import { TsLitPluginStore } from "../../state/store";
+import { LitAnalyzerContext } from "../../lit-analyzer/lit-analyzer-context";
 import { visitDependencies } from "./visit-dependencies";
 
 const map = new WeakMap<SourceFile, ComponentDefinition[]>();
@@ -8,17 +8,15 @@ const map = new WeakMap<SourceFile, ComponentDefinition[]>();
 /**
  * Returns a map of component declarations in each file encountered from a source file recursively.
  * @param sourceFile
- * @param store
+ * @param context
  */
-export function parseDependencies(sourceFile: SourceFile, store: TsLitPluginStore): ComponentDefinition[] {
+export function parseDependencies(sourceFile: SourceFile, context: LitAnalyzerContext): ComponentDefinition[] {
 	let definitions: ComponentDefinition[] = [];
-	const project = store.info.project;
-	const program = store.info.languageService.getProgram()!;
 
 	visitDependencies(sourceFile, {
-		project,
-		program,
-		ts: store.ts,
+		project: context.project,
+		program: context.program,
+		ts: context.ts,
 		lockedFiles: [],
 		addDefinitionsForFile(file: SourceFile, results: ComponentDefinition[], isCircular: boolean) {
 			// Only set the result if this isn't a circular import and file is equal to the start file.
@@ -35,7 +33,7 @@ export function parseDependencies(sourceFile: SourceFile, store: TsLitPluginStor
 			return map.get(file);
 		},
 		getDefinitionsInFile(file: SourceFile) {
-			return store.getDefinitionsInFile(file);
+			return context.definitionStore.getDefinitionsInFile(file);
 		},
 		addCircularReference(fromFile: SourceFile, toFile: SourceFile): void {}
 	});

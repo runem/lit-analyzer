@@ -8,11 +8,11 @@ import { EXTRA_HTML5_EVENTS, hasTypeForAttrName, html5TagAttrType } from "./extr
 import { HtmlData } from "./parsing/parse-html-data/html-data-tag";
 import { HtmlAttr, HtmlDataCollection, HtmlEvent, HtmlTag, mergeHtmlAttrs, mergeHtmlEvents, mergeHtmlTags } from "./parsing/parse-html-data/html-tag";
 import { parseHtmlData } from "./parsing/parse-html-data/parse-html-data";
-import { Config } from "./state/config";
+import { LitPluginConfig } from "./state/lit-plugin-config";
 import { logger } from "./util/logger";
 import { lazy } from "./util/util";
 
-export function getUserConfigHtmlCollection(config: Config): HtmlDataCollection {
+export function getUserConfigHtmlCollection(config: LitPluginConfig): HtmlDataCollection {
 	const collection = (() => {
 		let collection: HtmlDataCollection = { tags: [], events: [], attrs: [] };
 		for (const customHtmlData of Array.isArray(config.customHtmlData) ? config.customHtmlData : [config.customHtmlData]) {

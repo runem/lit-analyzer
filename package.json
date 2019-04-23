@@ -39,10 +39,10 @@
 	"dependencies": {
 		"didyoumean2": "2.0.4",
 		"parse5": "5.1.0",
-		"ts-simple-type": "~0.2.27",
+		"ts-simple-type": "file:../ts-simple-type",
 		"vscode-css-languageservice": "4.0.2-next.1",
 		"vscode-html-languageservice": "2.1.12",
-		"web-component-analyzer": "~0.0.42"
+		"web-component-analyzer": "~0.0.43"
 	},
 	"devDependencies": {
 		"@appnest/readme": "^1.0.21",
@@ -52,7 +52,7 @@
 		"pretty-quick": "^1.10.0",
 		"tslint": "^5.12.1",
 		"tslint-language-service": "^0.9.9",
-		"typescript": "^3.3.3"
+		"typescript": "^3.4.0"
 	},
 	"prettier": {
 		"useTabs": true,

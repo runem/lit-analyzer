@@ -1,11 +1,10 @@
-import { setTypescriptModule as setTsIsAssignableModule } from "ts-simple-type";
 import * as ts from "typescript";
 import * as tsServer from "typescript/lib/tsserverlibrary";
-import { getBuiltInHtmlCollection, getUserConfigHtmlCollection } from "../get-html-collection";
-import { makeConfig } from "../state/config";
-import { HtmlStoreDataSource, TsLitPluginStore } from "../state/store";
-import { setTypescriptModule } from "../ts-module";
+import { getBuiltInHtmlCollection } from "../get-html-collection";
+import { HtmlDataSourceKind } from "../lit-analyzer/store/html-store/html-data-source-merged";
+import { makeConfig } from "../state/lit-plugin-config";
 import { logger, LoggingLevel } from "../util/logger";
+import { LitPluginContext } from "./lit-plugin-context";
 import { TsLitPlugin } from "./ts-lit-plugin";
 
 /**
@@ -14,30 +13,35 @@ import { TsLitPlugin } from "./ts-lit-plugin";
  * @param info
  */
 export function createPlugin(typescript: typeof ts, info: tsServer.server.PluginCreateInfo): TsLitPlugin {
-	// Cache the typescript module
-	setTsIsAssignableModule(typescript);
-	setTypescriptModule(typescript);
-
 	// Create the store
-	const store = new TsLitPluginStore(typescript, info);
-	store.config = makeConfig(info.config);
+	//const store = new TsLitPluginStore(typescript, info);
+	//store.config = makeConfig(info.config);
 
 	// Setup logging
-	logger.level = store.config.verbose ? LoggingLevel.VERBOSE : LoggingLevel.NONE;
-	logger.cwd = store.config.cwd;
+	logger.level = LoggingLevel.VERBOSE;
 	logger.resetLogs();
-	logger.verbose("CreateLitTsPlugin called");
-	logger.debug("Config", store.config);
-
-	// Add all HTML5 tags and attributes
-	const builtInCollection = getBuiltInHtmlCollection();
-	store.absorbCollection(builtInCollection, HtmlStoreDataSource.BUILD_IN);
 
 	// Add user configured HTML5 collection
-	const userCollection = getUserConfigHtmlCollection(store.config);
-	store.absorbCollection(userCollection, HtmlStoreDataSource.USER);
+	//const userCollection = getUserConfigHtmlCollection(store.config);
+	//store.absorbCollection(userCollection, HtmlStoreDataSource.USER);
 
 	const prevLanguageService = info.languageService;
 
-	return new TsLitPlugin(prevLanguageService, store);
+	const context = new LitPluginContext({
+		ts: typescript,
+		getProgram: () => {
+			return info.languageService.getProgram()!;
+		},
+		getProject: () => {
+			return info.project;
+		}
+	});
+
+	context.updateConfig(makeConfig(info.config));
+
+	// Add all HTML5 tags and attributes
+	const builtInCollection = getBuiltInHtmlCollection();
+	context.htmlStore.absorbCollection(builtInCollection, HtmlDataSourceKind.BUILD_IN);
+
+	return new TsLitPlugin(prevLanguageService, context);
 }

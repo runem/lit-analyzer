@@ -1,92 +1,27 @@
 import { SimpleType, SimpleTypeKind, SimpleTypeUnion } from "ts-simple-type";
-import * as tsModule from "typescript";
-import { SourceFile } from "typescript";
-import * as ts from "typescript/lib/tsserverlibrary";
-import { AnalyzeComponentsResult, ComponentDefinition, ComponentDiagnostic } from "web-component-analyzer";
-import { HtmlAttr, HtmlAttrTarget, HtmlDataCollection, HtmlEvent, HtmlMember, HtmlProp, HtmlSlot, HtmlTag, mergeHtmlAttrs, mergeHtmlEvents, mergeHtmlTags } from "../parsing/parse-html-data/html-tag";
-import {
-	HtmlNodeAttr,
-	HtmlNodeAttrKind,
-	IHtmlNodeAttr,
-	IHtmlNodeAttrEventListener,
-	IHtmlNodeAttrProp,
-	IHtmlNodeBooleanAttribute
-} from "../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
-import { HtmlNode } from "../parsing/text-document/html-document/parse-html-node/types/html-node-types";
-import { iterableDefined } from "../util/iterable-util";
-import { lazy } from "../util/util";
-import { LitPluginConfig } from "./lit-plugin-config";
+import { HtmlAttr, HtmlDataCollection, HtmlEvent, HtmlMember, HtmlProp, HtmlSlot, HtmlTag, mergeHtmlAttrs, mergeHtmlEvents, mergeHtmlTags } from "../../../parsing/parse-html-data/html-tag";
+import { iterableDefined } from "../../../util/iterable-util";
+import { lazy } from "../../../util/util";
+import { HtmlDataSource } from "./html-data-source";
 
-export class TsLitPluginHtmlDataSource {
-	private _globalTags = new Map<string, HtmlTag>();
-	get globalTags(): ReadonlyMap<string, HtmlTag> {
-		return this._globalTags;
-	}
-
-	private _globalAttributes = new Map<string, HtmlAttr>();
-	get globalAttributes(): ReadonlyMap<string, HtmlAttr> {
-		return this._globalAttributes;
-	}
-
-	private _globalEvents = new Map<string, HtmlEvent>();
-	get globalEvents(): ReadonlyMap<string, HtmlEvent> {
-		return this._globalEvents;
-	}
-
-	absorbCollection(collection: Partial<HtmlDataCollection>) {
-		if (collection.tags != null) {
-			// For now, lowercase all names because "parse5" doesn't distinguish when parsing
-			collection.tags.forEach(tag => this._globalTags.set(tag.tagName.toLowerCase(), tag));
-		}
-
-		if (collection.attrs != null) {
-			// For now, lowercase all names because "parse5" doesn't distinguish when parsing
-			collection.attrs.forEach(attr => this._globalAttributes.set(attr.name.toLowerCase(), attr));
-		}
-
-		if (collection.events != null) {
-			// For now, lowercase all names because "parse5" doesn't distinguish when parsing
-			collection.events.forEach(evt => this._globalEvents.set(evt.name.toLowerCase(), evt));
-		}
-	}
-
-	forgetCollection({ tags, events, attrs }: Partial<Record<keyof HtmlDataCollection, string[]>>) {
-		if (tags != null) tags.forEach(tagName => this._globalTags.delete(tagName));
-		if (events != null) events.forEach(tagName => this._globalEvents.delete(tagName));
-		if (attrs != null) attrs.forEach(tagName => this._globalAttributes.delete(tagName));
-	}
-
-	getGlobalTag(tagName: string): HtmlTag | undefined {
-		return this._globalTags.get(tagName);
-	}
-
-	getGlobalAttribute(attrName: string): HtmlAttr | undefined {
-		return this._globalAttributes.get(attrName);
-	}
-
-	getGlobalEvent(eventName: string): HtmlEvent | undefined {
-		return this._globalEvents.get(eventName);
-	}
-}
-
-export enum HtmlStoreDataSource {
+export enum HtmlDataSourceKind {
 	DECLARED = 0,
 	USER = 1,
 	BUILD_IN = 2
 }
 
-export class TsLitPluginHtmlStore {
+export class HtmlDataSourceMerged {
 	private subclassExtensions = new Map<string, HtmlTag>();
 
-	private htmlDataSources: TsLitPluginHtmlDataSource[] = (() => {
-		const array: TsLitPluginHtmlDataSource[] = [];
-		array[HtmlStoreDataSource.BUILD_IN] = new TsLitPluginHtmlDataSource();
-		array[HtmlStoreDataSource.USER] = new TsLitPluginHtmlDataSource();
-		array[HtmlStoreDataSource.DECLARED] = new TsLitPluginHtmlDataSource();
+	private htmlDataSources: HtmlDataSource[] = (() => {
+		const array: HtmlDataSource[] = [];
+		array[HtmlDataSourceKind.BUILD_IN] = new HtmlDataSource();
+		array[HtmlDataSourceKind.USER] = new HtmlDataSource();
+		array[HtmlDataSourceKind.DECLARED] = new HtmlDataSource();
 		return array;
 	})();
 
-	private combinedHtmlDataSource = new TsLitPluginHtmlDataSource();
+	private combinedHtmlDataSource = new HtmlDataSource();
 
 	private relatedForTagName = {
 		attrs: new Map<string, ReadonlyMap<string, HtmlAttr>>(),
@@ -159,7 +94,7 @@ export class TsLitPluginHtmlStore {
 		this.invalidateCache(collection);
 	}
 
-	forgetCollection(collection: Partial<Record<keyof HtmlDataCollection, string[]>>, dataSource?: HtmlStoreDataSource) {
+	forgetCollection(collection: Partial<Record<keyof HtmlDataCollection, string[]>>, dataSource?: HtmlDataSourceKind) {
 		if (dataSource == null) {
 			this.htmlDataSources.forEach(ds => ds.forgetCollection(collection));
 		} else {
@@ -170,7 +105,7 @@ export class TsLitPluginHtmlStore {
 		this.mergeDataSourcesAndInvalidate(collection);
 	}
 
-	absorbCollection(collection: HtmlDataCollection, register: HtmlStoreDataSource) {
+	absorbCollection(collection: HtmlDataCollection, register: HtmlDataSourceKind) {
 		this.htmlDataSources[register].absorbCollection(collection);
 
 		this.mergeDataSourcesAndInvalidate({
@@ -315,125 +250,6 @@ export class TsLitPluginHtmlStore {
 		for (const extTag of extensions) {
 			yield* extTag.slots;
 		}
-	}
-}
-
-/**
- * The main store that this ts-plugin uses.
- */
-export class TsLitPluginStore {
-	config!: LitPluginConfig;
-	sourceFileDiagnostics = new Map<SourceFile, ComponentDiagnostic[]>();
-	importedComponentDefinitionsInFile = new Map<string, ComponentDefinition[]>();
-	analysisResultForFile = new Map<string, AnalyzeComponentsResult>();
-	private definitionForTagName = new Map<string, ComponentDefinition>();
-	private htmlStore = new TsLitPluginHtmlStore();
-
-	constructor(public ts: typeof tsModule, public info: ts.server.PluginCreateInfo) {}
-
-	absorbAnalysisResult(sourceFile: SourceFile, result: AnalyzeComponentsResult) {
-		this.analysisResultForFile.set(sourceFile.fileName, result);
-
-		result.componentDefinitions.forEach(definition => {
-			this.definitionForTagName.set(definition.tagName, definition);
-		});
-	}
-
-	absorbSubclassExtension(name: string, extension: HtmlTag) {
-		this.htmlStore.absorbSubclassExtension(name, extension);
-	}
-
-	absorbCollection(collection: HtmlDataCollection, register: HtmlStoreDataSource) {
-		this.htmlStore.absorbCollection(collection, register);
-	}
-
-	forgetTagsDefinedInFile(sourceFile: SourceFile) {
-		const result = this.analysisResultForFile.get(sourceFile.fileName);
-		if (result == null) return;
-
-		result.componentDefinitions.forEach(definition => {
-			this.definitionForTagName.delete(definition.tagName);
-		});
-
-		const tagNames = result.componentDefinitions.map(d => d.tagName);
-		const eventNames = result.globalEvents.map(e => e.name);
-
-		this.htmlStore.forgetCollection({ tags: tagNames, events: eventNames }, HtmlStoreDataSource.DECLARED);
-	}
-
-	getDefinitionsWithDeclarationInFile(sourceFile: SourceFile): ComponentDefinition[] {
-		return Array.from(this.definitionForTagName.values()).filter(d =>
-			[d.declaration.node, ...(d.declaration.inheritNodes || [])].map(n => n.getSourceFile()).find(sf => sf.fileName === sourceFile.fileName)
-		);
-	}
-
-	getDefinitionForTagName(tagName: string): ComponentDefinition | undefined {
-		return this.definitionForTagName.get(tagName);
-	}
-
-	getHtmlTag(htmlNode: HtmlNode | string): HtmlTag | undefined {
-		return this.htmlStore.getHtmlTag(typeof htmlNode === "string" ? htmlNode : htmlNode.tagName);
-	}
-
-	getGlobalTags(): Iterable<HtmlTag> {
-		return this.htmlStore.globalTags.values();
-	}
-
-	getAllAttributesForTag(htmlNode: HtmlNode | string): Iterable<HtmlAttr> {
-		return this.htmlStore.getAllAttributesForTag(typeof htmlNode === "string" ? htmlNode : htmlNode.tagName).values();
-	}
-
-	getAllPropertiesForTag(htmlNode: HtmlNode | string): Iterable<HtmlProp> {
-		return this.htmlStore.getAllPropertiesForTag(typeof htmlNode === "string" ? htmlNode : htmlNode.tagName).values();
-	}
-
-	getAllEventsForTag(htmlNode: HtmlNode | string): Iterable<HtmlEvent> {
-		return this.htmlStore.getAllEventsForTag(typeof htmlNode === "string" ? htmlNode : htmlNode.tagName).values();
-	}
-
-	getAllSlotsForTag(htmlNode: HtmlNode | string): Iterable<HtmlSlot> {
-		return this.htmlStore.getAllSlotForTag(typeof htmlNode === "string" ? htmlNode : htmlNode.tagName).values();
-	}
-
-	getHtmlAttrTarget(htmlNodeAttr: IHtmlNodeAttrProp): HtmlProp | undefined;
-	getHtmlAttrTarget(htmlNodeAttr: IHtmlNodeAttr | IHtmlNodeBooleanAttribute): HtmlAttr | undefined;
-	getHtmlAttrTarget(htmlNodeAttr: IHtmlNodeAttr | IHtmlNodeBooleanAttribute | IHtmlNodeAttrProp): HtmlMember | undefined;
-	getHtmlAttrTarget(htmlNodeAttr: IHtmlNodeAttrEventListener): HtmlEvent | undefined;
-	getHtmlAttrTarget(htmlNodeAttr: HtmlNodeAttr): HtmlAttrTarget | undefined;
-	getHtmlAttrTarget(htmlNodeAttr: HtmlNodeAttr): HtmlAttrTarget | undefined {
-		const name = htmlNodeAttr.name.toLowerCase();
-
-		switch (htmlNodeAttr.kind) {
-			case HtmlNodeAttrKind.EVENT_LISTENER:
-				return this.htmlStore.getAllEventsForTag(htmlNodeAttr.htmlNode.tagName).get(name);
-
-			case HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE:
-			case HtmlNodeAttrKind.ATTRIBUTE:
-				return this.htmlStore.getAllAttributesForTag(htmlNodeAttr.htmlNode.tagName).get(name);
-
-			case HtmlNodeAttrKind.PROPERTY:
-				return this.htmlStore.getAllPropertiesForTag(htmlNodeAttr.htmlNode.tagName).get(name);
-		}
-	}
-
-	getDefinitionsInFile(sourceFile: SourceFile): ComponentDefinition[] {
-		const result = this.analysisResultForFile.get(sourceFile.fileName);
-		return (result != null && result.componentDefinitions) || [];
-	}
-
-	/**
-	 * Returns if a component for a specific file has been imported.
-	 * @param fileName
-	 * @param tagName
-	 */
-	hasTagNameBeenImported(fileName: string, tagName: string): boolean {
-		for (const file of this.importedComponentDefinitionsInFile.get(fileName) || []) {
-			if (file.tagName === tagName) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 }
 

@@ -3,6 +3,10 @@ import "./my-element";
 import "@material/mwc-button/mwc-button";
 import "./my-button";
 import "@ideanote/atoms/lib/card";
+import { customElement, LitElement, property } from "lit-element";
+import "./my-element";
+import "./my-element";
+import "./my-component";
 
 (async () => {
 	await import("./my-card");
@@ -13,13 +17,18 @@ const myApp = (text: string, disabled: boolean) => html`
 		my-button {
 			color: ${"green"};
 		}
+
+		a {
+			color: rebeccapurple;
+			additive-symbols: cross-fade();
+		}
 	</style>
 
 	<lkjsldkfj></lkjsldkfj>
 
-	<a target="_blank" download="hello"></a>
+	<a .href="" target="_blank" download="hello"></a>
 
-	<my-component @submit="" hello="" onsubmit=""></my-component>
+	<my-component @submit="" hello="green green red" onsubmit=""></my-component>
 
 	<sldkfjlskjdf></sldkfjlskjdf>
 
@@ -47,11 +56,11 @@ const myApp = (text: string, disabled: boolean) => html`
 
 	<mwc-button></mwc-button>
 
-	<my-external-tag draggable="true"></my-external-tag>
+	<my-external-tag draggable="false"></my-external-tag>
 
 	<mwc-button label="" dense role="math" aria-checked="true" .accessKey="${"hejsa"}" onsubmit="" .dlfkjsdlfkjsdlfkj="${"test"}" @my-event=""></mwc-button>
 
-	<div>
+	<div @hello="${console.log}">
 		<div @change="${() => {}}" @hello="${console.log}" @test-event="${() => {}}" @loadstart="${() => {}}" @hello="${() => {}}">
 			<my-element data-looolz="" onmy-change-event="" a b c .minSetter="${""}" .prop1="${"hello"}" my-attr-hehehe="" @test-event="${() => true}">
 				<div slot=""></div>

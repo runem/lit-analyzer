@@ -1,9 +1,11 @@
+import { setTypescriptModule as setTsIsAssignableModule } from "ts-simple-type";
 import * as ts from "typescript";
 import * as tsServer from "typescript/lib/tsserverlibrary";
 import { decorateLanguageService } from "./decorate-language-service";
 import { createPlugin } from "./language-service/create-plugin";
 import { TsLitPlugin } from "./language-service/ts-lit-plugin";
-import { Config, makeConfig } from "./state/config";
+import { LitPluginConfig, makeConfig } from "./state/lit-plugin-config";
+import { setTypescriptModule } from "./ts-module";
 import { logger } from "./util/logger";
 
 const tsHtmlPluginSymbol = Symbol.for("__tsHtmlPlugin__");
@@ -15,6 +17,10 @@ let plugin: TsLitPlugin | undefined = undefined;
  * @param typescript
  */
 function init(typescript: { typescript: typeof ts }): tsServer.server.PluginModule {
+	// Cache the typescript module
+	setTsIsAssignableModule(typescript.typescript);
+	setTypescriptModule(typescript.typescript);
+
 	return {
 		create: (info: tsServer.server.PluginCreateInfo) => {
 			// Check if the language service is already decorated
@@ -41,9 +47,9 @@ function init(typescript: { typescript: typeof ts }): tsServer.server.PluginModu
 			}
 		},
 
-		onConfigurationChanged(config: Partial<Config>) {
+		onConfigurationChanged(config: Partial<LitPluginConfig>) {
 			if (plugin == null || config == null) return;
-			plugin.config = makeConfig(config);
+			plugin.context.updateConfig(makeConfig(config));
 		}
 	};
 }
