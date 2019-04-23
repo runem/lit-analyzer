@@ -1,5 +1,9 @@
 import { LitElement, property, html } from "lit-element";
 import { ifDefined } from "lit-html/directives/if-defined";
+import { repeat } from "lit-html/directives/repeat";
+import { classMap } from "lit-html/directives/class-map";
+import { styleMap } from "lit-html/directives/style-map";
+import { guard } from "lit-html/directives/guard";
 
 /**
  * hfhhdf
@@ -48,5 +52,23 @@ declare global {
 
 const src = "hello.png" as string | undefined;
 html`
-	<img src="${ifDefined(src)}" />
+	<img src="${ifDefined(src)}" alt="${repeat([], () => html``)}" />
+
+	<div>
+		${repeat([], () => html``)}
+	</div>
+`;
+
+const classes = {};
+html`
+	<div .class="${classMap(classes)}">Classy text</div>
+`;
+
+const style = {};
+html`
+	<p .style="${styleMap(style)}">Hello style!</p>
+`;
+
+html`
+	<img src="${guard([src], () => (Math.random() > 0.5 ? "something.png" : "nothing.png"))}" />
 `;

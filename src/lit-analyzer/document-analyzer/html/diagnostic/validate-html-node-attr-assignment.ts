@@ -8,11 +8,10 @@ import {
 	SimpleTypeKind,
 	SimpleTypeString,
 	SimpleTypeStringLiteral,
-	simpleTypeToString,
 	toSimpleType,
 	toTypeString
 } from "ts-simple-type";
-import { Type, TypeChecker } from "typescript";
+import { CallExpression, Type, TypeChecker } from "typescript";
 import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../../../constants";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../types/html-node/html-node-attr-assignment-types";
@@ -300,40 +299,140 @@ function validateHtmlAttrAssignmentTypes(
 	}
 }
 
-function validateHtmlAttrDirectiveAssignment(
-	htmlAttr: HtmlNodeAttr,
-	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },
-	{ ts, program, logger }: LitAnalyzerRequest
-): LitHtmlDiagnostic[] | undefined {
+function validateHtmlAttrDirectiveAssignment(htmlAttr: HtmlNodeAttr, { typeA, typeB }: { typeA: SimpleType; typeB: SimpleType }, request: LitAnalyzerRequest): LitHtmlDiagnostic[] | undefined {
 	const { assignment } = htmlAttr;
 	if (assignment == null) return undefined;
 
+	const { ts, program, document } = request;
 	const checker = program.getTypeChecker();
 
 	// Type check lit-html directives
 	if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.FUNCTION)) {
-		// TODO: Support typechecking of lit-html directives by name.
 		if (assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION && ts.isCallExpression(assignment.expression) && isLitDirective(typeB)) {
 			const functionName = assignment.expression.expression.getText();
 			const args = Array.from(assignment.expression.arguments);
 
 			switch (functionName) {
 				case "ifDefined":
+					// Example: html`<img src="${ifDefined(imageUrl)}">`;
+					// Take the argument to ifDefined and remove undefined from the type union (if possible).
+					// Then test if this result is now assignable to the attribute type.
+
 					if (args.length === 1) {
 						const returnType = toSimpleType(checker.getTypeAtLocation(args[0]), checker);
+						const returnTypeWithoutUndefined = removeUndefinedFromType(returnType);
 
-						if (!isAssignableToType(typeA, returnType, checker)) {
-							logger.debug(`${functionName}: ${simpleTypeToString(returnType)} not assignable to ${simpleTypeToString(typeA)}`);
-						} else {
-							logger.debug("is assignable!");
+						return (
+							validateHtmlAttrAssignmentTypes(
+								htmlAttr,
+								{
+									typeA,
+									typeB: returnTypeWithoutUndefined
+								},
+								request
+							) || []
+						);
+					}
+
+					break;
+
+				case "guard":
+					// Example: html`<img src="${guard([imageUrl], () => Math.random() > 0.5 ? imageUrl : "nothing.png")}">`;
+					// Check if the return value type of the function expression given to the second parameter is assignable to the attribute.
+					if (args.length === 2) {
+						const returnFunctionType = toSimpleType(checker.getTypeAtLocation(args[1]), checker);
+
+						if (returnFunctionType.kind === SimpleTypeKind.FUNCTION) {
+							const returnType = returnFunctionType.returnType;
+
+							return (
+								validateHtmlAttrAssignmentTypes(
+									htmlAttr,
+									{
+										typeA,
+										typeB: returnType
+									},
+									request
+								) || []
+							);
 						}
 					}
 					break;
+
+				case "classMap":
+					// Report error if "classMap" is not being used on the "class" attribute.
+					if (htmlAttr.name !== "class" || htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE) {
+						return [
+							{
+								kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWD_ON_ATTRIBUTE,
+								message: `The 'classMap' directive can only be used in an attribute binding for the 'class' attribute`,
+								severity: "error",
+								location: { document, ...htmlAttr.location.name }
+							}
+						];
+					}
+					break;
+
+				case "styleMap":
+					// Report error if "styleMap" is not being used on the "style" attribute.
+					if (htmlAttr.name !== "style" || htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE) {
+						return [
+							{
+								kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWD_ON_ATTRIBUTE,
+								message: `The 'styleMap' directive can only be used in an attribute binding for the 'style' attribute`,
+								severity: "error",
+								location: { document, ...htmlAttr.location.name }
+							}
+						];
+					}
+					break;
+
+				case "unsafeHTML":
+				case "cache":
+				case "repeat":
+				case "asyncReplace":
+				case "asyncAppend":
+					// These directives can only be used within a text binding.
+					// This function validating assignments is per definition used NOT in a text binding
+					return [
+						{
+							kind: LitHtmlDiagnosticKind.DIRECTIVE_ONLY_ALLOWED_IN_TEXT_BINDING,
+							message: `The '${functionName}' directive can only be used within a text binding.`,
+							severity: "error",
+							location: { document, ...htmlAttr.location.name }
+						}
+					];
 			}
 		}
 
-		if (isLitDirective(typeB)) {
-			return [];
+		// Now we have an unknown (user defined) directive.
+		// Return empty array and opt out of any more type checking for this directive
+		return [];
+	}
+
+	// Make sure that "classMap" and "styleMap" directives are not used in mixed bindings.
+	else if (assignment.kind === HtmlNodeAttrAssignmentKind.MIXED) {
+		// Find all relevant usage of directives in the assignment
+		const directivesUnavailableInMixed = assignment.values
+			.filter((value): value is CallExpression => typeof value !== "string" && ts.isCallExpression(value))
+			.filter(exp => ["classMap", "styleMap"].includes(exp.expression.getText()))
+			.map(exp => ({
+				type: toSimpleType(checker.getTypeAtLocation(exp), checker),
+				name: exp.expression.getText()
+			}))
+			.filter(directive => isLitDirective(directive.type));
+
+		if (directivesUnavailableInMixed.length > 0) {
+			const directiveName = directivesUnavailableInMixed[0].name;
+
+			return [
+				{
+					kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWED_IN_MIXED_ASSIGNMENT,
+					message: `The '${directiveName}' directive must be the entire value of the attribute.`,
+					severity: "error",
+					location: { document, ...htmlAttr.location.name }
+				}
+			];
 		}
 	}
 
@@ -346,7 +445,14 @@ function validateHtmlAttrDirectiveAssignment(
  * @param type
  */
 function isLitDirective(type: SimpleType): boolean {
-	return type.kind === SimpleTypeKind.FUNCTION && type.argTypes.length > 0 && type.argTypes[0].type.name === "Part" && type.returnType.kind === SimpleTypeKind.VOID;
+	switch (type.kind) {
+		case SimpleTypeKind.ALIAS:
+			return type.name === "DirectiveFn" || isLitDirective(type.target);
+		case SimpleTypeKind.FUNCTION:
+			return type.kind === SimpleTypeKind.FUNCTION && type.argTypes.length > 0 && type.argTypes[0].type.name === "Part" && type.returnType.kind === SimpleTypeKind.VOID;
+		default:
+			return false;
+	}
 }
 
 function removeUndefinedFromType(type: SimpleType): SimpleType {

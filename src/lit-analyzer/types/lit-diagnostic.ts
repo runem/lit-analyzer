@@ -21,7 +21,10 @@ export enum LitHtmlDiagnosticKind {
 	INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED = "INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED",
 	INVALID_ATTRIBUTE_EXPRESSION_TYPE = "INVALID_ATTRIBUTE_EXPRESSION_TYPE",
 	INVALID_SLOT_NAME = "INVALID_SLOT_NAME",
-	MISSING_SLOT_ATTRIBUTE = "MISSING_SLOT_ATTRIBUTE"
+	MISSING_SLOT_ATTRIBUTE = "MISSING_SLOT_ATTRIBUTE",
+	DIRECTIVE_ONLY_ALLOWED_IN_TEXT_BINDING = "DIRECTIVE_ONLY_ALLOWED_IN_TEXT_BINDING",
+	DIRECTIVE_NOT_ALLOWED_IN_MIXED_ASSIGNMENT = "DIRECTIVE_NOT_ALLOWED_IN_MIXED_ASSIGNMENT",
+	DIRECTIVE_NOT_ALLOWD_ON_ATTRIBUTE = "DIRECTIVE_NOT_ALLOWD_ON_ATTRIBUTE"
 }
 
 export interface LitDiagnosticBase {
@@ -113,6 +116,18 @@ export interface LitHtmlDiagnosticHtmlPropertyNeedsExpression extends LitDocumen
 	kind: LitHtmlDiagnosticKind.PROPERTY_NEEDS_EXPRESSION;
 }
 
+export interface LitHtmlDiagnosticHtmlDirectiveOnlyAllowedInTextBinding extends LitDocumentDiagnosticBase {
+	kind: LitHtmlDiagnosticKind.DIRECTIVE_ONLY_ALLOWED_IN_TEXT_BINDING;
+}
+
+export interface LitHtmlDiagnosticHtmlDirectiveNotAllowedInMixedAssignment extends LitDocumentDiagnosticBase {
+	kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWED_IN_MIXED_ASSIGNMENT;
+}
+
+export interface LitHtmlDiagnosticHtmlDirectiveNotAllowedOnAttribute extends LitDocumentDiagnosticBase {
+	kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWD_ON_ATTRIBUTE;
+}
+
 export interface LitHtmlDiagnosticInvalidSlotName extends LitDocumentDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.INVALID_SLOT_NAME;
 	validSlotNames: (string | undefined)[];
@@ -130,6 +145,9 @@ export type LitHtmlDiagnostic =
 	| LitHtmlDiagnosticMissingProps
 	| LitHtmlDiagnosticHtmlBoolMod
 	| LitHtmlDiagnosticUnknownMember
+	| LitHtmlDiagnosticHtmlDirectiveNotAllowedOnAttribute
+	| LitHtmlDiagnosticHtmlDirectiveNotAllowedInMixedAssignment
+	| LitHtmlDiagnosticHtmlDirectiveOnlyAllowedInTextBinding
 	| LitHtmlDiagnosticPrimitiveNotAssignableToComplex
 	| LitHtmlDiagnosticHtmlInvalidAttributeExpressionType
 	| LitHtmlDiagnosticHtmlInvalidAttributeExpressionTypeUndefined
