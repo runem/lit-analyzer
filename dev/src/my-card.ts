@@ -72,3 +72,19 @@ html`
 html`
 	<img src="${guard([src], () => (Math.random() > 0.5 ? "something.png" : "nothing.png"))}" />
 `;
+
+html`
+	<input ?disabled="${"hello"}" />
+`; /* <input disabled="true" /> */
+html`
+	<input disabled="${true}" />
+`; /* <input disabled="true" /> */
+html`
+	<input disabled="${false}" />
+`; /* <input disabled="false" /> */
+html`
+	<input ?disabled="${true}" />
+`; /* <input disabled /> */
+html`
+	<input ?disabled="${false}" />
+`; /* <input /> */

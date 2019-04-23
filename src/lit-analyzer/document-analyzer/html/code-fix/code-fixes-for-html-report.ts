@@ -1,3 +1,4 @@
+import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER } from "../../../../constants";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { litAttributeModifierForTarget } from "../../../parse/parse-html-data/html-tag";
 import { HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types";
@@ -7,7 +8,7 @@ import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../../types/lit-dia
 
 export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document, htmlStore }: LitAnalyzerRequest): LitCodeFix[] {
 	switch (htmlReport.kind) {
-		case LitHtmlDiagnosticKind.UNKNOWN_TARGET:
+		case LitHtmlDiagnosticKind.UNKNOWN_TARGET: {
 			const fixes: LitCodeFix[] = [];
 
 			switch (htmlReport.htmlAttr.kind) {
@@ -58,8 +59,9 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 			}
 
 			return fixes;
+		}
 
-		case LitHtmlDiagnosticKind.UNKNOWN_TAG:
+		case LitHtmlDiagnosticKind.UNKNOWN_TAG: {
 			if (htmlReport.suggestedName == null) break;
 
 			const { endTag: endTagRange } = htmlReport.htmlNode.location;
@@ -95,9 +97,10 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 					]
 				}
 			];
+		}
 
 		case LitHtmlDiagnosticKind.BOOL_MOD_ON_NON_BOOL:
-		case LitHtmlDiagnosticKind.PRIMITIVE_NOT_ASSIGNABLE_TO_COMPLEX:
+		case LitHtmlDiagnosticKind.PRIMITIVE_NOT_ASSIGNABLE_TO_COMPLEX: {
 			const { htmlAttr } = htmlReport;
 
 			const existingModifierLength = htmlAttr.modifier ? htmlAttr.modifier.length : 0;
@@ -126,6 +129,7 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 					]
 				}
 			];
+		}
 
 		case LitHtmlDiagnosticKind.MISSING_IMPORT:
 			return [
@@ -164,7 +168,30 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 				}
 			];
 
-		case LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED:
+		case LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING:
+			const newText = `${LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER}${htmlReport.htmlAttr.name}`;
+
+			return [
+				{
+					kind: CodeFixKind.ADD_TEXT,
+					message: `Change to '${newText}'`,
+					htmlReport,
+					actions: [
+						{
+							kind: CodeActionKind.DOCUMENT_TEXT_CHANGE,
+							change: {
+								range: {
+									document,
+									...htmlReport.htmlAttr.location.name
+								},
+								newText
+							}
+						}
+					]
+				}
+			];
+
+		case LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED: {
 			const { assignment } = htmlReport.htmlAttr;
 			return [
 				{
@@ -177,8 +204,8 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 							change: {
 								range: {
 									document,
-									start: assignment.location.start + 2, // ${
-									end: assignment.location.end - 1 // }
+									start: assignment.location.start + 2, // Offset 2 for '${'
+									end: assignment.location.end - 1 // Offset 1 for '}'
 								},
 								newText: `ifDefined(${assignment.expression.getText()})`
 							}
@@ -186,6 +213,7 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 					]
 				}
 			];
+		}
 	}
 
 	return [];

@@ -12,7 +12,7 @@ import {
 	toTypeString
 } from "ts-simple-type";
 import { CallExpression, Type, TypeChecker } from "typescript";
-import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../../../constants";
+import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../../../constants";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types";
@@ -196,6 +196,9 @@ function validateHtmlAttrAssignmentTypes(
 		case LIT_HTML_PROP_ATTRIBUTE_MODIFIER:
 			break;
 
+		case LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER:
+			break;
+
 		default:
 			// In this case there is no modifier. Therefore:
 
@@ -260,6 +263,22 @@ function validateHtmlAttrAssignmentTypes(
 				if (!isNaN(typeB.value as any)) {
 					return [];
 				}
+			}
+
+			// Take into account that assigning a boolean without "?" binding would result in "undefined" being assigned.
+			// Example: <input disabled="${true}" />
+			else if (isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.BOOLEAN, SimpleTypeKind.BOOLEAN_LITERAL], { op: "or" })) {
+				return [
+					{
+						kind: LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING,
+						severity: "error",
+						message: `The '${htmlAttr.name}' attribute is a boolean type but you not using a boolean binding. Change to boolean binding?`,
+						location: { document, ...htmlAttr.location.name },
+						htmlAttr,
+						typeA,
+						typeB
+					}
+				];
 			}
 	}
 
