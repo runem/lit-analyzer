@@ -101,7 +101,7 @@ function validateHtmlAttrAssignmentRules(htmlAttr: HtmlNodeAttr, typeB: SimpleTy
 						message: `You are setting up an event listener with a non-callable type '${toTypeString(typeB)}'`,
 						severity: "error",
 						location: { document, ...htmlAttr.location.name },
-						typeB: toTypeString(typeB)
+						typeB
 					}
 				];
 			}
@@ -166,42 +166,6 @@ function validateHtmlAttrSlotAssignment(htmlAttr: HtmlNodeAttr, { document, html
 	return undefined;
 }
 
-function validateHtmlAttrDirectiveAssignment(
-	htmlAttr: HtmlNodeAttr,
-	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },
-	{ ts, program, logger }: LitAnalyzerRequest
-): LitHtmlDiagnostic[] | undefined {
-	const { assignment } = htmlAttr;
-	if (assignment == null) return undefined;
-
-	const checker = program.getTypeChecker();
-
-	// Type check lit-html directives
-	if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.FUNCTION)) {
-		// TODO: Support typechecking of lit-html directives by name.
-		if (assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION && ts.isCallExpression(assignment.expression) && isLitDirective(typeB)) {
-			const functionName = assignment.expression.expression.getText();
-			const args = Array.from(assignment.expression.arguments);
-
-			switch (functionName) {
-				case "ifDefined":
-					if (args.length === 1) {
-						const returnType = toSimpleType(checker.getTypeAtLocation(args[0]), checker);
-
-						if (!isAssignableToType(typeA, returnType, checker)) {
-							logger.debug(`${functionName}: ${simpleTypeToString(returnType)} not assignable to ${simpleTypeToString(typeA)}`);
-						} else {
-							logger.debug("is assignable!");
-						}
-					}
-					break;
-			}
-		}
-
-		return [];
-	}
-}
-
 function validateHtmlAttrAssignmentTypes(
 	htmlAttr: HtmlNodeAttr,
 	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },
@@ -223,8 +187,8 @@ function validateHtmlAttrAssignmentTypes(
 						severity: "error",
 						location: { document, ...htmlAttr.location.name },
 						htmlAttr,
-						typeA: toTypeString(typeA),
-						typeB: toTypeString(typeB)
+						typeA,
+						typeB
 					}
 				];
 			}
@@ -257,8 +221,8 @@ function validateHtmlAttrAssignmentTypes(
 						message,
 						location: { document, ...htmlAttr.location.name },
 						htmlAttr,
-						typeA: toTypeString(typeA),
-						typeB: toTypeString(typeB)
+						typeA,
+						typeB
 					}
 				];
 			} else if (!isAssignableToPrimitiveType(typeB)) {
@@ -269,8 +233,8 @@ function validateHtmlAttrAssignmentTypes(
 						message: `You are assigning a non-primitive type '${toTypeString(typeB)}' to a primitive type '${toTypeString(typeA)}'`,
 						location: { document, ...htmlAttr.location.name },
 						htmlAttr,
-						typeA: toTypeString(typeA),
-						typeB: toTypeString(typeB)
+						typeA,
+						typeB
 					}
 				];
 			}
@@ -301,6 +265,26 @@ function validateHtmlAttrAssignmentTypes(
 	}
 
 	if (!isAssignableToType(typeA, typeB, checker)) {
+		// Test if removing "undefined" from typeB would work and suggest using "ifDefined".
+		if (assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION && htmlAttr.kind === HtmlNodeAttrKind.ATTRIBUTE) {
+			if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.UNDEFINED)) {
+				const typeBWithoutUndefined = removeUndefinedFromType(typeB);
+
+				if (isAssignableToType(typeA, typeBWithoutUndefined, checker)) {
+					return [
+						{
+							kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED,
+							message: `Type '${toTypeString(typeB)}' is not assignable to '${toTypeString(typeA)}'. Fix it using 'ifDefined'?`,
+							severity: "error",
+							location: { document, ...htmlAttr.location.name },
+							htmlAttr: htmlAttr as typeof htmlAttr & ({ assignment: typeof assignment }),
+							typeA,
+							typeB
+						}
+					];
+				}
+			}
+		}
 		// Fail if the two types are not assignable to each other.
 		return [
 			{
@@ -309,11 +293,51 @@ function validateHtmlAttrAssignmentTypes(
 				severity: "error",
 				location: { document, ...htmlAttr.location.name },
 				htmlAttr,
-				typeA: toTypeString(typeA),
-				typeB: toTypeString(typeB)
+				typeA,
+				typeB
 			}
 		];
 	}
+}
+
+function validateHtmlAttrDirectiveAssignment(
+	htmlAttr: HtmlNodeAttr,
+	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },
+	{ ts, program, logger }: LitAnalyzerRequest
+): LitHtmlDiagnostic[] | undefined {
+	const { assignment } = htmlAttr;
+	if (assignment == null) return undefined;
+
+	const checker = program.getTypeChecker();
+
+	// Type check lit-html directives
+	if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.FUNCTION)) {
+		// TODO: Support typechecking of lit-html directives by name.
+		if (assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION && ts.isCallExpression(assignment.expression) && isLitDirective(typeB)) {
+			const functionName = assignment.expression.expression.getText();
+			const args = Array.from(assignment.expression.arguments);
+
+			switch (functionName) {
+				case "ifDefined":
+					if (args.length === 1) {
+						const returnType = toSimpleType(checker.getTypeAtLocation(args[0]), checker);
+
+						if (!isAssignableToType(typeA, returnType, checker)) {
+							logger.debug(`${functionName}: ${simpleTypeToString(returnType)} not assignable to ${simpleTypeToString(typeA)}`);
+						} else {
+							logger.debug("is assignable!");
+						}
+					}
+					break;
+			}
+		}
+
+		if (isLitDirective(typeB)) {
+			return [];
+		}
+	}
+
+	return undefined;
 }
 
 /**
@@ -321,7 +345,23 @@ function validateHtmlAttrAssignmentTypes(
  * It will return true if the type is a function that takes a Part type and returns a void.
  * @param type
  */
-// @ts-ignore
 function isLitDirective(type: SimpleType): boolean {
 	return type.kind === SimpleTypeKind.FUNCTION && type.argTypes.length > 0 && type.argTypes[0].type.name === "Part" && type.returnType.kind === SimpleTypeKind.VOID;
+}
+
+function removeUndefinedFromType(type: SimpleType): SimpleType {
+	switch (type.kind) {
+		case SimpleTypeKind.ALIAS:
+			return {
+				...type,
+				target: removeUndefinedFromType(type.target)
+			};
+		case SimpleTypeKind.UNION:
+			return {
+				...type,
+				types: type.types.filter(t => !isAssignableToSimpleTypeKind(t, SimpleTypeKind.UNDEFINED))
+			};
+	}
+
+	return type;
 }

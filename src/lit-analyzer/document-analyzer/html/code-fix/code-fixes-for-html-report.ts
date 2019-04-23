@@ -1,6 +1,6 @@
+import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { litAttributeModifierForTarget } from "../../../parse/parse-html-data/html-tag";
 import { HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types";
-import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { CodeFixKind, LitCodeFix } from "../../../types/lit-code-fix";
 import { CodeActionKind, LitCodeFixAction } from "../../../types/lit-code-fix-action";
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../../types/lit-diagnostic";
@@ -158,6 +158,29 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 									end: htmlReport.htmlNode.location.name.end
 								},
 								newText: ` slot=""`
+							}
+						}
+					]
+				}
+			];
+
+		case LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED:
+			const { assignment } = htmlReport.htmlAttr;
+			return [
+				{
+					kind: CodeFixKind.ADD_TEXT,
+					message: `Use the 'ifDefined' directive.`,
+					htmlReport,
+					actions: [
+						{
+							kind: CodeActionKind.DOCUMENT_TEXT_CHANGE,
+							change: {
+								range: {
+									document,
+									start: assignment.location.start + 2, // ${
+									end: assignment.location.end - 1 // }
+								},
+								newText: `ifDefined(${assignment.expression.getText()})`
 							}
 						}
 					]

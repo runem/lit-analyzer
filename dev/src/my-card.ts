@@ -1,4 +1,5 @@
 import { LitElement, property, html } from "lit-element";
+import { ifDefined } from "lit-html/directives/if-defined";
 
 /**
  * hfhhdf
@@ -44,3 +45,8 @@ declare global {
 		"my-event-test": CustomEvent<string>;
 	}
 }
+
+const src = "hello.png" as string | undefined;
+html`
+	<img src="${ifDefined(src)}" />
+`;

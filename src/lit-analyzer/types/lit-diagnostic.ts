@@ -1,9 +1,11 @@
+import { SimpleType } from "ts-simple-type";
+import { SourceFile } from "typescript";
 import { ComponentDefinition } from "web-component-analyzer";
 import { HtmlAttr, HtmlAttrTarget } from "../parse/parse-html-data/html-tag";
-import { HtmlNodeAttr } from "./html-node/html-node-attr-types";
+import { IHtmlNodeAttrAssignmentExpression } from "./html-node/html-node-attr-assignment-types";
+import { HtmlNodeAttr, IHtmlNodeAttr } from "./html-node/html-node-attr-types";
 import { HtmlNode } from "./html-node/html-node-types";
 import { DocumentRange, SourceFileRange } from "./lit-range";
-import { SourceFile } from "typescript";
 
 export enum LitHtmlDiagnosticKind {
 	MISSING_IMPORT = "MISSING_IMPORT",
@@ -16,6 +18,7 @@ export enum LitHtmlDiagnosticKind {
 	NO_EVENT_LISTENER_FUNCTION = "NO_EVENT_LISTENER_FUNCTION",
 	PRIMITIVE_NOT_ASSIGNABLE_TO_COMPLEX = "PRIMITIVE_NOT_ASSIGNABLE_TO_COMPLEX",
 	COMPLEX_NOT_ASSIGNABLE_TO_PRIMITIVE = "COMPLEX_NOT_ASSIGNABLE_TO_PRIMITIVE",
+	INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED = "INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED",
 	INVALID_ATTRIBUTE_EXPRESSION_TYPE = "INVALID_ATTRIBUTE_EXPRESSION_TYPE",
 	INVALID_SLOT_NAME = "INVALID_SLOT_NAME",
 	MISSING_SLOT_ATTRIBUTE = "MISSING_SLOT_ATTRIBUTE"
@@ -69,34 +72,41 @@ export interface LitHtmlDiagnosticTagNotClosed extends LitDocumentDiagnosticBase
 export interface LitHtmlDiagnosticHtmlBoolMod extends LitDocumentDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.BOOL_MOD_ON_NON_BOOL;
 	htmlAttr: HtmlNodeAttr;
-	typeA: string;
-	typeB: string;
+	typeA: SimpleType;
+	typeB: SimpleType;
 }
 
 export interface LitHtmlDiagnosticPrimitiveNotAssignableToComplex extends LitDocumentDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.PRIMITIVE_NOT_ASSIGNABLE_TO_COMPLEX;
 	htmlAttr: HtmlNodeAttr;
-	typeA: string;
-	typeB: string;
+	typeA: SimpleType;
+	typeB: SimpleType;
 }
 
 export interface LitHtmlDiagnosticHtmlNoEventListenerFunction extends LitDocumentDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.NO_EVENT_LISTENER_FUNCTION;
-	typeB: string;
+	typeB: SimpleType;
 }
 
 export interface LitHtmlDiagnosticHtmlInvalidAttributeExpressionType extends LitDocumentDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE;
 	htmlAttr: HtmlNodeAttr;
-	typeA: string;
-	typeB: string;
+	typeA: SimpleType;
+	typeB: SimpleType;
+}
+
+export interface LitHtmlDiagnosticHtmlInvalidAttributeExpressionTypeUndefined extends LitDocumentDiagnosticBase {
+	kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED;
+	htmlAttr: IHtmlNodeAttr & { assignment: IHtmlNodeAttrAssignmentExpression };
+	typeA: SimpleType;
+	typeB: SimpleType;
 }
 
 export interface LitHtmlDiagnosticComplexNotAssignableToPrimitive extends LitDocumentDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.COMPLEX_NOT_ASSIGNABLE_TO_PRIMITIVE;
 	htmlAttr: HtmlNodeAttr;
-	typeA: string;
-	typeB: string;
+	typeA: SimpleType;
+	typeB: SimpleType;
 }
 
 export interface LitHtmlDiagnosticHtmlPropertyNeedsExpression extends LitDocumentDiagnosticBase {
@@ -122,6 +132,7 @@ export type LitHtmlDiagnostic =
 	| LitHtmlDiagnosticUnknownMember
 	| LitHtmlDiagnosticPrimitiveNotAssignableToComplex
 	| LitHtmlDiagnosticHtmlInvalidAttributeExpressionType
+	| LitHtmlDiagnosticHtmlInvalidAttributeExpressionTypeUndefined
 	| LitHtmlDiagnosticHtmlNoEventListenerFunction
 	| LitHtmlDiagnosticComplexNotAssignableToPrimitive
 	| LitHtmlDiagnosticHtmlPropertyNeedsExpression

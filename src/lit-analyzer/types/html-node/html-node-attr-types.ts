@@ -6,7 +6,7 @@ import { Range } from "../../../types/range";
 export enum HtmlNodeAttrKind {
 	EVENT_LISTENER = "EVENT_LISTENER",
 	ATTRIBUTE = "ATTRIBUTE",
-	BOOLEAN_ATTRIBUTE = "ATTRIBUTE",
+	BOOLEAN_ATTRIBUTE = "BOOLEAN_ATTRIBUTE",
 	PROPERTY = "PROPERTY"
 }
 

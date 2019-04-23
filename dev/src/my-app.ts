@@ -1,4 +1,5 @@
 import { html, render } from "lit-html";
+import { ifDefined } from "lit-html/directives/if-defined";
 import "@ideanote/atoms/lib/chunk-48d4e365";
 import "@material/mwc-button/mwc-button";
 import "./my-element";
@@ -8,7 +9,11 @@ import "./my-component";
 	await import("./my-card");
 })();
 
+const src = "hello.png" as string | undefined;
+
 const myApp = (text: string, disabled: boolean) => html`
+	<img src="${ifDefined(src)}" />
+
 	<style>
 		my-button {
 			color: ${"green"};

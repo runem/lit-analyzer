@@ -3,7 +3,6 @@ import {
 	LitHtmlDiagnostic,
 	LitHtmlDiagnosticHtmlBoolMod,
 	LitHtmlDiagnosticMissingImport,
-	LitHtmlDiagnosticMissingSlotAttr,
 	LitHtmlDiagnosticPrimitiveNotAssignableToComplex,
 	LitHtmlDiagnosticUnknownMember,
 	LitHtmlDiagnosticUnknownTag
@@ -24,7 +23,6 @@ export interface CodeFixBase {
 
 export interface CodeFixAddText extends CodeFixBase {
 	kind: CodeFixKind.ADD_TEXT;
-	htmlReport: LitHtmlDiagnosticMissingSlotAttr;
 }
 
 export interface CodeFixRename extends CodeFixBase {
