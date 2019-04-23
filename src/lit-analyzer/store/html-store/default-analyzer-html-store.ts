@@ -1,13 +1,6 @@
-import { HtmlAttr, HtmlAttrTarget, HtmlDataCollection, HtmlEvent, HtmlMember, HtmlProp, HtmlSlot, HtmlTag } from "../../../parsing/parse-html-data/html-tag";
-import {
-	HtmlNodeAttr,
-	HtmlNodeAttrKind,
-	IHtmlNodeAttr,
-	IHtmlNodeAttrEventListener,
-	IHtmlNodeAttrProp,
-	IHtmlNodeBooleanAttribute
-} from "../../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
-import { HtmlNode } from "../../../parsing/text-document/html-document/parse-html-node/types/html-node-types";
+import { HtmlAttr, HtmlAttrTarget, HtmlDataCollection, HtmlEvent, HtmlMember, HtmlProp, HtmlSlot, HtmlTag } from "../../parse/parse-html-data/html-tag";
+import { HtmlNodeAttr, HtmlNodeAttrKind, IHtmlNodeAttr, IHtmlNodeAttrEventListener, IHtmlNodeAttrProp, IHtmlNodeBooleanAttribute } from "../../types/html-node/html-node-attr-types";
+import { HtmlNode } from "../../types/html-node/html-node-types";
 import { AnalyzerHtmlStore } from "../analyzer-html-store";
 import { HtmlDataSourceKind, HtmlDataSourceMerged } from "./html-data-source-merged";
 

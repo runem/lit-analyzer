@@ -1,5 +1,5 @@
-import { documentationForHtmlTag } from "../../../../parsing/parse-html-data/html-tag";
-import { HtmlNode } from "../../../../parsing/text-document/html-document/parse-html-node/types/html-node-types";
+import { documentationForHtmlTag } from "../../../parse/parse-html-data/html-tag";
+import { HtmlNode } from "../../../types/html-node/html-node-types";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { LitQuickInfo } from "../../../types/lit-quick-info";
 

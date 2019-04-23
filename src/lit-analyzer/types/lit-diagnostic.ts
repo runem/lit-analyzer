@@ -1,7 +1,7 @@
 import { ComponentDefinition } from "web-component-analyzer";
-import { HtmlAttr, HtmlAttrTarget } from "../../parsing/parse-html-data/html-tag";
-import { HtmlNodeAttr } from "../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
-import { HtmlNode } from "../../parsing/text-document/html-document/parse-html-node/types/html-node-types";
+import { HtmlAttr, HtmlAttrTarget } from "../parse/parse-html-data/html-tag";
+import { HtmlNodeAttr } from "./html-node/html-node-attr-types";
+import { HtmlNode } from "./html-node/html-node-types";
 import { DocumentRange, SourceFileRange } from "./lit-range";
 import { SourceFile } from "typescript";
 

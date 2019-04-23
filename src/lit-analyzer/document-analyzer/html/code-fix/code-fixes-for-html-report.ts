@@ -1,5 +1,5 @@
-import { litAttributeModifierForTarget } from "../../../../parsing/parse-html-data/html-tag";
-import { HtmlNodeAttrKind } from "../../../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
+import { litAttributeModifierForTarget } from "../../../parse/parse-html-data/html-tag";
+import { HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { CodeFixKind, LitCodeFix } from "../../../types/lit-code-fix";
 import { CodeActionKind, LitCodeFixAction } from "../../../types/lit-code-fix-action";

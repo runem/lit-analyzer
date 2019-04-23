@@ -1,6 +1,6 @@
 import { isSimpleTypeLiteral, SimpleType, SimpleTypeKind } from "ts-simple-type";
-import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
-import { DocumentPositionContext } from "../../../../util/get-position-context-in-document";
+import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types";
+import { DocumentPositionContext } from "../../../util/get-position-context-in-document";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { LitCompletion } from "../../../types/lit-completion";
 

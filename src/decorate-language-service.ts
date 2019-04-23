@@ -1,6 +1,6 @@
 import { LanguageService } from "typescript";
-import { TsLitPlugin } from "./language-service/ts-lit-plugin";
-import { logger } from "./util/logger";
+import { TsLitPlugin } from "./ts-lit-plugin/ts-lit-plugin";
+import { logger } from "./lit-analyzer/util/logger";
 
 export function decorateLanguageService(languageService: LanguageService, plugin: TsLitPlugin): LanguageService {
 	const nextLanguageService: LanguageService = {

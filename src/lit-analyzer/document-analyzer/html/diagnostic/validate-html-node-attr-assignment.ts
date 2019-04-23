@@ -13,8 +13,8 @@ import {
 } from "ts-simple-type";
 import { Type } from "typescript";
 import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../../../constants";
-import { HtmlNodeAttrAssignmentKind } from "../../../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-assignment-types";
-import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
+import { HtmlNodeAttrAssignmentKind } from "../../../types/html-node/html-node-attr-assignment-types";
+import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../../types/lit-diagnostic";
 

@@ -1,5 +1,5 @@
-import { isHtmlEvent, isHtmlMember } from "../../../../parsing/parse-html-data/html-tag";
-import { HtmlNodeAttr } from "../../../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
+import { isHtmlEvent, isHtmlMember } from "../../../parse/parse-html-data/html-tag";
+import { HtmlNodeAttr } from "../../../types/html-node/html-node-attr-types";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { DefinitionKind, LitDefinition } from "../../../types/lit-definition";
 

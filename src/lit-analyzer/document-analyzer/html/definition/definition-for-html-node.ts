@@ -1,4 +1,4 @@
-import { HtmlNode } from "../../../../parsing/text-document/html-document/parse-html-node/types/html-node-types";
+import { HtmlNode } from "../../../types/html-node/html-node-types";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { DefinitionKind, LitDefinition } from "../../../types/lit-definition";
 

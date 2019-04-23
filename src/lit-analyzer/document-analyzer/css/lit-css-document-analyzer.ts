@@ -1,5 +1,5 @@
-import { CssDocument } from "../../../parsing/text-document/css-document/css-document";
-import { getPositionContextInDocument } from "../../../util/get-position-context-in-document";
+import { CssDocument } from "../../parse/document/text-document/css-document/css-document";
+import { getPositionContextInDocument } from "../../util/get-position-context-in-document";
 import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 import { LitCompletion } from "../../types/lit-completion";
 import { LitCompletionDetails } from "../../types/lit-completion-details";

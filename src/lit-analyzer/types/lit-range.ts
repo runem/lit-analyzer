@@ -1,4 +1,4 @@
-import { TextDocument } from "../../parsing/text-document/text-document";
+import { TextDocument } from "../parse/document/text-document/text-document";
 
 export interface SourceFileRange {
 	start: number;

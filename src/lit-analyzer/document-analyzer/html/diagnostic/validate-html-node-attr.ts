@@ -1,7 +1,7 @@
-import { HtmlAttrTarget, litAttributeModifierForTarget } from "../../../../parsing/parse-html-data/html-tag";
-import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
-import { HtmlNodeKind } from "../../../../parsing/text-document/html-document/parse-html-node/types/html-node-types";
-import { findBestMatch } from "../../../../util/find-best-match";
+import { HtmlAttrTarget, litAttributeModifierForTarget } from "../../../parse/parse-html-data/html-tag";
+import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types";
+import { HtmlNodeKind } from "../../../types/html-node/html-node-types";
+import { findBestMatch } from "../../../util/find-best-match";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../../types/lit-diagnostic";
 

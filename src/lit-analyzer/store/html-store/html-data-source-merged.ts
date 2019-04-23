@@ -1,7 +1,7 @@
 import { SimpleType, SimpleTypeKind, SimpleTypeUnion } from "ts-simple-type";
-import { HtmlAttr, HtmlDataCollection, HtmlEvent, HtmlMember, HtmlProp, HtmlSlot, HtmlTag, mergeHtmlAttrs, mergeHtmlEvents, mergeHtmlTags } from "../../../parsing/parse-html-data/html-tag";
-import { iterableDefined } from "../../../util/iterable-util";
-import { lazy } from "../../../util/util";
+import { HtmlAttr, HtmlDataCollection, HtmlEvent, HtmlMember, HtmlProp, HtmlSlot, HtmlTag, mergeHtmlAttrs, mergeHtmlEvents, mergeHtmlTags } from "../../parse/parse-html-data/html-tag";
+import { iterableDefined } from "../../util/iterable-util";
+import { lazy } from "../../util/util";
 import { HtmlDataSource } from "./html-data-source";
 
 export enum HtmlDataSourceKind {

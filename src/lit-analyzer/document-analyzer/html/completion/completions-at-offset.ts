@@ -1,5 +1,5 @@
-import { HtmlDocument } from "../../../../parsing/text-document/html-document/html-document";
-import { getPositionContextInDocument } from "../../../../util/get-position-context-in-document";
+import { HtmlDocument } from "../../../parse/document/text-document/html-document/html-document";
+import { getPositionContextInDocument } from "../../../util/get-position-context-in-document";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { LitCompletion } from "../../../types/lit-completion";
 import { completionsForHtmlAttrValues } from "./completions-for-html-attr-values";

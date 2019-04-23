@@ -1,6 +1,6 @@
-import { documentationForHtmlTag } from "../../../../parsing/parse-html-data/html-tag";
-import { DocumentPositionContext } from "../../../../util/get-position-context-in-document";
-import { isCustomElementTagName, lazy } from "../../../../util/util";
+import { documentationForHtmlTag } from "../../../parse/parse-html-data/html-tag";
+import { DocumentPositionContext } from "../../../util/get-position-context-in-document";
+import { isCustomElementTagName, lazy } from "../../../util/util";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { LitCompletion } from "../../../types/lit-completion";
 

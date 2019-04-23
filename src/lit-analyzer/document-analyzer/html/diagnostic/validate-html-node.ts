@@ -1,7 +1,7 @@
 import { basename, dirname, relative } from "path";
-import { HtmlNode, HtmlNodeKind } from "../../../../parsing/text-document/html-document/parse-html-node/types/html-node-types";
-import { findBestStringMatch } from "../../../../util/find-best-match";
-import { isCustomElementTagName } from "../../../../util/util";
+import { HtmlNode, HtmlNodeKind } from "../../../types/html-node/html-node-types";
+import { findBestStringMatch } from "../../../util/find-best-match";
+import { isCustomElementTagName } from "../../../util/util";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../../types/lit-diagnostic";
 

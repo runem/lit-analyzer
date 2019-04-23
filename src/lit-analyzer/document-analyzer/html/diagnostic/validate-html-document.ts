@@ -1,6 +1,6 @@
-import { HtmlDocument } from "../../../../parsing/text-document/html-document/html-document";
-import { HtmlNodeAttr } from "../../../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
-import { HtmlNode } from "../../../../parsing/text-document/html-document/parse-html-node/types/html-node-types";
+import { HtmlDocument } from "../../../parse/document/text-document/html-document/html-document";
+import { HtmlNodeAttr } from "../../../types/html-node/html-node-attr-types";
+import { HtmlNode } from "../../../types/html-node/html-node-types";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { LitHtmlDiagnostic } from "../../../types/lit-diagnostic";
 import { validateHtmlNode } from "./validate-html-node";

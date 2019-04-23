@@ -1,7 +1,7 @@
 import * as ts from "typescript";
 import * as vscode from "vscode-html-languageservice";
-import { HtmlDocument } from "../../../parsing/text-document/html-document/html-document";
-import { textPartsToRanges } from "../../../parsing/virtual-document/virtual-document";
+import { HtmlDocument } from "../../parse/document/text-document/html-document/html-document";
+import { textPartsToRanges } from "../../parse/document/virtual-document/virtual-document";
 import { LitClosingTagInfo } from "../../types/lit-closing-tag-info";
 import { LitFormatEdit } from "../../types/lit-format-edit";
 

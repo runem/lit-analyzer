@@ -1,8 +1,8 @@
 import * as vscode from "vscode-css-languageservice";
 import { IAtDirectiveData, ICSSDataProvider, IPropertyData, IPseudoClassData, IPseudoElementData } from "vscode-css-languageservice";
-import { CssDocument } from "../../../parsing/text-document/css-document/css-document";
-import { iterableFilter, iterableMap } from "../../../util/iterable-util";
-import { lazy } from "../../../util/util";
+import { CssDocument } from "../../parse/document/text-document/css-document/css-document";
+import { iterableFilter, iterableMap } from "../../util/iterable-util";
+import { lazy } from "../../util/util";
 import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 import { AnalyzerHtmlStore } from "../../store/analyzer-html-store";
 import { LitCompletion, LitCompletionKind } from "../../types/lit-completion";

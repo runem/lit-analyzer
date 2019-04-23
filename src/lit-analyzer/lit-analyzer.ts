@@ -1,9 +1,9 @@
 import { SourceFile } from "typescript";
-import { CssDocument } from "../parsing/text-document/css-document/css-document";
-import { HtmlDocument } from "../parsing/text-document/html-document/html-document";
-import { TextDocument } from "../parsing/text-document/text-document";
+import { CssDocument } from "./parse/document/text-document/css-document/css-document";
+import { HtmlDocument } from "./parse/document/text-document/html-document/html-document";
+import { TextDocument } from "./parse/document/text-document/text-document";
 import { Range } from "../types/range";
-import { flatten } from "../util/util";
+import { flatten } from "./util/util";
 import { LitCssDocumentAnalyzer } from "./document-analyzer/css/lit-css-document-analyzer";
 import { LitHtmlDocumentAnalyzer } from "./document-analyzer/html/lit-html-document-analyzer";
 import { LitAnalyzerContext, LitAnalyzerRequest } from "./lit-analyzer-context";

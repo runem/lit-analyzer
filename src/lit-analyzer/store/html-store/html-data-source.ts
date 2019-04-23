@@ -1,4 +1,4 @@
-import { HtmlAttr, HtmlDataCollection, HtmlEvent, HtmlTag } from "../../../parsing/parse-html-data/html-tag";
+import { HtmlAttr, HtmlDataCollection, HtmlEvent, HtmlTag } from "../../parse/parse-html-data/html-tag";
 
 export class HtmlDataSource {
 	private _globalTags = new Map<string, HtmlTag>();

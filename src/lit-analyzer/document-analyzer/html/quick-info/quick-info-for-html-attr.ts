@@ -1,5 +1,5 @@
-import { descriptionForTarget, targetKindAndTypeText } from "../../../../parsing/parse-html-data/html-tag";
-import { HtmlNodeAttr } from "../../../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
+import { descriptionForTarget, targetKindAndTypeText } from "../../../parse/parse-html-data/html-tag";
+import { HtmlNodeAttr } from "../../../types/html-node/html-node-attr-types";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { LitQuickInfo } from "../../../types/lit-quick-info";
 

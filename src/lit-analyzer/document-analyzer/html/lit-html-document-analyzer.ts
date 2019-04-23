@@ -1,10 +1,10 @@
 import { FormatCodeSettings } from "typescript";
-import { HtmlDocument } from "../../../parsing/text-document/html-document/html-document";
-import { isHTMLAttr } from "../../../parsing/text-document/html-document/parse-html-node/types/html-node-attr-types";
-import { isHTMLNode } from "../../../parsing/text-document/html-document/parse-html-node/types/html-node-types";
+import { HtmlDocument } from "../../parse/document/text-document/html-document/html-document";
+import { isHTMLAttr } from "../../types/html-node/html-node-attr-types";
+import { isHTMLNode } from "../../types/html-node/html-node-types";
 import { Range } from "../../../types/range";
-import { iterableDefined } from "../../../util/iterable-util";
-import { flatten, intersects } from "../../../util/util";
+import { iterableDefined } from "../../util/iterable-util";
+import { flatten, intersects } from "../../util/util";
 import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 import { LitClosingTagInfo } from "../../types/lit-closing-tag-info";
 import { LitCodeFix } from "../../types/lit-code-fix";

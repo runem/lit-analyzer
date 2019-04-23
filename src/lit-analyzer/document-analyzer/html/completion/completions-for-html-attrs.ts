@@ -1,10 +1,10 @@
 import { isAssignableToSimpleTypeKind, SimpleType, SimpleTypeKind } from "ts-simple-type";
 import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../../../constants";
-import { documentationForTarget, HtmlAttrTarget, isHtmlAttr, isHtmlEvent, isHtmlProp } from "../../../../parsing/parse-html-data/html-tag";
-import { HtmlNode } from "../../../../parsing/text-document/html-document/parse-html-node/types/html-node-types";
-import { DocumentPositionContext } from "../../../../util/get-position-context-in-document";
-import { iterableFilter, iterableMap } from "../../../../util/iterable-util";
-import { lazy } from "../../../../util/util";
+import { documentationForTarget, HtmlAttrTarget, isHtmlAttr, isHtmlEvent, isHtmlProp } from "../../../parse/parse-html-data/html-tag";
+import { HtmlNode } from "../../../types/html-node/html-node-types";
+import { DocumentPositionContext } from "../../../util/get-position-context-in-document";
+import { iterableFilter, iterableMap } from "../../../util/iterable-util";
+import { lazy } from "../../../util/util";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { LitCompletion } from "../../../types/lit-completion";
 
