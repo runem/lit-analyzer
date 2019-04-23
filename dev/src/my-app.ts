@@ -1,10 +1,6 @@
 import { html, render } from "lit-html";
-import "./my-element";
+import "@ideanote/atoms/lib/chunk-48d4e365";
 import "@material/mwc-button/mwc-button";
-import "./my-button";
-import "@ideanote/atoms/lib/card";
-import { customElement, LitElement, property } from "lit-element";
-import "./my-element";
 import "./my-element";
 import "./my-component";
 
@@ -54,7 +50,7 @@ const myApp = (text: string, disabled: boolean) => html`
 	<my-card></my-card>
 	<my-element></my-element>
 
-	<mwc-button></mwc-button>
+	<mwc-button .dense="${true}"></mwc-button>
 
 	<my-external-tag draggable="false"></my-external-tag>
 

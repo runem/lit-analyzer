@@ -26,7 +26,7 @@ export class MyBase extends LitElement {
 class Test extends MyBase {
 	sdlkfjsldkfj!: string;
 
-	@property({ type: Number }) text!: number;
+	@property({ type: Number }) text!: string;
 
 	@property({ type: Boolean }) hehehehe!: boolean;
 
