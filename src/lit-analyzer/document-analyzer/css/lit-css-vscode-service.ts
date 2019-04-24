@@ -1,13 +1,14 @@
 import * as vscode from "vscode-css-languageservice";
 import { IAtDirectiveData, ICSSDataProvider, IPropertyData, IPseudoClassData, IPseudoElementData } from "vscode-css-languageservice";
+import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 import { CssDocument } from "../../parse/document/text-document/css-document/css-document";
+import { AnalyzerHtmlStore } from "../../store/analyzer-html-store";
+import { LitCompletion } from "../../types/lit-completion";
+import { LitCssDiagnostic } from "../../types/lit-diagnostic";
+import { LitTargetKind } from "../../types/lit-target-kind";
+import { LitQuickInfo } from "../../types/lit-quick-info";
 import { iterableFilter, iterableMap } from "../../util/iterable-util";
 import { lazy } from "../../util/util";
-import { LitAnalyzerRequest } from "../../lit-analyzer-context";
-import { AnalyzerHtmlStore } from "../../store/analyzer-html-store";
-import { LitCompletion, LitCompletionKind } from "../../types/lit-completion";
-import { LitCssDiagnostic } from "../../types/lit-diagnostic";
-import { LitQuickInfo } from "../../types/lit-quick-info";
 
 function makeVscTextDocument(cssDocument: CssDocument): vscode.TextDocument {
 	return vscode.TextDocument.create("untitled://embedded.css", "css", 1, cssDocument.virtualDocument.text);
@@ -109,7 +110,7 @@ export class LitCssVscodeService {
 	}
 }
 
-function translateCompletionItemKind(kind: vscode.CompletionItemKind): LitCompletionKind {
+function translateCompletionItemKind(kind: vscode.CompletionItemKind): LitTargetKind {
 	switch (kind) {
 		case vscode.CompletionItemKind.Method:
 			return "memberFunctionElement";

@@ -4,6 +4,7 @@ import { repeat } from "lit-html/directives/repeat";
 import { classMap } from "lit-html/directives/class-map";
 import { styleMap } from "lit-html/directives/style-map";
 import { guard } from "lit-html/directives/guard";
+import { Button } from "@material/mwc-button";
 
 /**
  * hfhhdf
@@ -14,9 +15,10 @@ import { guard } from "lit-html/directives/guard";
  * @attr size
  */
 export class MyBase extends LitElement {
-	baseProp!: string;
+	hehe!: string;
 
 	click() {
+		this.hehe;
 		this.dispatchEvent(new CustomEvent("my-event", { detail: "hehehehe" }));
 	}
 }
@@ -54,6 +56,11 @@ const src = "hello.png" as string | undefined;
 html`
 	<img src="${ifDefined(src)}" alt="${repeat([], () => html``)}" />
 
+	<hehehe></hehehe>
+
+	<my-element></my-element>
+	<my-element></my-element>
+
 	<div>
 		${repeat([], () => html``)}
 	</div>
@@ -71,6 +78,7 @@ html`
 
 html`
 	<img src="${guard([src], () => (Math.random() > 0.5 ? "something.png" : "nothing.png"))}" />
+	<mwc-button></mwc-button>
 `;
 
 html`

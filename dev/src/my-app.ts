@@ -4,6 +4,7 @@ import "@ideanote/atoms/lib/chunk-48d4e365";
 import "@material/mwc-button/mwc-button";
 import "./my-element";
 import "./my-component";
+import { MyBase } from "./my-card";
 
 (async () => {
 	await import("./my-card");
@@ -71,6 +72,7 @@ const myApp = (text: string, disabled: boolean) => html`
 	</div>
 
 	<input .value="${null}" .disabled="${true}" type="email" maxlength="1" tabindex="${1 === 1 ? "-1" : "0"}" />
+	<just-testing></just-testing>
 `;
 
 render(myApp("Hello", false), document.body);

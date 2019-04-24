@@ -1,12 +1,12 @@
 import { SourceFile } from "typescript";
+import { Range } from "../types/range";
+import { LitCssDocumentAnalyzer } from "./document-analyzer/css/lit-css-document-analyzer";
+import { LitHtmlDocumentAnalyzer } from "./document-analyzer/html/lit-html-document-analyzer";
+import { renameLocationsForTagName } from "./document-analyzer/html/rename-locations/rename-locations-for-tag-name";
+import { LitAnalyzerContext, LitAnalyzerRequest } from "./lit-analyzer-context";
 import { CssDocument } from "./parse/document/text-document/css-document/css-document";
 import { HtmlDocument } from "./parse/document/text-document/html-document/html-document";
 import { TextDocument } from "./parse/document/text-document/text-document";
-import { Range } from "../types/range";
-import { flatten } from "./util/util";
-import { LitCssDocumentAnalyzer } from "./document-analyzer/css/lit-css-document-analyzer";
-import { LitHtmlDocumentAnalyzer } from "./document-analyzer/html/lit-html-document-analyzer";
-import { LitAnalyzerContext, LitAnalyzerRequest } from "./lit-analyzer-context";
 import { LitClosingTagInfo } from "./types/lit-closing-tag-info";
 import { LitCodeFix } from "./types/lit-code-fix";
 import { LitCompletion } from "./types/lit-completion";
@@ -16,6 +16,10 @@ import { LitDiagnostic, LitSourceFileDiagnostic } from "./types/lit-diagnostic";
 import { LitFormatEdit } from "./types/lit-format-edit";
 import { LitOutliningSpan } from "./types/lit-outlining-span";
 import { LitQuickInfo } from "./types/lit-quick-info";
+import { LitRenameInfo } from "./types/lit-rename-info";
+import { LitRenameLocation } from "./types/lit-rename-location";
+import { getNodeAtPosition, nodeIntersects } from "./util/ast-util";
+import { flatten } from "./util/util";
 
 /*interface LitDocumentAnalyzer {
  getCompletionDetailsAtOffset?(document: TextDocument, offset: number, name: string, request: LitAnalyzerRequest): LitCompletionDetails | undefined;
@@ -75,6 +79,66 @@ export class LitAnalyzer {
 		} else if (document instanceof HtmlDocument) {
 			return this.litHtmlDocumentAnalyzer.getQuickInfoAtOffset(document, offset, request);
 		}
+	}
+
+	getRenameInfoAtPosition(file: SourceFile, position: number): LitRenameInfo | undefined {
+		const { document, offset } = this.getDocumentAndOffsetAtPosition(file, position);
+		if (document != null) {
+			const request = this.makeRequest({ file, document });
+
+			if (document instanceof CssDocument) {
+				return undefined;
+			} else if (document instanceof HtmlDocument) {
+				return this.litHtmlDocumentAnalyzer.getRenameInfoAtOffset(document, offset, request);
+			}
+		} else {
+			const nodeUnderCursor = getNodeAtPosition(file, position);
+			if (nodeUnderCursor == null) return undefined;
+
+			if (this.context.ts.isStringLiteralLike(nodeUnderCursor)) {
+				const tagName = nodeUnderCursor.text;
+				const definition = this.context.definitionStore.getDefinitionForTagName(tagName);
+
+				if (definition != null && nodeIntersects(nodeUnderCursor, definition.node)) {
+					return {
+						fullDisplayName: tagName,
+						displayName: tagName,
+						range: { start: nodeUnderCursor.getStart() + 1, end: nodeUnderCursor.getEnd() - 1 },
+						kind: "label"
+					};
+				}
+			}
+		}
+	}
+
+	getRenameLocationsAtPosition(file: SourceFile, position: number): LitRenameLocation[] {
+		const { document, offset } = this.getDocumentAndOffsetAtPosition(file, position);
+		this.context.updateComponents(file);
+
+		if (document != null) {
+			const request = this.makeRequest({ file, document });
+
+			if (document instanceof CssDocument) {
+				return [];
+			} else if (document instanceof HtmlDocument) {
+				return this.litHtmlDocumentAnalyzer.getRenameLocationsAtOffset(document, offset, request);
+			}
+		} else {
+			const nodeUnderCursor = getNodeAtPosition(file, position);
+
+			if (nodeUnderCursor == null) return [];
+
+			if (this.context.ts.isStringLiteralLike(nodeUnderCursor)) {
+				const tagName = nodeUnderCursor.text;
+				const definition = this.context.definitionStore.getDefinitionForTagName(tagName);
+
+				if (definition != null && nodeIntersects(nodeUnderCursor, definition.node)) {
+					return renameLocationsForTagName(tagName, this.context);
+				}
+			}
+		}
+
+		return [];
 	}
 
 	getClosingTagAtPosition(file: SourceFile, position: number): LitClosingTagInfo | undefined {

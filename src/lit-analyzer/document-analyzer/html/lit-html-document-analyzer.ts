@@ -1,11 +1,9 @@
 import { FormatCodeSettings } from "typescript";
+import { Range } from "../../../types/range";
+import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 import { HtmlDocument } from "../../parse/document/text-document/html-document/html-document";
 import { isHTMLAttr } from "../../types/html-node/html-node-attr-types";
 import { isHTMLNode } from "../../types/html-node/html-node-types";
-import { Range } from "../../../types/range";
-import { iterableDefined } from "../../util/iterable-util";
-import { flatten, intersects } from "../../util/util";
-import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 import { LitClosingTagInfo } from "../../types/lit-closing-tag-info";
 import { LitCodeFix } from "../../types/lit-code-fix";
 import { LitCompletion } from "../../types/lit-completion";
@@ -15,6 +13,10 @@ import { LitHtmlDiagnostic } from "../../types/lit-diagnostic";
 import { LitFormatEdit } from "../../types/lit-format-edit";
 import { LitOutliningSpan, LitOutliningSpanKind } from "../../types/lit-outlining-span";
 import { LitQuickInfo } from "../../types/lit-quick-info";
+import { LitRenameInfo } from "../../types/lit-rename-info";
+import { LitRenameLocation } from "../../types/lit-rename-location";
+import { iterableDefined } from "../../util/iterable-util";
+import { flatten, intersects } from "../../util/util";
 import { codeFixesForHtmlReport } from "./code-fix/code-fixes-for-html-report";
 import { completionsAtOffset } from "./completion/completions-at-offset";
 import { definitionForHtmlAttr } from "./definition/definition-for-html-attr";
@@ -23,6 +25,7 @@ import { validateHTMLDocument } from "./diagnostic/validate-html-document";
 import { LitHtmlVscodeService } from "./lit-html-vscode-service";
 import { quickInfoForHtmlAttr } from "./quick-info/quick-info-for-html-attr";
 import { quickInfoForHtmlNode } from "./quick-info/quick-info-for-html-node";
+import { renameLocationsAtOffset } from "./rename-locations/rename-locations-at-offset";
 
 export class LitHtmlDocumentAnalyzer {
 	private vscodeHtmlService = new LitHtmlVscodeService();
@@ -73,6 +76,24 @@ export class LitHtmlDocumentAnalyzer {
 		} else if (isHTMLAttr(hit)) {
 			return definitionForHtmlAttr(hit, request);
 		}
+	}
+
+	getRenameInfoAtOffset(document: HtmlDocument, offset: number, request: LitAnalyzerRequest): LitRenameInfo | undefined {
+		const hit = document.htmlNodeOrAttrAtOffset(offset);
+		if (hit == null) return undefined;
+
+		if (isHTMLNode(hit)) {
+			return {
+				kind: "memberVariableElement",
+				fullDisplayName: hit.tagName,
+				displayName: hit.tagName,
+				range: { document, ...hit.location.name }
+			};
+		}
+	}
+
+	getRenameLocationsAtOffset(document: HtmlDocument, offset: number, request: LitAnalyzerRequest): LitRenameLocation[] {
+		return renameLocationsAtOffset(document, offset, request);
 	}
 
 	getQuickInfoAtOffset(document: HtmlDocument, offset: number, request: LitAnalyzerRequest): LitQuickInfo | undefined {

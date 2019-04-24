@@ -32,6 +32,19 @@ export function getNodeAtPosition(node: Node, position: number | Range): Node | 
 	return node.forEachChild(child => getNodeAtPosition(child, position)) || node;
 }
 
+export function nodeIntersects(nodeA: Node, nodeB: Node): boolean {
+	return intersects(
+		{
+			start: nodeA.getStart(),
+			end: nodeA.getEnd()
+		},
+		{
+			start: nodeB.getStart(),
+			end: nodeB.getEnd()
+		}
+	);
+}
+
 /**
  * Checks whether a leading comment includes a given search string.
  * @param text

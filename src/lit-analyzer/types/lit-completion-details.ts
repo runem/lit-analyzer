@@ -1,8 +1,8 @@
-import { LitCompletionKind } from "./lit-completion";
+import { LitTargetKind } from "./lit-target-kind";
 
 export interface LitCompletionDetails {
 	name: string;
-	kind: LitCompletionKind;
+	kind: LitTargetKind;
 	primaryInfo: string;
 	secondaryInfo?: string;
 }

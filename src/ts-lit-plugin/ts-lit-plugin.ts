@@ -11,6 +11,9 @@ import {
 	OutliningSpan,
 	Program,
 	QuickInfo,
+	RenameInfo,
+	RenameInfoOptions,
+	RenameLocation,
 	TextChange,
 	UserPreferences
 } from "typescript";
@@ -24,6 +27,8 @@ import { translateDiagnostics } from "./translate/translate-diagnostics";
 import { translateFormatEdits } from "./translate/translate-format-edits";
 import { translateOutliningSpans } from "./translate/translate-outlining-spans";
 import { translateQuickInfo } from "./translate/translate-quick-info";
+import { translateRenameInfo } from "./translate/translate-rename-info";
+import { translateRenameLocations } from "./translate/translate-rename-locations";
 
 export class TsLitPlugin {
 	private litAnalyzer = new LitAnalyzer(this.context);
@@ -77,8 +82,10 @@ export class TsLitPlugin {
 		preferences: UserPreferences
 	): ReadonlyArray<CodeFixAction> {
 		const file = this.program.getSourceFile(fileName)!;
+
 		const prevResult = this.prevLangService.getCodeFixesAtPosition(fileName, start, end, errorCodes, formatOptions, preferences) || [];
 		const codeFixes = translateCodeFixes(this.litAnalyzer.getCodeFixesAtPositionRange(file, { start, end }), file);
+
 		return [...prevResult, ...codeFixes];
 	}
 
@@ -90,8 +97,10 @@ export class TsLitPlugin {
 
 	getOutliningSpans(fileName: string): OutliningSpan[] {
 		const file = this.program.getSourceFile(fileName)!;
+
 		const prev = this.prevLangService.getOutliningSpans(fileName);
 		const outliningSpans = translateOutliningSpans(this.litAnalyzer.getOutliningSpansInFile(file));
+
 		return [...prev, ...outliningSpans];
 	}
 
@@ -99,6 +108,23 @@ export class TsLitPlugin {
 		const file = this.program.getSourceFile(fileName)!;
 		const result = this.litAnalyzer.getClosingTagAtPosition(file, position);
 		return result || this.prevLangService.getJsxClosingTagAtPosition(fileName, position);
+	}
+
+	findRenameLocations(fileName: string, position: number, findInStrings: boolean, findInComments: boolean, providePrefixAndSuffixTextForRename?: boolean): ReadonlyArray<RenameLocation> | undefined {
+		const file = this.program.getSourceFile(fileName)!;
+
+		const prev = this.prevLangService.findRenameLocations(fileName, position, findInStrings, findInComments, providePrefixAndSuffixTextForRename);
+		const renameLocations = translateRenameLocations(this.litAnalyzer.getRenameLocationsAtPosition(file, position));
+
+		if (prev == null) return renameLocations;
+
+		return [...prev, ...renameLocations];
+	}
+
+	getRenameInfo(fileName: string, position: number, options?: RenameInfoOptions): RenameInfo {
+		const file = this.program.getSourceFile(fileName)!;
+		const result = this.litAnalyzer.getRenameInfoAtPosition(file, position);
+		return (result && translateRenameInfo(result)) || this.prevLangService.getRenameInfo(fileName, position, options);
 	}
 
 	getFormattingEditsForRange(fileName: string, start: number, end: number, settings: FormatCodeSettings): TextChange[] {

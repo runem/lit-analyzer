@@ -269,7 +269,7 @@ function validateHtmlAttrAssignmentTypes(
 
 			// Take into account that assigning a boolean without "?" binding would result in "undefined" being assigned.
 			// Example: <input disabled="${true}" />
-			else if ([SimpleTypeKind.BOOLEAN_LITERAL, SimpleTypeKind.BOOLEAN].includes(typeA.kind)) {
+			else if (assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION && [SimpleTypeKind.BOOLEAN_LITERAL, SimpleTypeKind.BOOLEAN].includes(typeA.kind)) {
 				return [
 					{
 						kind: LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING,

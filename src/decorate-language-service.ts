@@ -11,7 +11,9 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 		getDefinitionAndBoundSpan: plugin.getDefinitionAndBoundSpan.bind(plugin),
 		getCodeFixesAtPosition: plugin.getCodeFixesAtPosition.bind(plugin),
 		getQuickInfoAtPosition: plugin.getQuickInfoAtPosition.bind(plugin),
-		getJsxClosingTagAtPosition: plugin.getJsxClosingTagAtPosition.bind(plugin)
+		getJsxClosingTagAtPosition: plugin.getJsxClosingTagAtPosition.bind(plugin),
+		getRenameInfo: plugin.getRenameInfo.bind(plugin),
+		findRenameLocations: plugin.findRenameLocations.bind(plugin)
 
 		//getOutliningSpans: plugin.getOutliningSpans.bind(plugin)
 		//getFormattingEditsForRange: plugin.getFormattingEditsForRange.bind(plugin)
