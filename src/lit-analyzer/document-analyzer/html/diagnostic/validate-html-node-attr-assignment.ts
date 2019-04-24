@@ -173,12 +173,10 @@ function validateHtmlAttrAssignmentTypes(
 	const { assignment } = htmlAttr;
 	if (assignment == null) return undefined;
 
-	const checker = program.getTypeChecker();
-
 	switch (htmlAttr.modifier) {
 		case LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER:
 			// Test if the user is trying to use the ? modifier on a non-boolean type.
-			if (!isAssignableToType(typeA, { kind: SimpleTypeKind.BOOLEAN })) {
+			if (!isAssignableToType(typeA, { kind: SimpleTypeKind.BOOLEAN }, program)) {
 				return [
 					{
 						kind: LitHtmlDiagnosticKind.BOOL_MOD_ON_NON_BOOL,
@@ -245,10 +243,14 @@ function validateHtmlAttrAssignmentTypes(
 			else if (
 				typeB.kind === SimpleTypeKind.STRING_LITERAL &&
 				typeB.value.length === 0 &&
-				isAssignableToType(typeA, {
-					kind: SimpleTypeKind.BOOLEAN_LITERAL,
-					value: true
-				})
+				isAssignableToType(
+					typeA,
+					{
+						kind: SimpleTypeKind.BOOLEAN_LITERAL,
+						value: true
+					},
+					program
+				)
 			) {
 				return [];
 			}
@@ -267,7 +269,7 @@ function validateHtmlAttrAssignmentTypes(
 
 			// Take into account that assigning a boolean without "?" binding would result in "undefined" being assigned.
 			// Example: <input disabled="${true}" />
-			else if (isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.BOOLEAN, SimpleTypeKind.BOOLEAN_LITERAL], { op: "or" })) {
+			else if ([SimpleTypeKind.BOOLEAN_LITERAL, SimpleTypeKind.BOOLEAN].includes(typeA.kind)) {
 				return [
 					{
 						kind: LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING,
@@ -282,13 +284,13 @@ function validateHtmlAttrAssignmentTypes(
 			}
 	}
 
-	if (!isAssignableToType(typeA, typeB, checker)) {
+	if (!isAssignableToType(typeA, typeB, program)) {
 		// Test if removing "undefined" from typeB would work and suggest using "ifDefined".
 		if (assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION && htmlAttr.kind === HtmlNodeAttrKind.ATTRIBUTE) {
 			if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.UNDEFINED)) {
 				const typeBWithoutUndefined = removeUndefinedFromType(typeB);
 
-				if (isAssignableToType(typeA, typeBWithoutUndefined, checker)) {
+				if (isAssignableToType(typeA, typeBWithoutUndefined, program)) {
 					return [
 						{
 							kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED,

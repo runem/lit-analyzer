@@ -77,10 +77,10 @@ html`
 	<input ?disabled="${"hello"}" />
 `; /* <input disabled="true" /> */
 html`
-	<input disabled="${true}" />
+	<input ?disabled="${true}" />
 `; /* <input disabled="true" /> */
 html`
-	<input disabled="${false}" />
+	<input ?disabled="${false}" />
 `; /* <input disabled="false" /> */
 html`
 	<input ?disabled="${true}" />
