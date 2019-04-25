@@ -87,7 +87,9 @@ export class LitHtmlDocumentAnalyzer {
 				kind: "memberVariableElement",
 				fullDisplayName: hit.tagName,
 				displayName: hit.tagName,
-				range: { document, ...hit.location.name }
+				range: { document, ...hit.location.name },
+				document,
+				target: hit
 			};
 		}
 	}

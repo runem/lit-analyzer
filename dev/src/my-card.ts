@@ -40,7 +40,7 @@ class Test extends MyBase {
 	mynumber!: number;
 }
 
-customElements.define("my-test", Test);
+customElements.define("my-hehehe-hehehe", Test);
 
 declare global {
 	interface HTMLElementTagNameMap {

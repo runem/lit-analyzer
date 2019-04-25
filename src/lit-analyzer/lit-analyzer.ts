@@ -104,7 +104,8 @@ export class LitAnalyzer {
 						fullDisplayName: tagName,
 						displayName: tagName,
 						range: { start: nodeUnderCursor.getStart() + 1, end: nodeUnderCursor.getEnd() - 1 },
-						kind: "label"
+						kind: "label",
+						target: definition
 					};
 				}
 			}
@@ -112,33 +113,22 @@ export class LitAnalyzer {
 	}
 
 	getRenameLocationsAtPosition(file: SourceFile, position: number): LitRenameLocation[] {
-		const { document, offset } = this.getDocumentAndOffsetAtPosition(file, position);
-		this.context.updateComponents(file);
+		const renameInfo = this.getRenameInfoAtPosition(file, position);
+		if (renameInfo == null) return [];
 
-		if (document != null) {
+		if ("document" in renameInfo) {
+			const document = renameInfo.document;
+			const offset = document.virtualDocument.scPositionToOffset(position);
 			const request = this.makeRequest({ file, document });
 
 			if (document instanceof CssDocument) {
 				return [];
-			} else if (document instanceof HtmlDocument) {
+			} else {
 				return this.litHtmlDocumentAnalyzer.getRenameLocationsAtOffset(document, offset, request);
 			}
 		} else {
-			const nodeUnderCursor = getNodeAtPosition(file, position);
-
-			if (nodeUnderCursor == null) return [];
-
-			if (this.context.ts.isStringLiteralLike(nodeUnderCursor)) {
-				const tagName = nodeUnderCursor.text;
-				const definition = this.context.definitionStore.getDefinitionForTagName(tagName);
-
-				if (definition != null && nodeIntersects(nodeUnderCursor, definition.node)) {
-					return renameLocationsForTagName(tagName, this.context);
-				}
-			}
+			return renameLocationsForTagName(renameInfo.target.tagName, this.context);
 		}
-
-		return [];
 	}
 
 	getClosingTagAtPosition(file: SourceFile, position: number): LitClosingTagInfo | undefined {

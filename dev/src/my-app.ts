@@ -43,9 +43,9 @@ const myApp = (text: string, disabled: boolean) => html`
 
 	<video playsinline muted preload="metadata" aria-pressed="undefined" aria-readonly="true"></video>
 
-	<my-test>
+	<my-hehehe-hehehe>
 		<div slot="myslot"></div>
-	</my-test>
+	</my-hehehe-hehehe>
 
 	<mwc-button dense></mwc-button>
 
