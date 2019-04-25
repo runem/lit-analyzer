@@ -37,6 +37,7 @@
 		"/html-documentation/"
 	],
 	"dependencies": {
+		"chalk": "^2.4.2",
 		"didyoumean2": "2.0.4",
 		"parse5": "5.1.0",
 		"ts-simple-type": "~0.3.0",

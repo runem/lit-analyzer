@@ -12,11 +12,24 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 	// Combine data with extra html5 events because vscode-html-language-service hasn't included all events yet.
 	const ALL_HTML5_EVENTS: typeof HTML5_EVENTS = [...HTML5_EVENTS, ...EXTRA_HTML5_EVENTS.filter(evt => HTML5_EVENTS.find(existingEvt => existingEvt.name === evt.name) == null)];
 
+	// It seems like the autocompletion value map for <select>, <textarea> and <input> needs "on" and "off" values
+	const EXTENDED_HTML5_VALUE_MAP = HTML5_VALUE_MAP.map(VALUE_MAP => {
+		switch (VALUE_MAP.name) {
+			case "inputautocomplete":
+				return {
+					...VALUE_MAP,
+					values: [{ name: "on" }, { name: "off" }, ...VALUE_MAP.values]
+				};
+			default:
+				return VALUE_MAP;
+		}
+	});
+
 	const result = parseHtmlData({
 		version: 1,
 		tags: HTML5_TAGS,
 		globalAttributes: [...HTML5_GLOBAL_ATTRIBUTES, ...ALL_HTML5_EVENTS, ...ARIA_ATTRIBUTES],
-		valueSets: HTML5_VALUE_MAP
+		valueSets: EXTENDED_HTML5_VALUE_MAP
 	});
 
 	result.tags.push({

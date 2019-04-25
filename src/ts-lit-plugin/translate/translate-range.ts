@@ -13,11 +13,4 @@ export function translateRange(range: DocumentRange): TextSpan {
 		start: range.start,
 		length: range.end - range.start
 	};
-	/*const start = document.virtualDocument.offsetToSCPosition(range.start);
-	 const end = document.virtualDocument.offsetToSCPosition(range.end);
-
-	 return {
-	 start,
-	 length: end - start
-	 };*/
 }

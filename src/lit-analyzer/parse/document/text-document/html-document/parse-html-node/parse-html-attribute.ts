@@ -1,8 +1,8 @@
 import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../../../../../constants";
+import { HtmlNodeAttr, HtmlNodeAttrKind, IHtmlNodeAttrBase, IHtmlNodeAttrSourceCodeLocation } from "../../../../../types/html-node/html-node-attr-types";
 import { parseLitAttrName } from "../../../../../util/util";
 import { IP5NodeAttr, IP5TagNode } from "../parse-html-p5/parse-html-types";
 import { parseHtmlAttrAssignment } from "./parse-html-attr-assignment";
-import { HtmlNodeAttr, HtmlNodeAttrKind, IHtmlNodeAttrBase, IHtmlNodeAttrSourceCodeLocation } from "../../../../../types/html-node/html-node-attr-types";
 import { ParseHtmlAttrContext } from "./parse-html-attr-context";
 
 /**
@@ -54,7 +54,10 @@ export function parseHtmlNodeAttr(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, conte
 function makeHtmlAttrLocation(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, context: ParseHtmlAttrContext): IHtmlNodeAttrSourceCodeLocation {
 	const { name, modifier } = parseLitAttrName(p5Attr.name);
 
-	const htmlAttrLocation = (p5Node.sourceCodeLocation.startTag.attrs || {})[p5Attr.name];
+	// Explicitly call "toLowerCase()" because of inconsistencies in parse5.
+	// Parse5 lowercases source code location attr keys but doesnt lowercase the attr name when it comes to svg.
+	// It would be correct not to lowercase the attr names because svg is case sensitive
+	const htmlAttrLocation = (p5Node.sourceCodeLocation.startTag.attrs || {})[p5Attr.name.toLowerCase()];
 	const start = htmlAttrLocation.startOffset;
 	const end = htmlAttrLocation.endOffset;
 	return {

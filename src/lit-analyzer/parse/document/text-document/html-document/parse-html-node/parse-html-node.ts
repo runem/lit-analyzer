@@ -1,8 +1,8 @@
 import { TS_IGNORE_FLAG } from "../../../../../../constants";
+import { HtmlNode, HtmlNodeKind, IHtmlNodeBase, IHtmlNodeSourceCodeLocation } from "../../../../../types/html-node/html-node-types";
 import { isCommentNode, isTagNode } from "../parse-html-p5/parse-html";
 import { IP5TagNode, P5Node } from "../parse-html-p5/parse-html-types";
 import { parseHtmlNodeAttrs } from "./parse-html-attribute";
-import { HtmlNode, HtmlNodeKind, IHtmlNodeBase, IHtmlNodeSourceCodeLocation } from "../../../../../types/html-node/html-node-types";
 import { ParseHtmlContext } from "./parse-html-context";
 
 /**
@@ -58,7 +58,10 @@ export function parseHtmlNode(p5Node: IP5TagNode, parent: HtmlNode | undefined, 
 
 	const htmlNode = parseHtmlNodeBase(htmlNodeBase);
 
-	htmlNode.children = parseHtmlNodes(p5Node.childNodes || [], htmlNode, context);
+	// Don't parse children of <style> and <svg> as of now
+	if (htmlNode.kind === HtmlNodeKind.NODE) {
+		htmlNode.children = parseHtmlNodes(p5Node.childNodes || [], htmlNode, context);
+	}
 
 	htmlNode.attributes = parseHtmlNodeAttrs(p5Node, { ...context, htmlNode });
 

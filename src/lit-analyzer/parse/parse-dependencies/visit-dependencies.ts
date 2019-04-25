@@ -6,7 +6,7 @@ import { logger } from "../../util/logger";
 interface IVisitDependenciesContext {
 	program: Program;
 	ts: typeof tsModule;
-	project: ts.server.Project;
+	project: ts.server.Project | undefined;
 	lockedFiles: string[];
 	getDefinitionsInFile(file: SourceFile): ComponentDefinition[] | undefined;
 	getImportedDefinitionsInFile(file: SourceFile): ComponentDefinition[] | undefined;
@@ -72,7 +72,12 @@ export function visitDependencies(node: Node, context: IVisitDependenciesContext
 
 function visitModuleWithName(moduleSpecifier: string, node: Node, context: IVisitDependenciesContext) {
 	// Resolve the imported string
-	const result = context.project.getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, node.getSourceFile().fileName);
+	const result = context.project
+		? context.project.getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, node.getSourceFile().fileName)
+		: "getResolvedModuleWithFailedLookupLocationsFromCache" in context.program
+		? (context.program as any)["getResolvedModuleWithFailedLookupLocationsFromCache"](moduleSpecifier, node.getSourceFile().fileName)
+		: undefined;
+
 	const mod = result != null ? result.resolvedModule : undefined;
 
 	if (mod != null) {

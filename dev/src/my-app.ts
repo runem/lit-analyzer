@@ -43,6 +43,8 @@ const myApp = (text: string, disabled: boolean) => html`
 
 	<video playsinline muted preload="metadata" aria-pressed="undefined" aria-readonly="true"></video>
 
+	<textarea autocomplete="sex"></textarea>
+
 	<my-hehehe-hehehe>
 		<div slot="myslot"></div>
 	</my-hehehe-hehehe>
