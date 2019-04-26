@@ -13,7 +13,7 @@ export class MyButton extends LitElement {
 	 */
 	@property({ type: String }) size: "small" | "medium" | "large" = "medium";
 
-	@property({ type: Number }) text!: number;
+	@property({ type: Number }) text!: string;
 
 	@property({ type: Boolean }) disabled: boolean = false;
 

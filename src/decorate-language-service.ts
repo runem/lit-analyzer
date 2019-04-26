@@ -1,6 +1,6 @@
 import { LanguageService } from "typescript";
-import { TsLitPlugin } from "./language-service/ts-lit-plugin";
-import { logger } from "./util/logger";
+import { TsLitPlugin } from "./ts-lit-plugin/ts-lit-plugin";
+import { logger } from "./lit-analyzer/util/logger";
 
 export function decorateLanguageService(languageService: LanguageService, plugin: TsLitPlugin): LanguageService {
 	const nextLanguageService: LanguageService = {
@@ -11,7 +11,10 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 		getDefinitionAndBoundSpan: plugin.getDefinitionAndBoundSpan.bind(plugin),
 		getCodeFixesAtPosition: plugin.getCodeFixesAtPosition.bind(plugin),
 		getQuickInfoAtPosition: plugin.getQuickInfoAtPosition.bind(plugin),
-		getJsxClosingTagAtPosition: plugin.getJsxClosingTagAtPosition.bind(plugin)
+		getJsxClosingTagAtPosition: plugin.getJsxClosingTagAtPosition.bind(plugin),
+		getRenameInfo: plugin.getRenameInfo.bind(plugin),
+		findRenameLocations: plugin.findRenameLocations.bind(plugin)
+
 		//getOutliningSpans: plugin.getOutliningSpans.bind(plugin)
 		//getFormattingEditsForRange: plugin.getFormattingEditsForRange.bind(plugin)
 	};
@@ -23,7 +26,7 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 
 		if (newMethod !== oldMethod) {
 			(nextLanguageService as any)[methodName] = function() {
-				if (plugin.config.disable && oldMethod != null) {
+				if (plugin.context.config.disable && oldMethod != null) {
 					return oldMethod(...arguments);
 				}
 
@@ -33,7 +36,7 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 	}
 
 	// Wrap all method called to the service in tryCatch and logging.
-	if (plugin.config.verbose) {
+	if (plugin.context.config.verbose) {
 		for (const methodName of Object.getOwnPropertyNames(nextLanguageService)) {
 			const method = (nextLanguageService as any)[methodName];
 			(nextLanguageService as any)[methodName] = wrapLog(methodName, method);

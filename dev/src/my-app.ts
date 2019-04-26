@@ -1,25 +1,36 @@
 import { html, render } from "lit-html";
-import "./my-element";
+import { ifDefined } from "lit-html/directives/if-defined";
+import "@ideanote/atoms/lib/chunk-48d4e365";
 import "@material/mwc-button/mwc-button";
-import "./my-button";
-import "@ideanote/atoms/lib/card";
+import "./my-element";
+import "./my-component";
+import { MyBase } from "./my-card";
 
 (async () => {
 	await import("./my-card");
 })();
 
+const src = "hello.png" as string | undefined;
+
 const myApp = (text: string, disabled: boolean) => html`
+	<img src="${ifDefined(src)}" />
+
 	<style>
 		my-button {
 			color: ${"green"};
+		}
+
+		a {
+			color: rebeccapurple;
+			additive-symbols: cross-fade();
 		}
 	</style>
 
 	<lkjsldkfj></lkjsldkfj>
 
-	<a target="_blank" download="hello"></a>
+	<a .href="" target="_blank" download="hello"></a>
 
-	<my-component @submit="" hello="" onsubmit=""></my-component>
+	<my-component @submit="" hello="green green red" onsubmit=""></my-component>
 
 	<sldkfjlskjdf></sldkfjlskjdf>
 
@@ -32,9 +43,11 @@ const myApp = (text: string, disabled: boolean) => html`
 
 	<video playsinline muted preload="metadata" aria-pressed="undefined" aria-readonly="true"></video>
 
-	<my-test>
+	<textarea autocomplete="sex"></textarea>
+
+	<my-hehehe-hehehe>
 		<div slot="myslot"></div>
-	</my-test>
+	</my-hehehe-hehehe>
 
 	<mwc-button dense></mwc-button>
 
@@ -45,13 +58,13 @@ const myApp = (text: string, disabled: boolean) => html`
 	<my-card></my-card>
 	<my-element></my-element>
 
-	<mwc-button></mwc-button>
+	<mwc-button .dense="${true}"></mwc-button>
 
-	<my-external-tag draggable="true"></my-external-tag>
+	<my-external-tag draggable="false"></my-external-tag>
 
 	<mwc-button label="" dense role="math" aria-checked="true" .accessKey="${"hejsa"}" onsubmit="" .dlfkjsdlfkjsdlfkj="${"test"}" @my-event=""></mwc-button>
 
-	<div>
+	<div @hello="${console.log}">
 		<div @change="${() => {}}" @hello="${console.log}" @test-event="${() => {}}" @loadstart="${() => {}}" @hello="${() => {}}">
 			<my-element data-looolz="" onmy-change-event="" a b c .minSetter="${""}" .prop1="${"hello"}" my-attr-hehehe="" @test-event="${() => true}">
 				<div slot=""></div>
@@ -61,6 +74,7 @@ const myApp = (text: string, disabled: boolean) => html`
 	</div>
 
 	<input .value="${null}" .disabled="${true}" type="email" maxlength="1" tabindex="${1 === 1 ? "-1" : "0"}" />
+	<just-testing></just-testing>
 `;
 
 render(myApp("Hello", false), document.body);
