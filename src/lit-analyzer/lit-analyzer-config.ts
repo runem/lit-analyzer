@@ -29,7 +29,7 @@ export interface LitAnalyzerConfig {
  * Parses a partial user configuration and returns a full options object with defaults.
  * @param userOptions
  */
-export function makeConfig(userOptions: Partial<LitAnalyzerConfig>): LitAnalyzerConfig {
+export function makeConfig(userOptions: Partial<LitAnalyzerConfig> = {}): LitAnalyzerConfig {
 	return {
 		disable: userOptions.disable || false,
 		verbose: userOptions.verbose || false,

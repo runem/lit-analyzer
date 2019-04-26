@@ -3,6 +3,7 @@ import { Program, SourceFile, TypeChecker } from "typescript";
 import * as tsServer from "typescript/lib/tsserverlibrary";
 import { analyzeComponents, analyzeLibDomHtmlElement } from "web-component-analyzer";
 import { getBuiltInHtmlCollection } from "./data/get-built-in-html-collection";
+import { getUserConfigHtmlCollection } from "./data/get-user-config-html-collection";
 import { LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config";
 import { LitAnalyzerContext, LitPluginContextHandler } from "./lit-analyzer-context";
 import { DefaultLitAnalyzerLogger } from "./lit-analyzer-logger";
@@ -44,6 +45,10 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 
 	public updateConfig(config: LitAnalyzerConfig) {
 		this._config = config;
+
+		// Add user configured HTML5 collection
+		const collection = getUserConfigHtmlCollection(config);
+		this.htmlStore.absorbCollection(collection, HtmlDataSourceKind.USER);
 	}
 
 	updateDependencies(file: SourceFile): void {

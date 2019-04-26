@@ -33,8 +33,6 @@ export async function analyzeGlobs(globs: string[], context: AnalyzeGlobsContext
 	// Expand the globs
 	const filePaths = await expandGlobs(globs);
 
-	console.log(filePaths);
-
 	// Callbacks
 	if (context.didExpandGlobs != null) context.didExpandGlobs(filePaths);
 	if (context.willAnalyzeFiles != null) context.willAnalyzeFiles(filePaths);
@@ -48,7 +46,7 @@ export async function analyzeGlobs(globs: string[], context: AnalyzeGlobsContext
 		if (context.didFindTypescriptDiagnostics != null) context.didFindTypescriptDiagnostics(diagnostics, { program });
 	}
 
-	// Analyze each file with web component analyzer
+	// Analyze each file
 	for (const file of files) {
 		// Analyze
 		if (context.analyzeSourceFile != null) context.analyzeSourceFile(file, { program });
