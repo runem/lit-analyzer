@@ -1,9 +1,9 @@
 import chalk from "chalk";
 import { Program, SourceFile, TextSpan } from "typescript";
-import { DefaultLitAnalyzerContext } from "../lit-analyzer/default-lit-analyzer-context";
-import { LitAnalyzer } from "../lit-analyzer/lit-analyzer";
-import { makeConfig } from "../lit-analyzer/lit-analyzer-config";
-import { DocumentRange } from "../lit-analyzer/types/lit-range";
+import { DefaultLitAnalyzerContext } from "../analyze/default-lit-analyzer-context";
+import { LitAnalyzer } from "../analyze/lit-analyzer";
+import { makeConfig } from "../analyze/lit-analyzer-config";
+import { DocumentRange } from "../analyze/types/lit-range";
 import { analyzeGlobs } from "./analyze-globs";
 import { readTsLitPluginConfig } from "./compile";
 

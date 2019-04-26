@@ -1,67 +1,23 @@
-import { setTypescriptModule as setTsIsAssignableModule } from "ts-simple-type";
-import * as ts from "typescript";
-import * as tsServer from "typescript/lib/tsserverlibrary";
-import { decorateLanguageService } from "./decorate-language-service";
-import { LitPluginContext } from "./ts-lit-plugin/lit-plugin-context";
-import { TsLitPlugin } from "./ts-lit-plugin/ts-lit-plugin";
-import { LitAnalyzerConfig, makeConfig } from "./lit-analyzer/lit-analyzer-config";
-import { setTypescriptModule } from "./ts-module";
-import { logger } from "./lit-analyzer/util/logger";
+export * from "./analyze/lit-analyzer";
+export * from "./analyze/lit-analyzer-config";
+export * from "./analyze/lit-analyzer-context";
+export * from "./analyze/lit-analyzer-logger";
+export * from "./analyze/default-lit-analyzer-context";
 
-const tsHtmlPluginSymbol = Symbol.for("__tsHtmlPlugin__");
+export * from "./analyze/types/lit-closing-tag-info";
+export * from "./analyze/types/lit-code-fix";
+export * from "./analyze/types/lit-code-fix-action";
+export * from "./analyze/types/lit-completion";
+export * from "./analyze/types/lit-completion-details";
+export * from "./analyze/types/lit-definition";
+export * from "./analyze/types/lit-diagnostic";
+export * from "./analyze/types/lit-format-edit";
+export * from "./analyze/types/lit-outlining-span";
+export * from "./analyze/types/lit-quick-info";
+export * from "./analyze/types/lit-quick-info";
+export * from "./analyze/types/lit-range";
+export * from "./analyze/types/lit-rename-info";
+export * from "./analyze/types/lit-rename-location";
+export * from "./analyze/types/lit-target-kind";
 
-let context: LitPluginContext | undefined = undefined;
-
-/**
- * Export a function for the ts-service to initialize our plugin.
- * @param typescript
- */
-function init({ typescript }: { typescript: typeof ts }): tsServer.server.PluginModule {
-	// Cache the typescript module
-	setTsIsAssignableModule(typescript);
-	setTypescriptModule(typescript);
-
-	return {
-		create: (info: tsServer.server.PluginCreateInfo) => {
-			// Check if the language service is already decorated
-			if ((info.languageService as any)[tsHtmlPluginSymbol] != null) {
-				return info.languageService;
-			}
-
-			// Extend existing language service with the plugin functions
-			try {
-				context = new LitPluginContext({
-					ts: typescript,
-					getProgram: () => {
-						return info.languageService.getProgram()!;
-					},
-					getProject: () => {
-						return info.project;
-					}
-				});
-
-				context.updateConfig(makeConfig(info.config));
-
-				const plugin = new TsLitPlugin(info.languageService, context);
-
-				const decoratedService = decorateLanguageService(info.languageService, plugin);
-
-				// Save that we've extended this service to prevent extending it again
-				(decoratedService as any)[tsHtmlPluginSymbol] = plugin;
-
-				return decoratedService;
-			} catch (e) {
-				logger.error("ts-lit-plugin crashed while decorating the language service...", e);
-
-				return info.languageService;
-			}
-		},
-
-		onConfigurationChanged(config: Partial<LitAnalyzerConfig>) {
-			if (context == null || config == null) return;
-			context.updateConfig(makeConfig(config));
-		}
-	};
-}
-
-export = init;
+export * from "./cli/cli";
