@@ -476,7 +476,7 @@ function isLitDirective(type: SimpleType): boolean {
 				type.kind === SimpleTypeKind.FUNCTION &&
 				type.argTypes != null &&
 				type.argTypes.length > 0 &&
-				type.argTypes[0].type.name === "Part" &&
+				["Part", "NodePart", "AttributePart", "PropertyPart"].includes(type.argTypes[0].type.name || "") &&
 				type.returnType != null &&
 				type.returnType.kind === SimpleTypeKind.VOID
 			);
