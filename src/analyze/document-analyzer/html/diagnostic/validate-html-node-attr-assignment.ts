@@ -308,7 +308,7 @@ function validateHtmlAttrAssignmentTypes(
 				}
 
 				// Take into account string === boolean expressions: 'aria-expanded="${this.open}"'
-				else if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.BOOLEAN) && isAssignableToType(typeA, STRINGIFIED_BOOLEAN_TYPE)) {
+				else if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.BOOLEAN) && isAssignableToType(typeA, STRINGIFIED_BOOLEAN_TYPE, program)) {
 					return [];
 				}
 			}

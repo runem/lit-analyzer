@@ -11,6 +11,7 @@ export interface IP5BaseSourceCodeLocation {
 export interface IP5NodeAttr {
 	name: string;
 	value: string;
+	prefix?: string;
 }
 
 export interface IP5NodeBase {

@@ -57,7 +57,8 @@ function makeHtmlAttrLocation(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, context: 
 	// Explicitly call "toLowerCase()" because of inconsistencies in parse5.
 	// Parse5 lowercases source code location attr keys but doesnt lowercase the attr name when it comes to svg.
 	// It would be correct not to lowercase the attr names because svg is case sensitive
-	const htmlAttrLocation = (p5Node.sourceCodeLocation.startTag.attrs || {})[p5Attr.name.toLowerCase()];
+	const sourceCodeLocationName = `${p5Attr.prefix || ""}${(p5Attr.prefix && ":") || ""}${p5Attr.name}`.toLowerCase();
+	const htmlAttrLocation = (p5Node.sourceCodeLocation.startTag.attrs || {})[sourceCodeLocationName];
 	const start = htmlAttrLocation.startOffset;
 	const end = htmlAttrLocation.endOffset;
 	return {
