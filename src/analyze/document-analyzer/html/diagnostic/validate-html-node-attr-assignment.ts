@@ -2,6 +2,7 @@ import {
 	isAssignableToPrimitiveType,
 	isAssignableToSimpleTypeKind,
 	isAssignableToType,
+	isAssignableToValue,
 	isSimpleType,
 	SimpleType,
 	SimpleTypeBooleanLiteral,
@@ -17,6 +18,18 @@ import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types";
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../../types/lit-diagnostic";
+import { lazy } from "../../../util/general-util";
+
+const STRINGIFIED_BOOLEAN_TYPE: SimpleType = {
+	kind: SimpleTypeKind.UNION,
+	types: [
+		{
+			kind: SimpleTypeKind.STRING_LITERAL,
+			value: "true"
+		},
+		{ kind: SimpleTypeKind.STRING_LITERAL, value: "false" }
+	]
+};
 
 /**
  * Validates an attribute assignment: lit-html style.
@@ -93,7 +106,12 @@ function validateHtmlAttrAssignmentRules(htmlAttr: HtmlNodeAttr, typeB: SimpleTy
 		case HtmlNodeAttrKind.EVENT_LISTENER:
 			// Make sure that there is a function as event listener value.
 			// Here we catch errors like: @click="onClick()"
-			if (!isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.FUNCTION, { matchAny: true }) && !isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.METHOD, { matchAny: true })) {
+			if (
+				!isAssignableToSimpleTypeKind(typeB, [SimpleTypeKind.FUNCTION, SimpleTypeKind.METHOD, SimpleTypeKind.UNKNOWN], {
+					matchAny: true,
+					op: "or"
+				})
+			) {
 				return [
 					{
 						kind: LitHtmlDiagnosticKind.NO_EVENT_LISTENER_FUNCTION,
@@ -239,48 +257,60 @@ function validateHtmlAttrAssignmentTypes(
 				];
 			}
 
-			// Take into account that 'disabled=""' is equal to true
-			else if (
-				typeB.kind === SimpleTypeKind.STRING_LITERAL &&
-				typeB.value.length === 0 &&
-				isAssignableToType(
-					typeA,
-					{
-						kind: SimpleTypeKind.BOOLEAN_LITERAL,
-						value: true
-					},
-					program
-				)
-			) {
-				return [];
-			}
+			// Test assignments to all possible type kinds
+			const typeAIsAssignableTo = {
+				[SimpleTypeKind.STRING]: lazy(() => isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.STRING, SimpleTypeKind.STRING_LITERAL], { op: "or" })),
+				[SimpleTypeKind.NUMBER]: lazy(() => isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.NUMBER, SimpleTypeKind.NUMBER_LITERAL], { op: "or" })),
+				[SimpleTypeKind.BOOLEAN]: lazy(() => isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.BOOLEAN, SimpleTypeKind.BOOLEAN_LITERAL], { op: "or" })),
+				[SimpleTypeKind.ARRAY]: lazy(() => isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.ARRAY, SimpleTypeKind.TUPLE], { op: "or" })),
+				[SimpleTypeKind.OBJECT]: lazy(() => isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.OBJECT, SimpleTypeKind.INTERFACE, SimpleTypeKind.CLASS], { op: "or" }))
+			};
 
-			// Take into account that assignments like maxlength="50" is allowed even though "50" is a string literal in this case.
-			else if (isAssignableToSimpleTypeKind(typeA, SimpleTypeKind.NUMBER)) {
-				if (typeB.kind !== SimpleTypeKind.STRING_LITERAL) {
+			const typeAIsAssignableToMultiple = lazy(() => Object.values(typeAIsAssignableTo).filter(assignable => assignable()).length > 1);
+
+			// Normal attribute 'string' assignments like 'max="123"'
+			if (typeB.kind === SimpleTypeKind.STRING_LITERAL) {
+				// Take into account that 'disabled=""' is equal to true
+				if (typeB.value.length === 0 && typeAIsAssignableTo[SimpleTypeKind.BOOLEAN]()) {
 					return [];
 				}
 
-				// Test if a potential string literal is a Number
-				if (!isNaN(typeB.value as any)) {
-					return [];
-				}
-			}
-
-			// Take into account that assigning a boolean without "?" binding would result in "undefined" being assigned.
-			// Example: <input disabled="${true}" />
-			else if (assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION && [SimpleTypeKind.BOOLEAN_LITERAL, SimpleTypeKind.BOOLEAN].includes(typeA.kind)) {
-				return [
-					{
-						kind: LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING,
-						severity: "error",
-						message: `The '${htmlAttr.name}' attribute is a boolean type but you not using a boolean binding. Change to boolean binding?`,
-						location: { document, ...htmlAttr.location.name },
-						htmlAttr,
-						typeA,
-						typeB
+				// Take into account that assignments like maxlength="50" (which is a number) is allowed even though "50" is a string literal in this case.
+				else if (typeAIsAssignableTo[SimpleTypeKind.NUMBER]()) {
+					// Test if a potential string literal is a Number
+					if (!isNaN(typeB.value as any) && isAssignableToValue(typeA, Number(typeB.value))) {
+						return [];
 					}
-				];
+				}
+			}
+
+			// Tagged template attribute 'expression' assignments like 'max="${this.max}"'
+			else if (assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION) {
+				// Take into account that assigning a boolean without "?" binding would result in "undefined" being assigned.
+				// Example: <input disabled="${true}" />
+				if (typeAIsAssignableTo[SimpleTypeKind.BOOLEAN]() && !typeAIsAssignableToMultiple()) {
+					return [
+						{
+							kind: LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING,
+							severity: "error",
+							message: `The '${htmlAttr.name}' attribute is a boolean type but you not using a boolean binding. Change to boolean binding?`,
+							location: { document, ...htmlAttr.location.name },
+							htmlAttr,
+							typeA,
+							typeB
+						}
+					];
+				}
+
+				// Take into account string === number expressions: 'value="${this.max}"'
+				else if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.NUMBER) && typeAIsAssignableTo[SimpleTypeKind.STRING]()) {
+					return [];
+				}
+
+				// Take into account string === boolean expressions: 'aria-expanded="${this.open}"'
+				else if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.BOOLEAN) && isAssignableToType(typeA, STRINGIFIED_BOOLEAN_TYPE)) {
+					return [];
+				}
 			}
 	}
 
@@ -305,6 +335,7 @@ function validateHtmlAttrAssignmentTypes(
 				}
 			}
 		}
+
 		// Fail if the two types are not assignable to each other.
 		return [
 			{

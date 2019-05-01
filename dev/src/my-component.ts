@@ -1,7 +1,7 @@
 import { customElement, html, LitElement, property } from "lit-element";
 import "./my-button";
 
-export type AtSnapPosition = "top" | "bottom" | "center" | "left-top" | "left" | "left-bottom" | "right-top" | "right" | "right-bottom";
+export type Position = 1 | 2 | 3;
 
 /**
  * Hejsa
@@ -22,7 +22,7 @@ export class MyTest extends LitElement {
 
 	//@property({ type: Object }) foo!: { hello: string };
 
-	@property() snapPosition: AtSnapPosition = "top";
+	@property({ type: Number }) snapPosition: Position = 1;
 
 	static get properties() {
 		return {
@@ -40,6 +40,7 @@ export class MyTest extends LitElement {
 }
 
 html`
-	<button disabled="10"></button>
-	<button ?disabled="${true}"></button>
+	<button disabled="" @keypress="${(() => {}).bind({})}" aria-expanded="${true as boolean}"></button>
+
+	<my-component snapPosition="2"></my-component>
 `;
