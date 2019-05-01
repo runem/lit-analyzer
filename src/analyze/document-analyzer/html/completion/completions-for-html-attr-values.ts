@@ -1,11 +1,16 @@
 import { isSimpleTypeLiteral, SimpleType, SimpleTypeKind } from "ts-simple-type";
-import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types";
-import { DocumentPositionContext } from "../../../util/get-position-context-in-document";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
+import { HtmlNodeAttrAssignmentKind } from "../../../types/html-node/html-node-attr-assignment-types";
+import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types";
 import { LitCompletion } from "../../../types/lit-completion";
+import { DocumentPositionContext } from "../../../util/get-position-context-in-document";
 
 export function completionsForHtmlAttrValues(htmlNodeAttr: HtmlNodeAttr, location: DocumentPositionContext, { htmlStore }: LitAnalyzerRequest): LitCompletion[] {
+	// There is not point in showing completions for event listener bindings
 	if (htmlNodeAttr.kind === HtmlNodeAttrKind.EVENT_LISTENER) return [];
+
+	// Don't show completions inside assignments with expressions
+	if (htmlNodeAttr.assignment && htmlNodeAttr.assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION) return [];
 
 	const htmlTagMember = htmlStore.getHtmlAttrTarget(htmlNodeAttr);
 	if (htmlTagMember == null) return [];

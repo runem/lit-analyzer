@@ -303,12 +303,12 @@ function validateHtmlAttrAssignmentTypes(
 				}
 
 				// Take into account string === number expressions: 'value="${this.max}"'
-				else if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.NUMBER) && typeAIsAssignableTo[SimpleTypeKind.STRING]()) {
+				else if (isAssignableToSimpleTypeKind(typeB, [SimpleTypeKind.NUMBER, SimpleTypeKind.NUMBER_LITERAL], { op: "or" }) && typeAIsAssignableTo[SimpleTypeKind.STRING]()) {
 					return [];
 				}
 
 				// Take into account string === boolean expressions: 'aria-expanded="${this.open}"'
-				else if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.BOOLEAN) && isAssignableToType(typeA, STRINGIFIED_BOOLEAN_TYPE, program)) {
+				else if (isAssignableToSimpleTypeKind(typeB, [SimpleTypeKind.BOOLEAN, SimpleTypeKind.BOOLEAN_LITERAL], { op: "or" }) && isAssignableToType(typeA, STRINGIFIED_BOOLEAN_TYPE, program)) {
 					return [];
 				}
 			}
