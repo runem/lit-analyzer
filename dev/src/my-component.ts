@@ -42,5 +42,7 @@ export class MyTest extends LitElement {
 html`
 	<button disabled="" @keypress="${(() => {}).bind({})}" aria-expanded="${true as boolean}"></button>
 
+	<video width="100%"></video>
+
 	<my-component snapPosition="2"></my-component>
 `;
