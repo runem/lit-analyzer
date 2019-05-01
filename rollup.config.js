@@ -1,5 +1,4 @@
 import ts from "@wessberg/rollup-plugin-ts";
-import commonjs from "rollup-plugin-commonjs";
 import resolve from "rollup-plugin-node-resolve";
 import replace from "rollup-plugin-replace";
 
@@ -11,8 +10,13 @@ const external = [
 	"util",
 	"path",
 	"fs",
+	"chalk",
+	"didyoumean2",
+	"parse5",
 	"ts-simple-type",
 	"didyoumean2",
+	"web-component-analyzer",
+	"ts-simple-type",
 	"chalk",
 	"vscode-html-languageservice",
 	"vscode-css-languageservice",
@@ -29,7 +33,6 @@ const plugins = [
 	resolve({
 		preferBuiltins: true
 	}),
-	commonjs(),
 	ts()
 ];
 

@@ -1,5 +1,4 @@
 import { SourceFile } from "typescript";
-import { Range } from "./types/range";
 import { LitCssDocumentAnalyzer } from "./document-analyzer/css/lit-css-document-analyzer";
 import { LitHtmlDocumentAnalyzer } from "./document-analyzer/html/lit-html-document-analyzer";
 import { renameLocationsForTagName } from "./document-analyzer/html/rename-locations/rename-locations-for-tag-name";
@@ -18,6 +17,7 @@ import { LitOutliningSpan } from "./types/lit-outlining-span";
 import { LitQuickInfo } from "./types/lit-quick-info";
 import { LitRenameInfo } from "./types/lit-rename-info";
 import { LitRenameLocation } from "./types/lit-rename-location";
+import { Range } from "./types/range";
 import { getNodeAtPosition, nodeIntersects } from "./util/ast-util";
 import { flatten } from "./util/general-util";
 
