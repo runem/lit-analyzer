@@ -16,7 +16,7 @@ export class MyTest extends LitElement {
 
 	myProp2: string = "bar";
 
-	@property({ type: Number }) bar!: number | { foo: string };
+	@property({ type: String }) bar!: number | { foo: string };
 
 	//@property({ type: Object }) bar2!: string;
 

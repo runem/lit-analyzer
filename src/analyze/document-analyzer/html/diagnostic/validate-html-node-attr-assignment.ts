@@ -51,7 +51,9 @@ export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, request: LitA
 	// ==========================================
 
 	// Infer the type of the RHS
-	const typeBInferred = inferTypeFromAssignment(assignment, checker);
+	const inJavascriptFile = request.file.fileName.endsWith(".js");
+	const ignoreTypeB = inJavascriptFile && assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION;
+	const typeBInferred = ignoreTypeB ? ({ kind: SimpleTypeKind.ANY } as SimpleType) : inferTypeFromAssignment(assignment, checker);
 
 	// Convert typeB to SimpleType
 	const typeB = isSimpleType(typeBInferred) ? typeBInferred : toSimpleType(typeBInferred, checker);
@@ -377,7 +379,7 @@ function validateHtmlAttrDirectiveAssignment(htmlAttr: HtmlNodeAttr, { typeA, ty
 								{
 									kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWED_HERE,
 									message: `The 'ifDefined' directive has no effect here.`,
-									severity: "error",
+									severity: "warning",
 									location: { document, ...htmlAttr.location.name }
 								}
 							];
