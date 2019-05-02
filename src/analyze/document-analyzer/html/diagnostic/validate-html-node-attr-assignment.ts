@@ -371,6 +371,18 @@ function validateHtmlAttrDirectiveAssignment(htmlAttr: HtmlNodeAttr, { typeA, ty
 					// Then test if this result is now assignable to the attribute type.
 
 					if (args.length === 1) {
+						// "ifDefined" only has an effect on "attribute" bindings
+						if (htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE) {
+							return [
+								{
+									kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWED_HERE,
+									message: `The 'ifDefined' directive has no effect here.`,
+									severity: "error",
+									location: { document, ...htmlAttr.location.name }
+								}
+							];
+						}
+
 						const returnType = toSimpleType(checker.getTypeAtLocation(args[0]), checker);
 						const returnTypeWithoutUndefined = removeUndefinedFromType(returnType);
 
@@ -418,7 +430,7 @@ function validateHtmlAttrDirectiveAssignment(htmlAttr: HtmlNodeAttr, { typeA, ty
 					if (htmlAttr.name !== "class" || htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE) {
 						return [
 							{
-								kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWD_ON_ATTRIBUTE,
+								kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWED_HERE,
 								message: `The 'classMap' directive can only be used in an attribute binding for the 'class' attribute`,
 								severity: "error",
 								location: { document, ...htmlAttr.location.name }
@@ -432,7 +444,7 @@ function validateHtmlAttrDirectiveAssignment(htmlAttr: HtmlNodeAttr, { typeA, ty
 					if (htmlAttr.name !== "style" || htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE) {
 						return [
 							{
-								kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWD_ON_ATTRIBUTE,
+								kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWED_HERE,
 								message: `The 'styleMap' directive can only be used in an attribute binding for the 'style' attribute`,
 								severity: "error",
 								location: { document, ...htmlAttr.location.name }
@@ -450,7 +462,7 @@ function validateHtmlAttrDirectiveAssignment(htmlAttr: HtmlNodeAttr, { typeA, ty
 					// This function validating assignments is per definition used NOT in a text binding
 					return [
 						{
-							kind: LitHtmlDiagnosticKind.DIRECTIVE_ONLY_ALLOWED_IN_TEXT_BINDING,
+							kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWED_HERE,
 							message: `The '${functionName}' directive can only be used within a text binding.`,
 							severity: "error",
 							location: { document, ...htmlAttr.location.name }
@@ -481,7 +493,7 @@ function validateHtmlAttrDirectiveAssignment(htmlAttr: HtmlNodeAttr, { typeA, ty
 
 			return [
 				{
-					kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWED_IN_MIXED_ASSIGNMENT,
+					kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWED_HERE,
 					message: `The '${directiveName}' directive must be the entire value of the attribute.`,
 					severity: "error",
 					location: { document, ...htmlAttr.location.name }
