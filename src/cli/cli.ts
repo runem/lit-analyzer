@@ -6,13 +6,23 @@ import { makeConfig } from "../analyze/lit-analyzer-config";
 import { DocumentRange } from "../analyze/types/lit-range";
 import { analyzeGlobs } from "./analyze-globs";
 import { readTsLitPluginConfig } from "./compile";
+import { LitAnalyzerCliConfig } from "./lit-analyzer-cli-config";
+import { parseCliArguments } from "./parse-cli-arguments";
 
 /**
  * The main function of the cli.
  */
 export async function cli() {
-	const args = process.argv.slice(2);
-	const glob = args[0] || "";
+	const args = parseCliArguments(process.argv.slice(2));
+	const glob = args._[0];
+
+	if (args.help) {
+		console.log(`Print help`);
+	} else if (glob == null) {
+		console.log(`Missing glob`);
+	} else {
+		console.log(`Running`);
+	}
 
 	let program: Program | undefined = undefined;
 	const context = new DefaultLitAnalyzerContext({
@@ -25,7 +35,7 @@ export async function cli() {
 
 	const analyzer = new LitAnalyzer(context);
 
-	await analyzeGlobs([glob], {
+	await analyzeGlobs(glob == null ? [] : [glob], args as LitAnalyzerCliConfig, {
 		analyzeSourceFile(file: SourceFile, options: { program: Program }): void {
 			console.log(`Analyzing file: ${file.fileName}`);
 			program = options.program;

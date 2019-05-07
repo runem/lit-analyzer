@@ -20,6 +20,7 @@ export enum LitHtmlDiagnosticKind {
 	COMPLEX_NOT_ASSIGNABLE_TO_PRIMITIVE = "COMPLEX_NOT_ASSIGNABLE_TO_PRIMITIVE",
 	EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING = "EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING",
 	INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED = "INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED",
+	INVALID_ATTRIBUTE_EXPRESSION_TYPE_NULL = "INVALID_ATTRIBUTE_EXPRESSION_TYPE_NULL",
 	INVALID_ATTRIBUTE_EXPRESSION_TYPE = "INVALID_ATTRIBUTE_EXPRESSION_TYPE",
 	INVALID_SLOT_NAME = "INVALID_SLOT_NAME",
 	MISSING_SLOT_ATTRIBUTE = "MISSING_SLOT_ATTRIBUTE",
@@ -104,6 +105,13 @@ export interface LitHtmlDiagnosticHtmlInvalidAttributeExpressionTypeUndefined ex
 	typeB: SimpleType;
 }
 
+export interface LitHtmlDiagnosticHtmlInvalidAttributeExpressionTypeNull extends LitDocumentDiagnosticBase {
+	kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_NULL;
+	htmlAttr: IHtmlNodeAttr & { assignment: IHtmlNodeAttrAssignmentExpression };
+	typeA: SimpleType;
+	typeB: SimpleType;
+}
+
 export interface LitHtmlDiagnosticHtmlExpressionOnlyAssignableWithBooleanBinding extends LitDocumentDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING;
 	htmlAttr: HtmlNodeAttr;
@@ -147,6 +155,7 @@ export type LitHtmlDiagnostic =
 	| LitHtmlDiagnosticPrimitiveNotAssignableToComplex
 	| LitHtmlDiagnosticHtmlInvalidAttributeExpressionType
 	| LitHtmlDiagnosticHtmlInvalidAttributeExpressionTypeUndefined
+	| LitHtmlDiagnosticHtmlInvalidAttributeExpressionTypeNull
 	| LitHtmlDiagnosticHtmlNoEventListenerFunction
 	| LitHtmlDiagnosticComplexNotAssignableToPrimitive
 	| LitHtmlDiagnosticHtmlPropertyNeedsExpression

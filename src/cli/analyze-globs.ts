@@ -4,6 +4,7 @@ import { join } from "path";
 import { Diagnostic, flattenDiagnosticMessageText, Program, SourceFile } from "typescript";
 import { flatten } from "../analyze/util/general-util";
 import { CompileResult, compileTypescript } from "./compile";
+import { LitAnalyzerCliConfig } from "./lit-analyzer-cli-config";
 
 const IGNORE_GLOBS = ["!**/node_modules/**", "!**/web_modules/**"];
 //const DEFAULT_DIR_GLOB = "{,!(node_modules|web_modules)/}**/*.{js,jsx,ts,tsx}";
@@ -22,16 +23,25 @@ export interface AnalyzeGlobsContext {
 /**
  * Parses and analyses all globs and calls some callbacks while doing it.
  * @param globs
+ * @param config
  * @param context
  */
-export async function analyzeGlobs(globs: string[], context: AnalyzeGlobsContext = {}): Promise<CompileResult> {
+export async function analyzeGlobs(globs: string[], config: LitAnalyzerCliConfig, context: AnalyzeGlobsContext = {}): Promise<CompileResult> {
 	// Set default glob
 	if (globs.length === 0) {
-		globs = DEFAULT_GLOBS;
+		if (existsSync("src")) {
+			globs = ["src"];
+		} else {
+			globs = DEFAULT_GLOBS;
+		}
 	}
 
 	// Expand the globs
 	const filePaths = await expandGlobs(globs);
+
+	if (config.debug) {
+		console.log(filePaths);
+	}
 
 	// Callbacks
 	if (context.didExpandGlobs != null) context.didExpandGlobs(filePaths);
@@ -41,7 +51,9 @@ export async function analyzeGlobs(globs: string[], context: AnalyzeGlobsContext
 	const { program, files, diagnostics } = compileTypescript(filePaths);
 
 	if (diagnostics.length > 0) {
-		console.dir(diagnostics.map(d => `${(d.file && d.file.fileName) || "unknown"}: ${flattenDiagnosticMessageText(d.messageText, "\n")}`));
+		if (config.debug) {
+			console.dir(diagnostics.map(d => `${(d.file && d.file.fileName) || "unknown"}: ${flattenDiagnosticMessageText(d.messageText, "\n")}`));
+		}
 
 		if (context.didFindTypescriptDiagnostics != null) context.didFindTypescriptDiagnostics(diagnostics, { program });
 	}

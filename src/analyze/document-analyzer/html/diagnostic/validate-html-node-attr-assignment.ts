@@ -16,7 +16,7 @@ import { CallExpression, Type, TypeChecker } from "typescript";
 import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../../constants";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../types/html-node/html-node-attr-assignment-types";
-import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types";
+import { HtmlNodeAttr, HtmlNodeAttrKind, IHtmlNodeAttr } from "../../../types/html-node/html-node-attr-types";
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../../types/lit-diagnostic";
 import { lazy } from "../../../util/general-util";
 
@@ -50,10 +50,12 @@ export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, request: LitA
 	// Let's start by validating the RHS (typeB)
 	// ==========================================
 
-	// Infer the type of the RHS
+	// Relax the type we are looking at an expression in javascript files
 	const inJavascriptFile = request.file.fileName.endsWith(".js");
-	const ignoreTypeB = inJavascriptFile && assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION;
-	const typeBInferred = ignoreTypeB ? ({ kind: SimpleTypeKind.ANY } as SimpleType) : inferTypeFromAssignment(assignment, checker);
+	const shouldRelaxTypeB = inJavascriptFile && assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION;
+
+	// Infer the type of the RHS
+	const typeBInferred = shouldRelaxTypeB ? ({ kind: SimpleTypeKind.ANY } as SimpleType) : inferTypeFromAssignment(assignment, checker);
 
 	// Convert typeB to SimpleType
 	const typeB = isSimpleType(typeBInferred) ? typeBInferred : toSimpleType(typeBInferred, checker);
@@ -185,13 +187,11 @@ function validateHtmlAttrSlotAssignment(htmlAttr: HtmlNodeAttr, { document, html
 	return undefined;
 }
 
-function validateHtmlAttrAssignmentTypes(
-	htmlAttr: HtmlNodeAttr,
-	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },
-	{ program, document }: LitAnalyzerRequest
-): LitHtmlDiagnostic[] | undefined {
+function validateHtmlAttrAssignmentTypes(htmlAttr: HtmlNodeAttr, { typeA, typeB }: { typeA: SimpleType; typeB: SimpleType }, request: LitAnalyzerRequest): LitHtmlDiagnostic[] | undefined {
 	const { assignment } = htmlAttr;
 	if (assignment == null) return undefined;
+
+	const { program, document } = request;
 
 	switch (htmlAttr.modifier) {
 		case LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER:
@@ -219,126 +219,12 @@ function validateHtmlAttrAssignmentTypes(
 
 		default:
 			// In this case there is no modifier. Therefore:
-
-			// Only primitive types should be allowed as "typeB" and "typeA".
-			if (!isAssignableToPrimitiveType(typeA)) {
-				const message = (() => {
-					if (assignment != null) {
-						if (assignment.kind === HtmlNodeAttrAssignmentKind.BOOLEAN) {
-							return `You are assigning a boolean to a non-primitive type '${toTypeString(typeA)}'. Use '.' binding instead?`;
-						} else if (assignment.kind === HtmlNodeAttrAssignmentKind.STRING && assignment.value.length > 0) {
-							return `You are assigning the string '${toTypeString(typeB)}' to a non-primitive type '${toTypeString(typeA)}'. Use '.' binding instead?`;
-						}
-					}
-					return `You are assigning the primitive '${toTypeString(typeB)}' to a non-primitive type '${toTypeString(typeA)}'. Use '.' binding instead?`;
-				})();
-
-				// Fail if the user is trying to assign a primitive value to a complex value.
-				return [
-					{
-						kind: LitHtmlDiagnosticKind.PRIMITIVE_NOT_ASSIGNABLE_TO_COMPLEX,
-						severity: "error",
-						message,
-						location: { document, ...htmlAttr.location.name },
-						htmlAttr,
-						typeA,
-						typeB
-					}
-				];
-			} else if (!isAssignableToPrimitiveType(typeB)) {
-				return [
-					{
-						kind: LitHtmlDiagnosticKind.COMPLEX_NOT_ASSIGNABLE_TO_PRIMITIVE,
-						severity: "error",
-						message: `You are assigning a non-primitive type '${toTypeString(typeB)}' to a primitive type '${toTypeString(typeA)}'`,
-						location: { document, ...htmlAttr.location.name },
-						htmlAttr,
-						typeA,
-						typeB
-					}
-				];
-			}
-
-			// Test assignments to all possible type kinds
-			const typeAIsAssignableTo = {
-				[SimpleTypeKind.STRING]: lazy(() => isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.STRING, SimpleTypeKind.STRING_LITERAL], { op: "or" })),
-				[SimpleTypeKind.NUMBER]: lazy(() => isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.NUMBER, SimpleTypeKind.NUMBER_LITERAL], { op: "or" })),
-				[SimpleTypeKind.BOOLEAN]: lazy(() => isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.BOOLEAN, SimpleTypeKind.BOOLEAN_LITERAL], { op: "or" })),
-				[SimpleTypeKind.ARRAY]: lazy(() => isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.ARRAY, SimpleTypeKind.TUPLE], { op: "or" })),
-				[SimpleTypeKind.OBJECT]: lazy(() => isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.OBJECT, SimpleTypeKind.INTERFACE, SimpleTypeKind.CLASS], { op: "or" }))
-			};
-
-			const typeAIsAssignableToMultiple = lazy(() => Object.values(typeAIsAssignableTo).filter(assignable => assignable()).length > 1);
-
-			// Normal attribute 'string' assignments like 'max="123"'
-			if (typeB.kind === SimpleTypeKind.STRING_LITERAL) {
-				// Take into account that 'disabled=""' is equal to true
-				if (typeB.value.length === 0 && typeAIsAssignableTo[SimpleTypeKind.BOOLEAN]()) {
-					return [];
-				}
-
-				// Take into account that assignments like maxlength="50" (which is a number) is allowed even though "50" is a string literal in this case.
-				else if (typeAIsAssignableTo[SimpleTypeKind.NUMBER]()) {
-					// Test if a potential string literal is a Number
-					if (!isNaN(typeB.value as any) && isAssignableToValue(typeA, Number(typeB.value))) {
-						return [];
-					}
-				}
-			}
-
-			// Tagged template attribute 'expression' assignments like 'max="${this.max}"'
-			else if (assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION) {
-				// Take into account that assigning a boolean without "?" binding would result in "undefined" being assigned.
-				// Example: <input disabled="${true}" />
-				if (typeAIsAssignableTo[SimpleTypeKind.BOOLEAN]() && !typeAIsAssignableToMultiple()) {
-					return [
-						{
-							kind: LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING,
-							severity: "error",
-							message: `The '${htmlAttr.name}' attribute is a boolean type but you not using a boolean binding. Change to boolean binding?`,
-							location: { document, ...htmlAttr.location.name },
-							htmlAttr,
-							typeA,
-							typeB
-						}
-					];
-				}
-
-				// Take into account string === number expressions: 'value="${this.max}"'
-				else if (isAssignableToSimpleTypeKind(typeB, [SimpleTypeKind.NUMBER, SimpleTypeKind.NUMBER_LITERAL], { op: "or" }) && typeAIsAssignableTo[SimpleTypeKind.STRING]()) {
-					return [];
-				}
-
-				// Take into account string === boolean expressions: 'aria-expanded="${this.open}"'
-				else if (isAssignableToSimpleTypeKind(typeB, [SimpleTypeKind.BOOLEAN, SimpleTypeKind.BOOLEAN_LITERAL], { op: "or" }) && isAssignableToType(typeA, STRINGIFIED_BOOLEAN_TYPE, program)) {
-					return [];
-				}
-			}
+			const results = validateStringifiedAssignment(htmlAttr, { typeA, typeB }, request);
+			if (results != null) return results;
 	}
 
+	// Fail if the two types are not assignable to each other.
 	if (!isAssignableToType(typeA, typeB, program)) {
-		// Test if removing "undefined" from typeB would work and suggest using "ifDefined".
-		if (assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION && htmlAttr.kind === HtmlNodeAttrKind.ATTRIBUTE) {
-			if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.UNDEFINED)) {
-				const typeBWithoutUndefined = removeUndefinedFromType(typeB);
-
-				if (isAssignableToType(typeA, typeBWithoutUndefined, program)) {
-					return [
-						{
-							kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED,
-							message: `Type '${toTypeString(typeB)}' is not assignable to '${toTypeString(typeA)}'. Fix it using 'ifDefined'?`,
-							severity: "error",
-							location: { document, ...htmlAttr.location.name },
-							htmlAttr: htmlAttr as typeof htmlAttr & ({ assignment: typeof assignment }),
-							typeA,
-							typeB
-						}
-					];
-				}
-			}
-		}
-
-		// Fail if the two types are not assignable to each other.
 		return [
 			{
 				kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE,
@@ -350,6 +236,156 @@ function validateHtmlAttrAssignmentTypes(
 				typeB
 			}
 		];
+	}
+}
+
+function validateStringifiedAssignment(
+	htmlAttr: IHtmlNodeAttr,
+	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },
+	{ document, program }: LitAnalyzerRequest
+): LitHtmlDiagnostic[] | undefined {
+	const { assignment } = htmlAttr;
+	if (assignment == null) return undefined;
+
+	// Only primitive types should be allowed as "typeB" and "typeA".
+	if (!isAssignableToPrimitiveType(typeA)) {
+		const message = (() => {
+			if (assignment != null) {
+				if (assignment.kind === HtmlNodeAttrAssignmentKind.BOOLEAN) {
+					return `You are assigning a boolean to a non-primitive type '${toTypeString(typeA)}'. Use '.' binding instead?`;
+				} else if (assignment.kind === HtmlNodeAttrAssignmentKind.STRING && assignment.value.length > 0) {
+					return `You are assigning the string '${toTypeString(typeB)}' to a non-primitive type '${toTypeString(typeA)}'. Use '.' binding instead?`;
+				}
+			}
+			return `You are assigning the primitive '${toTypeString(typeB)}' to a non-primitive type '${toTypeString(typeA)}'. Use '.' binding instead?`;
+		})();
+
+		// Fail if the user is trying to assign a primitive value to a complex value.
+		return [
+			{
+				kind: LitHtmlDiagnosticKind.PRIMITIVE_NOT_ASSIGNABLE_TO_COMPLEX,
+				severity: "error",
+				message,
+				location: { document, ...htmlAttr.location.name },
+				htmlAttr,
+				typeA,
+				typeB
+			}
+		];
+	} else if (!isAssignableToPrimitiveType(typeB)) {
+		return [
+			{
+				kind: LitHtmlDiagnosticKind.COMPLEX_NOT_ASSIGNABLE_TO_PRIMITIVE,
+				severity: "error",
+				message: `You are assigning a non-primitive type '${toTypeString(typeB)}' to a primitive type '${toTypeString(typeA)}'`,
+				location: { document, ...htmlAttr.location.name },
+				htmlAttr,
+				typeA,
+				typeB
+			}
+		];
+	}
+
+	// Test assignments to all possible type kinds
+	const typeAIsAssignableTo = {
+		[SimpleTypeKind.STRING]: lazy(() => isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.STRING, SimpleTypeKind.STRING_LITERAL], { op: "or" })),
+		[SimpleTypeKind.NUMBER]: lazy(() => isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.NUMBER, SimpleTypeKind.NUMBER_LITERAL], { op: "or" })),
+		[SimpleTypeKind.BOOLEAN]: lazy(() => isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.BOOLEAN, SimpleTypeKind.BOOLEAN_LITERAL], { op: "or" })),
+		[SimpleTypeKind.ARRAY]: lazy(() => isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.ARRAY, SimpleTypeKind.TUPLE], { op: "or" })),
+		[SimpleTypeKind.OBJECT]: lazy(() => isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.OBJECT, SimpleTypeKind.INTERFACE, SimpleTypeKind.CLASS], { op: "or" }))
+	};
+
+	const typeAIsAssignableToMultiple = lazy(() => Object.values(typeAIsAssignableTo).filter(assignable => assignable()).length > 1);
+
+	// Normal attribute 'string' assignments like 'max="123"'
+	if (typeB.kind === SimpleTypeKind.STRING_LITERAL) {
+		// Take into account that 'disabled=""' is equal to true
+		if (typeB.value.length === 0 && typeAIsAssignableTo[SimpleTypeKind.BOOLEAN]()) {
+			return [];
+		}
+
+		// Take into account that assignments like maxlength="50" (which is a number) is allowed even though "50" is a string literal in this case.
+		else if (typeAIsAssignableTo[SimpleTypeKind.NUMBER]()) {
+			// Test if a potential string literal is a Number
+			if (!isNaN(typeB.value as any) && isAssignableToValue(typeA, Number(typeB.value))) {
+				return [];
+			}
+		}
+	}
+
+	// Tagged template attribute 'expression' assignments like 'max="${this.max}"'
+	else if (assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION) {
+		// Test if removing "null" from typeB would work and suggest using "ifDefined(exp === null ? undefined : exp)".
+		if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.NULL)) {
+			return [
+				{
+					kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_NULL,
+					message: `This attribute binds the type '${toTypeString(typeB)}' which can be 'null'. Fix it using 'ifDefined' and strict equality check?`,
+					severity: "error",
+					location: { document, ...htmlAttr.location.name },
+					htmlAttr: htmlAttr as typeof htmlAttr & ({ assignment: typeof assignment }),
+					typeA,
+					typeB
+				}
+			];
+		}
+
+		// Test if removing "undefined" from typeB would work and suggest using "ifDefined".
+		else if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.UNDEFINED)) {
+			//const typeBWithoutUndefined = removeUndefinedFromType(typeB);
+			//const assignableWithoutUndefined = isAssignableToType(typeA, typeBWithoutUndefined, program);
+			return [
+				{
+					kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED,
+					message: `This attribute binds the type '${toTypeString(typeB)}' which can be 'undefined'. Fix it using 'ifDefined'?`,
+					severity: "error",
+					location: { document, ...htmlAttr.location.name },
+					htmlAttr: htmlAttr as typeof htmlAttr & ({ assignment: typeof assignment }),
+					typeA,
+					typeB
+				}
+			];
+		}
+
+		// Take into account string === number expressions: 'value="${this.max}"'
+		else if (isAssignableToSimpleTypeKind(typeB, [SimpleTypeKind.NUMBER, SimpleTypeKind.NUMBER_LITERAL], { op: "or" }) && typeAIsAssignableTo[SimpleTypeKind.STRING]()) {
+			return [];
+		}
+
+		// Take into account: string === boolean expressions: 'aria-expanded="${this.open}"'
+		else if (isAssignableToSimpleTypeKind(typeB, [SimpleTypeKind.BOOLEAN, SimpleTypeKind.BOOLEAN_LITERAL], { op: "or" })) {
+			if (isAssignableToType(typeA, STRINGIFIED_BOOLEAN_TYPE, program)) {
+				return [];
+			} else {
+				return [
+					{
+						kind: LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING,
+						severity: "error",
+						message: `The type '${toTypeString(typeB)}' is a boolean type but you not using a boolean binding. Change to boolean binding?`,
+						location: { document, ...htmlAttr.location.name },
+						htmlAttr,
+						typeA,
+						typeB
+					}
+				];
+			}
+		}
+
+		// Take into account that assigning to a boolean without "?" binding would result in "undefined" being assigned.
+		// Example: <input disabled="${true}" />
+		else if (typeAIsAssignableTo[SimpleTypeKind.BOOLEAN]() && !typeAIsAssignableToMultiple()) {
+			return [
+				{
+					kind: LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING,
+					severity: "error",
+					message: `The '${htmlAttr.name}' attribute is a boolean type but you not using a boolean binding. Change to boolean binding?`,
+					location: { document, ...htmlAttr.location.name },
+					htmlAttr,
+					typeA,
+					typeB
+				}
+			];
+		}
 	}
 }
 

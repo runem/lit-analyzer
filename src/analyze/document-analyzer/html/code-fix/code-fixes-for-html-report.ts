@@ -214,6 +214,31 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 				}
 			];
 		}
+
+		case LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_NULL: {
+			const { assignment } = htmlReport.htmlAttr;
+			const newText = `ifDefined(${assignment.expression.getText()} === null ? undefined : ${assignment.expression.getText()})`;
+			return [
+				{
+					kind: CodeFixKind.ADD_TEXT,
+					message: `Use '${newText}'`,
+					htmlReport,
+					actions: [
+						{
+							kind: CodeActionKind.DOCUMENT_TEXT_CHANGE,
+							change: {
+								range: {
+									document,
+									start: assignment.location.start + 2, // Offset 2 for '${'
+									end: assignment.location.end - 1 // Offset 1 for '}'
+								},
+								newText
+							}
+						}
+					]
+				}
+			];
+		}
 	}
 
 	return [];
