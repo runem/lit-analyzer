@@ -1,4 +1,4 @@
-export type FormatterFormat = "code" | "list";
+export type FormatterFormat = "code" | "list" | "markdown";
 
 export interface LitAnalyzerCliConfig {
 	debug?: boolean;

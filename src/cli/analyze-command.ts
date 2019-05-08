@@ -9,6 +9,7 @@ import { readTsLitPluginConfig } from "./compile";
 import { CodeDiagnosticFormatter } from "./format/code-diagnostic-formatter";
 import { AnalysisStats, DiagnosticFormatter } from "./format/diagnostic-formatter";
 import { ListDiagnosticFormatter } from "./format/list-diagnostic-formatter";
+import { MarkdownDiagnosticFormatter } from "./format/markdown-formatter";
 import { FormatterFormat, LitAnalyzerCliConfig } from "./lit-analyzer-cli-config";
 
 function printText(text: string, config: LitAnalyzerCliConfig) {
@@ -90,6 +91,8 @@ function getFormatter(format: FormatterFormat): DiagnosticFormatter {
 			return new ListDiagnosticFormatter();
 		case "code":
 			return new CodeDiagnosticFormatter();
+		case "markdown":
+			return new MarkdownDiagnosticFormatter();
 		default:
 			throw new Error(`Unknown format: '${format}'`);
 	}

@@ -1,6 +1,6 @@
 {
 	"name": "lit-analyzer",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"description": "CLI that analyzes lit-html templates",
 	"author": "runem",
 	"license": "MIT",
