@@ -12,7 +12,7 @@ import {
 	toSimpleType,
 	toTypeString
 } from "ts-simple-type";
-import { CallExpression, Type, TypeChecker } from "typescript";
+import { Type, TypeChecker } from "typescript";
 import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../../constants";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../types/html-node/html-node-attr-assignment-types";
@@ -516,28 +516,31 @@ function validateHtmlAttrDirectiveAssignment(htmlAttr: HtmlNodeAttr, { typeA, ty
 
 	// Make sure that "classMap" and "styleMap" directives are not used in mixed bindings.
 	else if (assignment.kind === HtmlNodeAttrAssignmentKind.MIXED) {
+		//
+		// Disabled this check because it seems that the requirement has been changed
+		//
 		// Find all relevant usage of directives in the assignment
-		const directivesUnavailableInMixed = assignment.values
-			.filter((value): value is CallExpression => typeof value !== "string" && ts.isCallExpression(value))
-			.filter(exp => ["classMap", "styleMap"].includes(exp.expression.getText()))
-			.map(exp => ({
-				type: toSimpleType(checker.getTypeAtLocation(exp), checker),
-				name: exp.expression.getText()
-			}))
-			.filter(directive => isLitDirective(directive.type));
+		/*const directivesUnavailableInMixed = assignment.values
+		 .filter((value): value is CallExpression => typeof value !== "string" && ts.isCallExpression(value))
+		 .filter(exp => ["classMap", "styleMap"].includes(exp.expression.getText()))
+		 .map(exp => ({
+		 type: toSimpleType(checker.getTypeAtLocation(exp), checker),
+		 name: exp.expression.getText()
+		 }))
+		 .filter(directive => isLitDirective(directive.type));
 
-		if (directivesUnavailableInMixed.length > 0) {
-			const directiveName = directivesUnavailableInMixed[0].name;
+		 if (directivesUnavailableInMixed.length > 0) {
+		 const directiveName = directivesUnavailableInMixed[0].name;
 
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWED_HERE,
-					message: `The '${directiveName}' directive must be the entire value of the attribute.`,
-					severity: "error",
-					location: { document, ...htmlAttr.location.name }
-				}
-			];
-		}
+		 return [
+		 {
+		 kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWED_HERE,
+		 message: `The '${directiveName}' directive must be the entire value of the attribute.`,
+		 severity: "error",
+		 location: { document, ...htmlAttr.location.name }
+		 }
+		 ];
+		 }*/
 	}
 
 	return undefined;

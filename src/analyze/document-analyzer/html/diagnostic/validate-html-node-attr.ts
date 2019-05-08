@@ -25,7 +25,7 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, request: LitAnalyzerReq
 				if (config.skipUnknownAttributes) return [];
 				break;
 			case HtmlNodeAttrKind.PROPERTY:
-				if (!config.skipUnknownProperties) return [];
+				if (config.skipUnknownProperties) return [];
 				break;
 			case HtmlNodeAttrKind.EVENT_LISTENER:
 				if (!config.checkUnknownEvents) return [];

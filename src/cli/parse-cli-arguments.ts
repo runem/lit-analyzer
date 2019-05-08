@@ -63,11 +63,21 @@ function transformValue(value: any): string | boolean | number {
 }
 
 /**
+ * Converts from snake case to camel case
+ * @param str
+ */
+function snakeToCamel(str: string): string {
+	return str.replace(/(\-\w)/g, function(m) {
+		return m[1].toUpperCase();
+	});
+}
+
+/**
  * Transform a key by removing the first "-" characters.
  * @param key
  */
 function transformKey(key: string): string {
-	return key.replace(/^-*/g, "");
+	return snakeToCamel(key.replace(/^-*/g, ""));
 }
 
 /**
