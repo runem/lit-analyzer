@@ -397,8 +397,8 @@ function validateHtmlAttrDirectiveAssignment(htmlAttr: HtmlNodeAttr, { typeA, ty
 	const checker = program.getTypeChecker();
 
 	// Type check lit-html directives
-	if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.FUNCTION)) {
-		if (assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION && ts.isCallExpression(assignment.expression) && isLitDirective(typeB)) {
+	if (isLitDirective(typeB)) {
+		if (assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION && ts.isCallExpression(assignment.expression)) {
 			const functionName = assignment.expression.expression.getText();
 			const args = Array.from(assignment.expression.arguments);
 
@@ -564,6 +564,9 @@ function isLitDirective(type: SimpleType): boolean {
 				type.returnType != null &&
 				type.returnType.kind === SimpleTypeKind.VOID
 			);
+		case SimpleTypeKind.GENERIC_ARGUMENTS:
+			// Test for the built in type from lit-html: Directive<NodePart>
+			return type.target.kind === SimpleTypeKind.FUNCTION && type.target.name === "Directive";
 		default:
 			return false;
 	}
