@@ -9,9 +9,10 @@ export function validateHtmlNode(htmlNode: HtmlNode, { document, htmlStore, conf
 	const reports: LitHtmlDiagnostic[] = [];
 
 	if (!htmlNode.selfClosed && htmlNode.location.endTag == null) {
+		const isCustomElement = isCustomElementTagName(htmlNode.tagName);
 		reports.push({
 			kind: LitHtmlDiagnosticKind.TAG_NOT_CLOSED,
-			message: "This tag isn't closed.",
+			message: `This tag isn't closed.${isCustomElement ? " Custom elements cannot be self closing." : ""}`,
 			severity: "error",
 			location: { document, ...htmlNode.location.name },
 			htmlNode
