@@ -224,7 +224,9 @@ function validateHtmlAttrAssignmentTypes(htmlAttr: HtmlNodeAttr, { typeA, typeB 
 	}
 
 	// Fail if the two types are not assignable to each other.
-	if (!isAssignableToType(typeA, typeB, program)) {
+	// Always disable "strict" in javascript files
+	const inJsFile = request.file.fileName.endsWith(".js");
+	if (!isAssignableToType(typeA, typeB, program, inJsFile ? { strict: false } : undefined)) {
 		return [
 			{
 				kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE,
