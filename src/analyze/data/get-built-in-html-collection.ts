@@ -81,6 +81,35 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 		builtIn: true
 	});
 
+	result.attrs.push({
+		kind: "attribute",
+		name: "part",
+		description: `This attribute specifies a "styleable" part on the element in your shadow tree.`,
+		getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
+		builtIn: true
+	});
+
+	result.attrs.push({
+		kind: "attribute",
+		name: "theme",
+		description: `This attribute specifies a global "styleable" part on the element.`,
+		getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
+		builtIn: true
+	});
+
+	result.attrs.push({
+		kind: "attribute",
+		name: "exportparts",
+		description: `This attribute is used to explicitly forward a child’s part to be styleable outside of the parent’s shadow tree.
+
+The value must be a comma-separated list of part mappings:
+  - "some-box, some-input"
+  - "some-input: foo-input"
+`,
+		getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
+		builtIn: true
+	});
+
 	const textareaElement = result.tags.find(t => t.tagName === "textarea");
 	if (textareaElement != null) {
 		textareaElement.properties.push({

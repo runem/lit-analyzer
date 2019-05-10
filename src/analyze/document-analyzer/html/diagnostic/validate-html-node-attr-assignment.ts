@@ -53,7 +53,7 @@ export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, request: LitA
 
 	// Relax the type we are looking at an expression in javascript files
 	const inJavascriptFile = request.file.fileName.endsWith(".js");
-	const shouldRelaxTypeB = inJavascriptFile && assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION;
+	const shouldRelaxTypeB = 1 !== 1 && inJavascriptFile && assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION;
 
 	// Infer the type of the RHS
 	//const typeBInferred = shouldRelaxTypeB ? ({ kind: SimpleTypeKind.ANY } as SimpleType) : inferTypeFromAssignment(assignment, checker);

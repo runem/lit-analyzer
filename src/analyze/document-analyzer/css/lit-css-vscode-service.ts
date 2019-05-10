@@ -162,7 +162,20 @@ class LitVscodeCSSDataProvider {
 				return [];
 			},
 			providePseudoClasses(): IPseudoClassData[] {
-				return [];
+				return [
+					{
+						browsers: [],
+						description: "Allows you to select elements that have been exposed via a part attribute.",
+						name: "part",
+						status: "standard"
+					},
+					{
+						browsers: [],
+						description: `Unlike ::part, ::theme matches elements parts with that theme name, anywhere in the document.`,
+						name: "theme",
+						status: "nonstandard"
+					}
+				];
 			},
 			provideProperties(): IPropertyData[] {
 				return [];
