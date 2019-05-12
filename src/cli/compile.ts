@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { CompilerOptions, createProgram, Diagnostic, getPreEmitDiagnostics, ModuleKind, ModuleResolutionKind, Program, ScriptTarget, SourceFile } from "typescript";
-import { LitAnalyzerConfig, makeConfig } from "../lit-analyzer/lit-analyzer-config";
+import { LitAnalyzerConfig, makeConfig } from "../analyze/lit-analyzer-config";
 
 /**
  * The most general version of compiler options.
@@ -15,7 +15,7 @@ const defaultOptions: CompilerOptions = {
 	module: ModuleKind.ESNext,
 	//module: ModuleKind.CommonJS,
 	//lib: ["esnext", "dom"],
-	//strictNullChecks: true,
+	strictNullChecks: true,
 	moduleResolution: ModuleResolutionKind.NodeJs,
 	esModuleInterop: true,
 	noEmit: true,

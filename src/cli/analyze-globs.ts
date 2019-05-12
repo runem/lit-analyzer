@@ -2,36 +2,34 @@ import { async } from "fast-glob";
 import { existsSync, lstatSync } from "fs";
 import { join } from "path";
 import { Diagnostic, flattenDiagnosticMessageText, Program, SourceFile } from "typescript";
-import { flatten } from "../lit-analyzer/util/util";
+import { flatten } from "../analyze/util/general-util";
 import { CompileResult, compileTypescript } from "./compile";
+import { LitAnalyzerCliConfig } from "./lit-analyzer-cli-config";
 
-const IGNORE_GLOBS = ["!**/node_modules/**", "!**/web_modules/**"];
-//const DEFAULT_DIR_GLOB = "{,!(node_modules|web_modules)/}**/*.{js,jsx,ts,tsx}";
+//const IGNORE_GLOBS = ["!**/node_modules/**", "!**/web_modules/**"];
+const IGNORE_GLOBS: string[] = [];
 const DEFAULT_DIR_GLOB = "**/*.{js,jsx,ts,tsx}";
-//const DEFAULT_FILE_GLOB = "**/*.{js,jsx,ts,tsx}";
-
-const DEFAULT_GLOBS = [DEFAULT_DIR_GLOB]; //, DEFAULT_FILE_GLOB];
 
 export interface AnalyzeGlobsContext {
 	didExpandGlobs?(filePaths: string[]): void;
 	willAnalyzeFiles?(filePaths: string[]): void;
 	didFindTypescriptDiagnostics?(diagnostics: ReadonlyArray<Diagnostic>, options: { program: Program }): void;
-	analyzeSourceFile?(file: SourceFile, options: { program: Program }): void;
+	analyzeSourceFile?(file: SourceFile, options: { program: Program }): void | boolean;
 }
 
 /**
  * Parses and analyses all globs and calls some callbacks while doing it.
  * @param globs
+ * @param config
  * @param context
  */
-export async function analyzeGlobs(globs: string[], context: AnalyzeGlobsContext = {}): Promise<CompileResult> {
-	// Set default glob
-	if (globs.length === 0) {
-		globs = DEFAULT_GLOBS;
-	}
-
+export async function analyzeGlobs(globs: string[], config: LitAnalyzerCliConfig, context: AnalyzeGlobsContext = {}): Promise<CompileResult> {
 	// Expand the globs
 	const filePaths = await expandGlobs(globs);
+
+	if (config.debug) {
+		console.log(filePaths);
+	}
 
 	// Callbacks
 	if (context.didExpandGlobs != null) context.didExpandGlobs(filePaths);
@@ -41,7 +39,9 @@ export async function analyzeGlobs(globs: string[], context: AnalyzeGlobsContext
 	const { program, files, diagnostics } = compileTypescript(filePaths);
 
 	if (diagnostics.length > 0) {
-		console.dir(diagnostics.map(d => `${(d.file && d.file.fileName) || "unknown"}: ${flattenDiagnosticMessageText(d.messageText, "\n")}`));
+		if (config.debug) {
+			console.dir(diagnostics.map(d => `${(d.file && d.file.fileName) || "unknown"}: ${flattenDiagnosticMessageText(d.messageText, "\n")}`));
+		}
 
 		if (context.didFindTypescriptDiagnostics != null) context.didFindTypescriptDiagnostics(diagnostics, { program });
 	}
@@ -49,7 +49,10 @@ export async function analyzeGlobs(globs: string[], context: AnalyzeGlobsContext
 	// Analyze each file
 	for (const file of files) {
 		// Analyze
-		if (context.analyzeSourceFile != null) context.analyzeSourceFile(file, { program });
+		if (context.analyzeSourceFile != null) {
+			const result = context.analyzeSourceFile(file, { program });
+			if (result === false) break;
+		}
 	}
 
 	return { program, diagnostics, files };

@@ -1,100 +1,54 @@
-import chalk from "chalk";
-import { Program, SourceFile, TextSpan } from "typescript";
-import { DefaultLitAnalyzerContext } from "../lit-analyzer/default-lit-analyzer-context";
-import { LitAnalyzer } from "../lit-analyzer/lit-analyzer";
-import { makeConfig } from "../lit-analyzer/lit-analyzer-config";
-import { DocumentRange } from "../lit-analyzer/types/lit-range";
-import { analyzeGlobs } from "./analyze-globs";
-import { readTsLitPluginConfig } from "./compile";
+import { analyzeCommand } from "./analyze-command";
+import { LitAnalyzerCliConfig } from "./lit-analyzer-cli-config";
+import { parseCliArguments } from "./parse-cli-arguments";
+
+const DEFAULT_GLOB = "src/**/*.{js,jsx,ts,tsx}";
+
+const DEFAULT_CONFIG: LitAnalyzerCliConfig = {
+	noColor: false,
+	quiet: false,
+	maxWarnings: 0,
+	debug: false,
+	help: false,
+	failFast: false,
+	format: "code"
+};
 
 /**
  * The main function of the cli.
  */
 export async function cli() {
-	const args = process.argv.slice(2);
-	const glob = args[0] || "";
+	const { _: args, ...rest } = parseCliArguments(process.argv.slice(2));
+	const globs = args.length > 0 ? args : [DEFAULT_GLOB];
 
-	let program: Program | undefined = undefined;
-	const context = new DefaultLitAnalyzerContext({
-		getProgram() {
-			return program!;
-		}
-	});
+	const config: LitAnalyzerCliConfig = { ...DEFAULT_CONFIG, ...rest };
 
-	context.updateConfig(readTsLitPluginConfig() || makeConfig());
+	if (config.help) {
+		console.log(`
 
-	const analyzer = new LitAnalyzer(context);
-
-	await analyzeGlobs([glob], {
-		analyzeSourceFile(file: SourceFile, options: { program: Program }): void {
-			console.log(`Analyzing file: ${file.fileName}`);
-			program = options.program;
-			const result = analyzer.getDiagnosticsInFile(file);
-			result.map(r => {
-				const textSpan = translateRange(r.location);
-				const text = generateSourceFileErrorText(file, textSpan, r.message);
-				console.log(text);
-			});
-		}
-	});
-}
-
-export function translateRange(range: DocumentRange): TextSpan {
-	if (range.document != null) {
-		return {
-			start: range.document.virtualDocument.offsetToSCPosition(range.start),
-			length: range.end - range.start
-		};
+  Usage
+    lit-analyzer [<file|directory|glob>]
+    
+  Options
+    --help                Print this message.
+    --format FORMAT       Specify output format. The possible options are:
+                            o code                Highlight problems in the code (default)
+                            o list                Short and precise list of problems
+                            o markdown            Markdown format
+    --noColor             Print results without color
+    --outFile FILE        Emit all output to a single file
+    --maxWarnings NUMBER  Fail only when the number of warnings is larger than this number
+    --quiet               Report only errors and not warnings
+    --failFast            Exit the process right after the first problem has been found
+    
+  Examples
+    lit-analyzer src
+    lit-analyzer "src/**/*.{js,ts}"
+    lit-analyzer my-element.js
+		`);
+		return;
 	}
 
-	return {
-		start: range.start,
-		length: range.end - range.start
-	};
-}
-
-export function generateSourceFileErrorText(file: SourceFile, textSpan: TextSpan, message: string) {
-	const MAX_LINE_WIDTH = 50;
-	const MIN_MESSAGE_PADDING = 10;
-
-	// Get line and character of start position
-	const lineContext = file.getLineAndCharacterOfPosition(textSpan.start);
-
-	// Get start and end position of the line
-	let linePositionRange = {
-		start: file.getPositionOfLineAndCharacter(lineContext.line, 0),
-		end: file.getLineEndOfPosition(textSpan.start)
-	};
-
-	// Modify the line position range if the width of the line exceeds MAX_LINE_WIDTH
-	if (linePositionRange.end - linePositionRange.start > MAX_LINE_WIDTH) {
-		// Calculate even padding to both sides
-		const padding = Math.max(MIN_MESSAGE_PADDING, Math.round((MAX_LINE_WIDTH - textSpan.length) / 2));
-
-		// Calculate new start and end position without exceeding the line position range
-		const start = Math.max(linePositionRange.start, textSpan.start - padding);
-		const end = Math.min(linePositionRange.end, textSpan.start + textSpan.length + padding);
-
-		linePositionRange = { start, end };
-	}
-
-	// Get the source file text on the position range
-	const lineText = file.getText().substring(linePositionRange.start, linePositionRange.end);
-
-	// Highlight the error in the text
-	// The highlighting range is offsetted by subtracting the line start position
-	const markedLine = markText(lineText, {
-		start: textSpan.start - linePositionRange.start,
-		length: textSpan.length
-	}).replace(/^\s*/, " ");
-
-	return `
-${chalk.bold(message)}
-${chalk.gray(file.fileName.replace(process.cwd(), "."))}
-${chalk.gray(`${lineContext.line + 1}:`)} ${markedLine}
-`;
-}
-
-export function markText(text: string, range: TextSpan): string {
-	return text.substring(0, range.start) + chalk.bold(chalk.bgRedBright(text.substr(range.start, range.length))) + text.substring(range.start + range.length);
+	const success = await analyzeCommand(globs, config);
+	process.exit(success ? 0 : 1);
 }
