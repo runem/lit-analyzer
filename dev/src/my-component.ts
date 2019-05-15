@@ -18,10 +18,6 @@ export class MyTest extends LitElement {
 
 	@property({ type: String }) bar!: number | { foo: string };
 
-	//@property({ type: Object }) bar2!: string;
-
-	//@property({ type: Object }) foo!: { hello: string };
-
 	@property({ type: Number }) snapPosition: Position = 1;
 
 	static get properties() {
