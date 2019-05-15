@@ -250,17 +250,20 @@ function validateStringifiedAssignment(
 	if (assignment == null) return undefined;
 
 	// Only primitive types should be allowed as "typeB" and "typeA".
-	if (!isAssignableToPrimitiveType(typeA)) {
-		const message = (() => {
-			if (assignment != null) {
-				if (assignment.kind === HtmlNodeAttrAssignmentKind.BOOLEAN) {
-					return `You are assigning a boolean to a non-primitive type '${toTypeString(typeA)}'. Use '.' binding instead?`;
-				} else if (assignment.kind === HtmlNodeAttrAssignmentKind.STRING && assignment.value.length > 0) {
-					return `You are assigning the string '${toTypeString(typeB)}' to a non-primitive type '${toTypeString(typeA)}'. Use '.' binding instead?`;
-				}
+	if (!isAssignableToPrimitiveType(typeB)) {
+		return [
+			{
+				kind: LitHtmlDiagnosticKind.COMPLEX_NOT_BINDABLE_IN_ATTRIBUTE_BINDING,
+				severity: "error",
+				message: `You are binding a non-primitive type '${toTypeString(typeB)}'. This could result in binding the string "[object Object]".`,
+				location: { document, ...htmlAttr.location.name },
+				htmlAttr,
+				typeA,
+				typeB
 			}
-			return `You are assigning the primitive '${toTypeString(typeB)}' to a non-primitive type '${toTypeString(typeA)}'. Use '.' binding instead?`;
-		})();
+		];
+	} else if (!isAssignableToPrimitiveType(typeA)) {
+		const message = `You are assigning the primitive '${toTypeString(typeB)}' to a non-primitive type '${toTypeString(typeA)}'. Use '.' binding instead?`;
 
 		// Fail if the user is trying to assign a primitive value to a complex value.
 		return [
@@ -268,18 +271,6 @@ function validateStringifiedAssignment(
 				kind: LitHtmlDiagnosticKind.PRIMITIVE_NOT_ASSIGNABLE_TO_COMPLEX,
 				severity: "error",
 				message,
-				location: { document, ...htmlAttr.location.name },
-				htmlAttr,
-				typeA,
-				typeB
-			}
-		];
-	} else if (!isAssignableToPrimitiveType(typeB)) {
-		return [
-			{
-				kind: LitHtmlDiagnosticKind.COMPLEX_NOT_ASSIGNABLE_TO_PRIMITIVE,
-				severity: "error",
-				message: `You are assigning a non-primitive type '${toTypeString(typeB)}' to a primitive type '${toTypeString(typeA)}'`,
 				location: { document, ...htmlAttr.location.name },
 				htmlAttr,
 				typeA,

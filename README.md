@@ -1,12 +1,12 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/runem/ts-lit-plugin/master/documentation/asset/lit-plugin@256w.png" alt="Logo" width="200" height="auto" />
 </p>
-<h1 align="center">ts-lit-plugin</h1>
+<h1 align="center">lit-analyzer</h1>
 <p align="center">
-		<a href="https://npmcharts.com/compare/ts-lit-plugin?minimal=true"><img alt="Downloads per month" src="https://img.shields.io/npm/dm/ts-lit-plugin.svg" height="20"/></a>
-<a href="https://www.npmjs.com/package/ts-lit-plugin"><img alt="NPM Version" src="https://img.shields.io/npm/v/ts-lit-plugin.svg" height="20"/></a>
-<a href="https://david-dm.org/runem/ts-lit-plugin"><img alt="Dependencies" src="https://img.shields.io/david/runem/ts-lit-plugin.svg" height="20"/></a>
-<a href="https://github.com/runem/ts-lit-plugin/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/runem/ts-lit-plugin.svg" height="20"/></a>
+		<a href="https://npmcharts.com/compare/lit-analyzer?minimal=true"><img alt="Downloads per month" src="https://img.shields.io/npm/dm/lit-analyzer.svg" height="20"/></a>
+<a href="https://www.npmjs.com/package/lit-analyzer"><img alt="NPM Version" src="https://img.shields.io/npm/v/lit-analyzer.svg" height="20"/></a>
+<a href="https://david-dm.org/runem/lit-analyzer"><img alt="Dependencies" src="https://img.shields.io/david/runem/lit-analyzer.svg" height="20"/></a>
+<a href="https://github.com/runem/lit-analyzer/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/runem/lit-analyzer.svg" height="20"/></a>
 <a href="https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin"><img alt="Publish at vscode marketplace" src="https://vsmarketplacebadge.apphb.com/version/runem.lit-plugin.svg" height="20"/></a>
 	</p>
 
@@ -15,29 +15,39 @@
   <img src="https://raw.githubusercontent.com/runem/ts-lit-plugin/master/documentation/asset/lit-plugin.gif" alt="Lit plugin GIF"/>
 </p>
 
+`lit-analyzer` is a CLI that makes it possible to easily analyze all `lit-html` templates in your code. It performs type checking on your bindings and automatically picks up on web components. 
+
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#table-of-contents)
 
 ## ➤ Table of Contents
 
 * [➤ Installation](#-installation)
-	* [Visual Studio Code](#visual-studio-code)
-	* [Other](#other)
 * [➤ Features](#-features)
-	* [✅ Attribute/property type checking](#-attributeproperty-type-checking)
-	* [🔍 Automatically pick up on custom elements](#-automatically-pick-up-on-custom-elements)
-	* [🌎 Support for dependencies that extend the global HTMLElementTagNameMap](#-support-for-dependencies-that-extend-the-global-htmlelementtagnamemap)
-	* [📣 Report missing imports of custom elements](#-report-missing-imports-of-custom-elements)
-	* [⚡️Event checking](#event-checking)
-	* [📬 Slot checking](#-slot-checking)
-	* [🚶Goto definition](#goto-definition)
-	* [✏️ Code completions for css and html](#-code-completions-for-css-and-html)
-	* [📖 Quick info on hover for html tags and attributes](#-quick-info-on-hover-for-html-tags-and-attributes)
-	* [🙈 Support for @ts-ignore comments inside html](#-support-for-ts-ignore-comments-inside-html)
-	* [⚠️ Warning if required attributes are not included](#-warning-if-required-attributes-are-not-included)
-	* [💅 Reformat html](#-reformat-html)
-	* [🚪 Auto close tags](#-auto-close-tags)
-* [➤ Feature comparison](#-feature-comparison)
+	* [Validating html elements](#validating-html-elements)
+		* [Unknown tag name](#unknown-tag-name)
+		* [Missing imports](#missing-imports)
+		* [Unclosed tag](#unclosed-tag)
+	* [Validating binding names](#validating-binding-names)
+		* [Unknown event, attribute or property](#unknown-event-attribute-or-property)
+		* [Documenting events, attributes and properties](#documenting-events-attributes-and-properties)
+		* [Custom vscode html data format](#custom-vscode-html-data-format)
+	* [Validating binding types](#validating-binding-types)
+		* [Boolean attribute binding on a non-boolean type](#boolean-attribute-binding-on-a-non-boolean-type)
+		* [Property binding without an expression](#property-binding-without-an-expression)
+		* [Event handler binding with a non-callable type](#event-handler-binding-with-a-non-callable-type)
+		* [Attribute binding with complex type](#attribute-binding-with-complex-type)
+		* [Binding to a boolean in an attribute binding](#binding-to-a-boolean-in-an-attribute-binding)
+		* [Attribute binding with value that can be undefined | null ](#attribute-binding-with-value-that-can-be-undefined--null-)
+		* [Binding an incompatible type](#binding-an-incompatible-type)
+		* [Invalid slot name](#invalid-slot-name)
+		* [Invalid usage of directives](#invalid-usage-of-directives)
+	* [Validating LitElement](#validating-litelement)
+		* [Incompatible LitElement property type](#incompatible-litelement-property-type)
+		* [Unknown LitElement property type](#unknown-litelement-property-type)
+		* [Invalid attribute name](#invalid-attribute-name)
+		* [Invalid custom element tag name](#invalid-custom-element-tag-name)
+	* [Validating CSS](#validating-css)
 * [➤ Configuring the plugin](#-configuring-the-plugin)
 	* [General settings](#general-settings)
 		* [disable](#disable)
@@ -66,80 +76,26 @@
 
 ## ➤ Installation
 
-### Visual Studio Code
-
-If you use Visual Studio Code you can simply install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension.
-
+<!-- prettier-ignore -->
 ```bash
-code --install-extension runem.lit-plugin
+$ npm install lit-analyer -g
 ```
 
-### Other
-
-
-*This approach requires that you use Typescript.*
-
-First, install the plugin:
-
-```bash
-npm install ts-lit-plugin -D
-```
-
-
-Then add a `plugins` section to your [`tsconfig.json`](http://www.typescriptlang.org/docs/handbook/tsconfig-json.html):
-
-```json
-{
-  "compilerOptions": {
-    "plugins": [
-      {
-        "name": "ts-lit-plugin"
-      }
-    ]
-  }
-}
-```
-
-See [Configuring the plugin](#configuring-the-plugin) for more information regarding how to configure the plugin.
-
-
+* If you use Visual Studio Code you can also install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension. 
+* If you use Typescript you can also install [ts-lit-plugin](link-coming-soon).
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#features)
 
 ## ➤ Features
 
-### ✅ Attribute/property type checking
 
-`lit-plugin` type checks all attributes and property assignment, both on your own elements, library elements and built in elements. You will also get the following warnings:
+### Validating html elements
 
--   Warning if you assign a complex type without using the `.` modifier.
--   Warning if you use the `?` modifier on a non-boolean type.
+#### Unknown tag name
 
-If the plugin doesn't pick up on your properties and attributes you can specify them using jsdoc on your element.
+All web components in your code are analyzed using [web-component-analyzer](https://github.com/runem/web-component-analyzer) which supports native custom elements and web components built with LitElement. Web components defined in libraries needs to either extend the global `HTMLElementTagNameMap` (typescript definition file) or include the "@customElement tag-name" jsdoc on the custom element class.
 
-```javascript
-/**
- * This is my element
- * @attr size
- * @attr {red|blue} color - The color of my element
- * @prop {String} value
- * @prop {Boolean} myProp - This is my property
- */
-@customElement("my-element")
-class MyElement extends LitElement {
-
-}
-```
-
-### 🔍 Automatically pick up on custom elements
-
-If you define a custom element somewhere in your code `lit-plugin` will automatically pick up on it. Then it will provide auto-import functionality, type checking and code completion out of the box by analyzing the element. [web-component-analyzer](https://github.com/runem/web-component-analyzer) is the tool that takes care of analyzing components.
-
-### 🌎 Support for dependencies that extend the global HTMLElementTagNameMap
-
-<img src="https://user-images.githubusercontent.com/5372940/53271293-4fc5f300-36ee-11e9-9ed9-31f1e50f898c.gif" width="500" />
-
-If a dependency extends the global `HTMLElementTagNameMap` this plugin will pick up on the map between the tag name and the class. Below you will see an example of what to add to your library typescript definition files if you want type checking support for a given html tag.
+Below you will see an example of what to add to your library typescript definition files if you want type checking support for a given html tag name.
 
 ```typescript
 declare global {
@@ -149,179 +105,361 @@ declare global {
 }
 ```
 
-**Two limitations using this approach as of now**
+#### Missing imports
 
--   By using this approach the plugin wont see detailed information about a given element as (e.g @property decorators and initializers) because it can only read public fields and their corresponding types. Therefore all properties on custom elements imported from libraries are optional and wont respect meta information in @property decorators.
--   `lit-plugin` will only be able two find your elements if you somewhere in the code imports the file. Before your import the file it will complain that the element is unknown not that it can be imported. This due to the constraint that Typescript only adds library files to the array of program files once the file has been imported.
+When using custom elements in HTML it is checked if the element has been imported and is available in the current context. It's considered imported if any imported module (or their imports) defines the custom element. You can disable this check by setting `skipMissingImports` to true in the configuration (see [Configuring the plugin](#configuring-the-plugin)).
 
+The following examples are considered warnings:
+```js
+html`<my-element></my-element>`
+```
+
+The following examples are not considered warnings:
+```js
+import "my-element.js";
+html`<my-element></my-element>`
+```
+
+
+#### Unclosed tag
+
+Unclosed tags and invalid self closing tags, like custom elements tags, are checked.
+
+The following examples are considered warnings:
+```js
+html`<div>`
+html`<video />`
+html`<custom-element />`
+```
+
+The following examples are not considered warnings:
+```js
+html`<div></div>`
+html`<custom-element></custom-element>`
+html`<video></video>`
+html`<input />`
+```
+
+### Validating binding names
+
+#### Unknown event, attribute or property
+
+You will get a warning whenever you use an unknown attribute or property. This check is made on both custom elements and built in elements. You can opt in to check the event names as well. 
+
+Attributes, properties and events are picked up on custom elements using [web-component-analyzer](https://github.com/runem/web-component-analyzer) which supports native custom elements and web components built with LitElement.
+
+The following examples are considered warnings:
+```js
+html`<input .valuuue="${value}" tyype="button" @iinput="${console.log}" />`
+```
+
+The following examples are not considered warnings:
+```js
+html`<input .value="${value}" type="button" @input="${console.log}" />`
+```
+
+#### Documenting events, attributes and properties
+
+You can document attributes, properties and events on your custom elements using the following jsdoc tags.
+
+```js
+/**
+ * This is my element
+ * @attr size
+ * @attr {red|blue} color - The color of my element
+ * @prop {String} value
+ * @prop {Boolean} myProp - This is my property
+ * @event change
+ */
+@customElement("my-element")
+class MyElement extends LitElement { 
+
+}
+```
+
+#### Custom vscode html data format
 This plugin already supports [custom vscode html data format](https://code.visualstudio.com/updates/v1_31#_html-and-css-custom-data-support) (see the configuration section) and I will of course work on supporting more methods of shipping metadata alongside custom elements.
 
-### 📣 Report missing imports of custom elements
 
-When using custom elements `lit-plugin` checks if the element has been imported and is available in the current context. It's considered imported if any file in the path of imports defines the custom element. You can disable this check by setting `skipMissingImports` to true in the configuration (see [Configuring the plugin](#configuring-the-plugin)). Be aware that dependencies need to extend the global `HTMLElementTagNameMap` in order for this plugin to pick up on them.
+### Validating binding types
 
-### ⚡️Event checking
+#### Boolean attribute binding on a non-boolean type
 
-This plugin will check and suggest event names if you declare them in the jsdoc of the custom element class.
+It never makes sense to use the boolean attribute binding on a non-boolean type.
 
-```javascript
+The following examples are considered warnings:
+```js
+html`<input ?type="${"button"}" />`
+```
+
+The following examples are not considered warnings:
+```js
+html`<input ?disabled="${isDisabled}" />`
+```
+
+#### Property binding without an expression
+
+Because of how `lit-html` [parses bindings internally](https://github.com/Polymer/lit-html/issues/843) you cannot use the property binding without an expression.
+
+The following examples are considered warnings:
+```js
+html`<input .value="text" />`
+```
+
+The following examples are not considered warnings:
+```js
+html`<input .value="${text}" />`
+```
+
+#### Event handler binding with a non-callable type
+
+It's a common mistake to incorrectly call the function when setting up an event handler binding. This makes the function call whenever the code evaluates. 
+
+The following examples are considered warnings:
+```js
+html`<button @click="${myEventHandler()}">Click</button>`
+html`<button @click="${{hannndleEvent: console.log()}}">Click</button>`
+```
+
+The following examples are not considered warnings:
+```js
+html`<button @click="${myEventHandler}">Click</button>`
+html`<button @click="${{handleEvent: console.log}}">Click</button>`
+```
+
+#### Attribute binding with complex type
+
+Binding an object using an attribute binding would result in binding the string "[object Object]" to the attribute. In this cases it's probably better to use a property binding instead.
+
+The following examples are considered warnings:
+```js
+html`<my-list listitems="${listItems}"></my-list>`
+```
+
+The following examples are not considered warnings:
+```js
+html`<my-list .listItems="${listItems}"></my-list>`
+```
+
+
+#### Binding to a boolean in an attribute binding
+
+Whenever binding to a boolean using an attribute binding, you should be using a *boolean* attribute binding instead, because it could result in binding the string "true" or "false".
+
+This error is particular tricky, because the string "false" is truthy when evaluated in a conditional.
+
+The following examples are considered warnings:
+```js
+html`<input disabled="${isDisabled}" />`
+```
+
+The following examples are not considered warnings:
+```js
+html`<input ?disabled="${isDisabled}" />`
+```
+
+#### Attribute binding with value that can be undefined | null 
+
+Binding `undefined` or `null` in an attribute binding will result in binding the string "undefined" or "null". Here you should probably wrap your expression in the "ifDefined" directive.
+
+The following examples are considered warnings:
+```js
+html`<input value="${maybeUndefined}" />`
+html`<input value="${maybeNull}" />`
+```
+
+The following examples are not considered warnings:
+```js
+html`<input value="${ifDefined(maybeUndefined)}" />`
+html`<input value="${ifDefined(maybeNull === null ? undefined : maybeNull)}" />`
+```
+
+#### Binding an incompatible type
+
+Assignments in your HTML are typed checked just like it would be in Typescript.
+
+The following examples are considered warnings:
+```js
+html`<input type="wrongvalue" />`
+html`<input placeholder />`
+html`<input max="${"hello"}" />`
+html`<my-list .listItems="${123}"></my-list>`
+```
+
+The following examples are not considered warnings:
+```js
+html`<input type="button" />`
+html`<input placeholder="a placeholder" />`
+html`<input max="${123}" />`
+html`<my-list .listItems="${listItems}"></my-list>`
+```
+
+#### Invalid slot name
+
+Using the "@slot" jsdoc tag on your custom element class, you can tell which slots are accepted for a particular element. Then you will get warnings for invalid slot names and if you forget to add the slot attribute on elements without an unnamed slot.
+
+```js
 /**
- * This is my element
- * @event change
- * @event commit - This event is dispatched when the user pressed 'commit'
+ * @slot - This is a comment for the unnamed slot
+ * @slot right - Right content
+ * @slot left
  */
+class MyElement extends HTMLElement {
+}
+customElements.define("my-element", MyElement);
+```
+
+The following examples are considered warnings:
+```js
+html`
+<my-element>
+  <div slot="not a slot name"></div>
+</my-element>
+`
+```
+
+The following examples are not considered warnings:
+```js
+html`
+<my-element>
+  <div></div>
+  <div slot="right"></div>
+  <div slot="left"></div>
+</my-element>
+`
+```
+
+#### Invalid usage of directives
+
+Directives are checked to make sure that the following rules are met.
+* `ifDefined` is only used in an attribute binding.
+* `class` is only used in an attribute binding on the 'class' attribute.
+* `style` is only used in an attribute binding on the 'style' attribute.
+* `unsafeHTML`, `cache`, `repeat`, `asyncReplace` and `asyncAppend` are only used within a text binding.
+
+The following examples are considered warnings:
+```js
+html`<button value="${unsafeHTML(html)}"></button>`
+html`<input .value="${ifDefined(myValue)}" />`
+html`<div role="${class(classMap)}"></div>`
+```
+
+The following examples are not considered warnings:
+```js
+html`<button>${unsafeHTML(html)}</button>`
+html`<input .value="${myValue}" />`
+html`<input value="${myValue}" />`
+html`<div class="${class(classMap)}"></div>`
+```
+
+
+
+### Validating LitElement
+
+#### Incompatible LitElement property type
+
+When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type.
+
+The following examples are considered warnings:
+```js
+class MyElement extends LitElement {
+  @property({type: Number}) text: string;
+  @property({type: Boolean}) count: number;
+  @property({type: String}) disabled: boolean;
+  @property({type: Object}) list: ListItem[];
+}
+```
+
+The following examples are not considered warnings:
+```js
+class MyElement extends LitElement {
+  @property({type: String}) text: string;
+  @property({type: Number}) count: number;
+  @property({type: Boolean}) disabled: boolean;
+  @property({type: Array}) list: ListItem[];
+}
+```
+
+#### Unknown LitElement property type
+
+The default converter in LitElement only accepts `String`, `Boolean`, `Number`, `Array` and `Object`, so all other values for `type` are considered warnings. This check doesn't run if a custom converter is used.
+
+The following examples are considered warnings:
+```js
+class MyElement extends LitElement {
+  static get properties () {
+    return {
+      callback: {
+        type: Function
+      },
+      text: {
+        type: MyElement
+      }
+    }
+  }
+}
+```
+
+The following examples are not considered warnings:
+```js
+class MyElement extends LitElement {
+  static get properties () {
+    return {
+      callback: {
+        type: Function,
+        converter: myCustomConverter
+      },
+      text: {
+        type: String
+      }
+    }
+  }
+}
+```
+
+
+#### Invalid attribute name
+
+When using the property option `attribute`, the value is checked to make sure it's a valid attribute name.
+
+The following examples are considered warnings:
+```js
+class MyElement extends LitElement {
+  static get properties () {
+    return {
+      text: {
+        attribute: "invald=name"
+      }
+    }
+  }
+}
+```
+
+#### Invalid custom element tag name
+
+When defining a custom element, the tag name is checked to make sure it's a valid custom element name.
+
+The following examples are considered warnings:
+```js
+@customElement("wrongElementName")
+class MyElement extends LitElement {
+}
+
+customElements.define("alsoWrongName", MyElement);
+```
+
+The following examples are not considered warnings:
+```js
 @customElement("my-element")
 class MyElement extends LitElement {
-
 }
+
+customElements.define("correct-element-name", MyElement);
 ```
 
-### 📬 Slot checking
+### Validating CSS
 
-This plugin will check and suggest slot names if you declare them in the jsdoc of the custom element class. A `@slot` jsdoc tag without a name is the unnamed slot.
-
-```javascript
-/**
- * This is my element
- * @slot - Default content placed in the middle
- * @slot header - Content placed above the main content
- * @slot footer - Content placed below the main content
- */
-@customElement("my-element")
-class MyElement extends LitElement {
-
-}
-```
-
-
-### 🚶Goto definition
-
-`Cmd+Click (Mac)` / `Ctrl+Click (Windows)` on a tag, attribute, property or event name and goto the definition.
-
-### ✏️ Code completions for css and html
-
-<img src="https://user-images.githubusercontent.com/5372940/53271979-4f2e5c00-36f0-11e9-98a6-f9b7996d841c.gif" width="500" />
-
-Press `Ctrl+Space` in an html or css context and to get code completions.
-
-
-### 📖 Quick info on hover for html tags and attributes
-
-Hover above a tag, attribute, property or event and see more information about the identifier such as type and jsdoc.
-
-
-### 🙈 Support for @ts-ignore comments inside html
-
-Add "@ts-ignore" comments to make `lit-plugin` quiet.
-
-**In front of html template tags:**
-This will make `lit-plugin` opt out of any checking inside the html template tag, but not the nested html template tags.
-
-```javascript
-// @ts-ignore
-html`this is not checked ${html`this is checked`} `;
-```
-
-**Inside HTML:**
-This will make `lit-plugin` opt out of any checking inside the div tag.
-
-```javascript
-return html`
-  <h1>Foo</h1>
-
-  <!-- @ts-ignore -->
-  <div>
-      <my-element></my-element>
-  </div>
-
-  <h1>Bar</h1>
-`;
-```
-
-
-### ⚠️ Warning if required attributes are not included
-
-**Note: This functionality has been temporarily disabled**
-
-<img src="https://user-images.githubusercontent.com/5372940/53272219-f612f800-36f0-11e9-98d2-2810f8b14c60.gif" width="500" />
-
-
-`lit-plugin` will warn you if you forget to set any required attributes on a given html tag. Right now this is based on the assumption that the property is required if it doesn't have an initializer and isn't assignable to `undefined` or `null`. Be aware that right now the plugin doesn't check if you assign it else where (for example in the constructor).
-
-**lit-plugin will think that the following is a required property**:
-
-```typescript
-@customElement("my-element")
-export class MyElement extends LitElement {
-  @property({ type: String }) text!: string;
-}
-```
-
-### 💅 Reformat html
-
-**Note: This functionality has been temporarliy disabled. Please look into using prettier for reformating your html.**
-
-`lit-plugin` will reformat html when you reformat code using your IDE. Keep in mind that right now there is an issue where the plugin does not take the current indentation of the html template tag into account. This means that the especially nested html template tags will look weird.
-
-**For example**:
-
-```javascript
-return html`<div>${html`<h1>Foo</h1> <h2>Bar</h2>`}</div>`;
-```
-
-**Will become**:
-
-```javascript
-return html`
-<div>
-  ${html`<h1>Foo</h1>
-<h2>Bar</h2>`}
-</div>`;
-```
-
-**And not:**:
-
-```javascript
-return html`
-  <div>
-    ${html`
-      <h1>Foo</h1>
-      <h2>Bar</h2>
-    `}
-  </div>`;
-```
-
-### 🚪 Auto close tags
-
-When typing html inside a template tag `lit-plugin` auto-closes tags as you would expect.
-
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#feature-comparison)
-
-## ➤ Feature comparison
-This plugin is similar to [vscode-lit-html](https://github.com/mjbvz/vscode-lit-html) on many points. The power of `vscode-lit-html` is that it covers all the basic functionality of HTML in tagged templates so it's a plugin that can be easily used with other libraries than `lit-html`. However `ts-lit-plugin` aims to be a specialized plugin for working with `lit-element` so for example it supports `css` and discovers web components out of the box. 
-
-Below is a comparison table of the two plugins.
-
-| Feature                 | [vscode-lit-html](https://github.com/mjbvz/vscode-lit-html)   | [vscode-lit-plugin](https://github.com/runem/vscode-lit-plugin) |
-|-------------------------|------------|------------|
-| CSS support             | ❌         | ✅         |
-| Goto definition         | ❌         | ✅         |
-| Check missing imports   | ❌         | ✅         |
-| Auto discover web components | ❌    | ✅         |
-| Template type checking  | ❌         | ✅         |
-| Report unknown tag names | ❌        | ✅         |
-| Report unknown attrs    | ❌         | ✅         |
-| Report unknown props    | ❌         | ✅         |
-| Report unknown events   | ❌         | ✅         |
-| Report unknown slots    | ❌         | ✅         |
-| Support for vscode custom data format | ❌| ✅    |
-| Auto close tags         | ✅         | ✅         |
-| Syntax Highlighting     | ✅         | ✅         |
-| Completions             | ✅         | ✅         |
-| Quick info on hover     | ✅         | ✅         |
-| Code folding            | ✅         | ⚠️ (disabled until problem with calling 'program.getSourceFile' is fixed) |
-| Formatting              | ✅         | ⚠️ (disabled until problem with nested templates is fixed) |
+`lit-analyzer` uses [vscode-html-languageservice](https://github.com/Microsoft/vscode-html-languageservice) to validate CSS.
 
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#configuring-the-plugin)

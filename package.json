@@ -33,7 +33,7 @@
 		"prettier:check": "prettier --list-different \"src/**/*.{ts,tsx}\"",
 		"prettier:write": "prettier --write \"src/**/*.{ts,tsx}\"",
 		"lint": "tslint --project ./",
-		"readme:build": "readme"
+		"readme:build": "readme generate"
 	},
 	"main": "lib/index.cjs.js",
 	"typings": "lib/index.cjs.d.ts",

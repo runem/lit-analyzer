@@ -5,8 +5,8 @@
 	},
 	"line": "rainbow",
 	"ids": {
-		"npm": "ts-lit-plugin",
-		"github": "runem/ts-lit-plugin"
+		"npm": "lit-analyzer",
+		"github": "runem/lit-analyzer"
 	},
 	"badges": [
 		{

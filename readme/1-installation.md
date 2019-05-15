@@ -1,37 +1,9 @@
 ## Installation
 
-### Visual Studio Code
-
-If you use Visual Studio Code you can simply install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension.
-
+<!-- prettier-ignore -->
 ```bash
-code --install-extension runem.lit-plugin
+$ npm install lit-analyer -g
 ```
 
-### Other
-
-
-*This approach requires that you use Typescript.*
-
-First, install the plugin:
-
-```bash
-npm install ts-lit-plugin -D
-```
-
-
-Then add a `plugins` section to your [`tsconfig.json`](http://www.typescriptlang.org/docs/handbook/tsconfig-json.html):
-
-```json
-{
-  "compilerOptions": {
-    "plugins": [
-      {
-        "name": "ts-lit-plugin"
-      }
-    ]
-  }
-}
-```
-
-See [Configuring the plugin](#configuring-the-plugin) for more information regarding how to configure the plugin.
+* If you use Visual Studio Code you can also install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension. 
+* If you use Typescript you can also install [ts-lit-plugin](link-coming-soon).

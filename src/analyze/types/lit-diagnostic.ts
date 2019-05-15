@@ -16,8 +16,8 @@ export enum LitHtmlDiagnosticKind {
 	BOOL_MOD_ON_NON_BOOL = "BOOL_MOD_ON_NON_BOOL",
 	PROPERTY_NEEDS_EXPRESSION = "PROPERTY_NEEDS_EXPRESSION",
 	NO_EVENT_LISTENER_FUNCTION = "NO_EVENT_LISTENER_FUNCTION",
-	PRIMITIVE_NOT_ASSIGNABLE_TO_COMPLEX = "PRIMITIVE_NOT_ASSIGNABLE_TO_COMPLEX",
-	COMPLEX_NOT_ASSIGNABLE_TO_PRIMITIVE = "COMPLEX_NOT_ASSIGNABLE_TO_PRIMITIVE",
+	PRIMITIVE_NOT_ASSIGNABLE_TO_COMPLEX = "PRIMITIITX_NOT_BINDING_IN_ATTRIBUTE_BINDING",
+	COMPLEX_NOT_BINDABLE_IN_ATTRIBUTE_BINDING = "COMPLEX_NOT_BINDABLE_IN_ATTRIBUTE_BINDING",
 	EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING = "EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING",
 	INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED = "INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED",
 	INVALID_ATTRIBUTE_EXPRESSION_TYPE_NULL = "INVALID_ATTRIBUTE_EXPRESSION_TYPE_NULL",
@@ -119,8 +119,8 @@ export interface LitHtmlDiagnosticHtmlExpressionOnlyAssignableWithBooleanBinding
 	typeB: SimpleType;
 }
 
-export interface LitHtmlDiagnosticComplexNotAssignableToPrimitive extends LitDocumentDiagnosticBase {
-	kind: LitHtmlDiagnosticKind.COMPLEX_NOT_ASSIGNABLE_TO_PRIMITIVE;
+export interface LitHtmlDiagnosticComplexNotBindableInAttributeBinding extends LitDocumentDiagnosticBase {
+	kind: LitHtmlDiagnosticKind.COMPLEX_NOT_BINDABLE_IN_ATTRIBUTE_BINDING;
 	htmlAttr: HtmlNodeAttr;
 	typeA: SimpleType;
 	typeB: SimpleType;
@@ -157,7 +157,7 @@ export type LitHtmlDiagnostic =
 	| LitHtmlDiagnosticHtmlInvalidAttributeExpressionTypeUndefined
 	| LitHtmlDiagnosticHtmlInvalidAttributeExpressionTypeNull
 	| LitHtmlDiagnosticHtmlNoEventListenerFunction
-	| LitHtmlDiagnosticComplexNotAssignableToPrimitive
+	| LitHtmlDiagnosticComplexNotBindableInAttributeBinding
 	| LitHtmlDiagnosticHtmlPropertyNeedsExpression
 	| LitHtmlDiagnosticHtmlExpressionOnlyAssignableWithBooleanBinding
 	| LitHtmlDiagnosticInvalidSlotName
