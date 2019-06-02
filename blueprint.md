@@ -8,9 +8,9 @@
 
 `lit-analyzer` is a CLI that makes it possible to easily analyze all `lit-html` templates in your code. It performs type checking on your bindings and automatically picks up on web components. 
 
-{{ template:toc }}
 {{ load:readme/1-installation.md }}
-{{ load:readme/2-features.md }}
-{{ load:readme/3-configuring.md }}
+{{ load:readme/2-usage.md }}
+{{ load:readme/3-features.md }}
+{{ load:readme/4-configuring.md }}
 {{ template:contributors }}
 {{ template:license }}

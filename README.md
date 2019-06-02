@@ -18,61 +18,6 @@
 `lit-analyzer` is a CLI that makes it possible to easily analyze all `lit-html` templates in your code. It performs type checking on your bindings and automatically picks up on web components. 
 
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#table-of-contents)
-
-## ➤ Table of Contents
-
-* [➤ Installation](#-installation)
-* [➤ Features](#-features)
-	* [Validating html elements](#validating-html-elements)
-		* [🤷‍ Unknown tag name](#-unknown-tag-name)
-		* [📣 Missing imports](#-missing-imports)
-		* [☯ Unclosed tag](#-unclosed-tag)
-	* [Validating binding names](#validating-binding-names)
-		* [✅ Unknown attribute or property](#-unknown-attribute-or-property)
-		* [⚡️ Unknown event](#-unknown-event)
-		* [📬 Unknown slot name](#-unknown-slot-name)
-		* [✏️ Documenting slots, events, attributes and properties](#-documenting-slots-events-attributes-and-properties)
-		* [ Custom vscode html data format](#-custom-vscode-html-data-format)
-	* [Validating binding types](#validating-binding-types)
-		* [❓ Boolean attribute binding on a non-boolean type](#-boolean-attribute-binding-on-a-non-boolean-type)
-		* [⚫️ Property binding without an expression](#-property-binding-without-an-expression)
-		* [🌀 Event handler binding with a non-callable type](#-event-handler-binding-with-a-non-callable-type)
-		* [😈 Binding to a boolean in an attribute binding](#-binding-to-a-boolean-in-an-attribute-binding)
-		* [☢️ Attribute binding with complex type](#-attribute-binding-with-complex-type)
-		* [⭕️ Attribute binding with value that can be undefined | null ](#-attribute-binding-with-value-that-can-be-undefined--null-)
-		* [💔 Binding an incompatible type](#-binding-an-incompatible-type)
-		* [💥 Invalid usage of directives](#-invalid-usage-of-directives)
-	* [Validating LitElement](#validating-litelement)
-		* [💞 Incompatible LitElement property type](#-incompatible-litelement-property-type)
-		* [👎 Unknown LitElement property type](#-unknown-litelement-property-type)
-		* [⁉️ Invalid attribute name](#-invalid-attribute-name)
-		* [⁉️ Invalid custom element tag name](#-invalid-custom-element-tag-name)
-	* [💅 Validating CSS](#-validating-css)
-* [➤ Configuring the plugin](#-configuring-the-plugin)
-	* [General settings](#general-settings)
-		* [disable](#disable)
-		* [htmlTemplateTags](#htmltemplatetags)
-		* [cssTemplateTags](#csstemplatetags)
-		* [format.disable](#formatdisable)
-	* [Add checks](#add-checks)
-		* [checkUnknownEvents](#checkunknownevents)
-	* [Skip checks](#skip-checks)
-		* [skipMissingImports](#skipmissingimports)
-		* [skipSuggestions](#skipsuggestions)
-		* [skipUnknownTags](#skipunknowntags)
-		* [skipUnknownAttributes](#skipunknownattributes)
-		* [skipUnknownProperties](#skipunknownproperties)
-		* [skipUnknownSlots](#skipunknownslots)
-		* [skipTypeChecking](#skiptypechecking)
-	* [Extra data](#extra-data)
-		* [globalTags](#globaltags)
-		* [globalAttributes](#globalattributes)
-		* [globalEvents](#globalevents)
-		* [customHtmlData](#customhtmldata)
-* [➤ Contributors](#-contributors)
-* [➤ License](#-license)
-
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#installation)
 
 ## ➤ Installation
@@ -85,16 +30,58 @@ $ npm install lit-analyer -g
 * If you use Visual Studio Code you can also install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension. 
 * If you use Typescript you can also install [ts-lit-plugin](link-coming-soon).
 
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#usage)
+
+## ➤ Usage
+
+`lit-analyzer` analyses an optional `input glob` and emits the output to the console as default. When the `input glob` is omitted it will find all components in `src`.
+
+<!-- prettier-ignore -->
+```bash
+$ lit-analyzer src
+$ lit-analyzer "src/**/*.{js,ts}"
+$ lit-analyzer my-element.js
+$ lit-analyzer --outFile result.txt
+```
+
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#features)
 
 ## ➤ Features
 
+| Feature | Description |
+|------------------------------------------------------------|--------|
+| **Validating custom elements**                               | |
+| [🤷‍ Unknown tag name](#-unknown-tag-name)                  | Unknown tag names are checked. Be aware that not all custom elements from libraries will be found out of the box. |
+| [📣 Missing imports](#-missing-imports)                    | When using custom elements in HTML it is checked if the element has been imported and is available in the current context. |
+| [☯ Unclosed tag](#-unclosed-tag)                           | Unclosed tags, and invalid self closing tags like custom elements tags, are checked. |
+| **Validating binding names**                               | |
+| [✅ Unknown attribute or property](#-unknown-attribute-or-property) | You will get a warning whenever you use an unknown attribute or property within your `lit-html` template. |
+| [⚡️ Unknown event](#-unknown-event)                        | You can opt in to check for unknown event names. |
+| [📬 Unknown slot name](#-unknown-slot-name)                | Using the "@slot" jsdoc tag on your custom element class, you can tell which slots are accepted for a particular element. |
+| [✏️ Documenting slots, events, attributes and properties](#-documenting-slots-events-attributes-and-properties) | |
+| [Custom vscode html data format](#-custom-vscode-html-data-format) | |
+| **Validating binding types**                               | |
+| [❓ Boolean attribute binding on a non-boolean type](#-boolean-attribute-binding-on-a-non-boolean-type)   | It never makes sense to use the boolean attribute binding on a non-boolean type. |
+| [⚫️ Property binding without an expression](#-property-binding-without-an-expression)                     | Because of how `lit-html` [parses bindings internally](https://github.com/Polymer/lit-html/issues/843) you cannot use the property binding without an expression. |
+| [🌀 Event handler binding with a non-callable type](#-event-handler-binding-with-a-non-callable-type)     | It's a common mistake to incorrectly call the function when setting up an event handler binding. This makes the function call whenever the code evaluates. |
+| [😈 Binding to a boolean in an attribute binding](#-binding-to-a-boolean-in-an-attribute-binding)         | You should not be binding to a boolean type using an attribute binding because it could result in binding the string "true" or "false". Instead you should be using a *boolean* attribute binding. |
+| [☢️ Attribute binding with complex type](#-attribute-binding-with-complex-type)                           | Binding an object using an attribute binding would result in binding the string "[object Object]" to the attribute. In this cases it's probably better to use a property binding instead |
+| [⭕️ Attribute binding with value that can be undefined \| null ](#-attribute-binding-with-value-that-can-be-undefined--null-) | Binding `undefined` or `null` in an attribute binding will result in binding the string "undefined" or "null". Here you should probably wrap your expression in the "ifDefined" directive. |
+| [💔 Binding an incompatible type](#-binding-an-incompatible-type) | Assignments in your HTML are typed checked just like it would be in Typescript. |
+| [💥 Invalid usage of directives](#-invalid-usage-of-directives)   | Built in directives can only be used in certain binding types. |
+| **Validating LitElement**                                  | |
+| [💞 Incompatible LitElement property type](#-incompatible-litelement-property-type) | When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type |
+| [👎 Unknown LitElement property type](#-unknown-litelement-property-type)           | LitElement provides default converters. For example 'Function' is not a valid default converter type for a LitElement-managed property. |
+| [⁉️ Invalid attribute name](#-invalid-attribute-name)     | When using the property option `attribute`, the value is checked to make sure it's a valid attribute name. |
+| [⁉️ Invalid custom element tag name](#-invalid-custom-element-tag-name)             | When defining a custom element the tag name is checked to make sure it's valid. |
+| [💅 Validating CSS](#-validating-css)                     | CSS within the tagged template literal `css` will be validated. |
 
-### Validating html elements
+### Validating custom elements
+All web components in your code are analyzed using [web-component-analyzer](https://github.com/runem/web-component-analyzer) which supports native custom elements and web components built with LitElement.
 
 #### 🤷‍ Unknown tag name
 
-All web components in your code are analyzed using [web-component-analyzer](https://github.com/runem/web-component-analyzer) which supports native custom elements and web components built with LitElement. Web components defined in libraries needs to either extend the global `HTMLElementTagNameMap` (typescript definition file) or include the "@customElement tag-name" jsdoc on the custom element class.
+Web components defined in libraries needs to either extend the global `HTMLElementTagNameMap` (typescript definition file) or include the "@customElement tag-name" jsdoc on the custom element class.
 
 Below you will see an example of what to add to your library typescript definition files if you want type checking support for a given html tag name.
 
@@ -124,7 +111,7 @@ html`<my-element></my-element>`
 
 #### ☯ Unclosed tag
 
-Unclosed tags and invalid self closing tags, like custom elements tags, are checked.
+Unclosed tags, and invalid self closing tags like custom elements tags, are checked.
 
 The following examples are considered warnings:
 ```js
@@ -161,7 +148,7 @@ html`<input .value="${value}" type="button" />`
 
 #### ⚡️ Unknown event
 
-You can opt in to check event names. Using the `@slot` jsdoc or the statement `this.dispatch(new CustomElement("my-event))` will make the event name available. Event names defined on an element are accepted globally because events bubbles. 
+You can opt in to check for unknown event names. Using the `@event` jsdoc or the statement `this.dispatch(new CustomElement("my-event))` will make the event name available. Event names defined on an element are accepted globally because events bubbles. 
 
 The following examples are considered warnings:
 ```js
@@ -477,7 +464,7 @@ class MyElement extends LitElement {
 customElements.define("correct-element-name", MyElement);
 ```
 
-### 💅 Validating CSS
+#### 💅 Validating CSS
 
 `lit-analyzer` uses [vscode-html-languageservice](https://github.com/Microsoft/vscode-html-languageservice) to validate CSS.
 
