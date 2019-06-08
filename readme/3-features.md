@@ -49,12 +49,13 @@ declare global {
 
 When using custom elements in HTML it is checked if the element has been imported and is available in the current context. It's considered imported if any imported module (or their imports) defines the custom element. You can disable this check by setting `skipMissingImports` to true in the configuration (see [Configuring the plugin](#configuring-the-plugin)).
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
+// No import of "my-element"
 html`<my-element></my-element>`
 ```
 
-The following examples are not considered warnings:
+The following example is not considered a warning:
 ```js
 import "my-element.js";
 html`<my-element></my-element>`
@@ -88,12 +89,12 @@ Attributes, properties and events are picked up on custom elements using [web-co
 
 You will get a warning whenever you use an unknown attribute or property. This check is made on both custom elements and built in elements. 
 
-The following examples are considered warnings:
+**The following example is considered a warning:**
 ```js
-html`<input .valuuue="${value}" tyype="button" />`
+html`<input .valuuue="${value}" unknownattribute="button" />`
 ```
 
-The following examples are not considered warnings:
+**The following example is not considered a warning:**
 ```js
 html`<input .value="${value}" type="button" />`
 ```
@@ -102,12 +103,12 @@ html`<input .value="${value}" type="button" />`
 
 You can opt in to check for unknown event names. Using the `@event` jsdoc or the statement `this.dispatch(new CustomElement("my-event))` will make the event name available. Event names defined on an element are accepted globally because events bubbles. 
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 html`<input @iinput="${console.log}" />`
 ```
 
-The following examples are not considered warnings:
+The following example is not considered a warning:
 ```js
 html`<input @input="${console.log}" />`
 ```
@@ -127,7 +128,7 @@ class MyElement extends HTMLElement {
 customElements.define("my-element", MyElement);
 ```
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 html`
 <my-element>
@@ -136,7 +137,7 @@ html`
 `
 ```
 
-The following examples are not considered warnings:
+The following example is not considered a warning:
 ```js
 html`
 <my-element>
@@ -158,7 +159,8 @@ You can document attributes, properties, events and slots on your custom element
  * @attr {red|blue} color - The color of my element
  * @prop {String} value
  * @prop {Boolean} myProp - This is my property
- * @event change
+ * @fires change
+ * @fires my-event - This is my own event
  * @slot - This is a comment for the unnamed slot
  * @slot right - Right content
  * @slot left
@@ -175,18 +177,18 @@ class MyElement extends LitElement {
 
 ### Validating binding types
 
-Many checks involving analyzing bindings will work better in Typescript files because we have more information about the values being bound.
+Be aware that many checks involving analyzing bindings will work better in Typescript files because we have more information about the values being bound.
 
 #### ❓ Boolean attribute binding on a non-boolean type
 
 It never makes sense to use the boolean attribute binding on a non-boolean type.
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 html`<input ?type="${"button"}" />`
 ```
 
-The following examples are not considered warnings:
+The following example is not considered warning:
 ```js
 html`<input ?disabled="${isDisabled}" />`
 ```
@@ -195,12 +197,12 @@ html`<input ?disabled="${isDisabled}" />`
 
 Because of how `lit-html` [parses bindings internally](https://github.com/Polymer/lit-html/issues/843) you cannot use the property binding without an expression.
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 html`<input .value="text" />`
 ```
 
-The following examples are not considered warnings:
+The following example is not considered a warning:
 ```js
 html`<input .value="${text}" />`
 ```
@@ -227,12 +229,12 @@ You should not be binding to a boolean type using an attribute binding because i
 
 This error is particular tricky, because the string "false" is truthy when evaluated in a conditional.
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 html`<input disabled="${isDisabled}" />`
 ```
 
-The following examples are not considered warnings:
+The following example is not considered a warning:
 ```js
 html`<input ?disabled="${isDisabled}" />`
 ```
@@ -241,12 +243,12 @@ html`<input ?disabled="${isDisabled}" />`
 
 Binding an object using an attribute binding would result in binding the string "[object Object]" to the attribute. In this cases it's probably better to use a property binding instead.
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 html`<my-list listitems="${listItems}"></my-list>`
 ```
 
-The following examples are not considered warnings:
+The following example is not considered a warning:
 ```js
 html`<my-list .listItems="${listItems}"></my-list>`
 ```
@@ -343,7 +345,7 @@ class MyElement extends LitElement {
 
 The default converter in LitElement only accepts `String`, `Boolean`, `Number`, `Array` and `Object`, so all other values for `type` are considered warnings. This check doesn't run if a custom converter is used.
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 class MyElement extends LitElement {
   static get properties () {
@@ -359,7 +361,7 @@ class MyElement extends LitElement {
 }
 ```
 
-The following examples are not considered warnings:
+The following example is not considered a warning:
 ```js
 class MyElement extends LitElement {
   static get properties () {
@@ -381,7 +383,7 @@ class MyElement extends LitElement {
 
 When using the property option `attribute`, the value is checked to make sure it's a valid attribute name.
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 class MyElement extends LitElement {
   static get properties () {
@@ -398,7 +400,7 @@ class MyElement extends LitElement {
 
 When defining a custom element, the tag name is checked to make sure it's a valid custom element name.
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 @customElement("wrongElementName")
 class MyElement extends LitElement {
@@ -407,7 +409,7 @@ class MyElement extends LitElement {
 customElements.define("alsoWrongName", MyElement);
 ```
 
-The following examples are not considered warnings:
+The following example is not considered a warning:
 ```js
 @customElement("my-element")
 class MyElement extends LitElement {
