@@ -27,11 +27,13 @@ export enum LitHtmlDiagnosticKind {
 	DIRECTIVE_NOT_ALLOWED_HERE = "DIRECTIVE_NOT_ALLOWED_HERE"
 }
 
+export type LitDiagnosticSeverity = "error" | "warning";
+
 export interface LitDiagnosticBase {
 	location: SourceFileRange;
 	message: string;
 	suggestion?: string;
-	severity: "error" | "warning";
+	severity: LitDiagnosticSeverity;
 }
 
 export interface LitDocumentDiagnosticBase extends LitDiagnosticBase {

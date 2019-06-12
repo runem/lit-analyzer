@@ -4,6 +4,7 @@ import { HtmlNodeKind } from "../../../types/html-node/html-node-types";
 import { findBestMatch } from "../../../util/find-best-match";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../../types/lit-diagnostic";
+import { isRuleDisabled, LitAnalyzerRuleName, litDiagnosticRuleSeverity } from "../../../lit-analyzer-config";
 
 /**
  * Returns html reports for unknown html attributes.
@@ -19,18 +20,7 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, request: LitAnalyzerReq
 	const htmlAttrTarget = htmlStore.getHtmlAttrTarget(htmlAttr);
 	if (htmlAttrTarget == null) {
 		// Check if we need to skip this check
-		switch (htmlAttr.kind) {
-			case HtmlNodeAttrKind.ATTRIBUTE:
-			case HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE:
-				if (config.skipUnknownAttributes) return [];
-				break;
-			case HtmlNodeAttrKind.PROPERTY:
-				if (config.skipUnknownProperties) return [];
-				break;
-			case HtmlNodeAttrKind.EVENT_LISTENER:
-				if (!config.checkUnknownEvents) return [];
-				break;
-		}
+		if (isRuleDisabled(config, ruleNameFromHtmlNodeAttrKind(htmlAttr.kind))) return [];
 
 		// Ignore unknown "data-" attributes
 		if (htmlAttr.name.startsWith("data-")) return [];
@@ -82,13 +72,16 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, request: LitAnalyzerReq
 			}
 		})();
 
+		// Get selected severity
+		const severity = litDiagnosticRuleSeverity(config, ruleNameFromHtmlNodeAttrKind(htmlAttr.kind));
+
 		return [
 			{
 				kind: LitHtmlDiagnosticKind.UNKNOWN_TARGET,
 				message: `Unknown ${existingKind} "${htmlAttr.name}"${suggestedMemberName != null ? `. Did you mean '${suggestedMemberName}'?` : ""}`,
-				suggestion,
-				severity: "warning",
 				location: { document, ...htmlAttr.location.name },
+				suggestion,
+				severity,
 				htmlAttr,
 				suggestedTarget
 			}
@@ -120,5 +113,17 @@ function findSuggestedTarget(name: string, ...tests: Iterable<HtmlAttrTarget>[])
 		if (match != null) {
 			return match;
 		}
+	}
+}
+
+function ruleNameFromHtmlNodeAttrKind(kind: HtmlNodeAttrKind): LitAnalyzerRuleName {
+	switch (kind) {
+		case HtmlNodeAttrKind.ATTRIBUTE:
+		case HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE:
+			return "no-unknown-attribute";
+		case HtmlNodeAttrKind.PROPERTY:
+			return "no-unknown-property";
+		case HtmlNodeAttrKind.EVENT_LISTENER:
+			return "no-unknown-event";
 	}
 }

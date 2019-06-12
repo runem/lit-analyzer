@@ -4,7 +4,7 @@ import * as tsServer from "typescript/lib/tsserverlibrary";
 import { analyzeComponents, analyzeLibDomHtmlElement } from "web-component-analyzer";
 import { getBuiltInHtmlCollection } from "./data/get-built-in-html-collection";
 import { getUserConfigHtmlCollection } from "./data/get-user-config-html-collection";
-import { LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config";
+import { isRuleDisabled, LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config";
 import { LitAnalyzerContext, LitPluginContextHandler } from "./lit-analyzer-context";
 import { DefaultLitAnalyzerLogger } from "./lit-analyzer-logger";
 import { convertAnalyzeResultToHtmlCollection, convertComponentDeclarationToHtmlTag } from "./parse/convert-component-definitions-to-html-collection";
@@ -137,7 +137,7 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 	}
 
 	private findDependenciesInFile(file: SourceFile) {
-		if (this.config.skipMissingImports) return;
+		if (isRuleDisabled(this.config, "no-missing-import")) return;
 
 		// Build a graph of component dependencies
 		const res = parseDependencies(file, this);

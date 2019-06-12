@@ -6,15 +6,16 @@ import {
 	isSimpleType,
 	SimpleType,
 	SimpleTypeBooleanLiteral,
+	SimpleTypeEnumMember,
 	SimpleTypeKind,
 	SimpleTypeString,
 	SimpleTypeStringLiteral,
 	toSimpleType,
-	toTypeString,
-	SimpleTypeEnumMember
+	toTypeString
 } from "ts-simple-type";
 import { Type, TypeChecker } from "typescript";
 import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../../constants";
+import { isRuleEnabled, litDiagnosticRuleSeverity } from "../../../lit-analyzer-config";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttr, HtmlNodeAttrKind, IHtmlNodeAttr } from "../../../types/html-node/html-node-attr-types";
@@ -39,8 +40,6 @@ const STRINGIFIED_BOOLEAN_TYPE: SimpleType = {
  */
 export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, request: LitAnalyzerRequest): LitHtmlDiagnostic[] {
 	const { htmlStore, config, program } = request;
-
-	if (config.skipTypeChecking) return [];
 
 	const { assignment } = htmlAttr;
 	if (assignment == null) return [];
@@ -70,8 +69,10 @@ export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, request: LitA
 	if (rulesResult != null) return rulesResult;
 
 	// Validate slot attribute assignments
-	const slotResult = validateHtmlAttrSlotAssignment(htmlAttr, request);
-	if (slotResult != null) return slotResult;
+	if (isRuleEnabled(config, "no-unknown-slot")) {
+		const slotResult = validateHtmlAttrSlotAssignment(htmlAttr, request);
+		if (slotResult != null) return slotResult;
+	}
 
 	// Find a corresponding target for this attribute
 	const htmlAttrTarget = htmlStore.getHtmlAttrTarget(htmlAttr);
@@ -84,8 +85,10 @@ export function validateHtmlAttrAssignment(htmlAttr: HtmlNodeAttr, request: LitA
 	const typeA = htmlAttrTarget.getType();
 
 	// Validate lit-html directives
-	const directiveResult = validateHtmlAttrDirectiveAssignment(htmlAttr, { typeA, typeB }, request);
-	if (directiveResult != null) return directiveResult;
+	if (isRuleEnabled(config, "no-invalid-directive-binding")) {
+		const directiveResult = validateHtmlAttrDirectiveAssignment(htmlAttr, { typeA, typeB }, request);
+		if (directiveResult != null) return directiveResult;
+	}
 
 	// Validate the types of the assignment
 	const typesResult = validateHtmlAttrAssignmentTypes(htmlAttr, { typeA, typeB }, request);
@@ -107,24 +110,26 @@ function inferTypeFromAssignment(assignment: HtmlNodeAttrAssignment, checker: Ty
 	}
 }
 
-function validateHtmlAttrAssignmentRules(htmlAttr: HtmlNodeAttr, typeB: SimpleType, { document, htmlStore, config, program }: LitAnalyzerRequest): LitHtmlDiagnostic[] | undefined {
+function validateHtmlAttrAssignmentRules(htmlAttr: HtmlNodeAttr, typeB: SimpleType, { document, config }: LitAnalyzerRequest): LitHtmlDiagnostic[] | undefined {
 	const { assignment } = htmlAttr;
 	if (assignment == null) return undefined;
 
 	switch (htmlAttr.kind) {
 		case HtmlNodeAttrKind.EVENT_LISTENER:
-			// Make sure that there is a function as event listener value.
-			// Here we catch errors like: @click="onClick()"
-			if (!isTypeBindableToEventListener(typeB)) {
-				return [
-					{
-						kind: LitHtmlDiagnosticKind.NO_EVENT_LISTENER_FUNCTION,
-						message: `You are setting up an event listener with a non-callable type '${toTypeString(typeB)}'`,
-						severity: "error",
-						location: { document, ...htmlAttr.location.name },
-						typeB
-					}
-				];
+			if (isRuleEnabled(config, "no-noncallable-event-binding")) {
+				// Make sure that there is a function as event listener value.
+				// Here we catch errors like: @click="onClick()"
+				if (!isTypeBindableToEventListener(typeB)) {
+					return [
+						{
+							kind: LitHtmlDiagnosticKind.NO_EVENT_LISTENER_FUNCTION,
+							message: `You are setting up an event listener with a non-callable type '${toTypeString(typeB)}'`,
+							severity: litDiagnosticRuleSeverity(config, "no-noncallable-event-binding"),
+							location: { document, ...htmlAttr.location.name },
+							typeB
+						}
+					];
+				}
 			}
 
 			return [];
@@ -134,26 +139,30 @@ function validateHtmlAttrAssignmentRules(htmlAttr: HtmlNodeAttr, typeB: SimpleTy
 			switch (assignment.kind) {
 				case HtmlNodeAttrAssignmentKind.STRING:
 				case HtmlNodeAttrAssignmentKind.BOOLEAN:
-					return [
-						{
-							kind: LitHtmlDiagnosticKind.PROPERTY_NEEDS_EXPRESSION,
-							message: `You are using the property binding without an expression`,
-							severity: "error",
-							location: { document, ...htmlAttr.location.name }
-						}
-					];
+					if (isRuleEnabled(config, "no-expressionless-property-binding")) {
+						return [
+							{
+								kind: LitHtmlDiagnosticKind.PROPERTY_NEEDS_EXPRESSION,
+								message: `You are using the property binding without an expression`,
+								severity: litDiagnosticRuleSeverity(config, "no-expressionless-property-binding"),
+								location: { document, ...htmlAttr.location.name }
+							}
+						];
+					}
+
+					return [];
 			}
 			break;
 	}
 }
 
-function validateHtmlAttrSlotAssignment(htmlAttr: HtmlNodeAttr, { document, htmlStore, config, program }: LitAnalyzerRequest): LitHtmlDiagnostic[] | undefined {
+function validateHtmlAttrSlotAssignment(htmlAttr: HtmlNodeAttr, { document, htmlStore, config }: LitAnalyzerRequest): LitHtmlDiagnostic[] | undefined {
 	const { assignment } = htmlAttr;
 
 	if (htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE || assignment == null || assignment.kind !== HtmlNodeAttrAssignmentKind.STRING) return undefined;
 
 	// Check for slots
-	if (htmlAttr.name === "slot" && !config.skipUnknownSlots) {
+	if (htmlAttr.name === "slot") {
 		const parent = htmlAttr.htmlNode.parent;
 		if (parent != null) {
 			const parentHtmlTag = htmlStore.getHtmlTag(parent.tagName);
@@ -175,7 +184,7 @@ function validateHtmlAttrSlotAssignment(htmlAttr: HtmlNodeAttr, { document, html
 							kind: LitHtmlDiagnosticKind.INVALID_SLOT_NAME,
 							message,
 							validSlotNames,
-							severity: "error",
+							severity: litDiagnosticRuleSeverity(config, "no-unknown-slot"),
 							location: { document, ...htmlAttr.location.name }
 						}
 					];
@@ -195,19 +204,21 @@ function validateHtmlAttrAssignmentTypes(htmlAttr: HtmlNodeAttr, { typeA, typeB 
 
 	switch (htmlAttr.modifier) {
 		case LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER:
-			// Test if the user is trying to use the ? modifier on a non-boolean type.
-			if (!isAssignableToType(typeA, { kind: SimpleTypeKind.BOOLEAN }, program)) {
-				return [
-					{
-						kind: LitHtmlDiagnosticKind.BOOL_MOD_ON_NON_BOOL,
-						message: `You are using a boolean binding on a non boolean type '${toTypeString(typeA)}'`,
-						severity: "error",
-						location: { document, ...htmlAttr.location.name },
-						htmlAttr,
-						typeA,
-						typeB
-					}
-				];
+			if (isRuleEnabled(request.config, "no-invalid-boolean-binding")) {
+				// Test if the user is trying to use the ? modifier on a non-boolean type.
+				if (!isAssignableToType(typeA, { kind: SimpleTypeKind.BOOLEAN }, program)) {
+					return [
+						{
+							kind: LitHtmlDiagnosticKind.BOOL_MOD_ON_NON_BOOL,
+							message: `You are using a boolean binding on a non boolean type '${toTypeString(typeA)}'`,
+							severity: litDiagnosticRuleSeverity(request.config, "no-invalid-boolean-binding"),
+							location: { document, ...htmlAttr.location.name },
+							htmlAttr,
+							typeA,
+							typeB
+						}
+					];
+				}
 			}
 			break;
 
@@ -223,60 +234,64 @@ function validateHtmlAttrAssignmentTypes(htmlAttr: HtmlNodeAttr, { typeA, typeB 
 			if (results != null) return results;
 	}
 
-	// Fail if the two types are not assignable to each other.
-	// Always disable "strict" in javascript files
-	const inJsFile = request.file.fileName.endsWith(".js");
-	if (!isAssignableToType(typeA, typeB, program, inJsFile ? { strict: false } : undefined)) {
-		return [
-			{
-				kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE,
-				message: `Type '${toTypeString(typeB)}' is not assignable to '${toTypeString(typeA)}'`,
-				severity: "error",
-				location: { document, ...htmlAttr.location.name },
-				htmlAttr,
-				typeA,
-				typeB
-			}
-		];
+	if (isRuleEnabled(request.config, "no-incompatible-type-binding")) {
+		// Fail if the two types are not assignable to each other.
+		// Always disable "strict" in javascript files
+		const inJsFile = request.file.fileName.endsWith(".js");
+		if (!isAssignableToType(typeA, typeB, program, inJsFile ? { strict: false } : undefined)) {
+			return [
+				{
+					kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE,
+					message: `Type '${toTypeString(typeB)}' is not assignable to '${toTypeString(typeA)}'`,
+					severity: litDiagnosticRuleSeverity(request.config, "no-incompatible-type-binding"),
+					location: { document, ...htmlAttr.location.name },
+					htmlAttr,
+					typeA,
+					typeB
+				}
+			];
+		}
 	}
 }
 
 function validateStringifiedAssignment(
 	htmlAttr: IHtmlNodeAttr,
 	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },
-	{ document, program }: LitAnalyzerRequest
+	{ document, program, config }: LitAnalyzerRequest
 ): LitHtmlDiagnostic[] | undefined {
 	const { assignment } = htmlAttr;
 	if (assignment == null) return undefined;
 
-	// Only primitive types should be allowed as "typeB" and "typeA".
-	if (!isAssignableToPrimitiveType(typeB)) {
-		return [
-			{
-				kind: LitHtmlDiagnosticKind.COMPLEX_NOT_BINDABLE_IN_ATTRIBUTE_BINDING,
-				severity: "error",
-				message: `You are binding a non-primitive type '${toTypeString(typeB)}'. This could result in binding the string "[object Object]".`,
-				location: { document, ...htmlAttr.location.name },
-				htmlAttr,
-				typeA,
-				typeB
-			}
-		];
-	} else if (!isAssignableToPrimitiveType(typeA)) {
-		const message = `You are assigning the primitive '${toTypeString(typeB)}' to a non-primitive type '${toTypeString(typeA)}'. Use '.' binding instead?`;
+	if (isRuleEnabled(config, "no-complex-attribute-binding")) {
+		// Only primitive types should be allowed as "typeB" and "typeA".
+		if (!isAssignableToPrimitiveType(typeB)) {
+			return [
+				{
+					kind: LitHtmlDiagnosticKind.COMPLEX_NOT_BINDABLE_IN_ATTRIBUTE_BINDING,
+					severity: litDiagnosticRuleSeverity(config, "no-complex-attribute-binding"),
+					message: `You are binding a non-primitive type '${toTypeString(typeB)}'. This could result in binding the string "[object Object]".`,
+					location: { document, ...htmlAttr.location.name },
+					htmlAttr,
+					typeA,
+					typeB
+				}
+			];
+		} else if (!isAssignableToPrimitiveType(typeA)) {
+			const message = `You are assigning the primitive '${toTypeString(typeB)}' to a non-primitive type '${toTypeString(typeA)}'. Use '.' binding instead?`;
 
-		// Fail if the user is trying to assign a primitive value to a complex value.
-		return [
-			{
-				kind: LitHtmlDiagnosticKind.PRIMITIVE_NOT_ASSIGNABLE_TO_COMPLEX,
-				severity: "error",
-				message,
-				location: { document, ...htmlAttr.location.name },
-				htmlAttr,
-				typeA,
-				typeB
-			}
-		];
+			// Fail if the user is trying to assign a primitive value to a complex value.
+			return [
+				{
+					kind: LitHtmlDiagnosticKind.PRIMITIVE_NOT_ASSIGNABLE_TO_COMPLEX,
+					severity: litDiagnosticRuleSeverity(config, "no-complex-attribute-binding"),
+					message,
+					location: { document, ...htmlAttr.location.name },
+					htmlAttr,
+					typeA,
+					typeB
+				}
+			];
+		}
 	}
 
 	// Test assignments to all possible type kinds
@@ -309,12 +324,12 @@ function validateStringifiedAssignment(
 	// Tagged template attribute 'expression' assignments like 'max="${this.max}"'
 	else if (assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION) {
 		// Test if removing "null" from typeB would work and suggest using "ifDefined(exp === null ? undefined : exp)".
-		if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.NULL)) {
+		if (isRuleEnabled(config, "no-nullable-attribute-binding") && isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.NULL)) {
 			return [
 				{
 					kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_NULL,
 					message: `This attribute binds the type '${toTypeString(typeB)}' which can be 'null'. Fix it using 'ifDefined' and strict equality check?`,
-					severity: "error",
+					severity: litDiagnosticRuleSeverity(config, "no-nullable-attribute-binding"),
 					location: { document, ...htmlAttr.location.name },
 					htmlAttr: htmlAttr as typeof htmlAttr & ({ assignment: typeof assignment }),
 					typeA,
@@ -324,14 +339,14 @@ function validateStringifiedAssignment(
 		}
 
 		// Test if removing "undefined" from typeB would work and suggest using "ifDefined".
-		else if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.UNDEFINED)) {
+		else if (isRuleEnabled(config, "no-nullable-attribute-binding") && isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.UNDEFINED)) {
 			//const typeBWithoutUndefined = removeUndefinedFromType(typeB);
 			//const assignableWithoutUndefined = isAssignableToType(typeA, typeBWithoutUndefined, program);
 			return [
 				{
 					kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED,
 					message: `This attribute binds the type '${toTypeString(typeB)}' which can be 'undefined'. Fix it using 'ifDefined'?`,
-					severity: "error",
+					severity: litDiagnosticRuleSeverity(config, "no-nullable-attribute-binding"),
 					location: { document, ...htmlAttr.location.name },
 					htmlAttr: htmlAttr as typeof htmlAttr & ({ assignment: typeof assignment }),
 					typeA,
@@ -347,14 +362,34 @@ function validateStringifiedAssignment(
 
 		// Take into account: string === boolean expressions: 'aria-expanded="${this.open}"'
 		else if (isAssignableToSimpleTypeKind(typeB, [SimpleTypeKind.BOOLEAN, SimpleTypeKind.BOOLEAN_LITERAL], { op: "or" })) {
-			if (isAssignableToType(typeA, STRINGIFIED_BOOLEAN_TYPE, program)) {
-				return [];
-			} else {
+			if (isRuleEnabled(config, "no-boolean-in-attribute-binding")) {
+				if (isAssignableToType(typeA, STRINGIFIED_BOOLEAN_TYPE, program)) {
+					return [];
+				} else {
+					return [
+						{
+							kind: LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING,
+							severity: litDiagnosticRuleSeverity(config, "no-boolean-in-attribute-binding"),
+							message: `The type '${toTypeString(typeB)}' is a boolean type but you not using a boolean binding. Change to boolean binding?`,
+							location: { document, ...htmlAttr.location.name },
+							htmlAttr,
+							typeA,
+							typeB
+						}
+					];
+				}
+			}
+		}
+
+		// Take into account that assigning to a boolean without "?" binding would result in "undefined" being assigned.
+		// Example: <input disabled="${true}" />
+		else if (typeAIsAssignableTo[SimpleTypeKind.BOOLEAN]() && !typeAIsAssignableToMultiple()) {
+			if (isRuleEnabled(config, "no-boolean-in-attribute-binding")) {
 				return [
 					{
 						kind: LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING,
-						severity: "error",
-						message: `The type '${toTypeString(typeB)}' is a boolean type but you not using a boolean binding. Change to boolean binding?`,
+						severity: litDiagnosticRuleSeverity(config, "no-boolean-in-attribute-binding"),
+						message: `The '${htmlAttr.name}' attribute is a boolean type but you not using a boolean binding. Change to boolean binding?`,
 						location: { document, ...htmlAttr.location.name },
 						htmlAttr,
 						typeA,
@@ -362,22 +397,6 @@ function validateStringifiedAssignment(
 					}
 				];
 			}
-		}
-
-		// Take into account that assigning to a boolean without "?" binding would result in "undefined" being assigned.
-		// Example: <input disabled="${true}" />
-		else if (typeAIsAssignableTo[SimpleTypeKind.BOOLEAN]() && !typeAIsAssignableToMultiple()) {
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING,
-					severity: "error",
-					message: `The '${htmlAttr.name}' attribute is a boolean type but you not using a boolean binding. Change to boolean binding?`,
-					location: { document, ...htmlAttr.location.name },
-					htmlAttr,
-					typeA,
-					typeB
-				}
-			];
 		}
 	}
 }
@@ -668,7 +687,7 @@ function isTypeBindableToEventListener(type: SimpleType): boolean {
 		// The "handleEvent" property must be present
 		const handleEventFunction = type.members != null ? type.members.find(m => m.name === "handleEvent") : undefined;
 
-		// The "handlEvent" property must be callable
+		// The "handleEvent" property must be callable
 		if (handleEventFunction != null) {
 			return isTypeBindableToEventListener(handleEventFunction.type);
 		}

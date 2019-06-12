@@ -48,33 +48,34 @@ $ lit-analyzer --outFile result.txt
 
 ## ➤ Features
 
+<!-- prettier-ignore -->
 | Feature | Description |
 |------------------------------------------------------------|--------|
-| **Validating custom elements**                               | |
-| [🤷‍ Unknown tag name](#-unknown-tag-name)                  | Unknown tag names are checked. Be aware that not all custom elements from libraries will be found out of the box. |
-| [📣 Missing imports](#-missing-imports)                    | When using custom elements in HTML it is checked if the element has been imported and is available in the current context. |
-| [☯ Unclosed tag](#-unclosed-tag)                           | Unclosed tags, and invalid self closing tags like custom elements tags, are checked. |
-| **Validating binding names**                               | |
-| [✅ Unknown attribute or property](#-unknown-attribute-or-property) | You will get a warning whenever you use an unknown attribute or property within your `lit-html` template. |
-| [⚡️ Unknown event](#-unknown-event)                        | You can opt in to check for unknown event names. |
-| [📬 Unknown slot name](#-unknown-slot-name)                | Using the "@slot" jsdoc tag on your custom element class, you can tell which slots are accepted for a particular element. |
+| **Validating custom elements**                                     | |
+| [no-unknown-tag-name](#-unknown-tag-name)                          | Unknown tag names are checked. Be aware that not all custom elements from libraries will be found out of the box. |
+| [no-missing-import](#-missing-imports)                             | When using custom elements in HTML it is checked if the element has been imported and is available in the current context. |
+| [no-unclosed-tag](#-unclosed-tag)                                  | Unclosed tags, and invalid self closing tags like custom elements tags, are checked. |
+| **Validating binding names**                                        | |
+| [no-unknown-attribute](#-unknown-attribute-or-property)<br> [no-unknown-property](#-unknown-attribute-or-property) | You will get a warning whenever you use an unknown attribute or property within your `lit-html` template. |
+| [no-unknown-event](#-unknown-event)                                | You can opt in to check for unknown event names. |
+| [no-unknown-slot](#-unknown-slot-name)                             | Using the "@slot" jsdoc tag on your custom element class, you can tell which slots are accepted for a particular element. |
 | [✏️ Documenting slots, events, attributes and properties](#-documenting-slots-events-attributes-and-properties) | |
-| [Custom vscode html data format](#-custom-vscode-html-data-format) | |
-| **Validating binding types**                               | |
-| [❓ Boolean attribute binding on a non-boolean type](#-boolean-attribute-binding-on-a-non-boolean-type)   | It never makes sense to use the boolean attribute binding on a non-boolean type. |
-| [⚫️ Property binding without an expression](#-property-binding-without-an-expression)                     | Because of how `lit-html` [parses bindings internally](https://github.com/Polymer/lit-html/issues/843) you cannot use the property binding without an expression. |
-| [🌀 Event handler binding with a non-callable type](#-event-handler-binding-with-a-non-callable-type)     | It's a common mistake to incorrectly call the function when setting up an event handler binding. This makes the function call whenever the code evaluates. |
-| [😈 Binding to a boolean in an attribute binding](#-binding-to-a-boolean-in-an-attribute-binding)         | You should not be binding to a boolean type using an attribute binding because it could result in binding the string "true" or "false". Instead you should be using a *boolean* attribute binding. |
-| [☢️ Attribute binding with complex type](#-attribute-binding-with-complex-type)                           | Binding an object using an attribute binding would result in binding the string "[object Object]" to the attribute. In this cases it's probably better to use a property binding instead |
-| [⭕️ Attribute binding with value that can be undefined \| null ](#-attribute-binding-with-value-that-can-be-undefined--null-) | Binding `undefined` or `null` in an attribute binding will result in binding the string "undefined" or "null". Here you should probably wrap your expression in the "ifDefined" directive. |
-| [💔 Binding an incompatible type](#-binding-an-incompatible-type) | Assignments in your HTML are typed checked just like it would be in Typescript. |
-| [💥 Invalid usage of directives](#-invalid-usage-of-directives)   | Built in directives can only be used in certain binding types. |
-| **Validating LitElement**                                  | |
-| [💞 Incompatible LitElement property type](#-incompatible-litelement-property-type) | When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type |
-| [👎 Unknown LitElement property type](#-unknown-litelement-property-type)           | LitElement provides default converters. For example 'Function' is not a valid default converter type for a LitElement-managed property. |
-| [⁉️ Invalid attribute name](#-invalid-attribute-name)     | When using the property option `attribute`, the value is checked to make sure it's a valid attribute name. |
-| [⁉️ Invalid custom element tag name](#-invalid-custom-element-tag-name)             | When defining a custom element the tag name is checked to make sure it's valid. |
-| [💅 Validating CSS](#-validating-css)                     | CSS within the tagged template literal `css` will be validated. |
+| [Custom vscode html data format](#-custom-vscode-html-data-format)                        | |
+| **Validating binding types**                                                              | |
+| [no-invalid-boolean-binding](#-boolean-attribute-binding-on-a-non-boolean-type)           | Disallow boolean attribute bindings on non-boolean types. |
+| [no-expressionless-property-binding](#-property-binding-without-an-expression)            | Disallow property bindings without an expression. |
+| [no-noncallable-event-binding](#-event-handler-binding-with-a-non-callable-type)          | Disallow event listener bindings with a noncallable type. |
+| [no-boolean-in-attribute-binding](#-binding-to-a-boolean-in-an-attribute-binding)         | Disallow attribute bindings with a boolean type. |
+| [no-complex-attribute-binding](#-attribute-binding-with-complex-type)                     | Disallow attribute bindings with a complex type. |
+| [no-nullable-attribute-binding](#-attribute-binding-with-value-that-can-be-undefined--null-) | Disallow attribute bindings with nullable types such as "null" or "undefined".  |
+| [no-incompatible-type-binding](#-binding-an-incompatible-type)                            | Disallow incompatible type in bindings.  |
+| [no-invalid-directive-binding](#-invalid-usage-of-directives)                             | Disallow using built-in directives in unsupported bindings. |
+| **Validating LitElement**                                           | |
+| [no-incompatible-lit-element-property-type](#-incompatible-litelement-property-type) | When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type |
+| [no-unknown-lit-element-property-type](#-unknown-litelement-property-type)           | LitElement provides default converters. For example 'Function' is not a valid default converter type for a LitElement-managed property. |
+| [no-invalid-attribute-name](#-invalid-attribute-name)              | When using the property option `attribute`, the value is checked to make sure it's a valid attribute name. |
+| [no-invalid-tag-name](#-invalid-custom-element-tag-name)           | When defining a custom element the tag name is checked to make sure it's valid. |
+| [💅 Validating CSS](#-validating-css)                              | CSS within the tagged template literal `css` will be validated. |
 
 ### Validating custom elements
 All web components in your code are analyzed using [web-component-analyzer](https://github.com/runem/web-component-analyzer) which supports native custom elements and web components built with LitElement.
@@ -97,12 +98,13 @@ declare global {
 
 When using custom elements in HTML it is checked if the element has been imported and is available in the current context. It's considered imported if any imported module (or their imports) defines the custom element. You can disable this check by setting `skipMissingImports` to true in the configuration (see [Configuring the plugin](#configuring-the-plugin)).
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
+// No import of "my-element"
 html`<my-element></my-element>`
 ```
 
-The following examples are not considered warnings:
+The following example is not considered a warning:
 ```js
 import "my-element.js";
 html`<my-element></my-element>`
@@ -136,12 +138,12 @@ Attributes, properties and events are picked up on custom elements using [web-co
 
 You will get a warning whenever you use an unknown attribute or property. This check is made on both custom elements and built in elements. 
 
-The following examples are considered warnings:
+**The following example is considered a warning:**
 ```js
-html`<input .valuuue="${value}" tyype="button" />`
+html`<input .valuuue="${value}" unknownattribute="button" />`
 ```
 
-The following examples are not considered warnings:
+**The following example is not considered a warning:**
 ```js
 html`<input .value="${value}" type="button" />`
 ```
@@ -150,12 +152,12 @@ html`<input .value="${value}" type="button" />`
 
 You can opt in to check for unknown event names. Using the `@event` jsdoc or the statement `this.dispatch(new CustomElement("my-event))` will make the event name available. Event names defined on an element are accepted globally because events bubbles. 
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 html`<input @iinput="${console.log}" />`
 ```
 
-The following examples are not considered warnings:
+The following example is not considered a warning:
 ```js
 html`<input @input="${console.log}" />`
 ```
@@ -175,7 +177,7 @@ class MyElement extends HTMLElement {
 customElements.define("my-element", MyElement);
 ```
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 html`
 <my-element>
@@ -184,7 +186,7 @@ html`
 `
 ```
 
-The following examples are not considered warnings:
+The following example is not considered a warning:
 ```js
 html`
 <my-element>
@@ -206,7 +208,8 @@ You can document attributes, properties, events and slots on your custom element
  * @attr {red|blue} color - The color of my element
  * @prop {String} value
  * @prop {Boolean} myProp - This is my property
- * @event change
+ * @fires change
+ * @fires my-event - This is my own event
  * @slot - This is a comment for the unnamed slot
  * @slot right - Right content
  * @slot left
@@ -223,18 +226,18 @@ class MyElement extends LitElement {
 
 ### Validating binding types
 
-Many checks involving analyzing bindings will work better in Typescript files because we have more information about the values being bound.
+Be aware that many checks involving analyzing bindings will work better in Typescript files because we have more information about the values being bound.
 
 #### ❓ Boolean attribute binding on a non-boolean type
 
 It never makes sense to use the boolean attribute binding on a non-boolean type.
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 html`<input ?type="${"button"}" />`
 ```
 
-The following examples are not considered warnings:
+The following example is not considered warning:
 ```js
 html`<input ?disabled="${isDisabled}" />`
 ```
@@ -243,12 +246,12 @@ html`<input ?disabled="${isDisabled}" />`
 
 Because of how `lit-html` [parses bindings internally](https://github.com/Polymer/lit-html/issues/843) you cannot use the property binding without an expression.
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 html`<input .value="text" />`
 ```
 
-The following examples are not considered warnings:
+The following example is not considered a warning:
 ```js
 html`<input .value="${text}" />`
 ```
@@ -275,12 +278,12 @@ You should not be binding to a boolean type using an attribute binding because i
 
 This error is particular tricky, because the string "false" is truthy when evaluated in a conditional.
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 html`<input disabled="${isDisabled}" />`
 ```
 
-The following examples are not considered warnings:
+The following example is not considered a warning:
 ```js
 html`<input ?disabled="${isDisabled}" />`
 ```
@@ -289,12 +292,12 @@ html`<input ?disabled="${isDisabled}" />`
 
 Binding an object using an attribute binding would result in binding the string "[object Object]" to the attribute. In this cases it's probably better to use a property binding instead.
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 html`<my-list listitems="${listItems}"></my-list>`
 ```
 
-The following examples are not considered warnings:
+The following example is not considered a warning:
 ```js
 html`<my-list .listItems="${listItems}"></my-list>`
 ```
@@ -391,7 +394,7 @@ class MyElement extends LitElement {
 
 The default converter in LitElement only accepts `String`, `Boolean`, `Number`, `Array` and `Object`, so all other values for `type` are considered warnings. This check doesn't run if a custom converter is used.
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 class MyElement extends LitElement {
   static get properties () {
@@ -407,7 +410,7 @@ class MyElement extends LitElement {
 }
 ```
 
-The following examples are not considered warnings:
+The following example is not considered a warning:
 ```js
 class MyElement extends LitElement {
   static get properties () {
@@ -429,7 +432,7 @@ class MyElement extends LitElement {
 
 When using the property option `attribute`, the value is checked to make sure it's a valid attribute name.
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 class MyElement extends LitElement {
   static get properties () {
@@ -446,7 +449,7 @@ class MyElement extends LitElement {
 
 When defining a custom element, the tag name is checked to make sure it's a valid custom element name.
 
-The following examples are considered warnings:
+The following example is considered a warning:
 ```js
 @customElement("wrongElementName")
 class MyElement extends LitElement {
@@ -455,7 +458,7 @@ class MyElement extends LitElement {
 customElements.define("alsoWrongName", MyElement);
 ```
 
-The following examples are not considered warnings:
+The following example is not considered a warning:
 ```js
 @customElement("my-element")
 class MyElement extends LitElement {
@@ -571,6 +574,8 @@ If you are using the vscode plugin you can configure these options directly from
 -   **Type**: [Vscode custom HTML data format](https://github.com/Microsoft/vscode-html-languageservice/blob/master/docs/customData.md) you can both specify a relative file paths or an entire objects with the data here. This value can both be an array and an object.
 -   **Description**: This plugin support the [custom vscode html data format](https://code.visualstudio.com/updates/v1_31#_html-and-css-custom-data-support) through this setting.
  
+
+
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#contributors)
 

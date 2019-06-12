@@ -1,4 +1,5 @@
 import { basename, dirname, relative } from "path";
+import { isRuleEnabled, litDiagnosticRuleSeverity } from "../../../lit-analyzer-config";
 import { HtmlNode, HtmlNodeKind } from "../../../types/html-node/html-node-types";
 import { findBestStringMatch } from "../../../util/find-best-match";
 import { isCustomElementTagName } from "../../../util/general-util";
@@ -8,15 +9,17 @@ import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../../types/lit-dia
 export function validateHtmlNode(htmlNode: HtmlNode, { document, htmlStore, config, dependencyStore, definitionStore }: LitAnalyzerRequest): LitHtmlDiagnostic[] {
 	const reports: LitHtmlDiagnostic[] = [];
 
-	if (!htmlNode.selfClosed && htmlNode.location.endTag == null) {
-		const isCustomElement = isCustomElementTagName(htmlNode.tagName);
-		reports.push({
-			kind: LitHtmlDiagnosticKind.TAG_NOT_CLOSED,
-			message: `This tag isn't closed.${isCustomElement ? " Custom elements cannot be self closing." : ""}`,
-			severity: "error",
-			location: { document, ...htmlNode.location.name },
-			htmlNode
-		});
+	if (isRuleEnabled(config, "no-unclosed-tag")) {
+		if (!htmlNode.selfClosed && htmlNode.location.endTag == null) {
+			const isCustomElement = isCustomElementTagName(htmlNode.tagName);
+			reports.push({
+				kind: LitHtmlDiagnosticKind.TAG_NOT_CLOSED,
+				message: `This tag isn't closed.${isCustomElement ? " Custom elements cannot be self closing." : ""}`,
+				severity: litDiagnosticRuleSeverity(config, "no-unclosed-tag"),
+				location: { document, ...htmlNode.location.name },
+				htmlNode
+			});
+		}
 	}
 
 	// Don't validate style and svg yet
@@ -25,19 +28,19 @@ export function validateHtmlNode(htmlNode: HtmlNode, { document, htmlStore, conf
 	const htmlTag = htmlStore.getHtmlTag(htmlNode);
 
 	if (htmlTag == null) {
-		if (config.skipUnknownTags) return [];
+		if (isRuleEnabled(config, "no-unknown-tag-name")) {
+			const suggestedName = findBestStringMatch(htmlNode.tagName, Array.from(htmlStore.getGlobalTags()).map(tag => tag.tagName));
 
-		const suggestedName = findBestStringMatch(htmlNode.tagName, Array.from(htmlStore.getGlobalTags()).map(tag => tag.tagName));
-
-		reports.push({
-			kind: LitHtmlDiagnosticKind.UNKNOWN_TAG,
-			message: `Unknown tag "${htmlNode.tagName}"${suggestedName ? `. Did you mean '${suggestedName}'?` : ""}`,
-			suggestion: `Please consider adding it to the 'globalTags' plugin configuration or disabling the check using 'skipUnknownTags'.`,
-			location: { document, ...htmlNode.location.name },
-			severity: "warning",
-			htmlNode,
-			suggestedName
-		});
+			reports.push({
+				kind: LitHtmlDiagnosticKind.UNKNOWN_TAG,
+				message: `Unknown tag "${htmlNode.tagName}"${suggestedName ? `. Did you mean '${suggestedName}'?` : ""}`,
+				suggestion: `Please consider adding it to the 'globalTags' plugin configuration or disabling the check using 'skipUnknownTags'.`,
+				location: { document, ...htmlNode.location.name },
+				severity: "warning",
+				htmlNode,
+				suggestedName
+			});
+		}
 	} else if (htmlTag.declaration != null) {
 		//const declaration = htmlTag.declaration;
 
@@ -58,7 +61,7 @@ export function validateHtmlNode(htmlNode: HtmlNode, { document, htmlStore, conf
 		 }*/
 
 		// Check if this element is imported
-		if (!config.skipMissingImports) {
+		if (isRuleEnabled(config, "no-missing-import")) {
 			const isCustomElement = isCustomElementTagName(htmlNode.tagName);
 			const fromFileName = document.virtualDocument.fileName;
 			const isDefinitionImported = dependencyStore.hasTagNameBeenImported(fromFileName, htmlNode.tagName);
@@ -84,20 +87,22 @@ export function validateHtmlNode(htmlNode: HtmlNode, { document, htmlStore, conf
 	}
 
 	// Check for slots
-	const slots = htmlNode.parent && Array.from(htmlStore.getAllSlotsForTag(htmlNode.parent.tagName));
-	if (slots != null && slots.length > 0) {
-		const slotAttr = htmlNode.attributes.find(a => a.name === "slot");
-		if (slotAttr == null) {
-			const unnamedSlot = slots.find(s => s.name === "");
-			if (unnamedSlot == null) {
-				reports.push({
-					kind: LitHtmlDiagnosticKind.MISSING_SLOT_ATTRIBUTE,
-					validSlotNames: slots.map(s => s.name!),
-					htmlNode,
-					message: `Missing slot attribute. Parent element <${htmlNode.tagName}> only allows named slots as children.`,
-					severity: "warning",
-					location: { document, ...htmlNode.location.name }
-				});
+	if (isRuleEnabled(config, "no-unknown-slot")) {
+		const slots = htmlNode.parent && Array.from(htmlStore.getAllSlotsForTag(htmlNode.parent.tagName));
+		if (slots != null && slots.length > 0) {
+			const slotAttr = htmlNode.attributes.find(a => a.name === "slot");
+			if (slotAttr == null) {
+				const unnamedSlot = slots.find(s => s.name === "");
+				if (unnamedSlot == null) {
+					reports.push({
+						kind: LitHtmlDiagnosticKind.MISSING_SLOT_ATTRIBUTE,
+						validSlotNames: slots.map(s => s.name!),
+						htmlNode,
+						message: `Missing slot attribute. Parent element <${htmlNode.tagName}> only allows named slots as children.`,
+						severity: litDiagnosticRuleSeverity(config, "no-unknown-slot"),
+						location: { document, ...htmlNode.location.name }
+					});
+				}
 			}
 		}
 	}
