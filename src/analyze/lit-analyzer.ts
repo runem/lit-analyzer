@@ -1,3 +1,4 @@
+import { setTypescriptModule as setTypescriptModuleTsSimpleType } from "ts-simple-type";
 import { SourceFile } from "typescript";
 import { LitCssDocumentAnalyzer } from "./document-analyzer/css/lit-css-document-analyzer";
 import { LitHtmlDocumentAnalyzer } from "./document-analyzer/html/lit-html-document-analyzer";
@@ -6,6 +7,7 @@ import { LitAnalyzerContext, LitAnalyzerRequest } from "./lit-analyzer-context";
 import { CssDocument } from "./parse/document/text-document/css-document/css-document";
 import { HtmlDocument } from "./parse/document/text-document/html-document/html-document";
 import { TextDocument } from "./parse/document/text-document/text-document";
+import { setTypescriptModule } from "./ts-module";
 import { LitClosingTagInfo } from "./types/lit-closing-tag-info";
 import { LitCodeFix } from "./types/lit-code-fix";
 import { LitCompletion } from "./types/lit-completion";
@@ -31,7 +33,12 @@ export class LitAnalyzer {
 	private litHtmlDocumentAnalyzer = new LitHtmlDocumentAnalyzer();
 	private litCssDocumentAnalyzer = new LitCssDocumentAnalyzer();
 
-	constructor(private context: LitAnalyzerContext) {}
+	constructor(private context: LitAnalyzerContext) {
+		// Set the Typescript module
+		// I plan on removing these methods, so only "context.ts" is used.
+		setTypescriptModule(context.ts);
+		setTypescriptModuleTsSimpleType(context.ts);
+	}
 
 	getOutliningSpansInFile(file: SourceFile): LitOutliningSpan[] {
 		const documents = this.getDocumentsInFile(file);
