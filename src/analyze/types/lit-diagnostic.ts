@@ -1,6 +1,7 @@
 import { SimpleType } from "ts-simple-type";
 import { SourceFile } from "typescript";
 import { ComponentDefinition } from "web-component-analyzer";
+import { LitAnalyzerRuleName } from "../lit-analyzer-config";
 import { HtmlAttr, HtmlAttrTarget } from "../parse/parse-html-data/html-tag";
 import { IHtmlNodeAttrAssignmentExpression } from "./html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttr, IHtmlNodeAttr } from "./html-node/html-node-attr-types";
@@ -32,6 +33,7 @@ export type LitDiagnosticSeverity = "error" | "warning";
 export interface LitDiagnosticBase {
 	location: SourceFileRange;
 	message: string;
+	source: LitAnalyzerRuleName;
 	suggestion?: string;
 	severity: LitDiagnosticSeverity;
 }

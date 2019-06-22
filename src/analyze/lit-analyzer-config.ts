@@ -22,11 +22,11 @@ export type LitAnalyzerRuleName =
 	| "no-invalid-attribute-name"
 	| "no-invalid-tag-name";
 
-export type LitAnalyzerRuleSeverity = "off" | "warn" | "warning" | "error" | 0 | 1 | 2;
+export type LitAnalyzerRuleSeverity = "off" | "warn" | "warning" | "error" | 0 | 1 | 2 | true | false;
 
-export type Rules = Partial<Record<LitAnalyzerRuleName, LitAnalyzerRuleSeverity | [LitAnalyzerRuleSeverity]>>;
+export type LitAnalyzerRules = Partial<Record<LitAnalyzerRuleName, LitAnalyzerRuleSeverity | [LitAnalyzerRuleSeverity]>>;
 
-export const DEFAULT_RULES: Required<Rules> = {
+export const DEFAULT_RULES: Required<LitAnalyzerRules> = {
 	"no-unknown-tag-name": "error",
 	"no-missing-import": "error",
 	"no-unclosed-tag": "error",
@@ -48,7 +48,7 @@ export const DEFAULT_RULES: Required<Rules> = {
 	"no-invalid-tag-name": "error"
 };
 
-export function ruleSeverity(rules: LitAnalyzerConfig | Rules, ruleName: LitAnalyzerRuleName): LitAnalyzerRuleSeverity {
+export function ruleSeverity(rules: LitAnalyzerConfig | LitAnalyzerRules, ruleName: LitAnalyzerRuleName): LitAnalyzerRuleSeverity {
 	if ("rules" in rules) return ruleSeverity(rules.rules, ruleName);
 
 	let ruleConfig = rules[ruleName] || "off";
@@ -56,7 +56,7 @@ export function ruleSeverity(rules: LitAnalyzerConfig | Rules, ruleName: LitAnal
 }
 
 export function isRuleDisabled(config: LitAnalyzerConfig, ruleName: LitAnalyzerRuleName): boolean {
-	return ["off", 0].includes(ruleSeverity(config, ruleName));
+	return ["off", 0, false].includes(ruleSeverity(config, ruleName));
 }
 
 export function isRuleEnabled(config: LitAnalyzerConfig, ruleName: LitAnalyzerRuleName): boolean {
@@ -66,11 +66,13 @@ export function isRuleEnabled(config: LitAnalyzerConfig, ruleName: LitAnalyzerRu
 export function litDiagnosticRuleSeverity(config: LitAnalyzerConfig, ruleName: LitAnalyzerRuleName): LitDiagnosticSeverity {
 	switch (ruleSeverity(config, ruleName)) {
 		case "off":
+		case false:
 		case 0:
 			return "warning";
 
 		case "warn":
 		case "warning":
+		case true:
 		case 1:
 			return "warning";
 
@@ -81,7 +83,7 @@ export function litDiagnosticRuleSeverity(config: LitAnalyzerConfig, ruleName: L
 }
 
 export interface LitAnalyzerConfig {
-	rules: Rules;
+	rules: LitAnalyzerRules;
 
 	disable: boolean;
 	verbose: boolean;
@@ -104,7 +106,7 @@ export interface LitAnalyzerConfig {
  * @param userOptions
  */
 export function makeConfig(userOptions: Partial<LitAnalyzerConfig> = {}): LitAnalyzerConfig {
-	const mappedDeprecatedRules: Rules = {};
+	const mappedDeprecatedRules: LitAnalyzerRules = {};
 
 	if ((userOptions as any)["skipMissingImports"] === true) {
 		mappedDeprecatedRules["no-missing-import"] = "off";
@@ -138,7 +140,7 @@ export function makeConfig(userOptions: Partial<LitAnalyzerConfig> = {}): LitAna
 			"no-complex-attribute-binding": "off",
 			"no-nullable-attribute-binding": "off",
 			"no-incompatible-type-binding": "off"
-		} as Rules);
+		} as LitAnalyzerRules);
 	}
 
 	return {

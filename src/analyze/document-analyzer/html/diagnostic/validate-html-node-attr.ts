@@ -80,6 +80,7 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, request: LitAnalyzerReq
 				kind: LitHtmlDiagnosticKind.UNKNOWN_TARGET,
 				message: `Unknown ${existingKind} "${htmlAttr.name}"${suggestedMemberName != null ? `. Did you mean '${suggestedMemberName}'?` : ""}`,
 				location: { document, ...htmlAttr.location.name },
+				source: ruleNameFromHtmlNodeAttrKind(htmlAttr.kind),
 				suggestion,
 				severity,
 				htmlAttr,

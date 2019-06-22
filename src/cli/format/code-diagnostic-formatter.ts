@@ -66,6 +66,7 @@ function diagnosticTextForFile(file: SourceFile, diagnostic: LitDiagnostic) {
 	return `
     ${chalk.bold(diagnostic.message)}
     ${chalk.gray(`${lineContext.line + 1}:`)} ${markedLine}
+    ${chalk.gray(`${diagnostic.source}`)} 
 `;
-	//${chalk.gray(`${file.fileName.replace(process.cwd(), ".")}:${lineContext.line + 1}`)}
+	//${chalk.gray(`${diagnostic.source}`)}
 }

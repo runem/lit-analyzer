@@ -28,7 +28,12 @@ export async function analyzeCommand(globs: string[], config: LitAnalyzerCliConf
 		}
 	});
 
-	context.updateConfig(readTsLitPluginConfig() || makeConfig());
+	// Read config from tsconfig or create a default config
+	const conf = readTsLitPluginConfig() || makeConfig();
+	// Assign rules from the CLI command (which overwrites tsconfig rules)
+	Object.assign(conf.rules, config.rules);
+	// Set the config on the context
+	context.updateConfig(conf);
 
 	const analyzer = new LitAnalyzer(context);
 

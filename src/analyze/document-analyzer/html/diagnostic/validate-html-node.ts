@@ -6,7 +6,10 @@ import { isCustomElementTagName } from "../../../util/general-util";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../../types/lit-diagnostic";
 
-export function validateHtmlNode(htmlNode: HtmlNode, { document, htmlStore, config, dependencyStore, definitionStore }: LitAnalyzerRequest): LitHtmlDiagnostic[] {
+export function validateHtmlNode(
+	htmlNode: HtmlNode,
+	{ document, htmlStore, config, dependencyStore, definitionStore }: LitAnalyzerRequest
+): LitHtmlDiagnostic[] {
 	const reports: LitHtmlDiagnostic[] = [];
 
 	if (isRuleEnabled(config, "no-unclosed-tag")) {
@@ -16,6 +19,7 @@ export function validateHtmlNode(htmlNode: HtmlNode, { document, htmlStore, conf
 				kind: LitHtmlDiagnosticKind.TAG_NOT_CLOSED,
 				message: `This tag isn't closed.${isCustomElement ? " Custom elements cannot be self closing." : ""}`,
 				severity: litDiagnosticRuleSeverity(config, "no-unclosed-tag"),
+				source: "no-unclosed-tag",
 				location: { document, ...htmlNode.location.name },
 				htmlNode
 			});
@@ -36,7 +40,8 @@ export function validateHtmlNode(htmlNode: HtmlNode, { document, htmlStore, conf
 				message: `Unknown tag "${htmlNode.tagName}"${suggestedName ? `. Did you mean '${suggestedName}'?` : ""}`,
 				suggestion: `Please consider adding it to the 'globalTags' plugin configuration or disabling the check using 'skipUnknownTags'.`,
 				location: { document, ...htmlNode.location.name },
-				severity: "warning",
+				source: "no-unknown-tag-name",
+				severity: litDiagnosticRuleSeverity(config, "no-unknown-tag-name"),
 				htmlNode,
 				suggestedName
 			});
@@ -76,7 +81,8 @@ export function validateHtmlNode(htmlNode: HtmlNode, { document, htmlStore, conf
 					kind: LitHtmlDiagnosticKind.MISSING_IMPORT,
 					message: `Missing import <${htmlNode.tagName}>: ${definition.declaration.className || ""}`,
 					suggestion: `You can disable this check using 'skipMissingImports'`,
-					severity: "warning",
+					source: "no-missing-import",
+					severity: litDiagnosticRuleSeverity(config, "no-missing-import"),
 					location: { document, ...htmlNode.location.name },
 					htmlNode,
 					definition,
@@ -100,6 +106,7 @@ export function validateHtmlNode(htmlNode: HtmlNode, { document, htmlStore, conf
 						htmlNode,
 						message: `Missing slot attribute. Parent element <${htmlNode.tagName}> only allows named slots as children.`,
 						severity: litDiagnosticRuleSeverity(config, "no-unknown-slot"),
+						source: "no-unknown-slot",
 						location: { document, ...htmlNode.location.name }
 					});
 				}

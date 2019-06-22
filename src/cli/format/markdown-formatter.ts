@@ -24,14 +24,20 @@ ${markdownDiagnosticTable(file, diagnostics)}`;
 }
 
 function markdownDiagnosticTable(file: SourceFile, diagnostics: LitDiagnostic[]): string {
-	const headerRow: string[] = ["Line", "Column", "Type", "Message"];
+	const headerRow: string[] = ["Line", "Column", "Type", "Rule", "Message"];
 
 	const rows: string[][] = diagnostics.map(
 		(diagnostic): string[] => {
 			const textSpan = translateRange(diagnostic.location);
 			const lineContext = file.getLineAndCharacterOfPosition(textSpan.start);
 
-			return [lineContext.line.toString(), lineContext.character.toString(), diagnostic.severity === "error" ? markdownHighlight("error") : "warning", diagnostic.message];
+			return [
+				(lineContext.line + 1).toString(),
+				(lineContext.character + 1).toString(),
+				diagnostic.severity === "error" ? markdownHighlight("error") : "warning",
+				diagnostic.source || "",
+				diagnostic.message
+			];
 		}
 	);
 

@@ -1,3 +1,5 @@
+import { LitAnalyzerRules } from "../analyze/lit-analyzer-config";
+
 export type FormatterFormat = "code" | "list" | "markdown";
 
 export interface LitAnalyzerCliConfig {
@@ -9,4 +11,5 @@ export interface LitAnalyzerCliConfig {
 	failFast?: boolean;
 	quiet?: boolean;
 	format?: FormatterFormat;
+	rules?: LitAnalyzerRules;
 }
