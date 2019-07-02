@@ -121,4 +121,5 @@ function findSuggestedTarget(name: string, ...tests: Iterable<HtmlAttrTarget>[])
 			return match;
 		}
 	}
+	return;
 }

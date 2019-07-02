@@ -20,6 +20,7 @@
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitThis": true,
 		"noImplicitAny": true,
+		"noImplicitReturns": true,
 		"skipLibCheck": true,
 		"declaration": true,
 		"declarationMap": true
