@@ -25,6 +25,7 @@ export function textPartsToRanges(parts: (Expression | string)[]): Range[] {
 			} else {
 				offset += p.getText().length + 3;
 			}
+			return;
 		})
 		.filter((r): r is Range => r != null);
 }

@@ -22,6 +22,7 @@ export class HtmlDocument extends TextDocument {
 
 				return node;
 			}
+			return;
 		});
 	}
 
@@ -43,6 +44,7 @@ export class HtmlDocument extends TextDocument {
 
 		const htmlAttr = this.htmlAttrNameAtOffset(offset);
 		if (htmlAttr != null) return htmlAttr;
+		return;
 	}
 
 	findAttr(test: (node: HtmlNodeAttr) => boolean): HtmlNodeAttr | undefined {
@@ -50,12 +52,14 @@ export class HtmlDocument extends TextDocument {
 			for (const attr of node.attributes) {
 				if (test(attr)) return attr;
 			}
+			return;
 		});
 	}
 
 	findNode(test: (node: HtmlNode) => boolean): HtmlNode | undefined {
 		return this.mapFindOne(node => {
 			if (test(node)) return node;
+			return;
 		});
 	}
 
@@ -81,6 +85,7 @@ export class HtmlDocument extends TextDocument {
 				const found = innerTest(childNode);
 				if (found != null) return found;
 			}
+			return;
 		}
 
 		for (const rootNode of this.rootNodes || []) {
@@ -89,5 +94,6 @@ export class HtmlDocument extends TextDocument {
 				return found;
 			}
 		}
+		return;
 	}
 }

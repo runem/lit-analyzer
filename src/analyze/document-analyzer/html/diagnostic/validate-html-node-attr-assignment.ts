@@ -145,6 +145,7 @@ function validateHtmlAttrAssignmentRules(htmlAttr: HtmlNodeAttr, typeB: SimpleTy
 			}
 			break;
 	}
+	return;
 }
 
 function validateHtmlAttrSlotAssignment(htmlAttr: HtmlNodeAttr, { document, htmlStore, config, program }: LitAnalyzerRequest): LitHtmlDiagnostic[] | undefined {
@@ -239,6 +240,7 @@ function validateHtmlAttrAssignmentTypes(htmlAttr: HtmlNodeAttr, { typeA, typeB 
 			}
 		];
 	}
+	return;
 }
 
 function validateStringifiedAssignment(
@@ -389,6 +391,7 @@ function validateStringifiedAssignment(
 			];
 		}
 	}
+	return;
 }
 
 function validateHtmlAttrDirectiveAssignment(htmlAttr: HtmlNodeAttr, { typeA, typeB }: { typeA: SimpleType; typeB: SimpleType }, request: LitAnalyzerRequest): LitHtmlDiagnostic[] | undefined {

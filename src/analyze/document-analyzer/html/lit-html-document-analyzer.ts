@@ -76,6 +76,7 @@ export class LitHtmlDocumentAnalyzer {
 		} else if (isHTMLAttr(hit)) {
 			return definitionForHtmlAttr(hit, request);
 		}
+		return;
 	}
 
 	getRenameInfoAtOffset(document: HtmlDocument, offset: number, request: LitAnalyzerRequest): LitRenameInfo | undefined {
@@ -92,6 +93,7 @@ export class LitHtmlDocumentAnalyzer {
 				target: hit
 			};
 		}
+		return;
 	}
 
 	getRenameLocationsAtOffset(document: HtmlDocument, offset: number, request: LitAnalyzerRequest): LitRenameLocation[] {
@@ -109,6 +111,7 @@ export class LitHtmlDocumentAnalyzer {
 		if (isHTMLAttr(hit)) {
 			return quickInfoForHtmlAttr(hit, request);
 		}
+		return;
 	}
 
 	getOutliningSpans(document: HtmlDocument): LitOutliningSpan[] {

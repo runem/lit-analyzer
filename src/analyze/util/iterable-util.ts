@@ -26,6 +26,7 @@ export function iterableFind<T>(iterable: Iterable<T>, match: (item: T) => boole
 			return item;
 		}
 	}
+	return;
 }
 
 export function* iterableUnique<T>(iterable: Iterable<T>, on: (item: T) => any): Iterable<T> {
@@ -44,6 +45,7 @@ export function iterableFirst<T>(iterable: Iterable<T>): T | undefined {
 	for (const item of iterable) {
 		return item;
 	}
+	return;
 }
 
 export function iterableDefined<T>(iterable: (T | undefined | null)[]): T[] {
