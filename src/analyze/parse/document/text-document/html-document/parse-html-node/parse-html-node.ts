@@ -1,7 +1,7 @@
 import { TS_IGNORE_FLAG } from "../../../../../constants";
 import { HtmlNode, HtmlNodeKind, IHtmlNodeBase, IHtmlNodeSourceCodeLocation } from "../../../../../types/html-node/html-node-types";
 import { isCommentNode, isTagNode } from "../parse-html-p5/parse-html";
-import { IP5TagNode, P5Node } from "../parse-html-p5/parse-html-types";
+import { IP5TagNode, P5Node, getSourceLocation } from "../parse-html-p5/parse-html-types";
 import { parseHtmlNodeAttrs } from "./parse-html-attribute";
 import { ParseHtmlContext } from "./parse-html-context";
 
@@ -45,7 +45,7 @@ export function parseHtmlNodes(p5Nodes: P5Node[], parent: HtmlNode | undefined, 
  */
 export function parseHtmlNode(p5Node: IP5TagNode, parent: HtmlNode | undefined, context: ParseHtmlContext): HtmlNode | undefined {
 	// `sourceCodeLocation` will be undefined if the element was implicitly created by the parser.
-	if (p5Node.sourceCodeLocation == null) return undefined;
+	if (getSourceLocation(p5Node) == null) return undefined;
 
 	const htmlNodeBase: IHtmlNodeBase = {
 		tagName: p5Node.tagName.toLowerCase(),
@@ -75,7 +75,7 @@ export function parseHtmlNode(p5Node: IP5TagNode, parent: HtmlNode | undefined, 
  */
 function isSelfClosed(p5Node: IP5TagNode, context: ParseHtmlContext) {
 	const isEmpty = p5Node.childNodes == null || p5Node.childNodes.length === 0;
-	const isSelfClosed = p5Node.sourceCodeLocation.startTag.endOffset === p5Node.sourceCodeLocation.endOffset;
+	const isSelfClosed = getSourceLocation(p5Node)!.startTag.endOffset === getSourceLocation(p5Node)!.endOffset;
 	return isEmpty && isSelfClosed;
 }
 
@@ -85,7 +85,7 @@ function isSelfClosed(p5Node: IP5TagNode, context: ParseHtmlContext) {
  * @param context
  */
 function makeHtmlNodeLocation(p5Node: IP5TagNode, context: ParseHtmlContext): IHtmlNodeSourceCodeLocation {
-	const loc = p5Node.sourceCodeLocation;
+	const loc = getSourceLocation(p5Node)!;
 
 	return {
 		start: loc.startOffset,

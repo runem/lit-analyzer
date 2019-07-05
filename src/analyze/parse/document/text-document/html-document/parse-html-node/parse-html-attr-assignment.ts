@@ -1,5 +1,5 @@
 import { Range } from "../../../../../types/range";
-import { IP5NodeAttr, IP5TagNode } from "../parse-html-p5/parse-html-types";
+import { IP5NodeAttr, IP5TagNode, getSourceLocation } from "../parse-html-p5/parse-html-types";
 import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../../../types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttr } from "../../../../../types/html-node/html-node-attr-types";
 import { ParseHtmlContext } from "./parse-html-context";
@@ -47,7 +47,7 @@ export function parseHtmlAttrAssignment(p5Node: IP5TagNode, p5Attr: IP5NodeAttr,
 }
 
 function getAssignmentLocation(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, htmlAttr: HtmlNodeAttr, context: ParseHtmlContext): Range | undefined {
-	const htmlAttrLocation = (p5Node.sourceCodeLocation.startTag.attrs || {})[p5Attr.name];
+	const htmlAttrLocation = (getSourceLocation(p5Node)!.startTag.attrs || {})[p5Attr.name];
 	if (htmlAttrLocation == null) return undefined;
 
 	const nameEndOffset = htmlAttr.location.name.end;
