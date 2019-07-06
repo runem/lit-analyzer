@@ -2,7 +2,7 @@
 
 <!-- prettier-ignore -->
 ```bash
-$ npm install lit-analyer -g
+$ npm install lit-analyzer -g
 ```
 
 * If you use Visual Studio Code you can also install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension. 

@@ -49,7 +49,7 @@
 		"ts-simple-type": "~0.3.4",
 		"vscode-css-languageservice": "4.0.2-next.1",
 		"vscode-html-languageservice": "2.1.12",
-		"web-component-analyzer": "~0.1.6"
+		"web-component-analyzer": "~0.1.10"
 	},
 	"devDependencies": {
 		"@appnest/readme": "^1.2.3",

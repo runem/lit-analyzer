@@ -1,19 +1,31 @@
 ## Features
 
+**Validating custom elements**
+
 <!-- prettier-ignore -->
 | Feature | Description |
-|------------------------------------------------------------|--------|
-| **Validating custom elements**                                     | |
+| :------ | ----------- |
 | [no-unknown-tag-name](#-unknown-tag-name)                          | Unknown tag names are checked. Be aware that not all custom elements from libraries will be found out of the box. |
 | [no-missing-import](#-missing-imports)                             | When using custom elements in HTML it is checked if the element has been imported and is available in the current context. |
 | [no-unclosed-tag](#-unclosed-tag)                                  | Unclosed tags, and invalid self closing tags like custom elements tags, are checked. |
-| **Validating binding names**                                        | |
+
+
+**Validating binding names**
+
+<!-- prettier-ignore -->
+| Feature | Description |
+| :------ | ----------- |
 | [no-unknown-attribute](#-unknown-attribute-or-property)<br> [no-unknown-property](#-unknown-attribute-or-property) | You will get a warning whenever you use an unknown attribute or property within your `lit-html` template. |
 | [no-unknown-event](#-unknown-event)                                | You can opt in to check for unknown event names. |
 | [no-unknown-slot](#-unknown-slot-name)                             | Using the "@slot" jsdoc tag on your custom element class, you can tell which slots are accepted for a particular element. |
 | [✏️ Documenting slots, events, attributes and properties](#-documenting-slots-events-attributes-and-properties) | |
 | [Custom vscode html data format](#-custom-vscode-html-data-format)                        | |
-| **Validating binding types**                                                              | |
+
+**Validating binding types**
+
+<!-- prettier-ignore -->
+| Feature | Description |
+| :------ | ----------- |
 | [no-invalid-boolean-binding](#-boolean-attribute-binding-on-a-non-boolean-type)           | Disallow boolean attribute bindings on non-boolean types. |
 | [no-expressionless-property-binding](#-property-binding-without-an-expression)            | Disallow property bindings without an expression. |
 | [no-noncallable-event-binding](#-event-handler-binding-with-a-non-callable-type)          | Disallow event listener bindings with a noncallable type. |
@@ -22,7 +34,12 @@
 | [no-nullable-attribute-binding](#-attribute-binding-with-value-that-can-be-undefined--null-) | Disallow attribute bindings with nullable types such as "null" or "undefined".  |
 | [no-incompatible-type-binding](#-binding-an-incompatible-type)                            | Disallow incompatible type in bindings.  |
 | [no-invalid-directive-binding](#-invalid-usage-of-directives)                             | Disallow using built-in directives in unsupported bindings. |
-| **Validating LitElement**                                           | |
+
+**Validating LitElement**
+
+<!-- prettier-ignore -->
+| Feature | Description |
+| :------ | ----------- |
 | [no-incompatible-lit-element-property-type](#-incompatible-litelement-property-type) | When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type |
 | [no-unknown-lit-element-property-type](#-unknown-litelement-property-type)           | LitElement provides default converters. For example 'Function' is not a valid default converter type for a LitElement-managed property. |
 | [no-invalid-attribute-name](#-invalid-attribute-name)              | When using the property option `attribute`, the value is checked to make sure it's a valid attribute name. |

@@ -35,8 +35,6 @@ export async function cli() {
 		{} as LitAnalyzerRules
 	);
 
-	console.log(config);
-
 	if (config.help) {
 		console.log(`
 

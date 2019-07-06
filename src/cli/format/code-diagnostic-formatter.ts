@@ -63,10 +63,14 @@ function diagnosticTextForFile(file: SourceFile, diagnostic: LitDiagnostic) {
 		highlightingColorFunction
 	).replace(/^\s*/, " ");
 
-	return `
-    ${chalk.bold(diagnostic.message)}
-    ${chalk.gray(`${lineContext.line + 1}:`)} ${markedLine}
-    ${chalk.gray(`${diagnostic.source}`)} 
-`;
-	//${chalk.gray(`${diagnostic.source}`)}
+	const block = [
+		chalk.bold(diagnostic.message),
+		`${chalk.gray(`${lineContext.line + 1}:`)} ${markedLine}`,
+		diagnostic.source == null ? undefined : chalk.gray(`${diagnostic.source}`)
+	]
+		.filter(line => line != null)
+		.map(line => `    ${line}`)
+		.join("\n");
+
+	return `\n${block}\n`;
 }
