@@ -32,6 +32,10 @@ export class LitCssVscodeService {
 		const vscStylesheet = this.makeVscStylesheet(vscTextDocument);
 		const diagnostics = this.scssService.doValidation(vscTextDocument, vscStylesheet);
 
+		if (context.config.skipCssChecks) {
+			return [];
+		}
+
 		return diagnostics
 			.filter(diagnostic => diagnostic.range.start.line !== 0 && diagnostic.range.start.line < vscTextDocument.lineCount - 1)
 			.map(

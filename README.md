@@ -54,6 +54,7 @@
 		* [skipUnknownProperties](#skipunknownproperties)
 		* [skipUnknownSlots](#skipunknownslots)
 		* [skipTypeChecking](#skiptypechecking)
+		* [skipCssChecks](#skipcsschecks)
 	* [Extra data](#extra-data)
 		* [globalTags](#globaltags)
 		* [globalAttributes](#globalattributes)
@@ -299,7 +300,7 @@ When typing html inside a template tag `lit-plugin` auto-closes tags as you woul
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#feature-comparison)
 
 ## ➤ Feature comparison
-This plugin is similar to [vscode-lit-html](https://github.com/mjbvz/vscode-lit-html) on many points. The power of `vscode-lit-html` is that it covers all the basic functionality of HTML in tagged templates so it's a plugin that can be easily used with other libraries than `lit-html`. However `ts-lit-plugin` aims to be a specialized plugin for working with `lit-element` so for example it supports `css` and discovers web components out of the box. 
+This plugin is similar to [vscode-lit-html](https://github.com/mjbvz/vscode-lit-html) on many points. The power of `vscode-lit-html` is that it covers all the basic functionality of HTML in tagged templates so it's a plugin that can be easily used with other libraries than `lit-html`. However `ts-lit-plugin` aims to be a specialized plugin for working with `lit-element` so for example it supports `css` and discovers web components out of the box.
 
 Below is a comparison table of the two plugins.
 
@@ -332,105 +333,111 @@ If you are using the vscode plugin you can configure these options directly from
 
 ### General settings
 #### disable
- 
+
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Completely disable this plugin.
- 
+
 #### htmlTemplateTags
- 
+
 -   **Type**: string[]
 -   **Default**: ["html", "raw"]
 -   **Description**: List of template tags to enable html support in.
- 
+
 #### cssTemplateTags
- 
+
 -   **Type**: string[]
 -   **Default**: ["css"]
 -   **Description**: List of template tags to enable css support in.
 
 #### format.disable
- 
+
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Disable formatting the HTML on code reformat.
 
 ### Add checks
 #### checkUnknownEvents
- 
+
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Activating this setting will make the plugin emit errors on unknown events.
 
 ### Skip checks
 #### skipMissingImports
- 
+
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Skip reporting missing imports of custom elements.
 
 #### skipSuggestions
- 
+
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Don't attach suggestions alongside warnings and errors.
 
 #### skipUnknownTags
- 
+
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Skip reporting unknown html tags.
 
 #### skipUnknownAttributes
- 
+
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Skip reporting unknown html attributes.
 
 #### skipUnknownProperties
- 
+
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Skip reporting unknown properties on elements.
 
 #### skipUnknownSlots
- 
+
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Skip reporting unknown slot names.
 
 #### skipTypeChecking
- 
+
 -   **Type**: boolean
 -   **Default**: false
 -   **Description**: Skip type checking of attributes and properties.
-  
+
+#### skipCssChecks
+
+-   **Type**: boolean
+-   **Default**: false
+-   **Description**: Skip all checking of css.
+
 ### Extra data
 #### globalTags
- 
+
 -   **Type**: string[]
 -   **Description**: List of html tag names that you expect to be present at all times.
- 
+
 #### globalAttributes
- 
+
 -   **Type**: string[]
 -   **Description**: List of html attributes names that you expect to be present at all times.
 
 #### globalEvents
- 
+
 -   **Type**: string[]
 -   **Description**: List of event names that you expect to be present at all times.
 
 #### customHtmlData
- 
+
 -   **Type**: [Vscode custom HTML data format](https://github.com/Microsoft/vscode-html-languageservice/blob/master/docs/customData.md) you can both specify a relative file paths or an entire objects with the data here. This value can both be an array and an object.
 -   **Description**: This plugin support the [custom vscode html data format](https://code.visualstudio.com/updates/v1_31#_html-and-css-custom-data-support) through this setting.
- 
+
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#contributors)
 
 ## ➤ Contributors
-	
+
 
 | [<img alt="Rune Mehlsen" src="https://avatars2.githubusercontent.com/u/5372940?s=460&v=4" width="100">](https://twitter.com/runemehlsen) | [<img alt="Andreas Mehlsen" src="https://avatars1.githubusercontent.com/u/6267397?s=460&v=4" width="100">](https://twitter.com/andreasmehlsen) | [<img alt="You?" src="https://joeschmoe.io/api/v1/random" width="100">](https://github.com/runem/ts-lit-plugin/blob/master/CONTRIBUTING.md) |
 |:--------------------------------------------------:|:--------------------------------------------------:|:--------------------------------------------------:|
@@ -440,5 +447,5 @@ If you are using the vscode plugin you can configure these options directly from
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#license)
 
 ## ➤ License
-	
+
 Licensed under [MIT](https://opensource.org/licenses/MIT).
