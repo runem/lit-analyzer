@@ -137,7 +137,7 @@ function validateHtmlAttrAssignmentRules(htmlAttr: HtmlNodeAttr, typeB: SimpleTy
 					return [
 						{
 							kind: LitHtmlDiagnosticKind.PROPERTY_NEEDS_EXPRESSION,
-							message: `You are using the property binding without an expression`,
+							message: `You are using a property binding without an expression`,
 							severity: "error",
 							location: { document, ...htmlAttr.location.name }
 						}
