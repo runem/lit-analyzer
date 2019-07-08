@@ -19,6 +19,8 @@ export interface LitAnalyzerConfig {
 	skipTypeChecking: boolean;
 	skipMissingImports: boolean;
 
+	dontSuggestConfigChanges: boolean;
+
 	globalTags: string[];
 	globalAttributes: string[];
 	globalEvents: string[];
@@ -37,6 +39,7 @@ export function makeConfig(userOptions: Partial<LitAnalyzerConfig> = {}): LitAna
 		format: {
 			disable: userOptions.format != null ? userOptions.format.disable : undefined || false
 		},
+		dontSuggestConfigChanges: userOptions.dontSuggestConfigChanges || false,
 		// Template tags
 		htmlTemplateTags: userOptions.htmlTemplateTags || ["html", "raw"],
 		cssTemplateTags: userOptions.cssTemplateTags || ["css"],
