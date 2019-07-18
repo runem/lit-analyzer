@@ -26,14 +26,12 @@ ${markdownDiagnosticTable(file, diagnostics)}`;
 function markdownDiagnosticTable(file: SourceFile, diagnostics: LitDiagnostic[]): string {
 	const headerRow: string[] = ["Line", "Column", "Type", "Message"];
 
-	const rows: string[][] = diagnostics.map(
-		(diagnostic): string[] => {
-			const textSpan = translateRange(diagnostic.location);
-			const lineContext = file.getLineAndCharacterOfPosition(textSpan.start);
+	const rows: string[][] = diagnostics.map((diagnostic): string[] => {
+		const textSpan = translateRange(diagnostic.location);
+		const lineContext = file.getLineAndCharacterOfPosition(textSpan.start);
 
-			return [lineContext.line.toString(), lineContext.character.toString(), diagnostic.severity === "error" ? markdownHighlight("error") : "warning", diagnostic.message];
-		}
-	);
+		return [lineContext.line.toString(), lineContext.character.toString(), diagnostic.severity === "error" ? markdownHighlight("error") : "warning", diagnostic.message];
+	});
 
 	return markdownTable([headerRow, ...rows], { removeEmptyColumns: true });
 }
