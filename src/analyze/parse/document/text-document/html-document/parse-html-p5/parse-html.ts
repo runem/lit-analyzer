@@ -39,5 +39,5 @@ export function isCommentNode(node: P5Node): node is IP5CommentNode {
  * @param html
  */
 export function parseHtml(html: string): IP5DocumentFragmentNode {
-	return parseFragment(html, { sourceCodeLocationInfo: true });
+	return parseFragment(html, { sourceCodeLocationInfo: true, locationInfo: true });
 }
