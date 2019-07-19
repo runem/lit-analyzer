@@ -18,6 +18,7 @@ export interface LitAnalyzerConfig {
 	skipUnknownSlots: boolean;
 	skipTypeChecking: boolean;
 	skipMissingImports: boolean;
+	skipCssChecks: boolean;
 
 	dontSuggestConfigChanges: boolean;
 
@@ -56,6 +57,7 @@ export function makeConfig(userOptions: Partial<LitAnalyzerConfig> = {}): LitAna
 		skipUnknownProperties: userOptions.skipUnknownProperties || false,
 		skipUnknownSlots: userOptions.skipUnknownSlots || false,
 		skipTypeChecking: userOptions.skipTypeChecking || false,
+		skipCssChecks: userOptions.skipCssChecks || false,
 		// Checks
 		checkUnknownEvents: userOptions.checkUnknownEvents || false
 	};
