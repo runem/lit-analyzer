@@ -22,11 +22,14 @@ export class HtmlDocument extends TextDocument {
 
 				return node;
 			}
+			return;
 		});
 	}
 
 	htmlAttrAssignmentAtOffset(offset: number | Range): HtmlNodeAttr | undefined {
-		return this.findAttr(attr => (attr.assignment != null && attr.assignment.location != null ? intersects(offset, attr.assignment.location) : false));
+		return this.findAttr(attr =>
+			attr.assignment != null && attr.assignment.location != null ? intersects(offset, attr.assignment.location) : false
+		);
 	}
 
 	htmlAttrNameAtOffset(offset: number | Range): HtmlNodeAttr | undefined {
@@ -34,7 +37,9 @@ export class HtmlDocument extends TextDocument {
 	}
 
 	htmlNodeNameAtOffset(offset: number | Range): HtmlNode | undefined {
-		return this.findNode(node => intersects(offset, node.location.name) || (node.location.endTag != null && intersects(offset, node.location.endTag)));
+		return this.findNode(
+			node => intersects(offset, node.location.name) || (node.location.endTag != null && intersects(offset, node.location.endTag))
+		);
 	}
 
 	htmlNodeOrAttrAtOffset(offset: number | Range): HtmlNode | HtmlNodeAttr | undefined {
@@ -43,6 +48,7 @@ export class HtmlDocument extends TextDocument {
 
 		const htmlAttr = this.htmlAttrNameAtOffset(offset);
 		if (htmlAttr != null) return htmlAttr;
+		return;
 	}
 
 	findAttr(test: (node: HtmlNodeAttr) => boolean): HtmlNodeAttr | undefined {
@@ -50,12 +56,14 @@ export class HtmlDocument extends TextDocument {
 			for (const attr of node.attributes) {
 				if (test(attr)) return attr;
 			}
+			return;
 		});
 	}
 
 	findNode(test: (node: HtmlNode) => boolean): HtmlNode | undefined {
 		return this.mapFindOne(node => {
 			if (test(node)) return node;
+			return;
 		});
 	}
 
@@ -81,6 +89,7 @@ export class HtmlDocument extends TextDocument {
 				const found = innerTest(childNode);
 				if (found != null) return found;
 			}
+			return;
 		}
 
 		for (const rootNode of this.rootNodes || []) {
@@ -89,5 +98,6 @@ export class HtmlDocument extends TextDocument {
 				return found;
 			}
 		}
+		return;
 	}
 }

@@ -39,8 +39,14 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, request: LitAnalyzerReq
 		const suggestion = (() => {
 			switch (htmlAttr.kind) {
 				case HtmlNodeAttrKind.EVENT_LISTENER:
+					if (request.config.dontSuggestConfigChanges) {
+						return `Please consider adding a '@event' tag to the jsdoc on a component class`;
+					}
 					return `Please consider adding a '@event' tag to the jsdoc on a component class, adding it to 'globalEvents' or removing 'checkUnknownEvents'.`;
 				case HtmlNodeAttrKind.PROPERTY:
+					if (request.config.dontSuggestConfigChanges) {
+						return undefined;
+					}
 					return tagIsBuiltIn
 						? `This is a built in tag. Please consider using 'skipUnknownProperties'.`
 						: tagIsFromLibrary
@@ -50,6 +56,9 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, request: LitAnalyzerReq
 						: `Please consider adding 'skipUnknownProperties' to the plugin config.`;
 				case HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE:
 				case HtmlNodeAttrKind.ATTRIBUTE:
+					if (request.config.dontSuggestConfigChanges) {
+						return `Please consider using a data-* attribute.`;
+					}
 					return tagIsBuiltIn
 						? `This is a built in tag. Please consider using a 'data-*' attribute, adding the attribute to 'globalAttributes' or using 'skipUnknownAttributes'.`
 						: tagIsFromLibrary
@@ -78,7 +87,7 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, request: LitAnalyzerReq
 		return [
 			{
 				kind: LitHtmlDiagnosticKind.UNKNOWN_TARGET,
-				message: `Unknown ${existingKind} "${htmlAttr.name}"${suggestedMemberName != null ? `. Did you mean '${suggestedMemberName}'?` : ""}`,
+				message: `Unknown ${existingKind} '${htmlAttr.name}'${suggestedMemberName != null ? `. Did you mean '${suggestedMemberName}'?` : ""}`,
 				location: { document, ...htmlAttr.location.name },
 				source: ruleNameFromHtmlNodeAttrKind(htmlAttr.kind),
 				suggestion,
@@ -115,6 +124,7 @@ function findSuggestedTarget(name: string, ...tests: Iterable<HtmlAttrTarget>[])
 			return match;
 		}
 	}
+	return;
 }
 
 function ruleNameFromHtmlNodeAttrKind(kind: HtmlNodeAttrKind): LitAnalyzerRuleName {

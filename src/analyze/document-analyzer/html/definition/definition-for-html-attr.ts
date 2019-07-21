@@ -20,4 +20,5 @@ export function definitionForHtmlAttr(htmlAttr: HtmlNodeAttr, { htmlStore, docum
 			target: target.declaration
 		};
 	}
+	return;
 }

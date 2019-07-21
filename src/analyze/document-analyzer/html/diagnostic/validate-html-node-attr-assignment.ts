@@ -152,18 +152,17 @@ function validateHtmlAttrAssignmentRules(
 						return [
 							{
 								kind: LitHtmlDiagnosticKind.PROPERTY_NEEDS_EXPRESSION,
-								message: `You are using the property binding without an expression`,
+								message: `You are using a property binding without an expression`,
 								severity: litDiagnosticRuleSeverity(config, "no-expressionless-property-binding"),
 								source: "no-expressionless-property-binding",
 								location: { document, ...htmlAttr.location.name }
 							}
 						];
 					}
-
-					return [];
 			}
 			break;
 	}
+	return;
 }
 
 function validateHtmlAttrSlotAssignment(
@@ -274,6 +273,7 @@ function validateHtmlAttrAssignmentTypes(
 			];
 		}
 	}
+	return;
 }
 
 function validateStringifiedAssignment(
@@ -404,7 +404,7 @@ function validateStringifiedAssignment(
 							kind: LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING,
 							severity: litDiagnosticRuleSeverity(config, "no-boolean-in-attribute-binding"),
 							source: "no-boolean-in-attribute-binding",
-							message: `The type '${toTypeString(typeB)}' is a boolean type but you not using a boolean binding. Change to boolean binding?`,
+							message: `The type '${toTypeString(typeB)}' is a boolean type but you are not using a boolean binding. Change to boolean binding?`,
 							location: { document, ...htmlAttr.location.name },
 							htmlAttr,
 							typeA,
@@ -424,7 +424,7 @@ function validateStringifiedAssignment(
 						kind: LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING,
 						severity: litDiagnosticRuleSeverity(config, "no-boolean-in-attribute-binding"),
 						source: "no-boolean-in-attribute-binding",
-						message: `The '${htmlAttr.name}' attribute is a boolean type but you not using a boolean binding. Change to boolean binding?`,
+						message: `The '${htmlAttr.name}' attribute is of boolean type but you are not using a boolean binding. Change to boolean binding?`,
 						location: { document, ...htmlAttr.location.name },
 						htmlAttr,
 						typeA,
@@ -434,6 +434,7 @@ function validateStringifiedAssignment(
 			}
 		}
 	}
+	return;
 }
 
 function validateHtmlAttrDirectiveAssignment(

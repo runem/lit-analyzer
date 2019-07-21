@@ -35,13 +35,19 @@ export function validateHtmlNode(
 		if (isRuleEnabled(config, "no-unknown-tag-name")) {
 			const suggestedName = findBestStringMatch(htmlNode.tagName, Array.from(htmlStore.getGlobalTags()).map(tag => tag.tagName));
 
+			let suggestion = `Check that you've imported the element, and that it's declared on the HTMLElementTagNameMap.`;
+
+			if (!config.dontSuggestConfigChanges) {
+				suggestion += ` If it can't be imported, consider adding it to the 'globalTags' plugin configuration or disabling the check using 'skipUnknownTags'.`;
+			}
+
 			reports.push({
 				kind: LitHtmlDiagnosticKind.UNKNOWN_TAG,
 				message: `Unknown tag "${htmlNode.tagName}"${suggestedName ? `. Did you mean '${suggestedName}'?` : ""}`,
-				suggestion: `Please consider adding it to the 'globalTags' plugin configuration or disabling the check using 'skipUnknownTags'.`,
 				location: { document, ...htmlNode.location.name },
 				source: "no-unknown-tag-name",
 				severity: litDiagnosticRuleSeverity(config, "no-unknown-tag-name"),
+				suggestion,
 				htmlNode,
 				suggestedName
 			});
@@ -77,9 +83,9 @@ export function validateHtmlNode(
 				// Get the import path and the position where it can be placed
 				const importPath = getRelativePathForImport(fromFileName, definition.node.getSourceFile().fileName);
 
-				reports.push({
+				const report: LitHtmlDiagnostic = {
 					kind: LitHtmlDiagnosticKind.MISSING_IMPORT,
-					message: `Missing import <${htmlNode.tagName}>: ${definition.declaration.className || ""}`,
+					message: `Missing import for <${htmlNode.tagName}>: ${definition.declaration.className || ""}`,
 					suggestion: `You can disable this check using 'skipMissingImports'`,
 					source: "no-missing-import",
 					severity: litDiagnosticRuleSeverity(config, "no-missing-import"),
@@ -87,7 +93,11 @@ export function validateHtmlNode(
 					htmlNode,
 					definition,
 					importPath
-				});
+				};
+				if (config.dontSuggestConfigChanges) {
+					report.suggestion = undefined;
+				}
+				reports.push(report);
 			}
 		}
 	}

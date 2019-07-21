@@ -71,6 +71,7 @@ export class LitAnalyzer {
 		} else if (document instanceof HtmlDocument) {
 			return this.litHtmlDocumentAnalyzer.getDefinitionAtOffset(document, offset, request);
 		}
+		return;
 	}
 
 	getQuickInfoAtPosition(file: SourceFile, position: number): LitQuickInfo | undefined {
@@ -86,6 +87,7 @@ export class LitAnalyzer {
 		} else if (document instanceof HtmlDocument) {
 			return this.litHtmlDocumentAnalyzer.getQuickInfoAtOffset(document, offset, request);
 		}
+		return;
 	}
 
 	getRenameInfoAtPosition(file: SourceFile, position: number): LitRenameInfo | undefined {
@@ -117,6 +119,7 @@ export class LitAnalyzer {
 				}
 			}
 		}
+		return;
 	}
 
 	getRenameLocationsAtPosition(file: SourceFile, position: number): LitRenameLocation[] {
@@ -147,6 +150,7 @@ export class LitAnalyzer {
 		if (document instanceof HtmlDocument) {
 			return this.litHtmlDocumentAnalyzer.getClosingTagAtOffset(document, offset);
 		}
+		return;
 	}
 
 	getCompletionDetailsAtPosition(file: SourceFile, position: number, name: string): LitCompletionDetails | undefined {
@@ -160,6 +164,7 @@ export class LitAnalyzer {
 		} else if (document instanceof HtmlDocument) {
 			return this.litHtmlDocumentAnalyzer.getCompletionDetailsAtOffset(document, offset, name, request);
 		}
+		return;
 	}
 
 	getCompletionsAtPosition(file: SourceFile, position: number): LitCompletion[] | undefined {
@@ -176,6 +181,7 @@ export class LitAnalyzer {
 		} else if (document instanceof HtmlDocument) {
 			return this.litHtmlDocumentAnalyzer.getCompletionsAtOffset(document, offset, request);
 		}
+		return;
 	}
 
 	getDiagnosticsInFile(file: SourceFile): LitDiagnostic[] {
@@ -291,7 +297,20 @@ export class LitAnalyzer {
 	 }*/
 
 	private makeRequest(options: { document: TextDocument; file: SourceFile }): LitAnalyzerRequest {
-		const { project, htmlStore, dependencyStore, definitionStore, config, updateDependencies, updateComponents, ts, program, documentStore, logger, updateConfig } = this.context;
+		const {
+			project,
+			htmlStore,
+			dependencyStore,
+			definitionStore,
+			config,
+			updateDependencies,
+			updateComponents,
+			ts,
+			program,
+			documentStore,
+			logger,
+			updateConfig
+		} = this.context;
 
 		return {
 			htmlStore,

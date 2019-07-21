@@ -94,6 +94,8 @@ export interface LitAnalyzerConfig {
 	cssTemplateTags: string[];
 
 	skipSuggestions: boolean;
+	skipCssChecks: boolean;
+	dontSuggestConfigChanges: boolean;
 
 	globalTags: string[];
 	globalAttributes: string[];
@@ -152,6 +154,7 @@ export function makeConfig(userOptions: Partial<LitAnalyzerConfig> = {}): LitAna
 		format: {
 			disable: userOptions.format != null ? userOptions.format.disable : undefined || false
 		},
+		dontSuggestConfigChanges: userOptions.dontSuggestConfigChanges || false,
 		// Template tags
 		htmlTemplateTags: userOptions.htmlTemplateTags || ["html", "raw"],
 		cssTemplateTags: userOptions.cssTemplateTags || ["css"],
@@ -161,6 +164,7 @@ export function makeConfig(userOptions: Partial<LitAnalyzerConfig> = {}): LitAna
 		globalEvents: userOptions.globalEvents || [],
 		customHtmlData: userOptions.customHtmlData || [],
 		// Skip
+		skipCssChecks: userOptions.skipCssChecks || false,
 		skipSuggestions: userOptions.skipSuggestions || false
 		//skipMissingImports: userOptions.skipMissingImports || false,
 		//skipUnknownTags: userOptions.skipUnknownTags || false,
