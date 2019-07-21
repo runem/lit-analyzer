@@ -46,10 +46,10 @@
 		"didyoumean2": "2.0.4",
 		"fast-glob": "^2.2.6",
 		"parse5": "5.1.0",
-		"ts-simple-type": "~0.3.4",
+		"ts-simple-type": "~0.3.5",
 		"vscode-css-languageservice": "4.0.2-next.1",
 		"vscode-html-languageservice": "2.1.12",
-		"web-component-analyzer": "~0.1.10"
+		"web-component-analyzer": "~0.1.11"
 	},
 	"devDependencies": {
 		"@appnest/readme": "^1.2.3",
