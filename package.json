@@ -28,12 +28,13 @@
 	"scripts": {
 		"prettier:check": "prettier --list-different \"**/*\"",
 		"prettier:write": "prettier --write \"**/*\"",
-		"publish": "lerna run prepare && lerna publish --exact",
+		"publish": "lerna run prepare && lerna publish --exact && lerna run install:safe --scope lit-plugin",
 		"bootstrap": "lerna clean --yes && lerna bootstrap --hoist --ignore-scripts --ignore lit-plugin && lerna run install:safe --scope lit-plugin && lerna run prepare",
 		"lint": "eslint 'packages/**/src/**/**/*.ts'",
 		"readme": "lerna run readme && readme generate -i readme.blueprint.md -c readme.config.json",
 		"dev": "cd dev && TSS_LOG=\"-traceToConsole true -level verbose -file $(pwd)/ts-server-log.txt\" TSS_DEBUG=5999 code .",
-		"dev:logs": "touch dev/lit-plugin.log && tail -f dev/lit-plugin.log"
+		"dev:logs": "touch dev/lit-plugin.log && tail -f dev/lit-plugin.log",
+		"copylink": "node scripts.js copylink"
 	},
 	"dependencies": {},
 	"devDependencies": {
@@ -42,6 +43,7 @@
 		"@typescript-eslint/parser": "^1.13.0",
 		"eslint": "^6.1.0",
 		"eslint-config-prettier": "^6.0.0",
+		"fs-extra": "^8.1.0",
 		"husky": "^1.3.1",
 		"lerna": "^3.16.1",
 		"prettier": "^1.16.4",
