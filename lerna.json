@@ -1,0 +1,5 @@
+{
+	"version": "independent",
+	"packages": ["packages/*"],
+	"nohoist": ["vscode", "vscode-styled-components", "lit-html"]
+}

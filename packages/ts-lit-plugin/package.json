@@ -1,0 +1,58 @@
+{
+	"name": "ts-lit-plugin",
+	"version": "1.0.6",
+	"description": "Typescript plugin that adds type checking and code completion to lit-html",
+	"author": "runem",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/runem/ts-lit-plugin.git"
+	},
+	"keywords": [
+		"lit-html",
+		"lit",
+		"lit-element",
+		"javascript",
+		"typescript",
+		"web components",
+		"web",
+		"components",
+		"tagged",
+		"template"
+	],
+	"scripts": {
+		"prepare": "npm run build",
+		"watch": "tsc --watch",
+		"build": "rm -rf lib && tsc",
+		"readme": "readme generate -i readme.blueprint.md -c readme.config.json"
+	},
+	"main": "lib/index.js",
+	"files": [
+		"/lib/",
+		"/html-documentation/"
+	],
+	"dependencies": {
+		"lit-analyzer": "^0.0.11"
+	},
+	"devDependencies": {
+		"@types/node": "^10.12.24",
+		"typescript": "^3.5.3"
+	},
+	"contributors": [
+		{
+			"name": "Rune Mehlsen",
+			"url": "https://twitter.com/runemehlsen",
+			"img": "https://avatars2.githubusercontent.com/u/5372940?s=460&v=4"
+		},
+		{
+			"name": "Andreas Mehlsen",
+			"url": "https://twitter.com/andreasmehlsen",
+			"img": "https://avatars1.githubusercontent.com/u/6267397?s=460&v=4"
+		},
+		{
+			"name": "You?",
+			"img": "https://joeschmoe.io/api/v1/random",
+			"url": "https://github.com/runem/ts-lit-plugin/blob/master/CONTRIBUTING.md"
+		}
+	]
+}

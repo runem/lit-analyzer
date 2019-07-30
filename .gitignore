@@ -1,3 +1,4 @@
+/.vsCode
 .idea
 node_modules
 *.txt
@@ -6,3 +7,5 @@ node_modules
 todo.md
 .DS_Store
 lib
+dist
+out

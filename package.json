@@ -1,13 +1,18 @@
 {
 	"name": "lit-analyzer",
-	"version": "0.0.11",
-	"description": "CLI that analyzes lit-html templates",
+	"version": "1.0.0",
+	"description": "Monorepo for tools that analyze lit-html templates",
+	"private": true,
 	"author": "runem",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/runem/ts-lit-plugin.git"
 	},
+	"bugs": {
+		"url": "https://github.com/runem/ts-lit-plugin/issues"
+	},
+	"homepage": "https://github.com/runem/ts-lit-plugin#readme",
 	"keywords": [
 		"lit-html",
 		"lit",
@@ -20,49 +25,28 @@
 		"tagged",
 		"template"
 	],
-	"bin": {
-		"lit-analyzer": "cli.js"
-	},
 	"scripts": {
-		"prepare": "npm run build",
-		"build": "rollup -c",
-		"watch": "rollup -c --watch",
-		"test": "ava",
-		"test:update": "ava --update-snapshots",
-		"test:watch": "ava --watch",
-		"prettier:check": "prettier --list-different \"src/**/*.{ts,tsx}\"",
-		"prettier:write": "prettier --write \"src/**/*.{ts,tsx}\"",
-		"lint": "tslint --project ./",
-		"readme:build": "readme generate"
+		"prettier:check": "prettier --list-different \"packages/**/src/**/*.ts\"",
+		"prettier:write": "prettier --write \"packages/**/src/**/*.ts\"",
+		"bootstrap": "lerna clean --yes && lerna bootstrap --hoist --ignore-scripts --ignore lit-plugin && lerna run install:safe --scope lit-plugin && lerna run prepare",
+		"vscode:postinstall": "cd ./packages/vscode-lit-plugin && npm run postinstall",
+		"lint": "eslint 'packages/**/src/**/**/*.ts'",
+		"readme": "lerna run readme && readme generate -i readme.blueprint.md -c readme.config.json",
+		"dev": "cd dev && TSS_LOG=\"-traceToConsole true -level verbose -file $(pwd)/ts-server-log.txt\" TSS_DEBUG=5999 code .",
+		"dev:logs": "touch dev/lit-plugin.log && tail -f dev/lit-plugin.log"
 	},
-	"main": "lib/index.cjs.js",
-	"typings": "lib/index.cjs.d.ts",
-	"files": [
-		"/lib/",
-		"cli.js"
-	],
-	"dependencies": {
-		"chalk": "^2.4.2",
-		"didyoumean2": "2.0.4",
-		"fast-glob": "^2.2.6",
-		"parse5": "5.1.0",
-		"ts-simple-type": "~0.3.5",
-		"vscode-css-languageservice": "4.0.2-next.1",
-		"vscode-html-languageservice": "2.1.12",
-		"web-component-analyzer": "~0.1.11"
-	},
+	"dependencies": {},
 	"devDependencies": {
 		"@appnest/readme": "^1.2.3",
-		"@types/node": "^10.12.24",
-		"@wessberg/rollup-plugin-ts": "^1.1.52",
-		"tslib": "^1.9.3",
-		"rollup": "^1.10.1",
-		"rollup-plugin-replace": "^2.1.0",
-		"rollup-plugin-node-resolve": "^4.0.1",
+		"@typescript-eslint/eslint-plugin": "^1.13.0",
+		"@typescript-eslint/parser": "^1.13.0",
+		"eslint": "^6.1.0",
+		"eslint-config-prettier": "^6.0.0",
 		"husky": "^1.3.1",
+		"lerna": "^3.16.1",
 		"prettier": "^1.16.4",
 		"pretty-quick": "^1.10.0",
-		"typescript": "^3.4.0"
+		"typescript": "^3.5.3"
 	},
 	"husky": {
 		"hooks": {

@@ -1,3 +1,5 @@
-blueprint.md
+packages/lit-analyzer/readme.blueprint.md
 README.md
-readme/
+readme
+out
+node_modules

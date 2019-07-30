@@ -1,0 +1,15 @@
+{
+	"env": {
+		"es6": true,
+		"node": true
+	},
+	"extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier", "prettier/@typescript-eslint"],
+	"parser": "@typescript-eslint/parser",
+	"plugins": ["@typescript-eslint"],
+	"rules": {
+		"@typescript-eslint/no-use-before-define": "off",
+		"@typescript-eslint/explicit-function-return-type": "off",
+		"@typescript-eslint/no-object-literal-type-assertion": "off",
+		"@typescript-eslint/explicit-member-accessibility": "off"
+	}
+}
