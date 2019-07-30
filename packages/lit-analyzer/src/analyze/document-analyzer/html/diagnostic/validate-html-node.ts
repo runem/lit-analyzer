@@ -38,7 +38,7 @@ export function validateHtmlNode(
 			let suggestion = `Check that you've imported the element, and that it's declared on the HTMLElementTagNameMap.`;
 
 			if (!config.dontSuggestConfigChanges) {
-				suggestion += ` If it can't be imported, consider adding it to the 'globalTags' plugin configuration or disabling the check using 'skipUnknownTags'.`;
+				suggestion += ` If it can't be imported, consider adding it to the 'globalTags' plugin configuration or disabling the 'no-unknown-tag' rule.`;
 			}
 
 			reports.push({
@@ -86,7 +86,7 @@ export function validateHtmlNode(
 				const report: LitHtmlDiagnostic = {
 					kind: LitHtmlDiagnosticKind.MISSING_IMPORT,
 					message: `Missing import for <${htmlNode.tagName}>: ${definition.declaration.className || ""}`,
-					suggestion: `You can disable this check using 'skipMissingImports'`,
+					suggestion: config.dontSuggestConfigChanges ? undefined : `You can disable this check by disabling the 'no-missing-import' rule.`,
 					source: "no-missing-import",
 					severity: litDiagnosticRuleSeverity(config, "no-missing-import"),
 					location: { document, ...htmlNode.location.name },

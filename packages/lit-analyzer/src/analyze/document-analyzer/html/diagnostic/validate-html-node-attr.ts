@@ -40,32 +40,35 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, request: LitAnalyzerReq
 			switch (htmlAttr.kind) {
 				case HtmlNodeAttrKind.EVENT_LISTENER:
 					if (request.config.dontSuggestConfigChanges) {
-						return `Please consider adding a '@event' tag to the jsdoc on a component class`;
+						return `Please consider adding a '@fires' tag to the jsdoc on a component class`;
 					}
-					return `Please consider adding a '@event' tag to the jsdoc on a component class, adding it to 'globalEvents' or removing 'checkUnknownEvents'.`;
+
+					return `Please consider adding a '@fires' tag to the jsdoc on a component class, adding it to 'globalEvents' or disabling the 'no-unknown-event' rule.`;
 				case HtmlNodeAttrKind.PROPERTY:
 					if (request.config.dontSuggestConfigChanges) {
 						return undefined;
 					}
+
 					return tagIsBuiltIn
-						? `This is a built in tag. Please consider using 'skipUnknownProperties'.`
+						? `This is a built in tag. Please consider disabling the 'no-unknown-property' rule.`
 						: tagIsFromLibrary
-						? `If you are not the author of this component please consider using 'skipUnknownProperties'.`
+						? `If you are not the author of this component please consider disabling the 'no-unknown-property' rule.`
 						: tagHasDeclaration
-						? `This plugin can't automatically find all properties yet. Please consider adding a '@prop' tag to jsdoc on the component class or using 'skipUnknownProperties'.`
-						: `Please consider adding 'skipUnknownProperties' to the plugin config.`;
+						? `This plugin can't automatically find all properties yet. Please consider adding a '@prop' tag to jsdoc on the component class or disabling the 'no-unknown-property' rule.`
+						: `Please consider disabling the 'no-unknown-property' rule.`;
 				case HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE:
 				case HtmlNodeAttrKind.ATTRIBUTE:
 					if (request.config.dontSuggestConfigChanges) {
 						return `Please consider using a data-* attribute.`;
 					}
+
 					return tagIsBuiltIn
-						? `This is a built in tag. Please consider using a 'data-*' attribute, adding the attribute to 'globalAttributes' or using 'skipUnknownAttributes'.`
+						? `This is a built in tag. Please consider using a 'data-*' attribute, adding the attribute to 'globalAttributes' or disabling the 'no-unknown-attribute' rule.`
 						: tagIsFromLibrary
-						? `If you are not the author of this component please consider using a 'data-*' attribute, adding the attribute to 'globalAttributes' or using 'skipUnknownAttributes'.`
+						? `If you are not the author of this component please consider using a 'data-*' attribute, adding the attribute to 'globalAttributes' or disabling the 'no-unknown-attribute' rule.`
 						: tagHasDeclaration
 						? `Please consider adding it as an attribute on the component, adding '@attr' tag to jsdoc on the component class or using a 'data-*' attribute instead.`
-						: `Please consider using a 'data-*' attribute instead.`;
+						: `Please consider using a 'data-*' attribute.`;
 			}
 		})();
 

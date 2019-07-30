@@ -10,7 +10,7 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | Rule    | Description | Severity normal | Severity strict |
 | :------ | ----------- | --------------- | --------------- |
 | [no-unknown-tag-name](#-no-unknown-tag-name) | Unknown tag names are checked. Be aware that not all custom elements from libraries will be found out of the box. | off | warning |
-| [no-missing-import](#-no-missing-imports)    | When using custom elements in HTML it is checked if the element has been imported and is available in the current context. | off | warning |
+| [no-missing-import](#-no-missing-import)    | When using custom elements in HTML it is checked if the element has been imported and is available in the current context. | off | warning |
 | [no-unclosed-tag](#-no-unclosed-tag)         | Unclosed tags, and invalid self closing tags like custom elements tags, are checked. | warning | error |
 
 
@@ -19,7 +19,7 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 <!-- prettier-ignore -->
 | Rule    | Description | Severity normal | Severity strict |
 | :------ | ----------- | --------------- | --------------- |
-| [no-unknown-attribute](#-no-unknown-attribute-or-property)<br> [no-unknown-property](#-no-unknown-attribute-or-property) | You will get a warning whenever you use an unknown attribute or property within your `lit-html` template. | off | warning |
+| [no-unknown-attribute](#-no-unknown-attribute-no-unknown-property)<br> [no-unknown-property](#-no-unknown-attribute-no-unknown-property) | You will get a warning whenever you use an unknown attribute or property within your `lit-html` template. | off | warning |
 | [no-unknown-event](#-no-unknown-event)       | When using event bindings it's checked that the event names are fired. | off | off |
 | [no-unknown-slot](#-no-unknown-slot)         | Using the "@slot" jsdoc tag on your custom element class, you can tell which slots are accepted for a particular element. | off | warning |
 
@@ -76,7 +76,7 @@ declare global {
 
 #### 📣 no-missing-import
 
-When using custom elements in HTML it is checked if the element has been imported and is available in the current context. It's considered imported if any imported module (or their imports) defines the custom element. You can disable this check by setting `skipMissingImports` to true in the configuration (see [Configuring the plugin](#configuring-the-plugin)).
+When using custom elements in HTML it is checked if the element has been imported and is available in the current context. It's considered imported if any imported module (or their imports) defines the custom element.
 
 The following example is considered a warning:
 ```js
@@ -130,7 +130,7 @@ html`<input .value="${value}" type="button" />`
 
 #### ⚡️ no-unknown-event
 
-You can opt in to check for unknown event names. Using the `@event` jsdoc or the statement `this.dispatch(new CustomElement("my-event))` will make the event name available. Event names defined on an element are accepted globally because events bubbles. 
+You can opt in to check for unknown event names. Using the `@fires` jsdoc or the statement `this.dispatch(new CustomElement("my-event))` will make the event name available. All event names are accepted globally because events bubble. 
 
 The following example is considered a warning:
 ```js
@@ -182,7 +182,7 @@ html`
 
 Be aware that many checks involving analyzing bindings will work better in Typescript files because we have more information about the values being bound.
 
-#### ❓no-invalid-boolean-binding
+#### ❓ no-invalid-boolean-binding
 
 It never makes sense to use the boolean attribute binding on a non-boolean type.
 

@@ -1,6 +1,6 @@
 {
 	"name": "lit-analyzer",
-	"version": "1.1.0",
+	"version": "1.0.0",
 	"description": "Monorepo for tools that analyze lit-html templates",
 	"private": true,
 	"author": "runem",
