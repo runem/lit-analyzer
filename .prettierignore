@@ -1,5 +1,9 @@
-packages/lit-analyzer/readme.blueprint.md
-README.md
+*.md
 readme
 out
 node_modules
+.DS_Store
+.*
+lib
+*.gif
+*.png
