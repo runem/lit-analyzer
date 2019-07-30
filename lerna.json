@@ -1,5 +1,5 @@
 {
-	"version": "independent",
+	"version": "1.1.0",
 	"packages": ["packages/*"],
 	"nohoist": ["vscode", "vscode-styled-components", "lit-html"]
 }

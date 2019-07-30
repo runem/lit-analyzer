@@ -1,6 +1,6 @@
 {
 	"name": "lit-analyzer",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "Monorepo for tools that analyze lit-html templates",
 	"private": true,
 	"author": "runem",
@@ -29,7 +29,6 @@
 		"prettier:check": "prettier --list-different \"packages/**/src/**/*.ts\"",
 		"prettier:write": "prettier --write \"packages/**/src/**/*.ts\"",
 		"bootstrap": "lerna clean --yes && lerna bootstrap --hoist --ignore-scripts --ignore lit-plugin && lerna run install:safe --scope lit-plugin && lerna run prepare",
-		"vscode:postinstall": "cd ./packages/vscode-lit-plugin && npm run postinstall",
 		"lint": "eslint 'packages/**/src/**/**/*.ts'",
 		"readme": "lerna run readme && readme generate -i readme.blueprint.md -c readme.config.json",
 		"dev": "cd dev && TSS_LOG=\"-traceToConsole true -level verbose -file $(pwd)/ts-server-log.txt\" TSS_DEBUG=5999 code .",
