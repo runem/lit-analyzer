@@ -28,6 +28,7 @@
 	"scripts": {
 		"prettier:check": "prettier --list-different \"**/*\"",
 		"prettier:write": "prettier --write \"**/*\"",
+		"publish": "lerna run prepare && lerna publish --exact",
 		"bootstrap": "lerna clean --yes && lerna bootstrap --hoist --ignore-scripts --ignore lit-plugin && lerna run install:safe --scope lit-plugin && lerna run prepare",
 		"lint": "eslint 'packages/**/src/**/**/*.ts'",
 		"readme": "lerna run readme && readme generate -i readme.blueprint.md -c readme.config.json",

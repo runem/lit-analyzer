@@ -1,5 +1,4 @@
 import { LitAnalyzerConfig, makeConfig } from "lit-analyzer";
-import { setTypescriptModule as setTsIsAssignableModule } from "ts-simple-type";
 import * as ts from "typescript";
 import * as tsServer from "typescript/lib/tsserverlibrary";
 import { decorateLanguageService } from "./decorate-language-service";
@@ -18,7 +17,6 @@ let context: LitPluginContext | undefined = undefined;
  */
 function init({ typescript }: { typescript: typeof ts }): tsServer.server.PluginModule {
 	// Cache the typescript module
-	setTsIsAssignableModule(typescript);
 	setTypescriptModule(typescript);
 
 	return {
