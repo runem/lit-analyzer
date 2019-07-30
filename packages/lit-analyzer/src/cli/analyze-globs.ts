@@ -13,7 +13,7 @@ const DEFAULT_DIR_GLOB = "**/*.{js,jsx,ts,tsx}";
 export interface AnalyzeGlobsContext {
 	didExpandGlobs?(filePaths: string[]): void;
 	willAnalyzeFiles?(filePaths: string[]): void;
-	didFindTypescriptDiagnostics?(diagnostics: ReadonlyArray<Diagnostic>, options: { program: Program }): void;
+	didFindTypescriptDiagnostics?(diagnostics: readonly Diagnostic[], options: { program: Program }): void;
 	analyzeSourceFile?(file: SourceFile, options: { program: Program }): void | boolean;
 }
 
@@ -78,7 +78,9 @@ async function expandGlobs(globs: string | string[]): Promise<string[]> {
 							followSymlinkedDirectories: false
 						});
 					}
-				} catch (e) {}
+				} catch {
+					// Do nothing
+				}
 
 				// Return the result of globbing
 				return async<string>([...IGNORE_GLOBS, g], {

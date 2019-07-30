@@ -29,8 +29,8 @@ export function iterableFind<T>(iterable: Iterable<T>, match: (item: T) => boole
 	return;
 }
 
-export function* iterableUnique<T>(iterable: Iterable<T>, on: (item: T) => any): Iterable<T> {
-	const unique = new Set<any>();
+export function* iterableUnique<T, U>(iterable: Iterable<T>, on: (item: T) => U): Iterable<T> {
+	const unique = new Set<U>();
 	for (const item of iterable) {
 		const u = on(item);
 		if (!unique.has(u)) {

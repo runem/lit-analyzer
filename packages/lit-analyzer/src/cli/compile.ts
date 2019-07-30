@@ -37,7 +37,7 @@ const defaultOptions: CompilerOptions = {
 };
 
 export interface CompileResult {
-	diagnostics: ReadonlyArray<Diagnostic>;
+	diagnostics: readonly Diagnostic[];
 	program: Program;
 	files: SourceFile[];
 	pluginOptions?: LitAnalyzerConfig;
@@ -67,7 +67,9 @@ export function readTsConfig(tsConfigPath?: string): CompilerOptions | undefined
 			const content = readFileSync(tsConfigPath, "utf8");
 			const config = JSON.parse(content) as { compilerOptions: CompilerOptions };
 			return config.compilerOptions;
-		} catch {}
+		} catch {
+			return undefined;
+		}
 	}
 
 	return undefined;

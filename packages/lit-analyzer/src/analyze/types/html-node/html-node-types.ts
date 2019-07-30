@@ -36,6 +36,7 @@ export interface IHtmlNodeSvgTag extends IHtmlNodeBase {
 
 export type HtmlNode = IHtmlNode | IHtmlNodeStyleTag | IHtmlNodeSvgTag;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isHTMLNode(obj: any): obj is IHtmlNodeBase {
 	return "tagName" in obj && "location" in obj && "attributes" in obj;
 }

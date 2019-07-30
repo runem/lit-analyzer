@@ -248,10 +248,11 @@ function validateHtmlAttrAssignmentTypes(
 		case LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER:
 			break;
 
-		default:
+		default: {
 			// In this case there is no modifier. Therefore:
 			const results = validateStringifiedAssignment(htmlAttr, { typeA, typeB }, request);
 			if (results != null) return results;
+		}
 	}
 
 	if (isRuleEnabled(request.config, "no-incompatible-type-binding")) {
@@ -343,7 +344,7 @@ function validateStringifiedAssignment(
 		// Take into account that assignments like maxlength="50" (which is a number) is allowed even though "50" is a string literal in this case.
 		else if (typeAIsAssignableTo[SimpleTypeKind.NUMBER]()) {
 			// Test if a potential string literal is a Number
-			if (!isNaN(typeB.value as any) && isAssignableToValue(typeA, Number(typeB.value))) {
+			if (!isNaN((typeB.value as unknown) as number) && isAssignableToValue(typeA, Number(typeB.value))) {
 				return [];
 			}
 		}

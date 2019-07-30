@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { appendFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { inspect } from "util";

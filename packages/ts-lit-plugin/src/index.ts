@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { LitAnalyzerConfig, makeConfig } from "lit-analyzer";
 import * as ts from "typescript";
 import * as tsServer from "typescript/lib/tsserverlibrary";

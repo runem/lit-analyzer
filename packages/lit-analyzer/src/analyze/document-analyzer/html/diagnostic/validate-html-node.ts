@@ -112,7 +112,7 @@ export function validateHtmlNode(
 				if (unnamedSlot == null) {
 					reports.push({
 						kind: LitHtmlDiagnosticKind.MISSING_SLOT_ATTRIBUTE,
-						validSlotNames: slots.map(s => s.name!),
+						validSlotNames: slots.map(s => s.name),
 						htmlNode,
 						message: `Missing slot attribute. Parent element <${htmlNode.tagName}> only allows named slots as children.`,
 						severity: litDiagnosticRuleSeverity(config, "no-unknown-slot"),

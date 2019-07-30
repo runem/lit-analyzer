@@ -74,7 +74,8 @@ function visitModuleWithName(moduleSpecifier: string, node: Node, context: IVisi
 	const result = context.project
 		? context.project.getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, node.getSourceFile().fileName)
 		: "getResolvedModuleWithFailedLookupLocationsFromCache" in context.program
-		? (context.program as any)["getResolvedModuleWithFailedLookupLocationsFromCache"](moduleSpecifier, node.getSourceFile().fileName)
+		? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+		  (context.program as any)["getResolvedModuleWithFailedLookupLocationsFromCache"](moduleSpecifier, node.getSourceFile().fileName)
 		: undefined;
 
 	const mod = result != null ? result.resolvedModule : undefined;

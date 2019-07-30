@@ -52,7 +52,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// Subscribe to configuration change
 	vscode.workspace.onDidChangeConfiguration(
-		(e: any) => {
+		e => {
 			if (e.affectsConfiguration(configurationSection) || e.affectsConfiguration(configurationExperimentalHtmlSection)) {
 				synchronizeConfig(api);
 			}
@@ -67,7 +67,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	synchronizeConfig(api);
 }
 
-function synchronizeConfig(api: any) {
+function synchronizeConfig(api: { configurePlugin: Function }) {
 	api.configurePlugin(tsLitPluginId, getConfig());
 }
 
@@ -160,12 +160,13 @@ function getConfig(): Partial<Config> {
 	withConfigValue(experimental, "customData", value => {
 		// Merge value from vscode with "lit-plugin.customHtmlData"
 		const filePaths = (Array.isArray(value) ? value : [value]).map(path => (typeof path === "string" ? toWorkspacePath(path) : path));
-		outConfig.customHtmlData = outConfig.customHtmlData == null ? filePaths : filePaths.concat(outConfig.customHtmlData);
+		outConfig.customHtmlData = outConfig.customHtmlData == null ? filePaths : filePaths.concat(outConfig.customHtmlData as []);
 	});
 
 	return outConfig;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function withConfigValue(config: vscode.WorkspaceConfiguration, key: string, withValue: (value: any) => void): void {
 	const configSetting = config.inspect(key);
 	if (!configSetting) {

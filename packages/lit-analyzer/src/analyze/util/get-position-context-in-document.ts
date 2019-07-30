@@ -19,14 +19,14 @@ export function getPositionContextInDocument(document: TextDocument, offset: num
 	const text = document.virtualDocument.text;
 
 	const leftWord = grabWordInDirection({
-		stopChar: /[\/=<>\s"${}]/,
+		stopChar: /[/=<>\s"${}]/,
 		direction: "left",
 		text,
 		startOffset: offset
 	});
 
 	const rightWord = grabWordInDirection({
-		stopChar: /[\/=<>\s"${}]/,
+		stopChar: /[/=<>\s"${}]/,
 		direction: "right",
 		text,
 		startOffset: offset

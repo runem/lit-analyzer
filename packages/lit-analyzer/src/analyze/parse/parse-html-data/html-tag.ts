@@ -178,8 +178,8 @@ export function targetKindText(target: HtmlAttrTarget): string {
 	return "unknown";
 }
 
-function mergeFirstUnique<T>(items: T[], uniqueOn: (item: T) => any): T[] {
-	const unique = new Set<any>();
+function mergeFirstUnique<T, U>(items: T[], uniqueOn: (item: T) => U): T[] {
+	const unique = new Set<U>();
 	return items.filter(item => {
 		const identity = uniqueOn(item);
 		if (!unique.has(identity)) {

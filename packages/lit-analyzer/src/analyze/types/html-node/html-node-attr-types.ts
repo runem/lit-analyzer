@@ -44,6 +44,7 @@ export interface IHtmlNodeAttr extends IHtmlNodeAttrBase {
 
 export type HtmlNodeAttr = IHtmlNodeAttrEventListener | IHtmlNodeAttrProp | IHtmlNodeAttr | IHtmlNodeBooleanAttribute;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isHTMLAttr(obj: any): obj is IHtmlNodeAttrBase {
 	return "name" in obj && "location" in obj && "htmlNode" in obj;
 }

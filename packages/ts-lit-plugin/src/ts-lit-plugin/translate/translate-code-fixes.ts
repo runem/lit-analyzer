@@ -27,7 +27,7 @@ function translateCodeFixAction(file: SourceFile, action: LitCodeFixAction): Fil
 					}
 				]
 			};
-		case CodeActionKind.IMPORT_COMPONENT:
+		case CodeActionKind.IMPORT_COMPONENT: {
 			// Get the import path and the position where it can be placed
 			const lastImportIndex = getLastImportIndex(file);
 
@@ -40,6 +40,7 @@ function translateCodeFixAction(file: SourceFile, action: LitCodeFixAction): Fil
 					}
 				]
 			};
+		}
 	}
 }
 

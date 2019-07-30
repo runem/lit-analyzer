@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { dashToCamelCase } from "./util";
 
 export type CliArguments = { _: string[] } & Record<string, number | string | boolean>;

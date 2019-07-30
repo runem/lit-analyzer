@@ -80,10 +80,10 @@ export class TsLitPlugin {
 		fileName: string,
 		start: number,
 		end: number,
-		errorCodes: ReadonlyArray<number>,
+		errorCodes: readonly number[],
 		formatOptions: FormatCodeSettings,
 		preferences: UserPreferences
-	): ReadonlyArray<CodeFixAction> {
+	): readonly CodeFixAction[] {
 		const file = this.program.getSourceFile(fileName)!;
 
 		const prevResult = this.prevLangService.getCodeFixesAtPosition(fileName, start, end, errorCodes, formatOptions, preferences) || [];
@@ -119,7 +119,7 @@ export class TsLitPlugin {
 		findInStrings: boolean,
 		findInComments: boolean,
 		providePrefixAndSuffixTextForRename?: boolean
-	): ReadonlyArray<RenameLocation> | undefined {
+	): readonly RenameLocation[] | undefined {
 		const file = this.program.getSourceFile(fileName)!;
 
 		const prev = this.prevLangService.findRenameLocations(fileName, position, findInStrings, findInComments, providePrefixAndSuffixTextForRename);

@@ -13,15 +13,15 @@ export interface FindBestMatchOptions<T> {
  * @param elements
  * @param options
  */
-export function findBestMatch<T>(find: string, elements: T[], options: FindBestMatchOptions<T>): T | undefined;
-export function findBestMatch<T>(find: string, elements: T[], options: FindBestMatchOptions<T>): T | undefined {
+export function findBestMatch<T extends string | object>(find: string, elements: T[], options: FindBestMatchOptions<T>): T | undefined;
+export function findBestMatch<T extends string | object>(find: string, elements: T[], options: FindBestMatchOptions<T>): T | undefined {
 	options.caseSensitive = "caseSensitive" in options ? options.caseSensitive : false;
 	options.threshold = "threshold" in options ? options.threshold : 0.5;
 
-	return (didYouMean(find, elements as any, {
+	return (didYouMean(find, elements, {
 		caseSensitive: options.caseSensitive,
 		threshold: options.threshold,
-		matchPath: [options.matchKey] as any,
+		matchPath: [options.matchKey] as [string],
 		returnType: dym.ReturnTypeEnums.FIRST_CLOSEST_MATCH,
 		trimSpaces: false
 	}) as unknown) as T | undefined;

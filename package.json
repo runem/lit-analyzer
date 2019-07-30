@@ -30,7 +30,7 @@
 		"prettier:write": "prettier --write \"**/*\"",
 		"publish": "lerna run prepare && lerna publish --exact && lerna run install:safe --scope lit-plugin",
 		"bootstrap": "lerna clean --yes && lerna bootstrap --hoist --ignore-scripts --ignore lit-plugin && lerna run install:safe --scope lit-plugin && lerna run prepare",
-		"lint": "eslint 'packages/**/src/**/**/*.ts'",
+		"lint": "eslint 'packages/**/*.{ts,js}'",
 		"readme": "lerna run readme && readme generate -i readme.blueprint.md -c readme.config.json",
 		"dev": "cd dev && TSS_LOG=\"-traceToConsole true -level verbose -file $(pwd)/ts-server-log.txt\" TSS_DEBUG=5999 code .",
 		"dev:logs": "touch dev/lit-plugin.log && tail -f dev/lit-plugin.log",
@@ -52,7 +52,7 @@
 	},
 	"husky": {
 		"hooks": {
-			"pre-commit": "pretty-quick --staged"
+			"pre-commit": "pretty-quick --staged && npm run lint"
 		}
 	},
 	"contributors": [

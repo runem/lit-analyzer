@@ -14,6 +14,7 @@ export function isTagNode(node: P5Node): node is IP5TagNode {
  * Returns if a p5Node is a document fragment.
  * @param node
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isDocumentFragmentNode(node: any): node is IP5DocumentFragmentNode {
 	return node.nodeName === "#document-fragment";
 }

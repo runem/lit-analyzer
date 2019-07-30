@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { LanguageService } from "typescript";
 import { logger } from "./logger";
 import { TsLitPlugin } from "./ts-lit-plugin/ts-lit-plugin";

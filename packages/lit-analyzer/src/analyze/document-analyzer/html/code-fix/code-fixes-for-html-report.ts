@@ -168,7 +168,7 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 				}
 			];
 
-		case LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING:
+		case LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING: {
 			const newText = `${LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER}${htmlReport.htmlAttr.name}`;
 
 			return [
@@ -190,6 +190,7 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 					]
 				}
 			];
+		}
 
 		case LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED: {
 			const { assignment } = htmlReport.htmlAttr;

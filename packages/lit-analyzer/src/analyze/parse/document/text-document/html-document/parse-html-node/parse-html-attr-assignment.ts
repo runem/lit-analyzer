@@ -52,7 +52,12 @@ export function parseHtmlAttrAssignment(
 }
 
 function getAssignmentLocation(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, htmlAttr: HtmlNodeAttr, context: ParseHtmlContext): Range | undefined {
-	const htmlAttrLocation = (getSourceLocation(p5Node)!.startTag.attrs || {})[p5Attr.name];
+	const sourceLocation = getSourceLocation(p5Node);
+	if (sourceLocation == null) {
+		return undefined;
+	}
+
+	const htmlAttrLocation = (sourceLocation.startTag.attrs || {})[p5Attr.name];
 	if (htmlAttrLocation == null) return undefined;
 
 	const nameEndOffset = htmlAttr.location.name.end;
