@@ -1,6 +1,6 @@
 ## Rules
 
-The default severity of each rule depend on the `strict` [configuration option](link-coming-soon). Strict mode is disabled as default.
+The default severity of each rule depend on the `strict` [configuration option](#-configuration). Strict mode is disabled as default.
 
 Each rule can have severity of `off`, `warning` or `error`. You can toggle rules as you like.
 

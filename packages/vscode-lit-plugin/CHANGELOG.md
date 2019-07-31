@@ -57,7 +57,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- Added support for `@ts-ignore` comments ([#2](https://github.com/runem/ts-lit-plugin/pull/2))
+- Added support for `@ts-ignore` comments ([#2](https://github.com/runem/lit-analyzer/pull/2))
 - Added reformat support
 - Added support for libraries that extend the global `HTMLElementTagNameMap`
 

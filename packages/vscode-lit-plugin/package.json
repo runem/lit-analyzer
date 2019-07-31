@@ -13,14 +13,14 @@
 	"categories": [
 		"Programming Languages"
 	],
-	"homepage": "https://github.com/runem/vscode-lit-plugin",
+	"homepage": "https://github.com/runem/lit-analyzer",
 	"bugs": {
-		"url": "https://github.com/runem/ts-lit-plugin/issues",
+		"url": "https://github.com/runem/lit-analyzer/issues",
 		"email": "runemehlsen@gmail.com"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/runem/vscode-lit-plugin.git"
+		"url": "https://github.com/runem/lit-analyzer.git"
 	},
 	"main": "./out/extension",
 	"scripts": {
@@ -66,7 +66,7 @@
 		{
 			"name": "You?",
 			"img": "https://joeschmoe.io/api/v1/random",
-			"url": "https://github.com/runem/ts-lit-plugin/blob/master/CONTRIBUTING.md"
+			"url": "https://github.com/runem/lit-analyzer/blob/master/CONTRIBUTING.md"
 		}
 	],
 	"contributes": {

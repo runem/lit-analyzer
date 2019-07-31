@@ -1,6 +1,6 @@
 ## Other features
 
-[Rules](link-coming-soon) gives you diagnostics directly in your code. Features described in this section will give you extra super powers.
+[Rules](#-rules) gives you diagnostics directly in your code. Features described in this section will give you extra super powers.
 
 ### 🚶Goto definition
 

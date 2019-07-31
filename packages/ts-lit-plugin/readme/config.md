@@ -1,4 +1,4 @@
-## Configuring the plugin
+## Configuration
 
 You can configure this plugin through your `tsconfig.json`. 
 
