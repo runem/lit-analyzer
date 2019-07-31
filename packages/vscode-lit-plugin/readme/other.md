@@ -1,6 +1,6 @@
 ## Other features
 
-[Rules](#-rules) gives you diagnostics directly in your code. Features described in this section will give you extra super powers.
+[Rules](#-rules) as described before, gives you diagnostics directly in your code. Features described in this section will give you super powers by making your lit-html templates come to life.
 
 ### 🚶Goto definition
 
