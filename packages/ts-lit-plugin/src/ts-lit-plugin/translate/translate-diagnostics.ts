@@ -32,7 +32,6 @@ function translateDiagnostic(report: LitDiagnostic, file: SourceFile, context: L
 		messageText,
 		category,
 		code,
-		source: DIAGNOSTIC_SOURCE
-		//source: `${DIAGNOSTIC_SOURCE}:${report.source != null ? `${report.source}}`
+		source: `${DIAGNOSTIC_SOURCE}.rules.${report.source || "unknown"}`
 	};
 }

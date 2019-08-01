@@ -1,0 +1,16 @@
+{
+	"name": "dev",
+	"version": "1.0.0",
+	"description": "",
+	"dependencies": {
+		"lit-element": "^2.2.1",
+		"lit-html": "^1.1.1",
+		"ts-lit-plugin": "file:../packages/ts-lit-plugin"
+	},
+	"devDependencies": {
+		"typescript": "^3.4.0"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC"
+}

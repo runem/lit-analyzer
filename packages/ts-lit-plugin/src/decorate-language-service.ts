@@ -74,14 +74,17 @@ function wrapTryCatch<T extends Function>(newMethod: T, oldMethod: T, methodName
  */
 function wrapLog<T extends Function>(name: string, proxy: T): T {
 	return (((...args: unknown[]) => {
-		/**
-		 const startTime = Date.now();
-		 logger.verbose(`[${name}] Called`);
-		 const result = proxy(...args);
-		 const time = Date.now() - startTime;
-		 logger.verbose(`[${name}] Finished (${Math.round(time)}ms): Result: `, result == null ? "undefined" : Array.isArray(result) ? `Array: ${result.length} length` : "defined");
-		 return result;
-		 /*/
+		/**/
+		const startTime = Date.now();
+		logger.verbose(`[${name}] Called`);
+		const result = proxy(...args);
+		const time = Date.now() - startTime;
+		logger.verbose(
+			`[${name}] Finished (${Math.round(time)}ms): Result: `,
+			result == null ? "undefined" : Array.isArray(result) ? `Array: ${result.length} length` : "defined"
+		);
+		return result;
+		/*/
 		return proxy(...args);
 		/**/
 	}) as unknown) as T;

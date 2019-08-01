@@ -27,6 +27,9 @@ function init({ typescript }: { typescript: typeof ts }): tsServer.server.Plugin
 				return info.languageService;
 			}
 
+			// Save the current working directory
+			info.config.cwd = info.config.cwd || info.project.getCurrentDirectory();
+
 			// Extend existing language service with the plugin functions
 			try {
 				context = new LitPluginContext({
