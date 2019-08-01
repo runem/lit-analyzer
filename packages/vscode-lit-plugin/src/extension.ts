@@ -1,3 +1,4 @@
+import { ALL_RULE_NAMES, LitAnalyzerConfig } from "lit-analyzer";
 import { join } from "path";
 import * as vscode from "vscode";
 
@@ -8,31 +9,6 @@ const configurationExperimentalHtmlSection = "html.experimental";
 const analyzeCommandId = "lit-plugin.analyze";
 
 let defaultAnalyzeGlob = "src";
-
-interface Config {
-	disable: boolean;
-	verbose: boolean;
-	cwd: string;
-	format: { disable: boolean };
-
-	htmlTemplateTags: string[];
-	cssTemplateTags: string[];
-
-	checkUnknownEvents: boolean;
-
-	skipUnknownTags: boolean;
-	skipSuggestions: boolean;
-	skipUnknownAttributes: boolean;
-	skipUnknownProperties: boolean;
-	skipUnknownSlots: boolean;
-	skipTypeChecking: boolean;
-	skipMissingImports: boolean;
-
-	globalTags: string[];
-	globalAttributes: string[];
-	globalEvents: string[];
-	customHtmlData: (string | Object)[] | string | Object;
-}
 
 export async function activate(context: vscode.ExtensionContext) {
 	const extension = vscode.extensions.getExtension(typeScriptExtensionId);
@@ -71,9 +47,9 @@ function synchronizeConfig(api: { configurePlugin: Function }) {
 	api.configurePlugin(tsLitPluginId, getConfig());
 }
 
-function getConfig(): Partial<Config> {
+function getConfig(): Partial<LitAnalyzerConfig> {
 	const config = vscode.workspace.getConfiguration(configurationSection);
-	const outConfig: Partial<Config> = {};
+	const outConfig: Partial<LitAnalyzerConfig> = {};
 
 	// Set cwd
 	outConfig.cwd = getCwd();
@@ -88,24 +64,36 @@ function getConfig(): Partial<Config> {
 	withConfigValue(config, "externalHtmlAttributes", value => {
 		outConfig.globalAttributes = value;
 	});
+	// Just set these deprecated rules directly on the config object.
+	// ts-lit-plugin will make sure that deprecated rules are mapped correctly to new rules
+	[
+		"skipSuggestions",
+		"checkUnknownEvents",
+		"skipUnknownTags",
+		"skipUnknownAttributes",
+		"skipUnknownProperties",
+		"skipUnknownSlots",
+		"skipMissingImports",
+		"skipTypeChecking"
+	].forEach(deprecatedRuleName => {
+		withConfigValue(config, deprecatedRuleName, value => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			(outConfig as any)[deprecatedRuleName] = value;
+		});
+	});
 
 	// Values
 	withConfigValue(config, "disable", value => {
 		outConfig.disable = value;
 	});
-	withConfigValue(config, "verbose", value => {
-		outConfig.verbose = value;
-	});
 	withConfigValue(config, "logging", value => {
-		if (value === "verbose") {
-			outConfig.verbose = true;
-		}
+		outConfig.logging = value;
 	});
-	withConfigValue(config, "format.disable", value => {
-		outConfig.format = Object.assign(outConfig.format || {}, { disable: value });
+	withConfigValue(config, "dontShowSuggestions", value => {
+		outConfig.dontShowSuggestions = value;
 	});
-	withConfigValue(config, "skipSuggestions", value => {
-		outConfig.skipSuggestions = value;
+	withConfigValue(config, "strict", value => {
+		outConfig.strict = value;
 	});
 
 	// Template tags
@@ -126,31 +114,6 @@ function getConfig(): Partial<Config> {
 	withConfigValue(config, "globalTags", value => {
 		outConfig.globalTags = value;
 	});
-
-	// Check
-	withConfigValue(config, "checkUnknownEvents", value => {
-		outConfig.checkUnknownEvents = value;
-	});
-
-	// Skip
-	withConfigValue(config, "skipUnknownTags", value => {
-		outConfig.skipUnknownTags = value;
-	});
-	withConfigValue(config, "skipUnknownAttributes", value => {
-		outConfig.skipUnknownAttributes = value;
-	});
-	withConfigValue(config, "skipUnknownProperties", value => {
-		outConfig.skipUnknownProperties = value;
-	});
-	withConfigValue(config, "skipUnknownSlots", value => {
-		outConfig.skipUnknownSlots = value;
-	});
-	withConfigValue(config, "skipMissingImports", value => {
-		outConfig.skipMissingImports = value;
-	});
-	withConfigValue(config, "skipTypeChecking", value => {
-		outConfig.skipTypeChecking = value;
-	});
 	withConfigValue(config, "customHtmlData", value => {
 		outConfig.customHtmlData = value;
 	});
@@ -162,6 +125,17 @@ function getConfig(): Partial<Config> {
 		const filePaths = (Array.isArray(value) ? value : [value]).map(path => (typeof path === "string" ? toWorkspacePath(path) : path));
 		outConfig.customHtmlData = outConfig.customHtmlData == null ? filePaths : filePaths.concat(outConfig.customHtmlData as []);
 	});
+
+	// Apply rules
+	const rules = outConfig.rules || {};
+
+	ALL_RULE_NAMES.forEach(ruleName => {
+		withConfigValue(config, `rules.${ruleName}`, value => {
+			rules[ruleName] = value;
+		});
+	});
+
+	outConfig.rules = rules;
 
 	return outConfig;
 }

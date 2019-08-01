@@ -84,7 +84,7 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 <!-- prettier-ignore -->
 | Rule    | Description | Severity normal | Severity strict |
 | :------ | ----------- | --------------- | --------------- |
-| [no-unknown-tag-name](#-no-unknown-tag-name) | Unknown tag names are checked. Be aware that not all custom elements from libraries will be found out of the box. | off | warning |
+| [no-unknown-tag-name](#-no-unknown-tag-name) | The existence of tag names are checked. Be aware that not all custom elements from libraries will be found out of the box. | off | warning |
 | [no-missing-import](#-no-missing-import)    | When using custom elements in HTML it is checked if the element has been imported and is available in the current context. | off | warning |
 | [no-unclosed-tag](#-no-unclosed-tag)         | Unclosed tags, and invalid self closing tags like custom elements tags, are checked. | warning | error |
 

@@ -23,6 +23,29 @@ export type LitAnalyzerRuleName =
 	| "no-invalid-tag-name"
 	| "no-invalid-css";
 
+export const ALL_RULE_NAMES: LitAnalyzerRuleName[] = [
+	"no-unknown-tag-name",
+	"no-missing-import",
+	"no-unclosed-tag",
+	"no-unknown-attribute",
+	"no-unknown-property",
+	"no-unknown-event",
+	"no-unknown-slot",
+	"no-invalid-boolean-binding",
+	"no-expressionless-property-binding",
+	"no-noncallable-event-binding",
+	"no-boolean-in-attribute-binding",
+	"no-complex-attribute-binding",
+	"no-nullable-attribute-binding",
+	"no-incompatible-type-binding",
+	"no-invalid-directive-binding",
+	"no-incompatible-property-type",
+	"no-unknown-property-converter",
+	"no-invalid-attribute-name",
+	"no-invalid-tag-name",
+	"no-invalid-css"
+];
+
 export type LitAnalyzerRuleSeverity = "off" | "warn" | "warning" | "error" | 0 | 1 | 2 | true | false;
 
 export type LitAnalyzerRules = Partial<Record<LitAnalyzerRuleName, LitAnalyzerRuleSeverity | [LitAnalyzerRuleSeverity]>>;
@@ -107,12 +130,14 @@ export function litDiagnosticRuleSeverity(config: LitAnalyzerConfig, ruleName: L
 	}
 }
 
+export type LitAnalyzerLogging = "off" | "verbose";
+
 export interface LitAnalyzerConfig {
 	strict: boolean;
 	rules: LitAnalyzerRules;
 
 	disable: boolean;
-	verbose: boolean;
+	logging: LitAnalyzerLogging;
 	cwd: string;
 	format: { disable: boolean };
 
@@ -138,7 +163,7 @@ export function makeConfig(userOptions: Partial<LitAnalyzerConfig> = {}): LitAna
 		rules: makeRules(userOptions),
 
 		disable: userOptions.disable || false,
-		verbose: userOptions.verbose || false,
+		logging: userOptions.logging || "off",
 		cwd: userOptions.cwd || process.cwd(),
 		format: {
 			disable: userOptions.format != null ? userOptions.format.disable : undefined || false // always disable formating for now

@@ -6,7 +6,7 @@ import { inspect } from "util";
 const LOG_FILE_NAME = "lit-plugin.log";
 
 export enum LoggingLevel {
-	NONE = 0,
+	OFF = 0,
 	ERROR = 1,
 	WARN = 2,
 	DEBUG = 3,
@@ -18,7 +18,7 @@ export enum LoggingLevel {
  * It logs to a file called "log.txt" in the root of this project.
  */
 export class Logger {
-	level = LoggingLevel.NONE;
+	level = LoggingLevel.OFF;
 	private logPath = join(process.cwd(), LOG_FILE_NAME);
 
 	set cwd(cwd: string) {
@@ -29,7 +29,7 @@ export class Logger {
 	 * Resets the log file.
 	 */
 	resetLogs() {
-		if (this.level > LoggingLevel.NONE) {
+		if (this.level > LoggingLevel.OFF) {
 			writeFileSync(this.logPath, "");
 		}
 	}
@@ -96,16 +96,20 @@ export class Logger {
 	}
 
 	private getLogLevelPrefix(level: LoggingLevel) {
+		return `[${new Date().toISOString()} ${this.getLogLevelSeverityPrefix(level)}] `;
+	}
+
+	private getLogLevelSeverityPrefix(level: LoggingLevel) {
 		switch (level) {
 			case LoggingLevel.VERBOSE:
-				return "\x1b[36m VERBOSE: \x1b[0m"; // CYAN
+				return "\x1b[36m VERBOSE \x1b[0m"; // CYAN
 			case LoggingLevel.DEBUG:
-				return "\x1b[35m DEBUG: \x1b[0m"; // PURPLE
+				return "\x1b[35m DEBUG \x1b[0m"; // PURPLE
 			case LoggingLevel.WARN:
-				return "\x1b[33m WARN: \x1b[0m"; // YELLOW
+				return "\x1b[33m WARN \x1b[0m"; // YELLOW
 			case LoggingLevel.ERROR:
-				return "\x1b[31m ERROR: \x1b[0m"; // RED
-			case LoggingLevel.NONE:
+				return "\x1b[31m ERROR \x1b[0m"; // RED
+			case LoggingLevel.OFF:
 				return "";
 		}
 	}

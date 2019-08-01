@@ -86,9 +86,9 @@
 						"description": "Completely disable this plugin.",
 						"default": false
 					},
-					"lit-plugin.format.disable": {
+					"lit-plugin.strict": {
 						"type": "boolean",
-						"description": "Disable formatting the HTML on code reformat.",
+						"description": "Enable strict mode.",
 						"default": false
 					},
 					"lit-plugin.htmlTemplateTags": {
@@ -114,44 +114,9 @@
 							"css"
 						]
 					},
-					"lit-plugin.checkUnknownEvents": {
-						"type": "boolean",
-						"description": "Check and report usage of unknown events.",
-						"default": false
-					},
-					"lit-plugin.skipSuggestions": {
+					"lit-plugin.dontShowSuggestions": {
 						"type": "boolean",
 						"description": "Don't append messages suggesting how to fix diagnostics.",
-						"default": false
-					},
-					"lit-plugin.skipUnknownTags": {
-						"type": "boolean",
-						"description": "Skip reporting unknown html tags.",
-						"default": false
-					},
-					"lit-plugin.skipUnknownAttributes": {
-						"type": "boolean",
-						"description": "Skip reporting unknown html attributes.",
-						"default": false
-					},
-					"lit-plugin.skipUnknownProperties": {
-						"type": "boolean",
-						"description": "Skip reporting unknown properties.",
-						"default": false
-					},
-					"lit-plugin.skipUnknownSlots": {
-						"type": "boolean",
-						"description": "Skip reporting unknown slots.",
-						"default": false
-					},
-					"lit-plugin.skipTypeChecking": {
-						"type": "boolean",
-						"description": "Skip type checking of attributes.",
-						"default": false
-					},
-					"lit-plugin.skipMissingImports": {
-						"type": "boolean",
-						"description": "Skip reporting missing imports of custom elements.",
 						"default": false
 					},
 					"lit-plugin.globalTags": {
@@ -177,6 +142,235 @@
 							"type": "string",
 							"description": "Event name."
 						}
+					},
+					"lit-plugin.logging": {
+						"type": "string",
+						"description": "Log to a file called 'lit-plugin.log' which will be created in the root of the project.",
+						"default": "off",
+						"enum": [
+							"off",
+							"verbose"
+						]
+					},
+					"lit-plugin.rules.no-unknown-tag-name": {
+						"type": "string",
+						"description": "Check the existence of tag names.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-missing-import": {
+						"type": "string",
+						"description": "Check that custom elements used are imported.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-unclosed-tag": {
+						"type": "string",
+						"description": "Check that all tags are properly closed.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-unknown-attribute": {
+						"type": "string",
+						"description": "Check the existence of attribute names.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-unknown-property": {
+						"type": "string",
+						"description": "Check the existence of property names.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-unknown-event": {
+						"type": "string",
+						"description": "Check the existence of event names.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-unknown-slot": {
+						"type": "string",
+						"description": "Check the existence of slot names (requires '@slot' jsdoc on custom element declarations).",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-invalid-boolean-binding": {
+						"type": "string",
+						"description": "Disallow boolean attribute bindings on non-boolean types.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-expressionless-property-binding": {
+						"type": "string",
+						"description": "Disallow property bindings without an expression.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-noncallable-event-binding": {
+						"type": "string",
+						"description": "Disallow event listener bindings with a noncallable type.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-boolean-in-attribute-binding": {
+						"type": "string",
+						"description": "Disallow attribute bindings with a boolean type.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-complex-attribute-binding": {
+						"type": "string",
+						"description": "Disallow attribute bindings with a complex type.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-nullable-attribute-binding": {
+						"type": "string",
+						"description": "Disallow attribute bindings with nullable types such as \"null\" or \"undefined\".",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-incompatible-type-binding": {
+						"type": "string",
+						"description": "Disallow incompatible type in bindings.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-invalid-directive-binding": {
+						"type": "string",
+						"description": "Disallow using built-in directives in unsupported bindings.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-incompatible-property-type": {
+						"type": "string",
+						"description": "Check the 'type' key of the @property decorator against the actual property type.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-unknown-property-converter": {
+						"type": "string",
+						"description": "Check that the converter of @property decorators exists.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-invalid-attribute-name": {
+						"type": "string",
+						"description": "Check the validity of the attribute names.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-invalid-tag-name": {
+						"type": "string",
+						"description": "Check the validity of the tag name when defining custom elements.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-invalid-css": {
+						"type": "string",
+						"description": "Check CSS within the css tagged template literal.",
+						"default": "undetermined",
+						"enum": [
+							"undetermined",
+							"off",
+							"warning",
+							"error"
+						]
 					},
 					"lit-plugin.customHtmlData": {
 						"version": 1,
@@ -397,15 +591,6 @@
 								}
 							}
 						}
-					},
-					"lit-plugin.logging": {
-						"type": "string",
-						"description": "Log to a file.",
-						"default": "none",
-						"enum": [
-							"none",
-							"verbose"
-						]
 					}
 				}
 			}
