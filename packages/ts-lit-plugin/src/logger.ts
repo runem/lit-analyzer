@@ -96,7 +96,7 @@ export class Logger {
 	}
 
 	private getLogLevelPrefix(level: LoggingLevel) {
-		return `[${new Date().toISOString()} ${this.getLogLevelSeverityPrefix(level)}] `;
+		return `[${new Date().toLocaleString()}] ${this.getLogLevelSeverityPrefix(level)}] `;
 	}
 
 	private getLogLevelSeverityPrefix(level: LoggingLevel) {

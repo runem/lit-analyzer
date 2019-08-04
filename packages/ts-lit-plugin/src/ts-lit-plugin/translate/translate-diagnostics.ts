@@ -1,6 +1,5 @@
 import { LitAnalyzerContext, LitDiagnostic } from "lit-analyzer";
 import { DiagnosticMessageChain, DiagnosticWithLocation, SourceFile } from "typescript";
-import { DIAGNOSTIC_SOURCE } from "../../constants";
 import { translateRange } from "./translate-range";
 
 export function translateDiagnostics(reports: LitDiagnostic[], file: SourceFile, context: LitAnalyzerContext): DiagnosticWithLocation[] {
@@ -32,6 +31,6 @@ function translateDiagnostic(report: LitDiagnostic, file: SourceFile, context: L
 		messageText,
 		category,
 		code,
-		source: `${DIAGNOSTIC_SOURCE}.rules.${report.source || "unknown"}`
+		source: report.source == null ? undefined : `lit-plugin.rules.${report.source}`
 	};
 }

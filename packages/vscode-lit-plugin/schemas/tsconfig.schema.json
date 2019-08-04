@@ -24,14 +24,10 @@
 									"description": "Completely disable this plugin.",
 									"default": false
 								},
-								"format": {
-									"properties": {
-										"disable": {
-											"type": "boolean",
-											"description": "Disable formatting the HTML on code reformat.",
-											"default": false
-										}
-									}
+								"strict": {
+									"type": "boolean",
+									"description": "Enable strict mode.",
+									"default": false
 								},
 								"htmlTemplateTags": {
 									"type": "array",
@@ -51,44 +47,9 @@
 									},
 									"default": ["css"]
 								},
-								"checkUnknownEvents": {
-									"type": "boolean",
-									"description": "Check and report usage of unknown events.",
-									"default": false
-								},
-								"skipSuggestions": {
+								"dontShowSuggestions": {
 									"type": "boolean",
 									"description": "Don't append messages suggesting how to fix diagnostics.",
-									"default": false
-								},
-								"skipUnknownTags": {
-									"type": "boolean",
-									"description": "Skip reporting unknown html tags.",
-									"default": false
-								},
-								"skipUnknownAttributes": {
-									"type": "boolean",
-									"description": "Skip reporting unknown html attributes.",
-									"default": false
-								},
-								"skipUnknownProperties": {
-									"type": "boolean",
-									"description": "Skip reporting unknown properties.",
-									"default": false
-								},
-								"skipUnknownSlots": {
-									"type": "boolean",
-									"description": "Skip reporting unknown slots.",
-									"default": false
-								},
-								"skipTypeChecking": {
-									"type": "boolean",
-									"description": "Skip type checking of attributes.",
-									"default": false
-								},
-								"skipMissingImports": {
-									"type": "boolean",
-									"description": "Skip reporting missing imports of custom elements.",
 									"default": false
 								},
 								"globalTags": {
@@ -113,6 +74,139 @@
 									"items": {
 										"type": "string",
 										"description": "Event name."
+									}
+								},
+								"logging": {
+									"type": "string",
+									"description": "Log to a file called 'lit-plugin.log' which will be created in the root of the project.",
+									"default": "off",
+									"enum": ["off", "verbose"]
+								},
+								"rules": {
+									"title": "Rules",
+									"description": "Rules for lit-plugin are enabled/disabled in this object.",
+									"type": "object",
+									"properties": {
+										"no-unknown-tag-name": {
+											"type": "string",
+											"description": "Check the existence of tag names.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-missing-import": {
+											"type": "string",
+											"description": "Check that custom elements used are imported.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-unclosed-tag": {
+											"type": "string",
+											"description": "Check that all tags are properly closed.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-unknown-attribute": {
+											"type": "string",
+											"description": "Check the existence of attribute names.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-unknown-property": {
+											"type": "string",
+											"description": "Check the existence of property names.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-unknown-event": {
+											"type": "string",
+											"description": "Check the existence of event names.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-unknown-slot": {
+											"type": "string",
+											"description": "Check the existence of slot names (requires '@slot' jsdoc on custom element declarations).",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-invalid-boolean-binding": {
+											"type": "string",
+											"description": "Disallow boolean attribute bindings on non-boolean types.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-expressionless-property-binding": {
+											"type": "string",
+											"description": "Disallow property bindings without an expression.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-noncallable-event-binding": {
+											"type": "string",
+											"description": "Disallow event listener bindings with a noncallable type.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-boolean-in-attribute-binding": {
+											"type": "string",
+											"description": "Disallow attribute bindings with a boolean type.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-complex-attribute-binding": {
+											"type": "string",
+											"description": "Disallow attribute bindings with a complex type.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-nullable-attribute-binding": {
+											"type": "string",
+											"description": "Disallow attribute bindings with nullable types such as \"null\" or \"undefined\".",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-incompatible-type-binding": {
+											"type": "string",
+											"description": "Disallow incompatible type in bindings.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-invalid-directive-binding": {
+											"type": "string",
+											"description": "Disallow using built-in directives in unsupported bindings.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-incompatible-property-type": {
+											"type": "string",
+											"description": "Check the 'type' key of the @property decorator against the actual property type.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-unknown-property-converter": {
+											"type": "string",
+											"description": "Check that the converter of @property decorators exists.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-invalid-attribute-name": {
+											"type": "string",
+											"description": "Check the validity of the attribute names.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-invalid-tag-name": {
+											"type": "string",
+											"description": "Check the validity of the tag name when defining custom elements.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										},
+										"no-invalid-css": {
+											"type": "string",
+											"description": "Check CSS within the css tagged template literal.",
+											"default": "undetermined",
+											"enum": ["undetermined", "off", "warning", "error"]
+										}
 									}
 								},
 								"customHtmlData": {
