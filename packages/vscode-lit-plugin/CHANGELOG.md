@@ -3,16 +3,26 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
-and this project adheres to [Semantic Versioning](http://semver.org/).
 
-<!--
-   PRs should document their user-visible changes (if any) in the
-   Unreleased section, uncommenting the header as necessary.
--->
 <!-- ### Added -->
 <!-- ### Changed -->
 <!-- ### Removed -->
 <!-- ### Fixed -->
+
+## [1.1.4] - 2019-08-05
+
+### Added
+- Some rules are disabled as default give users a smoother on boarding experience. To re-enable the stricter rules please set "strict: true". Consult the documentation for more information.
+- Functionality has been refactored into "rules" which can be enabled and disabled individually. It show not be much more clear how to enabled or disable individual functionality. Consult the documentation for more information.
+
+- Warning when using boolean type expression in attribute binding ([#15](https://github.com/runem/ts-lit-plugin/issues/15))
+- Allow "null" and "undefined" as values always when using "?" attr binding ([#16](https://github.com/runem/ts-lit-plugin/issues/16))
+- Suggested code fix: Please use the `ifDefined` directive. ([#17](https://github.com/runem/ts-lit-plugin/issues/17))
+- The usage of built-in directives is now checked to make sure that they are used correctly.
+- Experimental: It's now possible to refactor custom element tag names.
+
+- The analyzer has been updated and should now be much more robust (see [web-component-analyzer](https://github.com/runem/web-component-analyzer)).
+- The type checker has been updated and should now be much more robust (see [ts-simple-type](https://github.com/runem/ts-simple-type)).
 
 ## [1.0.0] - 2019-04-01
 
