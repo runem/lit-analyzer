@@ -44,6 +44,8 @@ function init({ typescript }: { typescript: typeof ts }): tsServer.server.Plugin
 
 				context.updateConfig(makeConfig(info.config));
 
+				logger.verbose("Starting ts-lit-plugin...");
+
 				const plugin = new TsLitPlugin(info.languageService, context);
 
 				const decoratedService = decorateLanguageService(info.languageService, plugin);

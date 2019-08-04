@@ -78,11 +78,14 @@ function wrapLog<T extends Function>(name: string, proxy: T): T {
 		const startTime = Date.now();
 		logger.verbose(`[${name}] Called`);
 		const result = proxy(...args);
-		const time = Date.now() - startTime;
+		const time = Math.round(Date.now() - startTime);
 		logger.verbose(
-			`[${name}] Finished (${Math.round(time)}ms): Result: `,
+			`[${name}] Finished (${time}ms): Result: `,
 			result == null ? "undefined" : Array.isArray(result) ? `Array: ${result.length} length` : "defined"
 		);
+		if (time > 100) {
+			logger.warn(`[${name}] took long time to complete! (${time}ms)`);
+		}
 		return result;
 		/*/
 		return proxy(...args);

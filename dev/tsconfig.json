@@ -4,8 +4,7 @@
 			{
 				"name": "ts-lit-plugin",
 				"logging": "verbose",
-				"skipUnknownTags": false,
-				"checkUnknownEvents": true,
+				"strict": true,
 				"globalTags": ["my-external-tag"],
 				"globalAttributes": ["my-attribute"],
 				"globalEvents": ["my-event"],
@@ -49,6 +48,7 @@
 		"allowJs": true,
 		"lib": ["esnext", "dom"],
 		"strict": true,
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"noEmit": true
 	}
 }
