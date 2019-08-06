@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { LitAnalyzerConfig, makeConfig, VERSION } from "lit-analyzer";
-import { VERSION as WCA_VERSION } from "web-component-analyzer";
 import * as ts from "typescript";
 import * as tsServer from "typescript/lib/tsserverlibrary";
+import { VERSION as WCA_VERSION } from "web-component-analyzer";
 import { decorateLanguageService } from "./decorate-language-service";
-import { logger } from "./logger";
+import { logger, LoggingLevel } from "./logger";
 import { LitPluginContext } from "./ts-lit-plugin/lit-plugin-context";
 import { TsLitPlugin } from "./ts-lit-plugin/ts-lit-plugin";
 import { setTypescriptModule } from "./ts-module";
@@ -20,6 +20,21 @@ let context: LitPluginContext | undefined = undefined;
 function init({ typescript }: { typescript: typeof ts }): tsServer.server.PluginModule {
 	// Cache the typescript module
 	setTypescriptModule(typescript);
+
+	/**
+	 * This function is used to print debug info once
+	 * Yes, it's a self destructing function!
+	 */
+	let printDebugOnce: Function | undefined = () => {
+		if (logger.level >= LoggingLevel.DEBUG) {
+			logger.debug(`Lit Analyzer: ${VERSION}`);
+			logger.debug(`Web Component Analyzer: ${WCA_VERSION}`);
+			logger.debug(`Installed Typescript: ${ts.version}`);
+			logger.debug(`Running Typescript: ${typescript.version}`);
+			logger.debug(`DIRNAME: ${__dirname}`);
+			printDebugOnce = undefined;
+		}
+	};
 
 	return {
 		create: (info: tsServer.server.PluginCreateInfo) => {
@@ -46,10 +61,7 @@ function init({ typescript }: { typescript: typeof ts }): tsServer.server.Plugin
 				context.updateConfig(makeConfig(info.config));
 
 				logger.verbose("Starting ts-lit-plugin...");
-				logger.debug(`Lit Analyzer: ${VERSION}`);
-				logger.debug(`Web Component Analyzer: ${WCA_VERSION}`);
-				logger.debug(`Installed Typescript: ${ts.version}`);
-				logger.debug(`Running Typescript: ${typescript.version}`);
+				if (printDebugOnce != null) printDebugOnce();
 
 				const plugin = new TsLitPlugin(info.languageService, context);
 
@@ -69,6 +81,7 @@ function init({ typescript }: { typescript: typeof ts }): tsServer.server.Plugin
 		onConfigurationChanged(config: Partial<LitAnalyzerConfig>) {
 			if (context == null || config == null) return;
 			context.updateConfig(makeConfig(config));
+			if (printDebugOnce != null) printDebugOnce();
 		}
 	};
 }

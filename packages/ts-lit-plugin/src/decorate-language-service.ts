@@ -36,14 +36,12 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 		}
 	}
 
-	// Wrap all method called to the service in tryCatch and logging.
-	if (plugin.context.config.logging === "verbose") {
-		for (const methodName of Object.getOwnPropertyNames(nextLanguageService)) {
-			const isDecorated = (nextLanguageService as any)[methodName] != null;
-			if (isDecorated) {
-				const method = (nextLanguageService as any)[methodName];
-				(nextLanguageService as any)[methodName] = wrapLog(methodName, method);
-			}
+	// Wrap all method called to the service in logging and performance measuring
+	for (const methodName of Object.getOwnPropertyNames(nextLanguageService)) {
+		const isDecorated = (nextLanguageService as any)[methodName] != null;
+		if (isDecorated) {
+			const method = (nextLanguageService as any)[methodName];
+			(nextLanguageService as any)[methodName] = wrapLog(methodName, method, plugin);
 		}
 	}
 	return nextLanguageService;
@@ -74,24 +72,26 @@ function wrapTryCatch<T extends Function>(newMethod: T, oldMethod: T, methodName
  * Wraps a function so that it is logged every time the function called.
  * @param name
  * @param proxy
+ * @param plugin
  */
-function wrapLog<T extends Function>(name: string, proxy: T): T {
+function wrapLog<T extends Function>(name: string, proxy: T, plugin: TsLitPlugin): T {
 	return (((...args: unknown[]) => {
-		/**/
-		const startTime = Date.now();
-		logger.verbose(`[${name}] Called`);
-		const result = proxy(...args);
-		const time = Math.round(Date.now() - startTime);
-		logger.verbose(
-			`[${name}] Finished (${time}ms): Result: `,
-			result == null ? "undefined" : Array.isArray(result) ? `Array: ${result.length} length` : "defined"
-		);
-		if (time > 100) {
-			logger.warn(`[${name}] took long time to complete! (${time}ms)`);
+		if (plugin.context.config.logging === "verbose") {
+			/**/
+			const startTime = Date.now();
+			logger.verbose(`[${name}] Called`);
+			const result = proxy(...args);
+			const time = Math.round(Date.now() - startTime);
+			logger.verbose(
+				`[${name}] Finished (${time}ms): Result: `,
+				result == null ? "undefined" : Array.isArray(result) ? `Array: ${result.length} length` : "defined"
+			);
+			if (time > 100) {
+				logger.warn(`[${name}] took long time to complete! (${time}ms)`);
+			}
+			return result;
+		} else {
+			return proxy(...args);
 		}
-		return result;
-		/*/
-		return proxy(...args);
-		/**/
 	}) as unknown) as T;
 }

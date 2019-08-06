@@ -5,7 +5,7 @@ export class LitPluginContext extends DefaultLitAnalyzerContext {
 	logger = logger;
 
 	public updateConfig(config: LitAnalyzerConfig) {
-		const hasChangedLogging = this.config.logging !== config.logging || this.config.cwd !== config.cwd;
+		const hasChangedLogging = config.logging !== "off" && (this.config.logging !== config.logging || this.config.cwd !== config.cwd);
 
 		// Setup logging
 		this.logger.cwd = config.cwd;
@@ -20,11 +20,11 @@ export class LitPluginContext extends DefaultLitAnalyzerContext {
 			}
 		})();
 
+		super.updateConfig(config);
+
 		if (hasChangedLogging) {
 			this.logger.resetLogs();
 		}
-
-		super.updateConfig(config);
 
 		logger.debug("Updating the config", config);
 	}

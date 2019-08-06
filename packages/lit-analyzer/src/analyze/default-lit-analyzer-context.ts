@@ -71,7 +71,7 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 	}
 
 	private findInvalidatedComponents() {
-		const seenFiles = new WeakSet<SourceFile>();
+		const seenFiles = new Set<SourceFile>();
 		const invalidatedFiles = new Set<SourceFile>();
 
 		// Find components in all changed files
@@ -90,9 +90,12 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 
 		for (const sourceFile of invalidatedFiles) {
 			if (!seenFiles.has(sourceFile)) {
+				seenFiles.add(sourceFile);
 				this.findComponentsInFile(sourceFile);
 			}
 		}
+
+		this.logger.verbose(`Analyzed ${seenFiles.size} files (${invalidatedFiles.size} invalidated)`);
 	}
 
 	private findComponentsInFile(sourceFile: SourceFile) {
