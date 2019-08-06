@@ -12,9 +12,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 ## [1.1.4] - 2019-08-05
 
 ### Added
-- Some rules are disabled as default give users a smoother on boarding experience. To re-enable the stricter rules please set "strict: true". Consult the documentation for more information.
-- Functionality has been refactored into "rules" which can be enabled and disabled individually. It show not be much more clear how to enabled or disable individual functionality. Consult the documentation for more information.
+- Some rules are disabled as default to give users a smoother on-boarding experience. To re-enable the stricter rules please set "strict: true". Consult the documentation for more information.
+- Functionality has been refactored into "rules" which can be enabled and disabled individually. It should now be much clearer how to enabled or disable individual functionality. Consult the documentation for more information.
 
+- When using the @property decorator from "lit-element" the type of "{type: ...}" is checked against the actual property type.
+- Support for using components built with mixins
 - Warning when using boolean type expression in attribute binding ([#15](https://github.com/runem/ts-lit-plugin/issues/15))
 - Allow "null" and "undefined" as values always when using "?" attr binding ([#16](https://github.com/runem/ts-lit-plugin/issues/16))
 - Suggested code fix: Please use the `ifDefined` directive. ([#17](https://github.com/runem/ts-lit-plugin/issues/17))
