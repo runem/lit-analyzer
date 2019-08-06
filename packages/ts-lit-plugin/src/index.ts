@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { LitAnalyzerConfig, makeConfig } from "lit-analyzer";
+import { LitAnalyzerConfig, makeConfig, VERSION } from "lit-analyzer";
+import { VERSION as WCA_VERSION } from "web-component-analyzer";
 import * as ts from "typescript";
 import * as tsServer from "typescript/lib/tsserverlibrary";
 import { decorateLanguageService } from "./decorate-language-service";
@@ -45,6 +46,10 @@ function init({ typescript }: { typescript: typeof ts }): tsServer.server.Plugin
 				context.updateConfig(makeConfig(info.config));
 
 				logger.verbose("Starting ts-lit-plugin...");
+				logger.debug(`Lit Analyzer: ${VERSION}`);
+				logger.debug(`Web Component Analyzer: ${WCA_VERSION}`);
+				logger.debug(`Installed Typescript: ${ts.version}`);
+				logger.debug(`Running Typescript: ${typescript.version}`);
 
 				const plugin = new TsLitPlugin(info.languageService, context);
 

@@ -31,6 +31,6 @@ function translateDiagnostic(report: LitDiagnostic, file: SourceFile, context: L
 		messageText,
 		category,
 		code,
-		source: report.source == null ? undefined : `lit-plugin.rules.${report.source}`
+		source: report.source == null ? undefined : report.source
 	};
 }

@@ -39,8 +39,11 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 	// Wrap all method called to the service in tryCatch and logging.
 	if (plugin.context.config.logging === "verbose") {
 		for (const methodName of Object.getOwnPropertyNames(nextLanguageService)) {
-			const method = (nextLanguageService as any)[methodName];
-			(nextLanguageService as any)[methodName] = wrapLog(methodName, method);
+			const isDecorated = (nextLanguageService as any)[methodName] != null;
+			if (isDecorated) {
+				const method = (nextLanguageService as any)[methodName];
+				(nextLanguageService as any)[methodName] = wrapLog(methodName, method);
+			}
 		}
 	}
 	return nextLanguageService;

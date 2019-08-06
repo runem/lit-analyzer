@@ -104,9 +104,9 @@ export class Logger {
 			case LoggingLevel.VERBOSE:
 				return "\x1b[36m VERBOSE \x1b[0m"; // CYAN
 			case LoggingLevel.DEBUG:
-				return "\x1b[35m DEBUG \x1b[0m"; // PURPLE
+				return "\x1b[33m DEBUG \x1b[0m"; // YELLOW
 			case LoggingLevel.WARN:
-				return "\x1b[33m WARN \x1b[0m"; // YELLOW
+				return "\x1b[35m WARN \x1b[0m"; // PURPLE
 			case LoggingLevel.ERROR:
 				return "\x1b[31m ERROR \x1b[0m"; // RED
 			case LoggingLevel.OFF:

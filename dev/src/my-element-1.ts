@@ -8,6 +8,10 @@ export class MyElement extends LitElement {
 			<my-tsconfig-element size="large"></my-tsconfig-element>
 			<unknown-element @heheheh="${() => {}}" globalattribute></unknown-element>
 			<heheheh></heheheh>
+			<my-element2>
+				<div slot=""></div>
+				<div slot="right"></div>
+			</my-element2>
 			<input @hehehehe="${() => {}}" />
 			<my-element></my-element>
 			<my-element></my-element>

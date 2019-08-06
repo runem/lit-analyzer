@@ -1,4 +1,5 @@
 export * from "./analyze/lit-analyzer";
+export * from "./analyze/constants";
 export * from "./analyze/lit-analyzer-config";
 export * from "./analyze/lit-analyzer-context";
 export * from "./analyze/lit-analyzer-logger";

@@ -15,3 +15,5 @@ export const LIT_HTML_ATTRIBUTE_MODIFIERS: LitHtmlAttributeModifier[] = [
 export const DIAGNOSTIC_SOURCE = "lit-plugin";
 
 export const TS_IGNORE_FLAG = "@ts-ignore";
+
+export const VERSION = "<@VERSION@>";
