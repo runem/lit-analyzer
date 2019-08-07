@@ -13,6 +13,12 @@ export class LitPluginContext extends DefaultLitAnalyzerContext {
 			switch (config.logging) {
 				case "off":
 					return LoggingLevel.OFF;
+				case "error":
+					return LoggingLevel.ERROR;
+				case "warn":
+					return LoggingLevel.WARN;
+				case "debug":
+					return LoggingLevel.DEBUG;
 				case "verbose":
 					return LoggingLevel.VERBOSE;
 				default:

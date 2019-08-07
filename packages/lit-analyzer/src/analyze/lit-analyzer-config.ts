@@ -130,7 +130,7 @@ export function litDiagnosticRuleSeverity(config: LitAnalyzerConfig, ruleName: L
 	}
 }
 
-export type LitAnalyzerLogging = "off" | "verbose";
+export type LitAnalyzerLogging = "off" | "error" | "warn" | "debug" | "verbose";
 
 export interface LitAnalyzerConfig {
 	strict: boolean;
