@@ -90,122 +90,102 @@
 										"no-unknown-tag-name": {
 											"type": "string",
 											"description": "Check the existence of tag names.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-missing-import": {
 											"type": "string",
 											"description": "Check that custom elements used are imported.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-unclosed-tag": {
 											"type": "string",
 											"description": "Check that all tags are properly closed.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-unknown-attribute": {
 											"type": "string",
 											"description": "Check the existence of attribute names.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-unknown-property": {
 											"type": "string",
 											"description": "Check the existence of property names.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-unknown-event": {
 											"type": "string",
 											"description": "Check the existence of event names.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-unknown-slot": {
 											"type": "string",
 											"description": "Check the existence of slot names (requires '@slot' jsdoc on custom element declarations).",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-invalid-boolean-binding": {
 											"type": "string",
 											"description": "Disallow boolean attribute bindings on non-boolean types.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-expressionless-property-binding": {
 											"type": "string",
 											"description": "Disallow property bindings without an expression.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-noncallable-event-binding": {
 											"type": "string",
 											"description": "Disallow event listener bindings with a noncallable type.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-boolean-in-attribute-binding": {
 											"type": "string",
 											"description": "Disallow attribute bindings with a boolean type.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-complex-attribute-binding": {
 											"type": "string",
 											"description": "Disallow attribute bindings with a complex type.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-nullable-attribute-binding": {
 											"type": "string",
 											"description": "Disallow attribute bindings with nullable types such as \"null\" or \"undefined\".",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-incompatible-type-binding": {
 											"type": "string",
 											"description": "Disallow incompatible type in bindings.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-invalid-directive-binding": {
 											"type": "string",
 											"description": "Disallow using built-in directives in unsupported bindings.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-incompatible-property-type": {
 											"type": "string",
 											"description": "Check the 'type' key of the @property decorator against the actual property type.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-unknown-property-converter": {
 											"type": "string",
 											"description": "Check that the converter of @property decorators exists.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-invalid-attribute-name": {
 											"type": "string",
 											"description": "Check the validity of the attribute names.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-invalid-tag-name": {
 											"type": "string",
 											"description": "Check the validity of the tag name when defining custom elements.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										},
 										"no-invalid-css": {
 											"type": "string",
 											"description": "Check CSS within the css tagged template literal.",
-											"default": "undetermined",
-											"enum": ["undetermined", "off", "warning", "error"]
+											"enum": ["off", "warning", "error"]
 										}
 									}
 								},
