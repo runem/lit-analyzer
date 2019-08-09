@@ -1,6 +1,9 @@
 import { ALL_RULE_NAMES, LitAnalyzerConfig } from "lit-analyzer";
 import { join } from "path";
+import { ColorProvider } from "./color-provider";
 import * as vscode from "vscode";
+
+const colorProvider = new ColorProvider();
 
 const tsLitPluginId = "ts-lit-plugin";
 const typeScriptExtensionId = "vscode.typescript-language-features";
@@ -39,6 +42,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// Subscribe to the analyze command
 	context.subscriptions.push(vscode.commands.registerCommand(analyzeCommandId, handleAnalyzeCommand));
+
+	// Register a color provider
+	const registration = vscode.languages.registerColorProvider(
+		[{ scheme: "file", language: "typescript" }, { scheme: "file", language: "javascript" }],
+		colorProvider
+	);
+	context.subscriptions.push(registration);
 
 	synchronizeConfig(api);
 }
