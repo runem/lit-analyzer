@@ -64,8 +64,8 @@ function getAssignmentLocation(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, htmlAttr
 
 	const htmlAfterName = context.html.substring(nameEndOffset, htmlAttrLocation.endOffset);
 
-	const firstQuote = htmlAfterName.indexOf('"');
-	const lastQuote = htmlAfterName.lastIndexOf('"');
+	const firstQuote = indexOfRegExp(htmlAfterName, /['"]/);
+	const lastQuote = indexOfRegExp(htmlAfterName, /['"]$/);
 	const firstEquals = htmlAfterName.indexOf("=");
 
 	// Example: attr
@@ -88,4 +88,15 @@ function getAssignmentLocation(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, htmlAttr
 	}
 
 	return undefined;
+}
+
+/**
+ * Returns the index of a regex match.
+ * Returns -1 when no match is found.
+ * @param text
+ * @param reg
+ */
+function indexOfRegExp(text: string, reg: RegExp): number {
+	const match = text.match(reg);
+	return match == null || match.index == null ? -1 : match.index;
 }
