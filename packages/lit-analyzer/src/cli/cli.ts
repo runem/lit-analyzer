@@ -27,6 +27,10 @@ export async function cli() {
 
 	const config: LitAnalyzerCliConfig = { ...DEFAULT_CONFIG, ...rest };
 
+	if (config.debug) {
+		console.log("CLI Config", config);
+	}
+
 	// Always convert "rules" to "dash case" because "rules" expects it.
 	config.rules = Object.entries(config.rules || {}).reduce(
 		(acc, [k, v]) => {

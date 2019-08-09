@@ -6,7 +6,7 @@ import { getBuiltInHtmlCollection } from "./data/get-built-in-html-collection";
 import { getUserConfigHtmlCollection } from "./data/get-user-config-html-collection";
 import { isRuleDisabled, LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config";
 import { LitAnalyzerContext, LitPluginContextHandler } from "./lit-analyzer-context";
-import { DefaultLitAnalyzerLogger } from "./lit-analyzer-logger";
+import { DefaultLitAnalyzerLogger, LitAnalyzerLoggerLevel } from "./lit-analyzer-logger";
 import { convertAnalyzeResultToHtmlCollection, convertComponentDeclarationToHtmlTag } from "./parse/convert-component-definitions-to-html-collection";
 import { parseDependencies } from "./parse/parse-dependencies/parse-dependencies";
 import { DefaultAnalyzerDefinitionStore } from "./store/definition-store/default-analyzer-definition-store";
@@ -45,6 +45,23 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 
 	public updateConfig(config: LitAnalyzerConfig) {
 		this._config = config;
+
+		this.logger.level = (() => {
+			switch (config.logging) {
+				case "off":
+					return LitAnalyzerLoggerLevel.OFF;
+				case "error":
+					return LitAnalyzerLoggerLevel.ERROR;
+				case "warn":
+					return LitAnalyzerLoggerLevel.WARN;
+				case "debug":
+					return LitAnalyzerLoggerLevel.DEBUG;
+				case "verbose":
+					return LitAnalyzerLoggerLevel.VERBOSE;
+				default:
+					return LitAnalyzerLoggerLevel.OFF;
+			}
+		})();
 
 		// Add user configured HTML5 collection
 		const collection = getUserConfigHtmlCollection(config);

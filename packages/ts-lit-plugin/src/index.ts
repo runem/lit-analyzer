@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { LitAnalyzerConfig, makeConfig, VERSION } from "lit-analyzer";
+import { LitAnalyzerConfig, makeConfig, VERSION, LitAnalyzerLoggerLevel } from "lit-analyzer";
 import * as ts from "typescript";
 import * as tsServer from "typescript/lib/tsserverlibrary";
 import { VERSION as WCA_VERSION } from "web-component-analyzer";
 import { decorateLanguageService } from "./decorate-language-service";
-import { logger, LoggingLevel } from "./logger";
+import { logger } from "./logger";
 import { LitPluginContext } from "./ts-lit-plugin/lit-plugin-context";
 import { TsLitPlugin } from "./ts-lit-plugin/ts-lit-plugin";
 import { setTypescriptModule } from "./ts-module";
@@ -26,7 +26,7 @@ function init({ typescript }: { typescript: typeof ts }): tsServer.server.Plugin
 	 * Yes, it's a self destructing function!
 	 */
 	let printDebugOnce: Function | undefined = () => {
-		if (logger.level >= LoggingLevel.DEBUG) {
+		if (logger.level >= LitAnalyzerLoggerLevel.DEBUG) {
 			logger.debug(`Lit Analyzer: ${VERSION}`);
 			logger.debug(`Web Component Analyzer: ${WCA_VERSION}`);
 			logger.debug(`Installed Typescript: ${ts.version}`);

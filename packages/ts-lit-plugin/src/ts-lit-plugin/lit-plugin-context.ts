@@ -1,5 +1,5 @@
 import { DefaultLitAnalyzerContext, LitAnalyzerConfig } from "lit-analyzer";
-import { logger, LoggingLevel } from "../logger";
+import { logger } from "../logger";
 
 export class LitPluginContext extends DefaultLitAnalyzerContext {
 	logger = logger;
@@ -9,22 +9,6 @@ export class LitPluginContext extends DefaultLitAnalyzerContext {
 
 		// Setup logging
 		this.logger.cwd = config.cwd;
-		this.logger.level = (() => {
-			switch (config.logging) {
-				case "off":
-					return LoggingLevel.OFF;
-				case "error":
-					return LoggingLevel.ERROR;
-				case "warn":
-					return LoggingLevel.WARN;
-				case "debug":
-					return LoggingLevel.DEBUG;
-				case "verbose":
-					return LoggingLevel.VERBOSE;
-				default:
-					return LoggingLevel.OFF;
-			}
-		})();
 
 		super.updateConfig(config);
 

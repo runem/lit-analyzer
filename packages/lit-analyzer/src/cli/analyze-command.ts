@@ -3,7 +3,7 @@ import { appendFileSync, writeFileSync } from "fs";
 import { Program, SourceFile } from "typescript";
 import { DefaultLitAnalyzerContext } from "../analyze/default-lit-analyzer-context";
 import { LitAnalyzer } from "../analyze/lit-analyzer";
-import { makeConfig } from "../analyze/lit-analyzer-config";
+import { LitAnalyzerConfig, makeConfig } from "../analyze/lit-analyzer-config";
 import { analyzeGlobs } from "./analyze-globs";
 import { readTsLitPluginConfig } from "./compile";
 import { CodeDiagnosticFormatter } from "./format/code-diagnostic-formatter";
@@ -28,14 +28,33 @@ export async function analyzeCommand(globs: string[], config: LitAnalyzerCliConf
 		}
 	});
 
-	// Read config from tsconfig or create a default config
-	const newConfig = readTsLitPluginConfig() || makeConfig();
-	// Assign "strict" setting from the CLI command (which overwrites tsconfig rules)
-	newConfig.strict = config.strict == null ? newConfig.strict : config.strict;
+	// Read config from tsconfig
+	let newConfig = readTsLitPluginConfig();
+
+	// Create a default config
+	if (newConfig == null) {
+		const configSeed: Partial<LitAnalyzerConfig> = {};
+
+		// Assign "strict" setting from the CLI command (which overwrites tsconfig rules)
+		if (config.strict != null) {
+			configSeed.strict = config.strict;
+		}
+
+		// Assign "logging" based on "debug" option from the CLI command
+		configSeed.logging = config.debug ? "verbose" : "off";
+
+		// Make config based on the seed
+		newConfig = makeConfig(configSeed);
+	}
+
 	// Assign rules from the CLI command (which overwrites tsconfig rules)
 	Object.assign(newConfig.rules, config.rules);
+
 	// Set the config on the context
 	context.updateConfig(newConfig);
+
+	// Debug config
+	context.logger.verbose("Lit Analyzer Configuration", newConfig);
 
 	const analyzer = new LitAnalyzer(context);
 
