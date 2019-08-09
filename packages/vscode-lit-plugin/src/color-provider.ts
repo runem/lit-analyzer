@@ -1,69 +1,88 @@
 import * as vscode from "vscode";
 
-const COLOR_HEX_REGEX = /#(?:[0-9a-fA-F]{3}){1,2}/gi;
+/**
+ * Regex to match colors in a string
+ */
+const COLOR_HEX_REGEX = /#[0-9a-fA-F]+/gi;
 
+/**
+ * Regex to match sections in a text where a color should be highlighted
+ */
 const COLOR_SECTION_REGEX = /(css|html)`([\s\S]*?)`/gi;
 
-function RGBAToHex(red: number, green: number, blue: number, alpha: number): string {
-	let r = red.toString(16);
-	let g = green.toString(16);
-	let b = blue.toString(16);
-	let a = alpha.toString(16);
-
-	if (r.length === 1) {
-		r = "0" + r;
-	}
-	if (g.length === 1) {
-		g = "0" + g;
-	}
-	if (b.length === 1) {
-		b = "0" + b;
-	}
-	if (a.length === 1) {
-		a = "0" + a;
-	}
+/**
+ * Convert "rgba" to "hex"
+ * @param red
+ * @param green
+ * @param blue
+ * @param alpha
+ */
+function RGBAToHex({ red, green, blue, alpha }: { red: number; green: number; blue: number; alpha: number }): string {
+	let r = red.toString(16).padStart(2, "0");
+	let g = green.toString(16).padStart(2, "0");
+	let b = blue.toString(16).padStart(2, "0");
+	let a = alpha.toString(16).padStart(2, "0");
 
 	return `#${r}${g}${b}${a === "ff" ? "" : a}`;
 }
 
-function hexToRGBA(hex: string): { r: number; g: number; b: number; a: number } | undefined {
+/**
+ * Converts "hex" to "rgba"
+ * @param hex
+ */
+function hexToRGBA(hex: string): { red: number; green: number; blue: number; alpha: number } | undefined {
+	// Parses "#ffffff" and "#ffffffff"
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
-
 	if (result != null) {
 		return {
-			r: parseInt(result[1], 16),
-			g: parseInt(result[2], 16),
-			b: parseInt(result[3], 16),
-			a: result[4] == null ? 255 : parseInt(result[4], 16)
+			red: parseInt(result[1], 16),
+			green: parseInt(result[2], 16),
+			blue: parseInt(result[3], 16),
+			alpha: result[4] == null ? 255 : parseInt(result[4], 16)
 		};
 	}
 
-	const shorthandResult = /^#?([a-f\d])([a-f\d])([a-f\d])$/i.exec(hex);
+	// Parses "#fff" and "#ffff"
+	const shorthandResult = /^#?([a-f\d])([a-f\d])([a-f\d])([a-f\d])?$/i.exec(hex);
 	if (shorthandResult != null) {
 		return {
-			r: parseInt(shorthandResult[1] + shorthandResult[1], 16),
-			g: parseInt(shorthandResult[2] + shorthandResult[2], 16),
-			b: parseInt(shorthandResult[3] + shorthandResult[3], 16),
-			a: 255
+			red: parseInt(shorthandResult[1] + shorthandResult[1], 16),
+			green: parseInt(shorthandResult[2] + shorthandResult[2], 16),
+			blue: parseInt(shorthandResult[3] + shorthandResult[3], 16),
+			alpha: shorthandResult == null ? 255 : parseInt(shorthandResult[4] + shorthandResult[4], 16)
 		};
 	}
 
 	return undefined;
 }
 
+/**
+ * Converts a vscode color to a hex
+ * @param vscodeColor
+ */
 function vscodeColorToHex(vscodeColor: vscode.Color): string {
 	const { red, green, blue, alpha } = vscodeColor;
-	return RGBAToHex(Math.floor(red * 255), Math.floor(green * 255), Math.floor(blue * 255), Math.floor(alpha * 255));
-}
 
-function hexToVscodeColor(hex: string): vscode.Color | undefined {
-	const rgba = hexToRGBA(hex);
-	if (rgba == null) return undefined;
-	return new vscode.Color(rgba.r / 255, rgba.g / 255, rgba.b / 255, rgba.a / 255);
+	return RGBAToHex({
+		red: Math.floor(red * 255),
+		green: Math.floor(green * 255),
+		blue: Math.floor(blue * 255),
+		alpha: Math.floor(alpha * 255)
+	});
 }
 
 /**
- *
+ * Converts a hex to a vscode color
+ * @param hex
+ */
+function hexToVscodeColor(hex: string): vscode.Color | undefined {
+	const rgba = hexToRGBA(hex);
+	if (rgba == null) return undefined;
+	return new vscode.Color(rgba.red / 255, rgba.green / 255, rgba.blue / 255, rgba.alpha / 255);
+}
+
+/**
+ * Matches a regex on a text and returns all positions where a match was found
  * @param regex
  * @param text
  * @param callback
@@ -82,16 +101,22 @@ function getRegexMatches(regex: RegExp, text: string): { start: number; text: st
 	return matches;
 }
 
+/**
+ * Parses a document a returns color information where appropriate
+ * @param document
+ */
 function findColorsInDocument(document: vscode.TextDocument): vscode.ColorInformation[] {
 	const documentText = document.getText();
 
 	const colors: vscode.ColorInformation[] = [];
 
-	// Find all hex colors in the document
+	// Find all sections that can include colors
 	const taggedLiteralMatches = getRegexMatches(COLOR_SECTION_REGEX, documentText);
 	for (const { text: taggedTemplateText, start: taggedTemplateStart } of taggedLiteralMatches) {
+		// Find all colors in those sections
 		const colorMatches = getRegexMatches(COLOR_HEX_REGEX, taggedTemplateText);
 
+		// Add a color information based on each color found
 		for (const { text: hex, start: colorStart } of colorMatches) {
 			const color = hexToVscodeColor(hex);
 			if (color == null) continue;
@@ -104,22 +129,12 @@ function findColorsInDocument(document: vscode.TextDocument): vscode.ColorInform
 		}
 	}
 
-	// Find all built in colors in the document
-	/*while ((match = BUILT_IN_COLOR_REGEX.exec(text)) != null) {
-	 const start = match.index;
-	 const colorName = match[0].toLowerCase();
-	 const hex = BUILT_IN_COLOR_MAP.get(colorName);
-	 if (hex == null) continue;
-
-	 const color = hexToVscodeColor(hex);
-	 if (color == null) continue;
-
-	 colors.push(new vscode.ColorInformation(new vscode.Range(document.positionAt(start), document.positionAt(start + hex.length)), color));
-	 }*/
-
 	return colors;
 }
 
+/**
+ * Exports a color provider that makes it possible to highlight colors within "css" and "html" tagged templates.
+ */
 export class ColorProvider implements vscode.DocumentColorProvider {
 	provideDocumentColors(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.ColorInformation[]> {
 		return findColorsInDocument(document);

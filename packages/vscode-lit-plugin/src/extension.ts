@@ -3,8 +3,6 @@ import { join } from "path";
 import { ColorProvider } from "./color-provider";
 import * as vscode from "vscode";
 
-const colorProvider = new ColorProvider();
-
 const tsLitPluginId = "ts-lit-plugin";
 const typeScriptExtensionId = "vscode.typescript-language-features";
 const configurationSection = "lit-plugin";
@@ -12,6 +10,8 @@ const configurationExperimentalHtmlSection = "html.experimental";
 const analyzeCommandId = "lit-plugin.analyze";
 
 let defaultAnalyzeGlob = "src";
+
+const colorProvider = new ColorProvider();
 
 export async function activate(context: vscode.ExtensionContext) {
 	const extension = vscode.extensions.getExtension(typeScriptExtensionId);
