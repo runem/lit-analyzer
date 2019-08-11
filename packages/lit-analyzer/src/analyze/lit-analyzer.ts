@@ -1,7 +1,7 @@
 import { setTypescriptModule as setTypescriptModuleTsSimpleType } from "ts-simple-type";
 import { SourceFile } from "typescript";
 import { LitCssDocumentAnalyzer } from "./document-analyzer/css/lit-css-document-analyzer";
-import { LitHtmlDocumentAnalyzer } from "./document-analyzer/html/lit-html-document-analyzer";
+import { LitHtmlDocumentAnalyzer, LitIndexEntry } from "./document-analyzer/html/lit-html-document-analyzer";
 import { renameLocationsForTagName } from "./document-analyzer/html/rename-locations/rename-locations-for-tag-name";
 import { LitAnalyzerContext, LitAnalyzerRequest } from "./lit-analyzer-context";
 import { CssDocument } from "./parse/document/text-document/css-document/css-document";
@@ -72,6 +72,24 @@ export class LitAnalyzer {
 			return this.litHtmlDocumentAnalyzer.getDefinitionAtOffset(document, offset, request);
 		}
 		return;
+	}
+
+	/**
+	 * Yields entries that describe regions of code in the given file, and
+	 * what the analyzer knows about them.
+	 *
+	 * This is useful for generating a static index of analysis output. Two such
+	 * indexing systems are Kythe and the Language Server Index Format.
+	 */
+	*indexFile(file: SourceFile): IterableIterator<LitIndexEntry> {
+		this.context.updateComponents(file);
+		const documents = this.getDocumentsInFile(file);
+		for (const document of documents) {
+			if (document instanceof HtmlDocument) {
+				const request = this.makeRequest({ file, document });
+				yield* this.litHtmlDocumentAnalyzer.indexFile(document, request);
+			}
+		}
 	}
 
 	getQuickInfoAtPosition(file: SourceFile, position: number): LitQuickInfo | undefined {
