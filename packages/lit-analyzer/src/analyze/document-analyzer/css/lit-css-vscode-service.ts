@@ -30,6 +30,13 @@ export class LitCssVscodeService {
 		this.dataProvider.update(context.htmlStore);
 
 		const vscTextDocument = makeVscTextDocument(document);
+
+		// Return nothing if this is a one liner css snippet.
+		// Example: css`100px`
+		if (!vscTextDocument.getText().includes("\n")) {
+			return [];
+		}
+
 		const vscStylesheet = this.makeVscStylesheet(vscTextDocument);
 		const diagnostics = this.scssService.doValidation(vscTextDocument, vscStylesheet);
 
