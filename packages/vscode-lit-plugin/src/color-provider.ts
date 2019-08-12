@@ -49,7 +49,7 @@ function hexToRGBA(hex: string): { red: number; green: number; blue: number; alp
 			red: parseInt(shorthandResult[1] + shorthandResult[1], 16),
 			green: parseInt(shorthandResult[2] + shorthandResult[2], 16),
 			blue: parseInt(shorthandResult[3] + shorthandResult[3], 16),
-			alpha: shorthandResult == null ? 255 : parseInt(shorthandResult[4] + shorthandResult[4], 16)
+			alpha: shorthandResult[4] == null ? 255 : parseInt(shorthandResult[4] + shorthandResult[4], 16)
 		};
 	}
 
