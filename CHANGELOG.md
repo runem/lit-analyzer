@@ -9,6 +9,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 <!-- ### Removed -->
 <!-- ### Fixed -->
 
+## [1.1.8] - 2019-08-13
+
+- Support css snippets and % units ([#40](https://github.com/runem/lit-analyzer/issues/40))
+- Export Bazel plugin ([#39](https://github.com/runem/lit-analyzer/issues/39))
+- Fix problem where the value of attributes on the form attr='val' could get parsed incorrectly. ([#36](https://github.com/runem/lit-analyzer/issues/36))
+
 ## [1.1.4] - 2019-08-05
 
 ### Added
@@ -17,9 +23,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
 - When using the @property decorator from "lit-element" the type of "{type: ...}" is checked against the actual property type.
 - Support for using components built with mixins
-- Warning when using boolean type expression in attribute binding ([#15](https://github.com/runem/ts-lit-plugin/issues/15))
-- Allow "null" and "undefined" as values always when using "?" attr binding ([#16](https://github.com/runem/ts-lit-plugin/issues/16))
-- Suggested code fix: Please use the `ifDefined` directive. ([#17](https://github.com/runem/ts-lit-plugin/issues/17))
+- Warning when using boolean type expression in attribute binding ([#15](https://github.com/runem/lit-analyzer/issues/15))
+- Allow "null" and "undefined" as values always when using "?" attr binding ([#16](https://github.com/runem/lit-analyzer/issues/16))
+- Suggested code fix: Please use the `ifDefined` directive. ([#17](https://github.com/runem/lit-analyzer/issues/17))
 - The usage of built-in directives is now checked to make sure that they are used correctly.
 - Experimental: It's now possible to refactor custom element tag names.
 
