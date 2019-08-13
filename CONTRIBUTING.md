@@ -4,6 +4,8 @@ Hi there, I really appreciate you considering contributing to this repository! T
 
 1. Clone the monorepo: `git clone https://github.com/runem/lit-analyzer.git`
 2. Install dependencies: `npm run bootstrap`
+3. Build libraries: `npm run watch`
+4. Run tests: `npm run test`
 
 ## Contributing to readmes
 

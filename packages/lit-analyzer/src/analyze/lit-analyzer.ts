@@ -23,12 +23,6 @@ import { Range } from "./types/range";
 import { getNodeAtPosition, nodeIntersects } from "./util/ast-util";
 import { flatten } from "./util/general-util";
 
-/*interface LitDocumentAnalyzer {
- getCompletionDetailsAtOffset?(document: TextDocument, offset: number, name: string, request: LitAnalyzerRequest): LitCompletionDetails | undefined;
- getCompletionsAtOffset?(document: TextDocument, offset: number, request: LitAnalyzerRequest): LitCompletion[];
- getDiagnostics?(document: TextDocument, request: LitAnalyzerRequest): LitDiagnostic[];
- }*/
-
 export class LitAnalyzer {
 	private litHtmlDocumentAnalyzer = new LitHtmlDocumentAnalyzer();
 	private litCssDocumentAnalyzer = new LitCssDocumentAnalyzer();

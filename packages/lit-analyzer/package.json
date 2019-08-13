@@ -27,7 +27,8 @@
 		"prepare": "npm run build",
 		"build": "rollup -c",
 		"watch": "rollup -c --watch",
-		"readme": "readme generate -i readme.blueprint.md -c readme.config.json"
+		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
+		"test": "ava"
 	},
 	"main": "lib/index.cjs.js",
 	"typings": "lib/index.cjs.d.ts",
@@ -53,7 +54,28 @@
 		"rollup-plugin-node-resolve": "^4.0.1",
 		"rollup-plugin-replace": "^2.1.0",
 		"tslib": "^1.9.3",
-		"typescript": "^3.5.3"
+		"typescript": "^3.5.3",
+		"ava": "^2.2.0",
+		"ts-node": "^8.3.0"
+	},
+	"ava": {
+		"compileEnhancements": false,
+		"extensions": [
+			"ts"
+		],
+		"require": [
+			"ts-node/register"
+		],
+		"snapshotDir": "test/snapshots/results",
+		"files": [
+			"test/**/*.ts"
+		],
+		"helpers": [
+			"test/helpers/**/*"
+		],
+		"sources": [
+			"src/**/*"
+		]
 	},
 	"contributors": [
 		{
