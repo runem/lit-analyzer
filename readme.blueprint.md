@@ -14,5 +14,8 @@ This mono-repository consists of the following tools:
 ## Rules
 You can find a list of all rules [here](https://github.com/runem/lit-analyzer/blob/master/docs/readme/rules.md).
 
+## Contributing
+If you are interested in contributing to this repository please read [`contributing.md`](/CONTRIBUTING.md)
+
 {{ template:contributors }}
 {{ template:license }}

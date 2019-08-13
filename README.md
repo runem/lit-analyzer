@@ -30,6 +30,12 @@ This mono-repository consists of the following tools:
 You can find a list of all rules [here](https://github.com/runem/lit-analyzer/blob/master/docs/readme/rules.md).
 
 
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#contributing)
+
+## ➤ Contributing
+If you are interested in contributing to this repository please read [`contributing.md`](/CONTRIBUTING.md)
+
+
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#contributors)
 
 ## ➤ Contributors
