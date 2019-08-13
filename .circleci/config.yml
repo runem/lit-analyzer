@@ -26,7 +26,7 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package-lock.json" }}
 
-      - run: lerna bootstrap --ci --hoist --ignore lit-plugin
+      - run: npx lerna bootstrap --ci --hoist --ignore lit-plugin
 
       # run tests!
       - run: npm test
