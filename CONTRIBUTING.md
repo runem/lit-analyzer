@@ -3,9 +3,10 @@
 Hi there, I really appreciate you considering contributing to this repository! This readme hopefully contains what you need to get started. If you have any questions please open an issue or PM me on twitter [@RuneMehlsen](https://twitter.com/RuneMehlsen).
 
 1. Clone the monorepo: `git clone https://github.com/runem/lit-analyzer.git`
-2. Install dependencies: `npm run bootstrap`
-3. Build libraries: `npm run watch`
-4. Run tests: `npm run test`
+2. Install dependencies: `npm run install`
+3. Bootstrap packages: `npm run bootstrap`
+4. Build libraries: `npm run watch`
+5. Run tests: `npm run test`
 
 ## Contributing to readmes
 
