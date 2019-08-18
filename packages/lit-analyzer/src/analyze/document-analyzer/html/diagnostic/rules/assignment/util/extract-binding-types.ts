@@ -38,7 +38,7 @@ export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, request:
 	const typeA = htmlAttrTarget == null ? ({ kind: SimpleTypeKind.ANY } as SimpleType) : htmlAttrTarget.getType();
 
 	// Handle directives
-	const directive = getDirective(assignment.htmlAttr, { typeA, typeB }, request);
+	const directive = getDirective(assignment, { typeA, typeB }, request);
 	if (directive != null && directive.actualType != null) {
 		typeB = directive.actualType;
 	}

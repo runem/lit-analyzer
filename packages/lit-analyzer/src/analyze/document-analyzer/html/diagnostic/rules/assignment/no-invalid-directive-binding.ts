@@ -2,14 +2,17 @@ import { litDiagnosticRuleSeverity } from "../../../../../lit-analyzer-config";
 import { HtmlNodeAttrKind } from "../../../../../types/html-node/html-node-attr-types";
 import { LitHtmlDiagnosticKind } from "../../../../../types/lit-diagnostic";
 import { RuleModule } from "../rule-module";
+import { extractBindingTypes } from "./util/extract-binding-types";
 import { getDirective } from "./util/get-directive";
 
 const rule: RuleModule = {
 	name: "no-invalid-directive-binding",
-	visitHtmlAssignment(assignment, { typeA, typeB }, request) {
+	visitHtmlAssignment(assignment, request) {
 		const { htmlAttr } = assignment;
 
-		const directive = getDirective(htmlAttr, { typeA, typeB }, request);
+		const { typeA, typeB } = extractBindingTypes(assignment, request);
+
+		const directive = getDirective(assignment, { typeA, typeB }, request);
 		if (directive == null) return;
 
 		const { document } = request;

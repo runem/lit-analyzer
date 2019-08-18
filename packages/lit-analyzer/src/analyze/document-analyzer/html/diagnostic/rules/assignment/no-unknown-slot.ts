@@ -6,7 +6,7 @@ import { RuleModule } from "../rule-module";
 
 const rule: RuleModule = {
 	name: "no-unknown-slot",
-	visitHtmlAssignment(assignment, { typeA, typeB }, request) {
+	visitHtmlAssignment(assignment, request) {
 		if (assignment == null || assignment.kind !== HtmlNodeAttrAssignmentKind.STRING) return;
 		const { htmlAttr } = assignment;
 

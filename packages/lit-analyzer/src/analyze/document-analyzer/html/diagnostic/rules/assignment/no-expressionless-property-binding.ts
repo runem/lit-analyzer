@@ -6,7 +6,7 @@ import { RuleModule } from "../rule-module";
 
 const rule: RuleModule = {
 	name: "no-expressionless-property-binding",
-	visitHtmlAssignment(assignment, { typeA, typeB }, request) {
+	visitHtmlAssignment(assignment, request) {
 		const { htmlAttr } = assignment;
 
 		// Check if we have a property assignment without a corresponding expression as value

@@ -3,6 +3,7 @@ import { litDiagnosticRuleSeverity } from "../../../../../lit-analyzer-config";
 import { HtmlNodeAttrKind } from "../../../../../types/html-node/html-node-attr-types";
 import { LitHtmlDiagnosticKind } from "../../../../../types/lit-diagnostic";
 import { RuleModule } from "../rule-module";
+import { extractBindingTypes } from "./util/extract-binding-types";
 
 /**
  * Returns if this type can be used in a event listener binding
@@ -35,9 +36,11 @@ function isTypeBindableToEventListener(type: SimpleType): boolean {
 
 const rule: RuleModule = {
 	name: "no-noncallable-event-binding",
-	visitHtmlAssignment(assignment, { typeA, typeB }, request) {
+	visitHtmlAssignment(assignment, request) {
 		const { htmlAttr } = assignment;
 		if (htmlAttr.kind !== HtmlNodeAttrKind.EVENT_LISTENER) return;
+
+		const { typeB } = extractBindingTypes(assignment, request);
 
 		// Make sure that there is a function as event listener value.
 		// Here we catch errors like: @click="onClick()"

@@ -4,14 +4,17 @@ import { HtmlNodeAttrAssignmentKind } from "../../../../../types/html-node/html-
 import { HtmlNodeAttrKind } from "../../../../../types/html-node/html-node-attr-types";
 import { LitHtmlDiagnosticKind } from "../../../../../types/lit-diagnostic";
 import { RuleModule } from "../rule-module";
+import { extractBindingTypes } from "./util/extract-binding-types";
 
 const rule: RuleModule = {
 	name: "no-nullable-attribute-binding",
-	visitHtmlAssignment(assignment, { typeA, typeB }, request) {
+	visitHtmlAssignment(assignment, request) {
 		if (assignment.kind !== HtmlNodeAttrAssignmentKind.EXPRESSION) return;
 
 		const { htmlAttr } = assignment;
 		if (htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE) return;
+
+		const { typeA, typeB } = extractBindingTypes(assignment, request);
 
 		// Test if removing "null" from typeB would work and suggest using "ifDefined(exp === null ? undefined : exp)".
 		if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.NULL)) {

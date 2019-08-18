@@ -3,12 +3,15 @@ import { litDiagnosticRuleSeverity } from "../../../../../lit-analyzer-config";
 import { HtmlNodeAttrKind } from "../../../../../types/html-node/html-node-attr-types";
 import { LitHtmlDiagnosticKind } from "../../../../../types/lit-diagnostic";
 import { RuleModule } from "../rule-module";
+import { extractBindingTypes } from "./util/extract-binding-types";
 
 const rule: RuleModule = {
 	name: "no-complex-attribute-binding",
-	visitHtmlAssignment(assignment, { typeA, typeB }, request) {
+	visitHtmlAssignment(assignment, request) {
 		const { htmlAttr } = assignment;
 		if (htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE) return;
+
+		const { typeA, typeB } = extractBindingTypes(assignment, request);
 
 		// Only primitive types should be allowed as "typeB" and "typeA".
 		if (!isAssignableToPrimitiveType(typeB)) {

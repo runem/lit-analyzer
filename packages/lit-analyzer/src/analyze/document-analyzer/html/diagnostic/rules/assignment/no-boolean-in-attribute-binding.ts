@@ -4,15 +4,18 @@ import { HtmlNodeAttrAssignmentKind } from "../../../../../types/html-node/html-
 import { HtmlNodeAttrKind } from "../../../../../types/html-node/html-node-attr-types";
 import { LitHtmlDiagnosticKind } from "../../../../../types/lit-diagnostic";
 import { RuleModule } from "../rule-module";
+import { extractBindingTypes } from "./util/extract-binding-types";
 import { isAssignableToType } from "./util/is-assignable-to-type";
 
 const rule: RuleModule = {
 	name: "no-boolean-in-attribute-binding",
-	visitHtmlAssignment(assignment, { typeA, typeB }, request) {
+	visitHtmlAssignment(assignment, request) {
 		if (assignment.kind === HtmlNodeAttrAssignmentKind.BOOLEAN) return;
 
 		const { htmlAttr } = assignment;
 		if (htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE) return;
+
+		const { typeA, typeB } = extractBindingTypes(assignment, request);
 
 		// Return early if the attribute is like: required=""
 		if (typeB.kind === SimpleTypeKind.STRING_LITERAL && typeB.value.length === 0) {

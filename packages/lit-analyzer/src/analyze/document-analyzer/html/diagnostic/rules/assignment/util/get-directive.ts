@@ -1,8 +1,7 @@
 import { SimpleType, SimpleTypeKind, toSimpleType } from "ts-simple-type";
 import { Expression } from "typescript";
 import { LitAnalyzerRequest } from "../../../../../../lit-analyzer-context";
-import { HtmlNodeAttrAssignmentKind } from "../../../../../../types/html-node/html-node-attr-assignment-types";
-import { HtmlNodeAttr } from "../../../../../../types/html-node/html-node-attr-types";
+import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../../../../types/html-node/html-node-attr-assignment-types";
 import { isLitDirective } from "./is-lit-directive";
 import { removeUndefinedFromType } from "./remove-undefined-from-type";
 
@@ -28,13 +27,10 @@ interface Directive {
 }
 
 export function getDirective(
-	htmlAttr: HtmlNodeAttr,
+	assignment: HtmlNodeAttrAssignment,
 	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },
 	request: LitAnalyzerRequest
 ): Directive | undefined {
-	const { assignment } = htmlAttr;
-	if (assignment == null) return undefined;
-
 	const { ts, program } = request;
 	const checker = program.getTypeChecker();
 
