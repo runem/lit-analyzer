@@ -15,6 +15,7 @@ import { LitOutliningSpan, LitOutliningSpanKind } from "../../types/lit-outlinin
 import { LitQuickInfo } from "../../types/lit-quick-info";
 import { LitRenameInfo } from "../../types/lit-rename-info";
 import { LitRenameLocation } from "../../types/lit-rename-location";
+import { RuleModule } from "../../types/rule-module";
 import { iterableDefined } from "../../util/iterable-util";
 import { flatten, intersects } from "../../util/general-util";
 import { codeFixesForHtmlReport } from "./code-fix/code-fixes-for-html-report";
@@ -25,6 +26,7 @@ import { LitHtmlVscodeService } from "./lit-html-vscode-service";
 import { quickInfoForHtmlAttr } from "./quick-info/quick-info-for-html-attr";
 import { quickInfoForHtmlNode } from "./quick-info/quick-info-for-html-node";
 import { renameLocationsAtOffset } from "./rename-locations/rename-locations-at-offset";
+import { isRuleEnabled, LitAnalyzerRuleName } from "../../lit-analyzer-config";
 import noBooleanInAttributeBinding from "../../../rules/no-boolean-in-attribute-binding";
 import noComplexAttributeBinding from "../../../rules/no-complex-attribute-binding";
 import noExpressionlessPropertyBinding from "../../../rules/no-expressionless-property-binding";
@@ -41,29 +43,32 @@ import noUnknownProperty from "../../../rules/no-unknown-property";
 import noUnknownSlot from "../../../rules/no-unknown-slot";
 import noUnknownTagName from "../../../rules/no-unknown-tag-name";
 
+const defaultRules: Partial<Record<LitAnalyzerRuleName, RuleModule>> = {
+	"no-boolean-in-attribute-binding": noBooleanInAttributeBinding,
+	"no-complex-attribute-binding": noComplexAttributeBinding,
+	"no-expressionless-property-binding": noExpressionlessPropertyBinding,
+	"no-incompatible-type-binding": noIncompatibleTypeBinding,
+	"no-invalid-boolean-binding": noInvalidBooleanBinding,
+	"no-invalid-directive-binding": noInvalidDirectiveBinding,
+	"no-missing-import": noMissingImport,
+	"no-noncallable-event-binding": noNonCallableEventBinding,
+	"no-nullable-attribute-binding": noNullableAttributeBinding,
+	"no-unclosed-tag": noUnclosedTag,
+	"no-unknown-attribute": noUnknownAttribute,
+	"no-unknown-event": noUnknownEvent,
+	"no-unknown-property": noUnknownProperty,
+	"no-unknown-slot": noUnknownSlot,
+	"no-unknown-tag-name": noUnknownTagName
+};
+
 export class LitHtmlDocumentAnalyzer {
 	private vscodeHtmlService = new LitHtmlVscodeService();
 	private completionsCache: LitCompletion[] = [];
 
 	validate(htmlDocument: HtmlDocument, request: LitAnalyzerRequest): LitHtmlDiagnostic[] {
-		const rules = [
-			noBooleanInAttributeBinding,
-			noComplexAttributeBinding,
-			noExpressionlessPropertyBinding,
-			noIncompatibleTypeBinding,
-			noInvalidBooleanBinding,
-			noInvalidDirectiveBinding,
-			noMissingImport,
-			noNonCallableEventBinding,
-			noNullableAttributeBinding,
-			noUnclosedTag,
-			noUnknownAttribute,
-			noUnknownEvent,
-			noUnknownProperty,
-			noUnknownSlot,
-			noUnknownTagName
-		];
-		const visitors = rules.map(r => r(request));
+		const visitors = (Object.keys(defaultRules) as LitAnalyzerRuleName[])
+			.filter(rule => isRuleEnabled(request.config, rule))
+			.map(rule => defaultRules[rule]!(request));
 
 		const iterateNodes = (nodes: HtmlNode[]) => {
 			for (const childNode of nodes) {
