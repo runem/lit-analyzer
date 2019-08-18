@@ -1,4 +1,6 @@
 import {
+	isAssignableToSimpleTypeKind,
+	isAssignableToValue,
 	isSimpleType,
 	SimpleType,
 	SimpleTypeBooleanLiteral,
@@ -12,6 +14,7 @@ import { HtmlNodeAttr } from "../types/html-node/html-node-attr-types";
 import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../types/html-node/html-node-attr-assignment-types";
 import { LitAnalyzerRequest } from "../lit-analyzer-context";
 import { relaxType, removeUndefinedFromType, isLitDirective } from "./type-util";
+import { lazy } from "./general-util";
 
 export function inferTypeFromAssignment(assignment: HtmlNodeAttrAssignment, checker: TypeChecker): SimpleType | Type {
 	switch (assignment.kind) {
@@ -76,4 +79,30 @@ export function extractAttributeTypes(context: LitAnalyzerRequest, node: HtmlNod
 		typeA: htmlAttrTarget.getType(),
 		typeB
 	};
+}
+
+export function isValidStringAssignment(typeA: SimpleType, typeB: SimpleType): boolean {
+	const typeAIsAssignableToBool = lazy(() =>
+		isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.BOOLEAN, SimpleTypeKind.BOOLEAN_LITERAL], { op: "or" })
+	);
+	const typeAIsAssignableToNumber = lazy(() =>
+		isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.NUMBER, SimpleTypeKind.NUMBER_LITERAL], { op: "or" })
+	);
+
+	if (typeB.kind === SimpleTypeKind.STRING_LITERAL) {
+		// Take into account that 'disabled=""' is equal to true
+		if (typeB.value.length === 0 && typeAIsAssignableToBool()) {
+			return true;
+		}
+
+		// Take into account that assignments like maxlength="50" (which is a number) is allowed even though "50" is a string literal in this case.
+		else if (typeAIsAssignableToNumber()) {
+			// Test if a potential string literal is a Number
+			if (!isNaN((typeB.value as unknown) as number) && isAssignableToValue(typeA, Number(typeB.value))) {
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
