@@ -38,7 +38,6 @@ export class LitHtmlDocumentAnalyzer {
 	private completionsCache: LitCompletion[] = [];
 
 	validate(htmlDocument: HtmlDocument, request: LitAnalyzerRequest): LitHtmlDiagnostic[] {
-		const reports: LitHtmlDiagnostic[] = [];
 		const rules = [noMissingImport, noUnclosedTag, noUnknownAttribute, noUnknownEvent, noUnknownProperty, noUnknownSlot, noUnknownTagName];
 		const visitors = rules.map(r => r(request));
 
@@ -60,7 +59,7 @@ export class LitHtmlDocumentAnalyzer {
 
 		iterateNodes(htmlDocument.rootNodes);
 
-		return reports;
+		return request.reports;
 	}
 
 	getCompletionDetailsAtOffset(document: HtmlDocument, offset: number, name: string, request: LitAnalyzerRequest): LitCompletionDetails | undefined {
