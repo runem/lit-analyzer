@@ -303,7 +303,8 @@ export class LitAnalyzer {
 			program,
 			documentStore,
 			logger,
-			updateConfig
+			updateConfig,
+			reports
 		} = this.context;
 
 		return {
@@ -319,6 +320,7 @@ export class LitAnalyzer {
 			documentStore,
 			logger,
 			updateConfig,
+			reports,
 			...options
 		};
 	}

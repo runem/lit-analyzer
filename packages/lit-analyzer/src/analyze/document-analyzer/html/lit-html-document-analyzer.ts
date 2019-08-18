@@ -2,8 +2,8 @@ import { FormatCodeSettings } from "typescript";
 import { Range } from "../../types/range";
 import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 import { HtmlDocument } from "../../parse/document/text-document/html-document/html-document";
-import { isHTMLAttr } from "../../types/html-node/html-node-attr-types";
-import { isHTMLNode } from "../../types/html-node/html-node-types";
+import { HtmlNodeAttr, isHTMLAttr } from "../../types/html-node/html-node-attr-types";
+import { HtmlNode, isHTMLNode } from "../../types/html-node/html-node-types";
 import { LitClosingTagInfo } from "../../types/lit-closing-tag-info";
 import { LitCodeFix } from "../../types/lit-code-fix";
 import { LitCompletion } from "../../types/lit-completion";
@@ -21,15 +21,47 @@ import { codeFixesForHtmlReport } from "./code-fix/code-fixes-for-html-report";
 import { completionsAtOffset } from "./completion/completions-at-offset";
 import { definitionForHtmlAttr } from "./definition/definition-for-html-attr";
 import { definitionForHtmlNode } from "./definition/definition-for-html-node";
-import { validateHTMLDocument } from "./diagnostic/validate-html-document";
 import { LitHtmlVscodeService } from "./lit-html-vscode-service";
 import { quickInfoForHtmlAttr } from "./quick-info/quick-info-for-html-attr";
 import { quickInfoForHtmlNode } from "./quick-info/quick-info-for-html-node";
 import { renameLocationsAtOffset } from "./rename-locations/rename-locations-at-offset";
+import noMissingImport from "../../../rules/no-missing-import";
+import noUnclosedTag from "../../../rules/no-unclosed-tag";
+import noUnknownAttribute from "../../../rules/no-unknown-attribute";
+import noUnknownEvent from "../../../rules/no-unknown-event";
+import noUnknownProperty from "../../../rules/no-unknown-property";
+import noUnknownSlot from "../../../rules/no-unknown-slot";
+import noUnknownTagName from "../../../rules/no-unknown-tag-name";
 
 export class LitHtmlDocumentAnalyzer {
 	private vscodeHtmlService = new LitHtmlVscodeService();
 	private completionsCache: LitCompletion[] = [];
+
+	validate(htmlDocument: HtmlDocument, request: LitAnalyzerRequest): LitHtmlDiagnostic[] {
+		const reports: LitHtmlDiagnostic[] = [];
+		const rules = [noMissingImport, noUnclosedTag, noUnknownAttribute, noUnknownEvent, noUnknownProperty, noUnknownSlot, noUnknownTagName];
+		const visitors = rules.map(r => r(request));
+
+		const iterateNodes = (nodes: HtmlNode[]) => {
+			for (const childNode of nodes) {
+				visitors.forEach(visitor => visitor.enterHtmlNode && visitor.enterHtmlNode(childNode));
+
+				const iterateAttrs = (attrs: HtmlNodeAttr[]) => {
+					for (const attr of attrs) {
+						visitors.forEach(visitor => visitor.enterHtmlAttribute && visitor.enterHtmlAttribute(attr));
+					}
+				};
+
+				iterateAttrs(childNode.attributes);
+
+				iterateNodes(childNode.children);
+			}
+		};
+
+		iterateNodes(htmlDocument.rootNodes);
+
+		return reports;
+	}
 
 	getCompletionDetailsAtOffset(document: HtmlDocument, offset: number, name: string, request: LitAnalyzerRequest): LitCompletionDetails | undefined {
 		const completionWithName = this.completionsCache.find(completion => completion.name === name);
@@ -52,7 +84,7 @@ export class LitHtmlDocumentAnalyzer {
 	}
 
 	getDiagnostics(document: HtmlDocument, request: LitAnalyzerRequest): LitHtmlDiagnostic[] {
-		return validateHTMLDocument(document, request);
+		return this.validate(document, request);
 	}
 
 	getClosingTagAtOffset(document: HtmlDocument, offset: number): LitClosingTagInfo | undefined {
@@ -63,7 +95,7 @@ export class LitHtmlDocumentAnalyzer {
 		const hit = document.htmlNodeOrAttrAtOffset(offsetRange);
 		if (hit == null) return [];
 
-		const reports = validateHTMLDocument(document, request);
+		const reports = this.validate(document, request);
 		return flatten(reports.filter(report => intersects(offsetRange, report.location)).map(report => codeFixesForHtmlReport(report, request)));
 	}
 

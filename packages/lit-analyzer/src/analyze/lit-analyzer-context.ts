@@ -8,6 +8,7 @@ import { AnalyzerDefinitionStore } from "./store/analyzer-definition-store";
 import { AnalyzerDependencyStore } from "./store/analyzer-dependency-store";
 import { AnalyzerDocumentStore } from "./store/analyzer-document-store";
 import { AnalyzerHtmlStore } from "./store/analyzer-html-store";
+import { LitHtmlDiagnostic } from "./types/lit-diagnostic";
 
 export interface LitAnalyzerContext {
 	readonly ts: typeof tsModule;
@@ -22,6 +23,7 @@ export interface LitAnalyzerContext {
 	updateConfig(config: LitAnalyzerConfig): void;
 	updateDependencies(file: SourceFile): void;
 	updateComponents(file: SourceFile): void;
+	reports: LitHtmlDiagnostic[];
 }
 
 export interface LitAnalyzerRequest extends LitAnalyzerContext {

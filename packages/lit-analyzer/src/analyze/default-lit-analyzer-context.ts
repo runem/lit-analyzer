@@ -42,6 +42,7 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 	readonly documentStore = new DefaultAnalyzerDocumentStore();
 	readonly definitionStore = new DefaultAnalyzerDefinitionStore();
 	readonly logger = new DefaultLitAnalyzerLogger();
+	readonly reports = [];
 
 	public updateConfig(config: LitAnalyzerConfig) {
 		this._config = config;
