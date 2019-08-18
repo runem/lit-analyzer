@@ -25,7 +25,15 @@ import { LitHtmlVscodeService } from "./lit-html-vscode-service";
 import { quickInfoForHtmlAttr } from "./quick-info/quick-info-for-html-attr";
 import { quickInfoForHtmlNode } from "./quick-info/quick-info-for-html-node";
 import { renameLocationsAtOffset } from "./rename-locations/rename-locations-at-offset";
+import noBooleanInAttributeBinding from "../../../rules/no-boolean-in-attribute-binding";
+import noComplexAttributeBinding from "../../../rules/no-complex-attribute-binding";
+import noExpressionlessPropertyBinding from "../../../rules/no-expressionless-property-binding";
+import noIncompatibleTypeBinding from "../../../rules/no-incompatible-type-binding";
+import noInvalidBooleanBinding from "../../../rules/no-invalid-boolean-binding";
+import noInvalidDirectiveBinding from "../../../rules/no-invalid-directive-binding";
 import noMissingImport from "../../../rules/no-missing-import";
+import noNonCallableEventBinding from "../../../rules/no-noncallable-event-binding";
+import noNullableAttributeBinding from "../../../rules/no-nullable-attribute-binding";
 import noUnclosedTag from "../../../rules/no-unclosed-tag";
 import noUnknownAttribute from "../../../rules/no-unknown-attribute";
 import noUnknownEvent from "../../../rules/no-unknown-event";
@@ -38,7 +46,23 @@ export class LitHtmlDocumentAnalyzer {
 	private completionsCache: LitCompletion[] = [];
 
 	validate(htmlDocument: HtmlDocument, request: LitAnalyzerRequest): LitHtmlDiagnostic[] {
-		const rules = [noMissingImport, noUnclosedTag, noUnknownAttribute, noUnknownEvent, noUnknownProperty, noUnknownSlot, noUnknownTagName];
+		const rules = [
+			noBooleanInAttributeBinding,
+			noComplexAttributeBinding,
+			noExpressionlessPropertyBinding,
+			noIncompatibleTypeBinding,
+			noInvalidBooleanBinding,
+			noInvalidDirectiveBinding,
+			noMissingImport,
+			noNonCallableEventBinding,
+			noNullableAttributeBinding,
+			noUnclosedTag,
+			noUnknownAttribute,
+			noUnknownEvent,
+			noUnknownProperty,
+			noUnknownSlot,
+			noUnknownTagName
+		];
 		const visitors = rules.map(r => r(request));
 
 		const iterateNodes = (nodes: HtmlNode[]) => {
