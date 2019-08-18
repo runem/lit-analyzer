@@ -1,6 +1,7 @@
 import * as tsModule from "typescript";
 import * as tsServer from "typescript/lib/tsserverlibrary";
 import { Program, SourceFile } from "typescript";
+import { RuleModule } from "./document-analyzer/html/diagnostic/rules/rule-module";
 import { LitAnalyzerConfig } from "./lit-analyzer-config";
 import { LitAnalyzerLogger } from "./lit-analyzer-logger";
 import { TextDocument } from "./parse/document/text-document/text-document";
@@ -19,6 +20,7 @@ export interface LitAnalyzerContext {
 	readonly documentStore: AnalyzerDocumentStore;
 	readonly definitionStore: AnalyzerDefinitionStore;
 	readonly logger: LitAnalyzerLogger;
+	readonly rules: RuleModule[];
 	updateConfig(config: LitAnalyzerConfig): void;
 	updateDependencies(file: SourceFile): void;
 	updateComponents(file: SourceFile): void;

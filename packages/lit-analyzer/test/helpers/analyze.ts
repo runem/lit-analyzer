@@ -1,6 +1,8 @@
+import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import * as ts from "typescript";
 import {
+	CompilerHost,
 	CompilerOptions,
 	createProgram,
 	createSourceFile,
@@ -15,14 +17,16 @@ import {
 import { DefaultLitAnalyzerContext } from "../../src/analyze/default-lit-analyzer-context";
 import { LitAnalyzer } from "../../src/analyze/lit-analyzer";
 import { LitAnalyzerConfig, makeConfig } from "../../src/analyze/lit-analyzer-config";
+import { LitAnalyzerContext } from "../../src/analyze/lit-analyzer-context";
 import { LitDiagnostic } from "../../src/analyze/types/lit-diagnostic";
 
 // tslint:disable:no-any
 
 export interface ITestFile {
-	fileName: string;
-	text?: string;
+	fileName?: string;
+	text: string;
 	entry?: boolean;
+	includeLib?: boolean;
 }
 
 export type TestFile = ITestFile | string;
@@ -43,7 +47,10 @@ export function compileFiles(inputFiles: TestFile[] | TestFile): { program: Prog
 						fileName: `auto-generated-${Math.floor(Math.random() * 100000)}.ts`,
 						entry: true
 				  }
-				: file
+				: {
+						...file,
+						fileName: file.fileName || `auto-generated-${Math.floor(Math.random() * 100000)}.ts`
+				  }
 		)
 		.map(file => ({ ...file, fileName: join(cwd, file.fileName) }));
 
@@ -52,9 +59,23 @@ export function compileFiles(inputFiles: TestFile[] | TestFile): { program: Prog
 		throw new ReferenceError(`No entry could be found`);
 	}
 
+	const includeLib = files.find(file => file.includeLib) != null;
+
 	const readFile = (fileName: string): string | undefined => {
 		const matchedFile = files.find(currentFile => currentFile.fileName === fileName);
-		return matchedFile == null ? undefined : matchedFile.text;
+		if (matchedFile != null) {
+			return matchedFile.text;
+		}
+
+		if (includeLib) {
+			fileName = fileName.includes("/") ? fileName : `node_modules/typescript/lib/${fileName}`;
+		}
+
+		if (existsSync(fileName)) {
+			return readFileSync(fileName, "utf8").toString();
+		}
+
+		return undefined;
 	};
 	const fileExists = (fileName: string): boolean => {
 		return files.some(currentFile => currentFile.fileName === fileName);
@@ -64,50 +85,54 @@ export function compileFiles(inputFiles: TestFile[] | TestFile): { program: Prog
 		module: ModuleKind.ESNext,
 		target: ScriptTarget.ESNext,
 		allowJs: true,
-		sourceMap: false
+		sourceMap: false,
+		strict: true // if strict = false, "undefined" and "null" will be removed from type unions.
+	};
+
+	const compilerHost: CompilerHost = {
+		writeFile: () => {},
+		readFile,
+		fileExists,
+		getSourceFile(fileName: string, languageVersion: ScriptTarget): SourceFile | undefined {
+			const sourceText = this.readFile(fileName);
+			if (sourceText == null) return undefined;
+
+			return createSourceFile(fileName, sourceText, languageVersion, true, ScriptKind.TS);
+		},
+
+		getCurrentDirectory() {
+			return ".";
+		},
+
+		getDirectories(directoryName: string) {
+			return sys.getDirectories(directoryName);
+		},
+
+		getDefaultLibFileName(options: CompilerOptions): string {
+			return getDefaultLibFileName(options);
+		},
+
+		getCanonicalFileName(fileName: string): string {
+			return this.useCaseSensitiveFileNames() ? fileName : fileName.toLowerCase();
+		},
+
+		getNewLine(): string {
+			return sys.newLine;
+		},
+
+		useCaseSensitiveFileNames() {
+			return sys.useCaseSensitiveFileNames;
+		}
 	};
 
 	const program = createProgram({
-		rootNames: files.map(file => file.fileName),
+		//rootNames: [...files.map(file => file.fileName!), ...(includeLib ? ["node_modules/typescript/lib/lib.dom.d.ts"] : [])],
+		rootNames: files.map(file => file.fileName!),
 		options: compilerOptions,
-		host: {
-			writeFile: () => {},
-			readFile,
-			fileExists,
-			getSourceFile(fileName: string, languageVersion: ScriptTarget): SourceFile | undefined {
-				const sourceText = this.readFile(fileName);
-				if (sourceText == null) return undefined;
-
-				return createSourceFile(fileName, sourceText, languageVersion, true, ScriptKind.TS);
-			},
-
-			getCurrentDirectory() {
-				return ".";
-			},
-
-			getDirectories(directoryName: string) {
-				return sys.getDirectories(directoryName);
-			},
-
-			getDefaultLibFileName(options: CompilerOptions): string {
-				return getDefaultLibFileName(options);
-			},
-
-			getCanonicalFileName(fileName: string): string {
-				return this.useCaseSensitiveFileNames() ? fileName : fileName.toLowerCase();
-			},
-
-			getNewLine(): string {
-				return sys.newLine;
-			},
-
-			useCaseSensitiveFileNames() {
-				return sys.useCaseSensitiveFileNames;
-			}
-		}
+		host: compilerHost
 	});
 
-	const entrySourceFile = program.getSourceFile(entryFile.fileName)!;
+	const entrySourceFile = program.getSourceFile(entryFile.fileName!)!;
 
 	return {
 		program,
@@ -123,7 +148,7 @@ export function compileFiles(inputFiles: TestFile[] | TestFile): { program: Prog
 export function prepareAnalyzer(
 	inputFiles: TestFile[] | TestFile,
 	config: Partial<LitAnalyzerConfig> = {}
-): { analyzer: LitAnalyzer; program: Program; sourceFile: SourceFile } {
+): { analyzer: LitAnalyzer; program: Program; sourceFile: SourceFile; context: LitAnalyzerContext } {
 	const { program, sourceFile } = compileFiles(inputFiles);
 
 	const context = new DefaultLitAnalyzerContext({
@@ -140,7 +165,8 @@ export function prepareAnalyzer(
 	return {
 		analyzer,
 		program,
-		sourceFile
+		sourceFile,
+		context
 	};
 }
 
@@ -149,10 +175,15 @@ export function prepareAnalyzer(
  * @param inputFiles
  * @param config
  */
-export function getDiagnostics(inputFiles: TestFile[] | TestFile, config: Partial<LitAnalyzerConfig> = {}): { diagnostics: LitDiagnostic[] } {
-	const { analyzer, sourceFile } = prepareAnalyzer(inputFiles, config);
+export function getDiagnostics(
+	inputFiles: TestFile[] | TestFile,
+	config: Partial<LitAnalyzerConfig> = {}
+): { diagnostics: LitDiagnostic[]; program: Program; sourceFile: SourceFile } {
+	const { analyzer, sourceFile, program } = prepareAnalyzer(inputFiles, config);
 
 	return {
-		diagnostics: analyzer.getDiagnosticsInFile(sourceFile)
+		diagnostics: analyzer.getDiagnosticsInFile(sourceFile),
+		program,
+		sourceFile
 	};
 }

@@ -20,7 +20,7 @@ export function parseHtmlAttrAssignment(
 	const location = getAssignmentLocation(p5Node, p5Attr, htmlAttr, context);
 
 	if (location == null) {
-		return { kind: HtmlNodeAttrAssignmentKind.BOOLEAN };
+		return { kind: HtmlNodeAttrAssignmentKind.BOOLEAN, htmlAttr };
 	}
 
 	const values = context.getPartsAtOffsetRange(location);
@@ -33,20 +33,23 @@ export function parseHtmlAttrAssignment(
 			return {
 				kind: HtmlNodeAttrAssignmentKind.STRING,
 				location,
-				value
+				value,
+				htmlAttr
 			};
 		} else {
 			return {
 				kind: HtmlNodeAttrAssignmentKind.EXPRESSION,
 				location,
-				expression: value
+				expression: value,
+				htmlAttr
 			};
 		}
 	} else {
 		return {
 			kind: HtmlNodeAttrAssignmentKind.MIXED,
 			location,
-			values
+			values,
+			htmlAttr
 		};
 	}
 }

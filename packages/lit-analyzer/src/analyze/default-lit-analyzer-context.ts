@@ -4,6 +4,15 @@ import * as tsServer from "typescript/lib/tsserverlibrary";
 import { analyzeComponents, analyzeLibDomHtmlElement } from "web-component-analyzer";
 import { getBuiltInHtmlCollection } from "./data/get-built-in-html-collection";
 import { getUserConfigHtmlCollection } from "./data/get-user-config-html-collection";
+import noBooleanInAttributeBindingRule from "./document-analyzer/html/diagnostic/rules/assignment/no-boolean-in-attribute-binding";
+import noComplexAttributeBindingRule from "./document-analyzer/html/diagnostic/rules/assignment/no-complex-attribute-binding";
+import noExpressionlessPropertyBindingRule from "./document-analyzer/html/diagnostic/rules/assignment/no-expressionless-property-binding";
+import noIncompatibleTypeBindingRule from "./document-analyzer/html/diagnostic/rules/assignment/no-incompatible-type-binding";
+import noInvalidDirectiveBindingRule from "./document-analyzer/html/diagnostic/rules/assignment/no-invalid-directive-binding";
+import noNoncallableEventBindingRule from "./document-analyzer/html/diagnostic/rules/assignment/no-noncallable-event-binding";
+import noNullableAttributeBindingRule from "./document-analyzer/html/diagnostic/rules/assignment/no-nullable-attribute-binding";
+import noUnknownSlotRule from "./document-analyzer/html/diagnostic/rules/assignment/no-unknown-slot";
+import { RuleModule } from "./document-analyzer/html/diagnostic/rules/rule-module";
 import { isRuleDisabled, LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config";
 import { LitAnalyzerContext, LitPluginContextHandler } from "./lit-analyzer-context";
 import { DefaultLitAnalyzerLogger, LitAnalyzerLoggerLevel } from "./lit-analyzer-logger";
@@ -15,6 +24,17 @@ import { DefaultAnalyzerDocumentStore } from "./store/document-store/default-ana
 import { DefaultAnalyzerHtmlStore } from "./store/html-store/default-analyzer-html-store";
 import { HtmlDataSourceKind } from "./store/html-store/html-data-source-merged";
 import { changedSourceFileIterator } from "./util/changed-source-file-iterator";
+
+const rules: RuleModule[] = [
+	noExpressionlessPropertyBindingRule,
+	noUnknownSlotRule,
+	noNoncallableEventBindingRule,
+	noNullableAttributeBindingRule,
+	noComplexAttributeBindingRule,
+	noBooleanInAttributeBindingRule,
+	noInvalidDirectiveBindingRule,
+	noIncompatibleTypeBindingRule
+];
 
 export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 	protected componentSourceFileIterator = changedSourceFileIterator();
@@ -42,6 +62,10 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 	readonly documentStore = new DefaultAnalyzerDocumentStore();
 	readonly definitionStore = new DefaultAnalyzerDefinitionStore();
 	readonly logger = new DefaultLitAnalyzerLogger();
+
+	get rules(): RuleModule[] {
+		return rules;
+	}
 
 	public updateConfig(config: LitAnalyzerConfig) {
 		this._config = config;

@@ -28,7 +28,8 @@
 		"build": "rollup -c",
 		"watch": "rollup -c --watch",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
-		"test": "ava"
+		"test": "ava --color",
+		"test:watch": "ava --watch --color"
 	},
 	"main": "lib/index.cjs.js",
 	"typings": "lib/index.cjs.d.ts",
@@ -41,7 +42,7 @@
 		"didyoumean2": "2.0.4",
 		"fast-glob": "^2.2.6",
 		"parse5": "5.1.0",
-		"ts-simple-type": "~0.3.5",
+		"ts-simple-type": "~0.3.6",
 		"vscode-css-languageservice": "4.0.2-next.1",
 		"vscode-html-languageservice": "2.1.12",
 		"web-component-analyzer": "~0.1.11"
