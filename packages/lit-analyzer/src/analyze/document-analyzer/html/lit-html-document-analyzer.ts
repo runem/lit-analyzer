@@ -65,32 +65,6 @@ export class LitHtmlDocumentAnalyzer {
 	private vscodeHtmlService = new LitHtmlVscodeService();
 	private completionsCache: LitCompletion[] = [];
 
-	validate(htmlDocument: HtmlDocument, request: LitAnalyzerRequest): LitHtmlDiagnostic[] {
-		const visitors = (Object.keys(defaultRules) as LitAnalyzerRuleName[])
-			.filter(rule => isRuleEnabled(request.config, rule))
-			.map(rule => defaultRules[rule]!(request));
-
-		const iterateNodes = (nodes: HtmlNode[]) => {
-			for (const childNode of nodes) {
-				visitors.forEach(visitor => visitor.enterHtmlNode && visitor.enterHtmlNode(childNode));
-
-				const iterateAttrs = (attrs: HtmlNodeAttr[]) => {
-					for (const attr of attrs) {
-						visitors.forEach(visitor => visitor.enterHtmlAttribute && visitor.enterHtmlAttribute(attr));
-					}
-				};
-
-				iterateAttrs(childNode.attributes);
-
-				iterateNodes(childNode.children);
-			}
-		};
-
-		iterateNodes(htmlDocument.rootNodes);
-
-		return request.reports;
-	}
-
 	getCompletionDetailsAtOffset(document: HtmlDocument, offset: number, name: string, request: LitAnalyzerRequest): LitCompletionDetails | undefined {
 		const completionWithName = this.completionsCache.find(completion => completion.name === name);
 
@@ -112,7 +86,29 @@ export class LitHtmlDocumentAnalyzer {
 	}
 
 	getDiagnostics(document: HtmlDocument, request: LitAnalyzerRequest): LitHtmlDiagnostic[] {
-		return this.validate(document, request);
+		const visitors = (Object.keys(defaultRules) as LitAnalyzerRuleName[])
+			.filter(rule => isRuleEnabled(request.config, rule))
+			.map(rule => defaultRules[rule]!(request));
+
+		const iterateNodes = (nodes: HtmlNode[]) => {
+			for (const childNode of nodes) {
+				visitors.forEach(visitor => visitor.enterHtmlNode && visitor.enterHtmlNode(childNode));
+
+				const iterateAttrs = (attrs: HtmlNodeAttr[]) => {
+					for (const attr of attrs) {
+						visitors.forEach(visitor => visitor.enterHtmlAttribute && visitor.enterHtmlAttribute(attr));
+					}
+				};
+
+				iterateAttrs(childNode.attributes);
+
+				iterateNodes(childNode.children);
+			}
+		};
+
+		iterateNodes(document.rootNodes);
+
+		return request.reports;
 	}
 
 	getClosingTagAtOffset(document: HtmlDocument, offset: number): LitClosingTagInfo | undefined {
@@ -123,7 +119,7 @@ export class LitHtmlDocumentAnalyzer {
 		const hit = document.htmlNodeOrAttrAtOffset(offsetRange);
 		if (hit == null) return [];
 
-		const reports = this.validate(document, request);
+		const reports = this.getDiagnostics(document, request);
 		return flatten(reports.filter(report => intersects(offsetRange, report.location)).map(report => codeFixesForHtmlReport(report, request)));
 	}
 
