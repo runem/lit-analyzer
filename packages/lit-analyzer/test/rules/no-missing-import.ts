@@ -17,7 +17,14 @@ test("Don't report missing imports when the custom element has been imported 1",
 
 test("Don't report missing imports when the custom element has been imported 2", t => {
 	const { diagnostics } = getDiagnostics(
-		[makeElement({}), { fileName: "file2.ts", text: "import './my-element'" }, "import './file2'; html`<my-element></my-element>`"],
+		[
+			makeElement({}),
+			{
+				fileName: "file2.ts",
+				text: "import './my-element'"
+			},
+			"import './file2'; html`<my-element></my-element>`"
+		],
 		{ rules: { "no-missing-import": true } }
 	);
 	hasNoDiagnostics(t, diagnostics);

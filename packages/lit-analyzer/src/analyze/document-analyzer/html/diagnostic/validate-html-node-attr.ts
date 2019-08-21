@@ -22,6 +22,9 @@ export function validateHtmlAttr(htmlAttr: HtmlNodeAttr, request: LitAnalyzerReq
 		// Check if we need to skip this check
 		if (isRuleDisabled(config, ruleNameFromHtmlNodeAttrKind(htmlAttr.kind))) return [];
 
+		// Don't report unknown html nodes if this is an unknown element
+		if (htmlStore.getHtmlTag(htmlAttr.htmlNode) == null) return [];
+
 		// Ignore unknown "data-" attributes
 		if (htmlAttr.name.startsWith("data-")) return [];
 
