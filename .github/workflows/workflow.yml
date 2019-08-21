@@ -1,0 +1,29 @@
+name: Main Workflow
+
+on: [push, pull_request]
+
+jobs:
+  run:
+    name: Run
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Set Node.js 10.x
+        uses: actions/setup-node@master
+        with:
+          version: 10.x
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npx lerna bootstrap --ci --hoist --ignore lit-plugin
+
+      - name: Test
+        run: npm test
