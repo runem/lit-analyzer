@@ -1,7 +1,7 @@
 import * as tsModule from "typescript";
 import * as tsServer from "typescript/lib/tsserverlibrary";
 import { Program, SourceFile } from "typescript";
-import { RuleModule } from "./document-analyzer/html/diagnostic/rules/rule-module";
+import { RuleModule } from "./types/rule-module";
 import { LitAnalyzerConfig } from "./lit-analyzer-config";
 import { LitAnalyzerLogger } from "./lit-analyzer-logger";
 import { TextDocument } from "./parse/document/text-document/text-document";

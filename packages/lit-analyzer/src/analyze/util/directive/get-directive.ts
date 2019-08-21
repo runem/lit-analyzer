@@ -1,9 +1,9 @@
 import { SimpleType, SimpleTypeKind, toSimpleType } from "ts-simple-type";
 import { Expression } from "typescript";
-import { LitAnalyzerRequest } from "../../../../../../lit-analyzer-context";
-import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../../../../types/html-node/html-node-attr-assignment-types";
+import { LitAnalyzerRequest } from "../../lit-analyzer-context";
+import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../types/html-node/html-node-attr-assignment-types";
 import { isLitDirective } from "./is-lit-directive";
-import { removeUndefinedFromType } from "./remove-undefined-from-type";
+import { removeUndefinedFromType } from "../type/remove-undefined-from-type";
 
 export type BuiltInDirectiveKind =
 	| "ifDefined"

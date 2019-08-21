@@ -1,9 +1,9 @@
-import { litDiagnosticRuleSeverity } from "../../../../../lit-analyzer-config";
-import { HtmlNodeAttrKind } from "../../../../../types/html-node/html-node-attr-types";
-import { LitHtmlDiagnosticKind } from "../../../../../types/lit-diagnostic";
-import { RuleModule } from "../rule-module";
-import { extractBindingTypes } from "./util/extract-binding-types";
-import { getDirective } from "./util/get-directive";
+import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
+import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
+import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
+import { RuleModule } from "../analyze/types/rule-module";
+import { extractBindingTypes } from "../analyze/util/type/extract-binding-types";
+import { getDirective } from "../analyze/util/directive/get-directive";
 
 const rule: RuleModule = {
 	name: "no-invalid-directive-binding",

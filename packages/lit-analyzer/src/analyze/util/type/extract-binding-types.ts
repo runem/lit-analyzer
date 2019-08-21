@@ -9,9 +9,9 @@ import {
 	toSimpleType
 } from "ts-simple-type";
 import { Type, TypeChecker } from "typescript";
-import { LitAnalyzerRequest } from "../../../../../../lit-analyzer-context";
-import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../../../../types/html-node/html-node-attr-assignment-types";
-import { getDirective } from "./get-directive";
+import { LitAnalyzerRequest } from "../../lit-analyzer-context";
+import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../types/html-node/html-node-attr-assignment-types";
+import { getDirective } from "../directive/get-directive";
 
 export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, request: LitAnalyzerRequest): { typeA: SimpleType; typeB: SimpleType } {
 	const checker = request.program.getTypeChecker();

@@ -1,11 +1,11 @@
 import { isAssignableToType as _isAssignableToType, SimpleType, SimpleTypeComparisonOptions, SimpleTypeKind, toTypeString } from "ts-simple-type";
-import { litDiagnosticRuleSeverity } from "../../../../../../lit-analyzer-config";
-import { LitAnalyzerRequest } from "../../../../../../lit-analyzer-context";
-import { HtmlNodeAttrAssignmentKind } from "../../../../../../types/html-node/html-node-attr-assignment-types";
-import { HtmlNodeAttr } from "../../../../../../types/html-node/html-node-attr-types";
-import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../../../../../types/lit-diagnostic";
+import { litDiagnosticRuleSeverity } from "../../lit-analyzer-config";
+import { LitAnalyzerRequest } from "../../lit-analyzer-context";
+import { HtmlNodeAttrAssignmentKind } from "../../types/html-node/html-node-attr-assignment-types";
+import { HtmlNodeAttr } from "../../types/html-node/html-node-attr-types";
+import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../types/lit-diagnostic";
 import { isAssignableToType } from "./is-assignable-to-type";
-import { isLitDirective } from "./is-lit-directive";
+import { isLitDirective } from "../directive/is-lit-directive";
 
 export function isAssignableInAttributeBinding(
 	htmlAttr: HtmlNodeAttr,

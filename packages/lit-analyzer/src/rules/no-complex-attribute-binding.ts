@@ -1,9 +1,9 @@
 import { isAssignableToPrimitiveType, toTypeString } from "ts-simple-type";
-import { litDiagnosticRuleSeverity } from "../../../../../lit-analyzer-config";
-import { HtmlNodeAttrKind } from "../../../../../types/html-node/html-node-attr-types";
-import { LitHtmlDiagnosticKind } from "../../../../../types/lit-diagnostic";
-import { RuleModule } from "../rule-module";
-import { extractBindingTypes } from "./util/extract-binding-types";
+import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
+import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
+import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
+import { RuleModule } from "../analyze/types/rule-module";
+import { extractBindingTypes } from "../analyze/util/type/extract-binding-types";
 
 const rule: RuleModule = {
 	name: "no-complex-attribute-binding",

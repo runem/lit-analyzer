@@ -1,5 +1,5 @@
 import { isAssignableToType as _isAssignableToType, SimpleType, SimpleTypeComparisonOptions } from "ts-simple-type";
-import { LitAnalyzerRequest } from "../../../../../../lit-analyzer-context";
+import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 
 export function isAssignableToType(
 	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },

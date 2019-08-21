@@ -1,11 +1,11 @@
 import { isAssignableToSimpleTypeKind, SimpleTypeKind, toTypeString } from "ts-simple-type";
-import { litDiagnosticRuleSeverity } from "../../../../../lit-analyzer-config";
-import { HtmlNodeAttrAssignmentKind } from "../../../../../types/html-node/html-node-attr-assignment-types";
-import { HtmlNodeAttrKind } from "../../../../../types/html-node/html-node-attr-types";
-import { LitHtmlDiagnosticKind } from "../../../../../types/lit-diagnostic";
-import { RuleModule } from "../rule-module";
-import { extractBindingTypes } from "./util/extract-binding-types";
-import { isAssignableToType } from "./util/is-assignable-to-type";
+import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
+import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node-attr-assignment-types";
+import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
+import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
+import { RuleModule } from "../analyze/types/rule-module";
+import { extractBindingTypes } from "../analyze/util/type/extract-binding-types";
+import { isAssignableToType } from "../analyze/util/type/is-assignable-to-type";
 
 const rule: RuleModule = {
 	name: "no-boolean-in-attribute-binding",
