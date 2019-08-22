@@ -2,14 +2,14 @@ import { FormatCodeSettings } from "typescript";
 import { Range } from "../../types/range";
 import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 import { HtmlDocument } from "../../parse/document/text-document/html-document/html-document";
-import { isHTMLAttr } from "../../types/html-node/html-node-attr-types";
-import { isHTMLNode } from "../../types/html-node/html-node-types";
+import { isHTMLAttr, HtmlNodeAttr } from "../../types/html-node/html-node-attr-types";
+import { isHTMLNode, HtmlNode } from "../../types/html-node/html-node-types";
 import { LitClosingTagInfo } from "../../types/lit-closing-tag-info";
 import { LitCodeFix } from "../../types/lit-code-fix";
 import { LitCompletion } from "../../types/lit-completion";
 import { LitCompletionDetails } from "../../types/lit-completion-details";
 import { LitDefinition } from "../../types/lit-definition";
-import { LitHtmlDiagnostic } from "../../types/lit-diagnostic";
+import { LitDiagnostic } from "../../types/lit-diagnostic";
 import { LitFormatEdit } from "../../types/lit-format-edit";
 import { LitOutliningSpan, LitOutliningSpanKind } from "../../types/lit-outlining-span";
 import { LitQuickInfo } from "../../types/lit-quick-info";
@@ -21,11 +21,12 @@ import { codeFixesForHtmlReport } from "./code-fix/code-fixes-for-html-report";
 import { completionsAtOffset } from "./completion/completions-at-offset";
 import { definitionForHtmlAttr } from "./definition/definition-for-html-attr";
 import { definitionForHtmlNode } from "./definition/definition-for-html-node";
-import { validateHTMLDocument } from "./diagnostic/validate-html-document";
 import { LitHtmlVscodeService } from "./lit-html-vscode-service";
 import { quickInfoForHtmlAttr } from "./quick-info/quick-info-for-html-attr";
 import { quickInfoForHtmlNode } from "./quick-info/quick-info-for-html-node";
 import { renameLocationsAtOffset } from "./rename-locations/rename-locations-at-offset";
+import { RuleModule } from "../../types/rule-module";
+import { isRuleEnabled } from "../../lit-analyzer-config";
 
 export class LitHtmlDocumentAnalyzer {
 	private vscodeHtmlService = new LitHtmlVscodeService();
@@ -51,8 +52,54 @@ export class LitHtmlDocumentAnalyzer {
 		return completionsAtOffset(document, offset, request);
 	}
 
-	getDiagnostics(document: HtmlDocument, request: LitAnalyzerRequest): LitHtmlDiagnostic[] {
-		return validateHTMLDocument(document, request);
+	getDiagnostics(document: HtmlDocument, request: LitAnalyzerRequest): LitDiagnostic[] {
+		const rules: RuleModule[] = [];
+
+		for (const rule of request.rules) {
+			if (isRuleEnabled(request.config, rule.name)) {
+				rules.push(rule);
+			}
+		}
+
+		const iterateNodes = (nodes: HtmlNode[]) => {
+			for (const childNode of nodes) {
+				for (const rule of rules) {
+					if (request.hasReports(childNode)) {
+						break;
+					}
+
+					if (rule.visitHtmlNode) {
+						rule.visitHtmlNode(childNode, request);
+					}
+				}
+
+				const iterateAttrs = (attrs: HtmlNodeAttr[]) => {
+					for (const attr of attrs) {
+						for (const rule of rules) {
+							if (request.hasReports(attr)) {
+								break;
+							}
+
+							if (rule.visitHtmlAttribute) {
+								rule.visitHtmlAttribute(attr, request);
+							}
+
+							if (attr.assignment != null && !request.hasReports(attr.assignment) && rule.visitHtmlAssignment) {
+								rule.visitHtmlAssignment(attr.assignment, request);
+							}
+						}
+					}
+				};
+
+				iterateAttrs(childNode.attributes);
+
+				iterateNodes(childNode.children);
+			}
+		};
+
+		iterateNodes(document.rootNodes);
+
+		return request.reports;
 	}
 
 	getClosingTagAtOffset(document: HtmlDocument, offset: number): LitClosingTagInfo | undefined {
@@ -63,7 +110,7 @@ export class LitHtmlDocumentAnalyzer {
 		const hit = document.htmlNodeOrAttrAtOffset(offsetRange);
 		if (hit == null) return [];
 
-		const reports = validateHTMLDocument(document, request);
+		const reports = this.getDiagnostics(document, request);
 		return flatten(reports.filter(report => intersects(offsetRange, report.location)).map(report => codeFixesForHtmlReport(report, request)));
 	}
 

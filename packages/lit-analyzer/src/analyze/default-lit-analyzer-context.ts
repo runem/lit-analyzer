@@ -19,6 +19,7 @@ import noUnknownAttribute from "../rules/no-unknown-attribute";
 import noUnknownProperty from "../rules/no-unknown-property";
 import noUnknownEvent from "../rules/no-unknown-event";
 import { RuleModule } from "./types/rule-module";
+import { LitDiagnostic } from "./types/lit-diagnostic";
 import { isRuleDisabled, LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config";
 import { LitAnalyzerContext, LitPluginContextHandler } from "./lit-analyzer-context";
 import { DefaultLitAnalyzerLogger, LitAnalyzerLoggerLevel } from "./lit-analyzer-logger";
@@ -30,6 +31,9 @@ import { DefaultAnalyzerDocumentStore } from "./store/document-store/default-ana
 import { DefaultAnalyzerHtmlStore } from "./store/html-store/default-analyzer-html-store";
 import { HtmlDataSourceKind } from "./store/html-store/html-data-source-merged";
 import { changedSourceFileIterator } from "./util/changed-source-file-iterator";
+import { HtmlNode } from "./types/html-node/html-node-types";
+import { HtmlNodeAttr } from "./types/html-node/html-node-attr-types";
+import { HtmlNodeAttrAssignment } from "./types/html-node/html-node-attr-assignment-types";
 
 const rules: RuleModule[] = [
 	noExpressionlessPropertyBindingRule,
@@ -48,10 +52,14 @@ const rules: RuleModule[] = [
 	noUnknownEvent
 ];
 
+type Node = HtmlNode | HtmlNodeAttr | HtmlNodeAttrAssignment;
+
 export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
+	public reports: LitDiagnostic[] = [];
 	protected componentSourceFileIterator = changedSourceFileIterator();
 	protected hasAnalyzedSubclassExtensions = false;
 	protected _config: LitAnalyzerConfig = makeConfig({});
+	protected _reportedNodes: Set<Node> = new Set();
 
 	get ts() {
 		return this.handler.ts || tsModule;
@@ -77,6 +85,14 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 
 	get rules(): RuleModule[] {
 		return rules;
+	}
+
+	public report(diagnostic: LitDiagnostic): void {
+		this.reports.push(diagnostic);
+	}
+
+	public hasReports(node: HtmlNode | HtmlNodeAttr | HtmlNodeAttrAssignment): boolean {
+		return this._reportedNodes.has(node);
 	}
 
 	public updateConfig(config: LitAnalyzerConfig) {

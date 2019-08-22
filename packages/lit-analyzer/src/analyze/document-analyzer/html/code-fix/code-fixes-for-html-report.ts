@@ -4,9 +4,9 @@ import { litAttributeModifierForTarget } from "../../../parse/parse-html-data/ht
 import { HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types";
 import { CodeFixKind, LitCodeFix } from "../../../types/lit-code-fix";
 import { CodeActionKind, LitCodeFixAction } from "../../../types/lit-code-fix-action";
-import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../../types/lit-diagnostic";
+import { LitDiagnostic, LitHtmlDiagnosticKind } from "../../../types/lit-diagnostic";
 
-export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document, htmlStore }: LitAnalyzerRequest): LitCodeFix[] {
+export function codeFixesForHtmlReport(htmlReport: LitDiagnostic, { document, htmlStore }: LitAnalyzerRequest): LitCodeFix[] {
 	switch (htmlReport.kind) {
 		case LitHtmlDiagnosticKind.UNKNOWN_TARGET: {
 			const fixes: LitCodeFix[] = [];

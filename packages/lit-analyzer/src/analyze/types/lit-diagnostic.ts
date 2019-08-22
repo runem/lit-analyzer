@@ -169,8 +169,12 @@ export type LitHtmlDiagnostic =
 	| LitHtmlDiagnosticMissingSlotAttr
 	| LitHtmlDiagnosticTagNotClosed;
 
-export interface LitCssDiagnostic extends LitDocumentDiagnosticBase {}
+export interface LitCssDiagnostic extends LitDocumentDiagnosticBase {
+	kind: "CSS_DIAGNOSTIC";
+}
 
-export interface LitSourceFileDiagnostic extends LitSourceFileDiagnosticBase {}
+export interface LitSourceFileDiagnostic extends LitSourceFileDiagnosticBase {
+	kind: "SOURCE_FILE_DIAGNOSTIC";
+}
 
 export type LitDiagnostic = LitHtmlDiagnostic | LitCssDiagnostic | LitSourceFileDiagnostic;
