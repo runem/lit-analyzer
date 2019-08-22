@@ -3,11 +3,6 @@ import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { HtmlNodeAttrAssignment } from "../../../types/html-node/html-node-attr-assignment-types";
 import { LitHtmlDiagnostic } from "../../../types/lit-diagnostic";
 
-/**
- * Validates an attribute assignment: lit-html style.
- * @param assignment
- * @param request
- */
 export function validateHtmlAttrAssignment(assignment: HtmlNodeAttrAssignment, request: LitAnalyzerRequest): LitHtmlDiagnostic[] {
 	for (const rule of request.rules) {
 		if (isRuleEnabled(request.config, rule.name) && rule.visitHtmlAssignment != null) {

@@ -15,6 +15,9 @@ import noUnknownSlotRule from "../rules/no-unknown-slot";
 import noMissingImport from "../rules/no-missing-import";
 import noUnclosedTag from "../rules/no-unclosed-tag";
 import noUnknownTagName from "../rules/no-unknown-tag-name";
+import noUnknownAttribute from "../rules/no-unknown-attribute";
+import noUnknownProperty from "../rules/no-unknown-property";
+import noUnknownEvent from "../rules/no-unknown-event";
 import { RuleModule } from "./types/rule-module";
 import { isRuleDisabled, LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config";
 import { LitAnalyzerContext, LitPluginContextHandler } from "./lit-analyzer-context";
@@ -39,7 +42,10 @@ const rules: RuleModule[] = [
 	noIncompatibleTypeBindingRule,
 	noMissingImport,
 	noUnclosedTag,
-	noUnknownTagName
+	noUnknownTagName,
+	noUnknownAttribute,
+	noUnknownProperty,
+	noUnknownEvent
 ];
 
 export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
