@@ -6,6 +6,31 @@ import { RuleModule } from "../analyze/types/rule-module";
 
 const rule: RuleModule = {
 	name: "no-unknown-slot",
+	visitHtmlNode(htmlNode, { htmlStore, document, config }) {
+		const slots = htmlNode.parent && Array.from(htmlStore.getAllSlotsForTag(htmlNode.parent.tagName));
+
+		if (slots != null && slots.length > 0) {
+			const slotAttr = htmlNode.attributes.find(a => a.name === "slot");
+			if (slotAttr == null) {
+				const unnamedSlot = slots.find(s => s.name === "");
+				if (unnamedSlot == null) {
+					return [
+						{
+							kind: LitHtmlDiagnosticKind.MISSING_SLOT_ATTRIBUTE,
+							validSlotNames: slots.map(s => s.name),
+							htmlNode,
+							message: `Missing slot attribute. Parent element <${htmlNode.tagName}> only allows named slots as children.`,
+							severity: litDiagnosticRuleSeverity(config, "no-unknown-slot"),
+							source: "no-unknown-slot",
+							location: { document, ...htmlNode.location.name }
+						}
+					];
+				}
+			}
+		}
+
+		return;
+	},
 	visitHtmlAssignment(assignment, request) {
 		if (assignment == null || assignment.kind !== HtmlNodeAttrAssignmentKind.STRING) return;
 		const { htmlAttr } = assignment;

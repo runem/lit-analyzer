@@ -12,6 +12,9 @@ import noInvalidDirectiveBindingRule from "../rules/no-invalid-directive-binding
 import noNoncallableEventBindingRule from "../rules/no-noncallable-event-binding";
 import noNullableAttributeBindingRule from "../rules/no-nullable-attribute-binding";
 import noUnknownSlotRule from "../rules/no-unknown-slot";
+import noMissingImport from "../rules/no-missing-import";
+import noUnclosedTag from "../rules/no-unclosed-tag";
+import noUnknownTagName from "../rules/no-unknown-tag-name";
 import { RuleModule } from "./types/rule-module";
 import { isRuleDisabled, LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config";
 import { LitAnalyzerContext, LitPluginContextHandler } from "./lit-analyzer-context";
@@ -33,7 +36,10 @@ const rules: RuleModule[] = [
 	noComplexAttributeBindingRule,
 	noBooleanInAttributeBindingRule,
 	noInvalidDirectiveBindingRule,
-	noIncompatibleTypeBindingRule
+	noIncompatibleTypeBindingRule,
+	noMissingImport,
+	noUnclosedTag,
+	noUnknownTagName
 ];
 
 export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
