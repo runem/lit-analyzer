@@ -30,7 +30,7 @@ jobs:
         run: npm test
 
       - name: Package vscode plugin
-        run: npm run copylink && lerna run package --scope lit-plugin && mkdir vscode-lit-plugin && mv packages/vscode-lit-plugin/lit-plugin-*.vsix vscode-lit-plugin
+        run: npm run copylink && npx lerna run package --scope lit-plugin && mkdir vscode-lit-plugin && mv packages/vscode-lit-plugin/lit-plugin-*.vsix vscode-lit-plugin
 
       - name: Upload artifacts
         uses: actions/upload-artifact@master
