@@ -1,4 +1,4 @@
-import { TestFile } from "./analyze";
+import { TestFile } from "./compile-files";
 
 export function makeElement({ properties, slots }: { properties?: string[]; slots?: string[] }): TestFile {
 	return {
