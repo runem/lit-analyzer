@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@master
+      - name: Checkout code
+        uses: actions/checkout@master
 
       - name: Set Node.js 10.x
         uses: actions/setup-node@master
@@ -23,7 +24,16 @@ jobs:
         run: npm run lint
 
       - name: Build
-        run: npx lerna bootstrap --ci --hoist --ignore lit-plugin
+        run: npm run bootstrap
 
       - name: Test
         run: npm test
+
+      - name: Package vscode plugin
+        run: npm run copylink && lerna run package --scope lit-plugin && mkdir vscode-lit-plugin && mv packages/vscode-lit-plugin/lit-plugin-*.vsix vscode-lit-plugin
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@master
+        with:
+          name: vscode-lit-plugin
+          path: vscode-lit-plugin

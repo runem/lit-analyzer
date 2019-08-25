@@ -29,7 +29,7 @@
 		"prettier:check": "prettier --list-different \"**/*\"",
 		"prettier:write": "prettier --write \"**/*\"",
 		"publish": "lerna run prepare && lerna publish --exact && lerna run install:safe --scope lit-plugin",
-		"bootstrap": "lerna clean --yes && lerna bootstrap --hoist --ignore-scripts --ignore lit-plugin && lerna run install:safe --scope lit-plugin && lerna run prepare",
+		"bootstrap": "lerna clean --yes && lerna bootstrap --hoist --ignore lit-plugin && lerna run install:safe --scope lit-plugin",
 		"lint": "eslint 'packages/**/*.{ts,js}'",
 		"build": "lerna run build --parallel --stream",
 		"watch": "lerna run watch --parallel --stream",
