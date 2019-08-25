@@ -25,3 +25,10 @@ test("Complex types are assignable using property binding", t => {
 	]);
 	hasNoDiagnostics(t, diagnostics);
 });
+
+test("Don't check for the assignability of complex types in attribute bindings if the type is a custom lit directive", t => {
+	const { diagnostics } = getDiagnostics(
+		'type Part = {}; type ifExists = (val: any) => (part: Part) => void; html`<input max="${ifExists(123)}" />`'
+	);
+	hasNoDiagnostics(t, diagnostics);
+});

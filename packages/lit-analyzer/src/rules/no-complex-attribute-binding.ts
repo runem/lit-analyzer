@@ -3,6 +3,7 @@ import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
+import { isLitDirective } from "../analyze/util/directive/is-lit-directive";
 import { extractBindingTypes } from "../analyze/util/type/extract-binding-types";
 
 /**
@@ -16,6 +17,9 @@ const rule: RuleModule = {
 		if (htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE) return;
 
 		const { typeA, typeB } = extractBindingTypes(assignment, request);
+
+		// Don't validate directives in this rule, because they are assignable even though they are complex types (functions).
+		if (isLitDirective(typeB)) return;
 
 		// Only primitive types should be allowed as "typeB"
 		if (!isAssignableToPrimitiveType(typeB)) {
