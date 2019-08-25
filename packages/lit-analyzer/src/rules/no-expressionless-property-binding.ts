@@ -4,12 +4,15 @@ import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-type
 import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
 
+/**
+ * This rule validates that non-attribute bindings are always used with an expression.
+ */
 const rule: RuleModule = {
 	name: "no-expressionless-property-binding",
 	visitHtmlAssignment(assignment, request) {
 		const { htmlAttr } = assignment;
 
-		// Check if we have a property assignment without a corresponding expression as value
+		// Only make this check non-expression type assignments.
 		switch (assignment.kind) {
 			case HtmlNodeAttrAssignmentKind.STRING:
 			case HtmlNodeAttrAssignmentKind.BOOLEAN:

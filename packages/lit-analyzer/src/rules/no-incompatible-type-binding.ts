@@ -9,6 +9,9 @@ import { isAssignableInAttributeBinding } from "../analyze/util/type/is-assignab
 import { isAssignableInBooleanBinding } from "../analyze/util/type/is-assignable-in-boolean-binding";
 import { isAssignableInPropertyBinding } from "../analyze/util/type/is-assignable-in-property-binding";
 
+/**
+ * This rule validate if the types of a binding are assignable.
+ */
 const rule: RuleModule = {
 	name: "no-incompatible-type-binding",
 	visitHtmlAssignment(assignment, request) {
@@ -16,6 +19,7 @@ const rule: RuleModule = {
 
 		const { typeA, typeB } = extractBindingTypes(assignment, request);
 
+		// Validate types based on the binding in which they appear
 		switch (htmlAttr.modifier) {
 			case LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER:
 				return isAssignableInBooleanBinding(htmlAttr, { typeA, typeB }, request);

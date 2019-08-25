@@ -6,11 +6,16 @@ import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
 import { extractBindingTypes } from "../analyze/util/type/extract-binding-types";
 
+/**
+ * This rule validates that "null" and "undefined" types are not bound in an attribute binding.
+ */
 const rule: RuleModule = {
 	name: "no-nullable-attribute-binding",
 	visitHtmlAssignment(assignment, request) {
+		// Only validate "expression" kind bindings.
 		if (assignment.kind !== HtmlNodeAttrAssignmentKind.EXPRESSION) return;
 
+		// Only validate "attribute" bindings because these will coerce null|undefined to a string.
 		const { htmlAttr } = assignment;
 		if (htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE) return;
 
@@ -34,8 +39,6 @@ const rule: RuleModule = {
 
 		// Test if removing "undefined" from typeB would work and suggest using "ifDefined".
 		else if (isAssignableToSimpleTypeKind(typeB, SimpleTypeKind.UNDEFINED)) {
-			//const typeBWithoutUndefined = removeUndefinedFromType(typeB);
-			//const assignableWithoutUndefined = isAssignableToType(typeA, typeBWithoutUndefined, program);
 			return [
 				{
 					kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED,

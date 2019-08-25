@@ -6,6 +6,39 @@ import { RuleModule } from "../analyze/types/rule-module";
 import { extractBindingTypes } from "../analyze/util/type/extract-binding-types";
 
 /**
+ * This rule validates that only callable types are used within event binding expressions.
+ * This rule catches typos like: @click="onClick()"
+ */
+const rule: RuleModule = {
+	name: "no-noncallable-event-binding",
+	visitHtmlAssignment(assignment, request) {
+		// Only validate event listener bindings.
+		const { htmlAttr } = assignment;
+		if (htmlAttr.kind !== HtmlNodeAttrKind.EVENT_LISTENER) return;
+
+		const { typeB } = extractBindingTypes(assignment, request);
+
+		// Make sure that the expression given to the event listener binding a function or an object with "handleEvent" property.
+		if (!isTypeBindableToEventListener(typeB)) {
+			return [
+				{
+					kind: LitHtmlDiagnosticKind.NO_EVENT_LISTENER_FUNCTION,
+					message: `You are setting up an event listener with a non-callable type '${toTypeString(typeB)}'`,
+					source: "no-noncallable-event-binding",
+					severity: litDiagnosticRuleSeverity(request.config, "no-noncallable-event-binding"),
+					location: { document: request.document, ...htmlAttr.location.name },
+					typeB
+				}
+			];
+		}
+
+		return;
+	}
+};
+
+export default rule;
+
+/**
  * Returns if this type can be used in a event listener binding
  * @param type
  */
@@ -33,32 +66,3 @@ function isTypeBindableToEventListener(type: SimpleType): boolean {
 
 	return false;
 }
-
-const rule: RuleModule = {
-	name: "no-noncallable-event-binding",
-	visitHtmlAssignment(assignment, request) {
-		const { htmlAttr } = assignment;
-		if (htmlAttr.kind !== HtmlNodeAttrKind.EVENT_LISTENER) return;
-
-		const { typeB } = extractBindingTypes(assignment, request);
-
-		// Make sure that there is a function as event listener value.
-		// Here we catch errors like: @click="onClick()"
-		if (!isTypeBindableToEventListener(typeB)) {
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.NO_EVENT_LISTENER_FUNCTION,
-					message: `You are setting up an event listener with a non-callable type '${toTypeString(typeB)}'`,
-					source: "no-noncallable-event-binding",
-					severity: litDiagnosticRuleSeverity(request.config, "no-noncallable-event-binding"),
-					location: { document: request.document, ...htmlAttr.location.name },
-					typeB
-				}
-			];
-		}
-
-		return;
-	}
-};
-
-export default rule;

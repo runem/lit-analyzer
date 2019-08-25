@@ -7,14 +7,21 @@ import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
 import { suggestTargetForHtmlAttr } from "../analyze/util/attribute-util";
 
+/**
+ * This rule validates that only known attributes are used in attribute bindings.
+ */
 const rule: RuleModule = {
 	name: "no-unknown-attribute",
 	visitHtmlAttribute(htmlAttr, { htmlStore, config, definitionStore, document }) {
 		// Ignore "style" and "svg" attrs because I don't yet have all data for them.
 		if (htmlAttr.htmlNode.kind !== HtmlNodeKind.NODE) return;
 
+		// Only validate attribute bindings.
+		if (htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE && htmlAttr.kind !== HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE) return;
+
+		// Report a diagnostic if the target is unknown
 		const htmlAttrTarget = htmlStore.getHtmlAttrTarget(htmlAttr);
-		if (htmlAttrTarget == null && (htmlAttr.kind === HtmlNodeAttrKind.ATTRIBUTE || htmlAttr.kind === HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE)) {
+		if (htmlAttrTarget == null) {
 			// Don't report unknown attributes on unknown tag names
 			const htmlTag = htmlStore.getHtmlTag(htmlAttr.htmlNode);
 			if (htmlTag == null) return;
@@ -48,6 +55,12 @@ const rule: RuleModule = {
 
 export default rule;
 
+/**
+ * Returns are suggestion for the unknown attribute rule.
+ * @param config
+ * @param definitionStore
+ * @param htmlTag
+ */
 function getSuggestionText({
 	config,
 	definitionStore,

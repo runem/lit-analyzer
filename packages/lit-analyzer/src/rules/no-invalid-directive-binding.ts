@@ -1,22 +1,27 @@
 import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
+import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
-import { extractBindingTypes } from "../analyze/util/type/extract-binding-types";
 import { getDirective } from "../analyze/util/directive/get-directive";
 
+/**
+ * This rule validates that directives are used properly.
+ */
 const rule: RuleModule = {
 	name: "no-invalid-directive-binding",
 	visitHtmlAssignment(assignment, request) {
 		const { htmlAttr } = assignment;
 
-		const { typeA, typeB } = extractBindingTypes(assignment, request);
+		// Only validate expression because this is where directives can be used.
+		if (assignment.kind !== HtmlNodeAttrAssignmentKind.EXPRESSION) return;
 
-		const directive = getDirective(assignment, { typeA, typeB }, request);
+		// Check if the expression is a directive
+		const directive = getDirective(assignment, request);
 		if (directive == null) return;
 
+		// Validate built-in directive kind
 		const { document } = request;
-
 		if (typeof directive.kind === "string") {
 			switch (directive.kind) {
 				case "ifDefined":

@@ -38,7 +38,7 @@ export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, request:
 	const typeA = htmlAttrTarget == null ? ({ kind: SimpleTypeKind.ANY } as SimpleType) : htmlAttrTarget.getType();
 
 	// Handle directives
-	const directive = getDirective(assignment, { typeA, typeB }, request);
+	const directive = getDirective(assignment, request);
 	if (directive != null && directive.actualType != null) {
 		typeB = directive.actualType;
 	}
@@ -46,7 +46,7 @@ export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, request:
 	return { typeA, typeB };
 }
 
-function inferTypeFromAssignment(assignment: HtmlNodeAttrAssignment, checker: TypeChecker): SimpleType | Type {
+export function inferTypeFromAssignment(assignment: HtmlNodeAttrAssignment, checker: TypeChecker): SimpleType | Type {
 	switch (assignment.kind) {
 		case HtmlNodeAttrAssignmentKind.STRING:
 			return { kind: SimpleTypeKind.STRING_LITERAL, value: assignment.value } as SimpleTypeStringLiteral;

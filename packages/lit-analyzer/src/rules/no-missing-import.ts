@@ -4,39 +4,51 @@ import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../analyze/types/lit-d
 import { RuleModule } from "../analyze/types/rule-module";
 import { isCustomElementTagName } from "../analyze/util/general-util";
 
+/**
+ * This rule makes sure that all custom elements used are imported in a given file.
+ */
 const rule: RuleModule = {
 	name: "no-missing-import",
 	visitHtmlNode(htmlNode, { htmlStore, config, definitionStore, dependencyStore, document }) {
+		// Return if the html tag doesn't exists or if the html tag doesn't have a declaration
 		const htmlTag = htmlStore.getHtmlTag(htmlNode);
+		if (htmlTag == null) return;
 
-		if (htmlTag != null && htmlTag.declaration != null) {
-			const isCustomElement = isCustomElementTagName(htmlNode.tagName);
-			const fromFileName = document.virtualDocument.fileName;
-			const isDefinitionImported = dependencyStore.hasTagNameBeenImported(fromFileName, htmlNode.tagName);
+		// Only check if custom elements have been imported.
+		const isCustomElement = isCustomElementTagName(htmlNode.tagName);
+		if (!isCustomElement) return;
 
-			const definition = definitionStore.getDefinitionForTagName(htmlNode.tagName);
+		// Don't continue if this tag name doesn't have a definition.
+		// If the html tag doesn't have a definition we won't know how to import it.
+		const definition = definitionStore.getDefinitionForTagName(htmlNode.tagName);
+		if (definition == null) return;
 
-			if (isCustomElement && !isDefinitionImported && definition != null) {
-				// Get the import path and the position where it can be placed
-				const importPath = getRelativePathForImport(fromFileName, definition.node.getSourceFile().fileName);
+		// Check if the tag name has been imported in the file of the template.
+		const fromFileName = document.virtualDocument.fileName;
+		const isDefinitionImported = dependencyStore.hasTagNameBeenImported(fromFileName, htmlNode.tagName);
 
-				const report: LitHtmlDiagnostic = {
-					kind: LitHtmlDiagnosticKind.MISSING_IMPORT,
-					message: `Missing import for <${htmlNode.tagName}>`,
-					suggestion: config.dontSuggestConfigChanges ? undefined : `You can disable this check by disabling the 'no-missing-import' rule.`,
-					source: "no-missing-import",
-					severity: litDiagnosticRuleSeverity(config, "no-missing-import"),
-					location: { document, ...htmlNode.location.name },
-					htmlNode,
-					definition,
-					importPath
-				};
-				if (config.dontSuggestConfigChanges) {
-					report.suggestion = undefined;
-				}
+		// Report diagnostic if the html tag hasn't been imported.
+		if (!isDefinitionImported) {
+			// Get the import path and the position where it can be placed
+			const importPath = getRelativePathForImport(fromFileName, definition.node.getSourceFile().fileName);
 
-				return [report];
+			const report: LitHtmlDiagnostic = {
+				kind: LitHtmlDiagnosticKind.MISSING_IMPORT,
+				message: `Missing import for <${htmlNode.tagName}>`,
+				suggestion: config.dontSuggestConfigChanges ? undefined : `You can disable this check by disabling the 'no-missing-import' rule.`,
+				source: "no-missing-import",
+				severity: litDiagnosticRuleSeverity(config, "no-missing-import"),
+				location: { document, ...htmlNode.location.name },
+				htmlNode,
+				definition,
+				importPath
+			};
+
+			if (config.dontSuggestConfigChanges) {
+				report.suggestion = undefined;
 			}
+
+			return [report];
 		}
 
 		return;

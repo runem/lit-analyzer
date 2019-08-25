@@ -7,21 +7,29 @@ import { RuleModule } from "../analyze/types/rule-module";
 import { extractBindingTypes } from "../analyze/util/type/extract-binding-types";
 import { isAssignableToType } from "../analyze/util/type/is-assignable-to-type";
 
+/**
+ * This rule validates that you are not binding a boolean type in an attribute binding
+ * This would result in binding the string 'true' or 'false' and a '?' binding should be used instead.
+ */
 const rule: RuleModule = {
 	name: "no-boolean-in-attribute-binding",
 	visitHtmlAssignment(assignment, request) {
+		// Don't validate boolean attribute bindings.
 		if (assignment.kind === HtmlNodeAttrAssignmentKind.BOOLEAN) return;
 
+		// Only validate attribute bindings.
 		const { htmlAttr } = assignment;
 		if (htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE) return;
 
 		const { typeA, typeB } = extractBindingTypes(assignment, request);
 
-		// Return early if the attribute is like: required=""
+		// Return early if the attribute is like 'required=""' because this is assignable to boolean.
 		if (typeB.kind === SimpleTypeKind.STRING_LITERAL && typeB.value.length === 0) {
 			return;
 		}
 
+		// Check that typeB is not of any|unknown type and typeB is assignable to boolean.
+		// Report a diagnostic if typeB is assignable to boolean type because this would result in binding the boolean coerced to string.
 		if (
 			!isAssignableToSimpleTypeKind(typeB, [SimpleTypeKind.ANY, SimpleTypeKind.UNKNOWN], { op: "or" }) &&
 			isAssignableToType({ typeA: { kind: SimpleTypeKind.BOOLEAN }, typeB }, request)
@@ -38,7 +46,12 @@ const rule: RuleModule = {
 					typeB
 				}
 			];
-		} else if (
+		}
+
+		// Check that typeA is not of any|unknown type and typeA is assignable to boolean.
+		// Report a diagnostic if typeA is assignable to boolean type because then
+		//   we should probably be using a boolean binding instead of an attribute binding.
+		if (
 			!isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.ANY, SimpleTypeKind.UNKNOWN], { op: "or" }) &&
 			isAssignableToType(
 				{

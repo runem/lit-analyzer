@@ -7,15 +7,22 @@ import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
 import { suggestTargetForHtmlAttr } from "../analyze/util/attribute-util";
 
+/**
+ * This rule validates that only known events are used in event listener bindings.
+ */
 const rule: RuleModule = {
 	name: "no-unknown-event",
 	visitHtmlAttribute(htmlAttr, { htmlStore, config, definitionStore, document }) {
 		// Ignore "style" and "svg" attrs because I don't yet have all data for them.
 		if (htmlAttr.htmlNode.kind !== HtmlNodeKind.NODE) return;
 
+		// Only validate event listener bindings.
+		if (htmlAttr.kind !== HtmlNodeAttrKind.EVENT_LISTENER) return;
+
+		// Report a diagnostic if the target is unknown
 		const htmlAttrTarget = htmlStore.getHtmlAttrTarget(htmlAttr);
-		if (htmlAttrTarget == null && htmlAttr.kind === HtmlNodeAttrKind.EVENT_LISTENER) {
-			// Don't report unknown properties on unknown tag names
+		if (htmlAttrTarget == null) {
+			// Don't report unknown properties on unknown tags
 			const htmlTag = htmlStore.getHtmlTag(htmlAttr.htmlNode);
 			if (htmlTag == null) return;
 
@@ -45,6 +52,12 @@ const rule: RuleModule = {
 
 export default rule;
 
+/**
+ * Returns a suggestion text for the unknown event rule.
+ * @param config
+ * @param definitionStore
+ * @param htmlTag
+ */
 function getSuggestionText({
 	config,
 	definitionStore,

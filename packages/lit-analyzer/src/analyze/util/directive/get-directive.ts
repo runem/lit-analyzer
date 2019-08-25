@@ -2,8 +2,8 @@ import { SimpleType, SimpleTypeKind, toSimpleType } from "ts-simple-type";
 import { Expression } from "typescript";
 import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../types/html-node/html-node-attr-assignment-types";
-import { isLitDirective } from "./is-lit-directive";
 import { removeUndefinedFromType } from "../type/remove-undefined-from-type";
+import { isLitDirective } from "./is-lit-directive";
 
 export type BuiltInDirectiveKind =
 	| "ifDefined"
@@ -26,11 +26,7 @@ interface Directive {
 	args: Expression[];
 }
 
-export function getDirective(
-	assignment: HtmlNodeAttrAssignment,
-	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },
-	request: LitAnalyzerRequest
-): Directive | undefined {
+export function getDirective(assignment: HtmlNodeAttrAssignment, request: LitAnalyzerRequest): Directive | undefined {
 	const { ts, program } = request;
 	const checker = program.getTypeChecker();
 
@@ -103,14 +99,19 @@ export function getDirective(
 				};
 
 			default:
-				if (isLitDirective(typeB)) {
-					// Now we have an unknown (user defined) directive.
-					return {
-						kind: {
-							name: functionName
-						},
-						args
-					};
+				// Grab the type of the expression and get a SimpleType
+				if (assignment.kind === HtmlNodeAttrAssignmentKind.EXPRESSION) {
+					const typeB = toSimpleType(checker.getTypeAtLocation(assignment.expression), checker);
+
+					if (isLitDirective(typeB)) {
+						// Now we have an unknown (user defined) directive.
+						return {
+							kind: {
+								name: functionName
+							},
+							args
+						};
+					}
 				}
 		}
 	}

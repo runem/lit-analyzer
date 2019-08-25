@@ -7,19 +7,26 @@ import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
 import { suggestTargetForHtmlAttr } from "../analyze/util/attribute-util";
 
+/**
+ * This rule validates that only known properties are used in bindings.
+ */
 const rule: RuleModule = {
 	name: "no-unknown-property",
 	visitHtmlAttribute(htmlAttr, { htmlStore, config, definitionStore, document }) {
 		// Ignore "style" and "svg" attrs because I don't yet have all data for them.
 		if (htmlAttr.htmlNode.kind !== HtmlNodeKind.NODE) return;
 
+		// Only validate property bindings.
+		if (htmlAttr.kind !== HtmlNodeAttrKind.PROPERTY) return;
+
+		// Report a diagnostic if the target is unknown.
 		const htmlAttrTarget = htmlStore.getHtmlAttrTarget(htmlAttr);
-		if (htmlAttrTarget == null && htmlAttr.kind === HtmlNodeAttrKind.PROPERTY) {
-			// Don't report unknown properties on unknown tag names
+		if (htmlAttrTarget == null) {
+			// Don't report unknown properties on unknown tags
 			const htmlTag = htmlStore.getHtmlTag(htmlAttr.htmlNode);
 			if (htmlTag == null) return;
 
-			// Get suggested target
+			// Get suggested target because the name could be a typo.
 			const suggestedTarget = suggestTargetForHtmlAttr(htmlAttr, htmlStore);
 			const suggestedMemberName = (suggestedTarget && `${litAttributeModifierForTarget(suggestedTarget)}${suggestedTarget.name}`) || undefined;
 
@@ -45,6 +52,12 @@ const rule: RuleModule = {
 
 export default rule;
 
+/**
+ * Generates a suggestion for the unknown property rule.
+ * @param config
+ * @param definitionStore
+ * @param htmlTag
+ */
 function getSuggestionText({
 	config,
 	definitionStore,
@@ -54,6 +67,7 @@ function getSuggestionText({
 	definitionStore: AnalyzerDefinitionStore;
 	htmlTag: HtmlTag;
 }): string | undefined {
+	// Don't generate suggestion if config changes has been disabled.
 	if (config.dontSuggestConfigChanges) {
 		return undefined;
 	}
