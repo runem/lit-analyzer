@@ -28,9 +28,8 @@ const rule: RuleModule = {
 					kind: LitHtmlDiagnosticKind.COMPLEX_NOT_BINDABLE_IN_ATTRIBUTE_BINDING,
 					severity: litDiagnosticRuleSeverity(request.config, "no-complex-attribute-binding"),
 					source: "no-complex-attribute-binding",
-					message: `You are binding a non-primitive type '${toTypeString(
-						typeB
-					)}'. This could result in binding the string "[object Object]". Use '.' binding instead?`,
+					message: `You are binding a non-primitive type '${toTypeString(typeB)}'. This could result in binding the string "[object Object]".`,
+					fix: "Use '.' binding instead?",
 					location: { document: request.document, ...htmlAttr.location.name },
 					htmlAttr,
 					typeA,
@@ -41,9 +40,7 @@ const rule: RuleModule = {
 
 		// Only primitive types should be allowed as "typeA"
 		if (!isAssignableToPrimitiveType(typeA)) {
-			const message = `You are assigning the primitive '${toTypeString(typeB)}' to a non-primitive type '${toTypeString(
-				typeA
-			)}'. Use '.' binding instead?`;
+			const message = `You are assigning the primitive '${toTypeString(typeB)}' to a non-primitive type '${toTypeString(typeA)}'.`;
 
 			return [
 				{
@@ -51,6 +48,7 @@ const rule: RuleModule = {
 					severity: litDiagnosticRuleSeverity(request.config, "no-complex-attribute-binding"),
 					source: "no-complex-attribute-binding",
 					message,
+					fix: "Use '.' binding instead?",
 					location: { document: request.document, ...htmlAttr.location.name },
 					htmlAttr,
 					typeA,

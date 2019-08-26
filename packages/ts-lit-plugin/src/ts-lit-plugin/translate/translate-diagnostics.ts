@@ -14,7 +14,7 @@ function translateDiagnostic(report: LitDiagnostic, file: SourceFile, context: L
 	const messageText: string | DiagnosticMessageChain =
 		!context.config.dontShowSuggestions && report.suggestion
 			? {
-					messageText: report.message,
+					messageText: `${report.message}${report.fix == null ? "" : ` ${report.fix}`}`,
 					code,
 					category,
 					next: {

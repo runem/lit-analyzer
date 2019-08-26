@@ -33,6 +33,7 @@ export type LitDiagnosticSeverity = "error" | "warning";
 export interface LitDiagnosticBase {
 	location: SourceFileRange;
 	message: string;
+	fix?: string;
 	source: LitAnalyzerRuleName;
 	suggestion?: string;
 	severity: LitDiagnosticSeverity;

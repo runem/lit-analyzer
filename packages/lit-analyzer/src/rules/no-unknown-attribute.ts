@@ -38,7 +38,8 @@ const rule: RuleModule = {
 			return [
 				{
 					kind: LitHtmlDiagnosticKind.UNKNOWN_TARGET,
-					message: `Unknown attribute '${htmlAttr.name}'${suggestedMemberName != null ? `. Did you mean '${suggestedMemberName}'?` : ""}`,
+					message: `Unknown attribute '${htmlAttr.name}'.`,
+					fix: suggestedMemberName == null ? undefined : `Did you mean '${suggestedMemberName}'?`,
 					location: { document, ...htmlAttr.location.name },
 					source: "no-unknown-attribute",
 					severity: litDiagnosticRuleSeverity(config, "no-unknown-attribute"),

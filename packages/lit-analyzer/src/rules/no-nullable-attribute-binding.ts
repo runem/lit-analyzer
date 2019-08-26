@@ -26,7 +26,8 @@ const rule: RuleModule = {
 			return [
 				{
 					kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_NULL,
-					message: `This attribute binds the type '${toTypeString(typeB)}' which can be 'null'. Fix it using 'ifDefined' and strict equality check?`,
+					message: `This attribute binds the type '${toTypeString(typeB)}' which can be 'null'.`,
+					fix: "Use the 'ifDefined' directive and strict null check?",
 					source: "no-nullable-attribute-binding",
 					severity: litDiagnosticRuleSeverity(request.config, "no-nullable-attribute-binding"),
 					location: { document: request.document, ...htmlAttr.location.name },
@@ -42,7 +43,8 @@ const rule: RuleModule = {
 			return [
 				{
 					kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED,
-					message: `This attribute binds the type '${toTypeString(typeB)}' which can be 'undefined'. Fix it using 'ifDefined'?`,
+					message: `This attribute binds the type '${toTypeString(typeB)}' which can be 'undefined'.`,
+					fix: "Use the 'ifDefined' directive?",
 					source: "no-nullable-attribute-binding",
 					severity: litDiagnosticRuleSeverity(request.config, "no-nullable-attribute-binding"),
 					location: { document: request.document, ...htmlAttr.location.name },

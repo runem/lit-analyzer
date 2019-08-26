@@ -35,7 +35,8 @@ const rule: RuleModule = {
 			return [
 				{
 					kind: LitHtmlDiagnosticKind.UNKNOWN_TARGET,
-					message: `Unknown event '${htmlAttr.name}'${suggestedMemberName != null ? `. Did you mean '${suggestedMemberName}'?` : ""}`,
+					message: `Unknown event '${htmlAttr.name}'.`,
+					fix: suggestedMemberName == null ? undefined : `Did you mean '${suggestedMemberName}'?`,
 					location: { document, ...htmlAttr.location.name },
 					source: "no-unknown-event",
 					severity: litDiagnosticRuleSeverity(config, "no-unknown-event"),
