@@ -124,7 +124,7 @@ test("Boolean binding: Boolean is assignable in a boolean attribute binding", t 
 });
 
 test("Boolean binding: String is not assignable in boolean attribute binding", t => {
-	const { diagnostics } = getDiagnostics('html`<input ?required="${{} as string}}" />`');
+	const { diagnostics } = getDiagnostics('html`<input ?required="${{} as string}" />`');
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
