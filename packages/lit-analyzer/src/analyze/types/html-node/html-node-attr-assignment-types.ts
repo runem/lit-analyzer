@@ -1,5 +1,6 @@
 import { Expression } from "typescript";
 import { Range } from "../range";
+import { HtmlNodeAttr } from "./html-node-attr-types";
 
 export enum HtmlNodeAttrAssignmentKind {
 	BOOLEAN = "BOOLEAN",
@@ -10,6 +11,7 @@ export enum HtmlNodeAttrAssignmentKind {
 
 export interface IHtmlNodeAttrAssignmentBase {
 	location?: Range;
+	htmlAttr: HtmlNodeAttr;
 }
 
 export interface IHtmlNodeAttrAssignmentExpression extends IHtmlNodeAttrAssignmentBase {

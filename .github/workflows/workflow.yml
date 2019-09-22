@@ -1,0 +1,39 @@
+name: Main Workflow
+
+on: [push, pull_request]
+
+jobs:
+  run:
+    name: Run
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+
+      - name: Set Node.js 10.x
+        uses: actions/setup-node@master
+        with:
+          version: 10.x
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run bootstrap
+
+      - name: Test
+        run: npm test
+
+      - name: Package vscode plugin
+        run: npm run copylink && npx lerna run package --scope lit-plugin && mkdir vscode-lit-plugin && mv packages/vscode-lit-plugin/lit-plugin-*.vsix vscode-lit-plugin
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@master
+        with:
+          name: vscode-lit-plugin
+          path: vscode-lit-plugin

@@ -4,6 +4,21 @@ import * as tsServer from "typescript/lib/tsserverlibrary";
 import { analyzeComponents, analyzeLibDomHtmlElement } from "web-component-analyzer";
 import { getBuiltInHtmlCollection } from "./data/get-built-in-html-collection";
 import { getUserConfigHtmlCollection } from "./data/get-user-config-html-collection";
+import noBooleanInAttributeBindingRule from "../rules/no-boolean-in-attribute-binding";
+import noComplexAttributeBindingRule from "../rules/no-complex-attribute-binding";
+import noExpressionlessPropertyBindingRule from "../rules/no-expressionless-property-binding";
+import noIncompatibleTypeBindingRule from "../rules/no-incompatible-type-binding";
+import noInvalidDirectiveBindingRule from "../rules/no-invalid-directive-binding";
+import noNoncallableEventBindingRule from "../rules/no-noncallable-event-binding";
+import noNullableAttributeBindingRule from "../rules/no-nullable-attribute-binding";
+import noUnknownSlotRule from "../rules/no-unknown-slot";
+import noMissingImport from "../rules/no-missing-import";
+import noUnclosedTag from "../rules/no-unclosed-tag";
+import noUnknownTagName from "../rules/no-unknown-tag-name";
+import noUnknownAttribute from "../rules/no-unknown-attribute";
+import noUnknownProperty from "../rules/no-unknown-property";
+import noUnknownEvent from "../rules/no-unknown-event";
+import { RuleModule } from "./types/rule-module";
 import { isRuleDisabled, LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config";
 import { LitAnalyzerContext, LitPluginContextHandler } from "./lit-analyzer-context";
 import { DefaultLitAnalyzerLogger, LitAnalyzerLoggerLevel } from "./lit-analyzer-logger";
@@ -15,6 +30,23 @@ import { DefaultAnalyzerDocumentStore } from "./store/document-store/default-ana
 import { DefaultAnalyzerHtmlStore } from "./store/html-store/default-analyzer-html-store";
 import { HtmlDataSourceKind } from "./store/html-store/html-data-source-merged";
 import { changedSourceFileIterator } from "./util/changed-source-file-iterator";
+
+const rules: RuleModule[] = [
+	noExpressionlessPropertyBindingRule,
+	noUnknownSlotRule,
+	noNoncallableEventBindingRule,
+	noNullableAttributeBindingRule,
+	noComplexAttributeBindingRule,
+	noBooleanInAttributeBindingRule,
+	noInvalidDirectiveBindingRule,
+	noIncompatibleTypeBindingRule,
+	noMissingImport,
+	noUnclosedTag,
+	noUnknownTagName,
+	noUnknownAttribute,
+	noUnknownProperty,
+	noUnknownEvent
+];
 
 export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 	protected componentSourceFileIterator = changedSourceFileIterator();
@@ -42,6 +74,10 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 	readonly documentStore = new DefaultAnalyzerDocumentStore();
 	readonly definitionStore = new DefaultAnalyzerDefinitionStore();
 	readonly logger = new DefaultLitAnalyzerLogger();
+
+	get rules(): RuleModule[] {
+		return rules;
+	}
 
 	public updateConfig(config: LitAnalyzerConfig) {
 		this._config = config;

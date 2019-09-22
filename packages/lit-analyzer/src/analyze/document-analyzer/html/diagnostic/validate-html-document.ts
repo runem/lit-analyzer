@@ -1,7 +1,7 @@
+import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { HtmlDocument } from "../../../parse/document/text-document/html-document/html-document";
 import { HtmlNodeAttr } from "../../../types/html-node/html-node-attr-types";
 import { HtmlNode } from "../../../types/html-node/html-node-types";
-import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { LitHtmlDiagnostic } from "../../../types/lit-diagnostic";
 import { validateHtmlNode } from "./validate-html-node";
 import { validateHtmlAttr } from "./validate-html-node-attr";
@@ -17,7 +17,10 @@ export function validateHTMLDocument(htmlDocument: HtmlDocument, request: LitAna
 			const iterateAttrs = (attrs: HtmlNodeAttr[]) => {
 				for (const attr of attrs) {
 					reports.push(...validateHtmlAttr(attr, request));
-					reports.push(...validateHtmlAttrAssignment(attr, request));
+
+					if (attr.assignment != null) {
+						reports.push(...validateHtmlAttrAssignment(attr.assignment, request));
+					}
 				}
 			};
 

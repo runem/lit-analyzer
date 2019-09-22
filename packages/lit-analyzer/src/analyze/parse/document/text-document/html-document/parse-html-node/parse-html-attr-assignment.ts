@@ -1,7 +1,7 @@
-import { Range } from "../../../../../types/range";
-import { IP5NodeAttr, IP5TagNode, getSourceLocation } from "../parse-html-p5/parse-html-types";
 import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../../../types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttr } from "../../../../../types/html-node/html-node-attr-types";
+import { Range } from "../../../../../types/range";
+import { getSourceLocation, IP5NodeAttr, IP5TagNode } from "../parse-html-p5/parse-html-types";
 import { ParseHtmlContext } from "./parse-html-context";
 
 /**
@@ -20,7 +20,7 @@ export function parseHtmlAttrAssignment(
 	const location = getAssignmentLocation(p5Node, p5Attr, htmlAttr, context);
 
 	if (location == null) {
-		return { kind: HtmlNodeAttrAssignmentKind.BOOLEAN };
+		return { kind: HtmlNodeAttrAssignmentKind.BOOLEAN, htmlAttr };
 	}
 
 	const values = context.getPartsAtOffsetRange(location);
@@ -33,20 +33,23 @@ export function parseHtmlAttrAssignment(
 			return {
 				kind: HtmlNodeAttrAssignmentKind.STRING,
 				location,
-				value
+				value,
+				htmlAttr
 			};
 		} else {
 			return {
 				kind: HtmlNodeAttrAssignmentKind.EXPRESSION,
 				location,
-				expression: value
+				expression: value,
+				htmlAttr
 			};
 		}
 	} else {
 		return {
 			kind: HtmlNodeAttrAssignmentKind.MIXED,
 			location,
-			values
+			values,
+			htmlAttr
 		};
 	}
 }
@@ -64,15 +67,15 @@ function getAssignmentLocation(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, htmlAttr
 
 	const htmlAfterName = context.html.substring(nameEndOffset, htmlAttrLocation.endOffset);
 
-	const firstQuote = indexOfRegExp(htmlAfterName, /['"]/);
-	const lastQuote = indexOfRegExp(htmlAfterName, /['"]$/);
-	const firstEquals = htmlAfterName.indexOf("=");
+	const firstQuote = indexOfRegExp(htmlAfterName, /^([\s=]*)(['"])/);
+	const lastQuote = indexOfRegExp(htmlAfterName, /['"]\s*$/);
+	const firstEquals = indexOfRegExp(htmlAfterName, /=/);
 
 	// Example: attr
-	if (firstEquals < 0) return undefined;
+	if (firstEquals == null) return undefined;
 
-	// Example: attr=myvalue
-	if (firstQuote < 0 && lastQuote < 0) {
+	// Example: attr=myvalue | attr=myvalue" | attr="myvalue
+	if (firstQuote == null || lastQuote == null) {
 		return {
 			start: nameEndOffset + firstEquals + 1,
 			end: htmlAttrLocation.endOffset
@@ -80,14 +83,10 @@ function getAssignmentLocation(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, htmlAttr
 	}
 
 	// Example: attr="myvalue"
-	if (firstQuote >= 0 && lastQuote >= 0) {
-		return {
-			start: nameEndOffset + firstQuote + 1,
-			end: nameEndOffset + lastQuote
-		};
-	}
-
-	return undefined;
+	return {
+		start: nameEndOffset + firstQuote + 1,
+		end: nameEndOffset + lastQuote
+	};
 }
 
 /**
@@ -96,7 +95,14 @@ function getAssignmentLocation(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, htmlAttr
  * @param text
  * @param reg
  */
-function indexOfRegExp(text: string, reg: RegExp): number {
+function indexOfRegExp(text: string, reg: RegExp): number | undefined {
 	const match = text.match(reg);
-	return match == null || match.index == null ? -1 : match.index;
+	if (match == null) return undefined;
+
+	// Support matching with a prefix group that counts as padding
+	if (match.length === 3) {
+		return match[1].length;
+	}
+
+	return match.index;
 }
