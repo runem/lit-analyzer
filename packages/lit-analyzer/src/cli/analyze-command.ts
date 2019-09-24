@@ -16,6 +16,7 @@ function printText(text: string, config: LitAnalyzerCliConfig) {
 	if (config.outFile != null) {
 		appendFileSync(config.outFile, text);
 	} else {
+		// eslint-disable-next-line no-console
 		console.log(text);
 	}
 }
@@ -65,8 +66,10 @@ export async function analyzeCommand(globs: string[], config: LitAnalyzerCliConf
 	await analyzeGlobs(globs, config, {
 		didExpandGlobs(filePaths: string[]): void {
 			if (filePaths.length === 0) {
+				// eslint-disable-next-line no-console
 				console.log(`\n${chalk.red("  ✖ Couldn't find any files to analyze")}`);
 			} else {
+				// eslint-disable-next-line no-console
 				console.log(`Analyzing ${filePaths.length} files...`);
 			}
 		},

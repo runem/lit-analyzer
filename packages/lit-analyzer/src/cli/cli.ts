@@ -28,6 +28,7 @@ export async function cli() {
 	const config: LitAnalyzerCliConfig = { ...DEFAULT_CONFIG, ...rest };
 
 	if (config.debug) {
+		// eslint-disable-next-line no-console
 		console.log("CLI Config", config);
 	}
 
@@ -41,6 +42,7 @@ export async function cli() {
 	);
 
 	if (config.help) {
+		// eslint-disable-next-line no-console
 		console.log(`
 
   Usage

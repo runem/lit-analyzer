@@ -28,6 +28,7 @@ export async function analyzeGlobs(globs: string[], config: LitAnalyzerCliConfig
 	const filePaths = await expandGlobs(globs);
 
 	if (config.debug) {
+		// eslint-disable-next-line no-console
 		console.log(filePaths);
 	}
 
@@ -40,6 +41,7 @@ export async function analyzeGlobs(globs: string[], config: LitAnalyzerCliConfig
 
 	if (diagnostics.length > 0) {
 		if (config.debug) {
+			// eslint-disable-next-line no-console
 			console.dir(diagnostics.map(d => `${(d.file && d.file.fileName) || "unknown"}: ${flattenDiagnosticMessageText(d.messageText, "\n")}`));
 		}
 

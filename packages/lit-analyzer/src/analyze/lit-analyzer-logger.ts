@@ -61,15 +61,19 @@ export class DefaultLitAnalyzerLogger implements LitAnalyzerLogger {
 
 		switch (level) {
 			case LitAnalyzerLoggerLevel.VERBOSE:
+				// eslint-disable-next-line no-console
 				console.log(prefix, ...args);
 				return;
 			case LitAnalyzerLoggerLevel.DEBUG:
+				// eslint-disable-next-line no-console
 				console.debug(prefix, ...args);
 				return;
 			case LitAnalyzerLoggerLevel.WARN:
+				// eslint-disable-next-line no-console
 				console.warn(prefix, ...args);
 				return;
 			case LitAnalyzerLoggerLevel.ERROR:
+				// eslint-disable-next-line no-console
 				console.error(prefix, ...args);
 				return;
 			case LitAnalyzerLoggerLevel.OFF:
