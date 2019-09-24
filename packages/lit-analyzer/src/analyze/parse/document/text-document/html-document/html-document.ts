@@ -51,6 +51,30 @@ export class HtmlDocument extends TextDocument {
 		return;
 	}
 
+	/**
+	 * Finds the closest node to offset.
+	 * This method can be used to find out which tag to close in the HTML.
+	 * @param offset
+	 */
+	htmlNodeClosestToOffset(offset: number): HtmlNode | undefined {
+		let closestNode: HtmlNode | undefined = undefined;
+
+		// Use 'findNode' to iterate nodes. Keep track of the closest node.
+		this.findNode(node => {
+			if (offset < node.location.startTag.end) {
+				// Break as soon as we find a node that starts AFTER the offset.
+				// The closestNode would now be the previous found node.
+				return true;
+			} else if (node.location.endTag == null || offset < node.location.endTag.end) {
+				// Save closest node if the node doesn't have an end tag of the node ends AFTER the offset.
+				closestNode = node;
+			}
+			return false;
+		});
+
+		return closestNode;
+	}
+
 	findAttr(test: (node: HtmlNodeAttr) => boolean): HtmlNodeAttr | undefined {
 		return this.mapFindOne(node => {
 			for (const attr of node.attributes) {

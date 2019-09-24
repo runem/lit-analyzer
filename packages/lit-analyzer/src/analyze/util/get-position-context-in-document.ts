@@ -35,7 +35,7 @@ export function getPositionContextInDocument(document: TextDocument, offset: num
 	const word = leftWord + rightWord;
 
 	const beforeWord = text[Math.max(0, offset - leftWord.length - 1)];
-	const afterWord = text[Math.min(text.length, offset - leftWord.length)];
+	const afterWord = text[Math.min(text.length - 1, offset + rightWord.length)];
 
 	return {
 		offset,

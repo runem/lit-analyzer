@@ -1,7 +1,7 @@
-import { HtmlDocument } from "../../../parse/document/text-document/html-document/html-document";
-import { getPositionContextInDocument } from "../../../util/get-position-context-in-document";
 import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
+import { HtmlDocument } from "../../../parse/document/text-document/html-document/html-document";
 import { LitCompletion } from "../../../types/lit-completion";
+import { getPositionContextInDocument } from "../../../util/get-position-context-in-document";
 import { completionsForHtmlAttrValues } from "./completions-for-html-attr-values";
 import { completionsForHtmlAttrs } from "./completions-for-html-attrs";
 import { completionsForHtmlNodes } from "./completions-for-html-nodes";
@@ -15,6 +15,7 @@ export function completionsAtOffset(document: HtmlDocument, offset: number, requ
 	const intersectingAttr = document.htmlAttrNameAtOffset(offset);
 	const intersectingAttrAreaNode = document.htmlAttrAreaAtOffset(offset);
 	const intersectingAttrAssignment = document.htmlAttrAssignmentAtOffset(offset);
+	const intersectingClosestNode = document.htmlNodeClosestToOffset(offset);
 
 	// Get entries from the extensions
 	if (intersectingAttr != null) {
@@ -29,8 +30,8 @@ export function completionsAtOffset(document: HtmlDocument, offset: number, requ
 		return completionsForHtmlAttrValues(intersectingAttrAssignment, positionContext, request);
 	} else if (intersectingAttrAreaNode != null) {
 		return completionsForHtmlAttrs(intersectingAttrAreaNode, positionContext, request);
-	} else if (beforeWord === "<") {
-		return completionsForHtmlNodes(positionContext, positionContext, request);
+	} else if (beforeWord === "<" || beforeWord === "/") {
+		return completionsForHtmlNodes(intersectingClosestNode, positionContext, request);
 	}
 
 	return [];
