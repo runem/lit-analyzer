@@ -112,6 +112,7 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | [no-nullable-attribute-binding](#-no-nullable-attribute-binding) | Disallow attribute bindings with nullable types such as "null" or "undefined".  | error | error |
 | [no-incompatible-type-binding](#-no-incompatible-type-binding)   | Disallow incompatible type in bindings.  | error | error |
 | [no-invalid-directive-binding](#-no-invalid-directive-binding)   | Disallow using built-in directives in unsupported bindings. | error | error |
+| [no-unintended-mixed-binding](#-no-unintended-mixed-binding)   | Disallow mixed value bindings where a character `'`, `"`, `}` or `/` is unintentionally included in the binding. | warn | warn |
 
 **Validating LitElement**
 
@@ -380,7 +381,7 @@ The directives already make these checks on runtime, so this will help you catch
 
 The following examples are considered warnings:
 ```js
-html`<button value="${unsafeHTML(html)}"></button>`
+html`<input value="${unsafeHTML(html)}" />`
 html`<input .value="${ifDefined(myValue)}" />`
 html`<div role="${class(classMap)}"></div>`
 ```
@@ -393,6 +394,27 @@ html`<input value="${myValue}" />`
 html`<div class="${class(classMap)}"></div>`
 ```
 
+#### 🕷 no-unintended-mixed-binding
+
+Sometimes unintended characters sneak into bindings. This often indicates a typo such as `<input value=${"foo"}} />` where the expression is directly followed by a "}" which will be included in the value being bound, resulting in "foo}". Another example is self-closing tags without a space between the binding and "/" like `<input value=${"foo"}/>` which will result in binding the string "myvalue/".
+
+This rule disallows mixed value bindings where a character `'`, `"`, `}` or `/` is unintentionally included in the binding.
+
+The following examples are considered warnings:
+```js
+html`<input .value=${"myvalue"}" />`
+html`<input value=${"myvalue"}} />`
+html`<input value=${"myvalue"}/>`
+html`<input ?required=${true}/>`
+```
+
+The following examples are not considered warnings:
+```js
+html`<input .value=${"myvalue"} />`
+html`<input value="${"myvalue"}" />`
+html`<input ?required=${true} />`
+html`<input @input="${console.log}" />`
+```
 
 
 ### Validating LitElement
