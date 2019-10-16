@@ -51,3 +51,8 @@ test("Event binding: Object literal without 'handleEvent' is not bindable", t =>
 	const { diagnostics } = getDiagnostics('function foo() {}; html`<input @change="${{foo: "bar"}}" />`');
 	hasDiagnostic(t, diagnostics, "no-noncallable-event-binding");
 });
+
+test("Event binding: Mixed value binding with first expression being callable is bindable", t => {
+	const { diagnostics } = getDiagnostics('html`<input @change="foo${console.log}bar" />`');
+	hasNoDiagnostics(t, diagnostics);
+});

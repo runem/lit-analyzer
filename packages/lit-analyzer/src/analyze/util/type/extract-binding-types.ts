@@ -8,9 +8,10 @@ import {
 	SimpleTypeStringLiteral,
 	toSimpleType
 } from "ts-simple-type";
-import { Type, TypeChecker } from "typescript";
+import { Type, TypeChecker, Expression } from "typescript";
 import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../types/html-node/html-node-attr-assignment-types";
+import { HtmlNodeAttrKind } from "../../types/html-node/html-node-attr-types";
 import { getDirective } from "../directive/get-directive";
 
 export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, request: LitAnalyzerRequest): { typeA: SimpleType; typeB: SimpleType } {
@@ -55,6 +56,16 @@ export function inferTypeFromAssignment(assignment: HtmlNodeAttrAssignment, chec
 		case HtmlNodeAttrAssignmentKind.EXPRESSION:
 			return checker.getTypeAtLocation(assignment.expression);
 		case HtmlNodeAttrAssignmentKind.MIXED:
+			// Event bindings always looks at the first expression
+			// Therefore, return the type of the first expression
+			if (assignment.htmlAttr.kind === HtmlNodeAttrKind.EVENT_LISTENER) {
+				const expression = assignment.values.find((val): val is Expression => typeof val !== "string");
+
+				if (expression != null) {
+					return checker.getTypeAtLocation(expression);
+				}
+			}
+
 			return { kind: SimpleTypeKind.STRING } as SimpleTypeString;
 	}
 }

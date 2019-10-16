@@ -1,5 +1,6 @@
 import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
 import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node-attr-assignment-types";
+import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
 
@@ -23,6 +24,12 @@ const rule: RuleModule = {
 
 		// Only check mixed bindings with 2 values
 		if (assignment.values.length !== 2) {
+			return;
+		}
+
+		// Event listener binding ignores mixed bindings.
+		// This kind of binding only uses the first expression present in the mixed binding.
+		if (assignment.htmlAttr.kind === HtmlNodeAttrKind.EVENT_LISTENER) {
 			return;
 		}
 
