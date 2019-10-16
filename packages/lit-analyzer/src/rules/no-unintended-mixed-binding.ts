@@ -14,7 +14,7 @@ const CONTROL_CHARACTERS = ["'", '"', "}", "/"];
  *   <input value=${val}} />
  */
 const rule: RuleModule = {
-	name: "no-unexpected-mixed-binding",
+	name: "no-unintended-mixed-binding",
 	visitHtmlAssignment(assignment, request) {
 		// Check mixed bindings
 		if (assignment.kind !== HtmlNodeAttrAssignmentKind.MIXED) {
@@ -48,8 +48,8 @@ const rule: RuleModule = {
 			return [
 				{
 					kind: LitHtmlDiagnosticKind.INVALID_MIXED_BINDING,
-					severity: litDiagnosticRuleSeverity(request.config, "no-unexpected-mixed-binding"),
-					source: "no-unexpected-mixed-binding",
+					severity: litDiagnosticRuleSeverity(request.config, "no-unintended-mixed-binding"),
+					source: "no-unintended-mixed-binding",
 					message,
 					location: { document: request.document, ...assignment.htmlAttr.location.name }
 				}

@@ -9,7 +9,7 @@ export type LitAnalyzerRuleName =
 	| "no-unknown-property"
 	| "no-unknown-event"
 	| "no-unknown-slot"
-	| "no-unexpected-mixed-binding"
+	| "no-unintended-mixed-binding"
 	| "no-invalid-boolean-binding"
 	| "no-expressionless-property-binding"
 	| "no-noncallable-event-binding"
@@ -32,7 +32,7 @@ export const ALL_RULE_NAMES: LitAnalyzerRuleName[] = [
 	"no-unknown-property",
 	"no-unknown-event",
 	"no-unknown-slot",
-	"no-unexpected-mixed-binding",
+	"no-unintended-mixed-binding",
 	"no-invalid-boolean-binding",
 	"no-expressionless-property-binding",
 	"no-noncallable-event-binding",
@@ -60,7 +60,7 @@ const DEFAULT_RULES_NOSTRICT: Required<LitAnalyzerRules> = {
 	"no-unknown-property": "off",
 	"no-unknown-event": "off",
 	"no-unknown-slot": "off",
-	"no-unexpected-mixed-binding": "warn",
+	"no-unintended-mixed-binding": "warn",
 	"no-invalid-boolean-binding": "error",
 	"no-expressionless-property-binding": "error",
 	"no-noncallable-event-binding": "error",
@@ -84,7 +84,7 @@ const DEFAULT_RULES_STRICT: Required<LitAnalyzerRules> = {
 	"no-unknown-property": "warn",
 	"no-unknown-event": "off",
 	"no-unknown-slot": "warn",
-	"no-unexpected-mixed-binding": "warn",
+	"no-unintended-mixed-binding": "warn",
 	"no-invalid-boolean-binding": "error",
 	"no-expressionless-property-binding": "error",
 	"no-noncallable-event-binding": "error",

@@ -4,22 +4,22 @@ import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert";
 
 test('Report mixed binding with expression and "', t => {
 	const { diagnostics } = getDiagnostics('html`<input value=${"foo"}" />`');
-	hasDiagnostic(t, diagnostics, "no-unexpected-mixed-binding");
+	hasDiagnostic(t, diagnostics, "no-unintended-mixed-binding");
 });
 
 test("Report mixed binding with expression and '", t => {
 	const { diagnostics } = getDiagnostics("html`<input value=${'foo'}' />`");
-	hasDiagnostic(t, diagnostics, "no-unexpected-mixed-binding");
+	hasDiagnostic(t, diagnostics, "no-unintended-mixed-binding");
 });
 
 test("Report mixed binding with expression and }", t => {
 	const { diagnostics } = getDiagnostics("html`<input value=${'foo'}} />`");
-	hasDiagnostic(t, diagnostics, "no-unexpected-mixed-binding");
+	hasDiagnostic(t, diagnostics, "no-unintended-mixed-binding");
 });
 
 test("Report mixed binding with expression and /", t => {
 	const { diagnostics } = getDiagnostics("html`<input value=${'foo'}/>`");
-	hasDiagnostic(t, diagnostics, "no-unexpected-mixed-binding");
+	hasDiagnostic(t, diagnostics, "no-unintended-mixed-binding");
 });
 
 test("Don't report mixed binding with expression and %", t => {
@@ -29,5 +29,5 @@ test("Don't report mixed binding with expression and %", t => {
 
 test("Report mixed binding with expression and } inside quotes", t => {
 	const { diagnostics } = getDiagnostics('html`<input value="${"foo"}}" />`');
-	hasDiagnostic(t, diagnostics, "no-unexpected-mixed-binding");
+	hasDiagnostic(t, diagnostics, "no-unintended-mixed-binding");
 });
