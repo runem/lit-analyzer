@@ -26,13 +26,14 @@ const rule: RuleModule = {
 			// If it's not possible to use an unnamed slot, see if there is a "slot" attribute present.
 			const slotAttr = htmlNode.attributes.find(a => a.name === "slot");
 			if (slotAttr == null) {
+				const parentTagName = (htmlNode.parent && htmlNode.parent.tagName) || "";
 				// The slot attribute is missing, and it's not possible to use an unnamed slot.
 				return [
 					{
 						kind: LitHtmlDiagnosticKind.MISSING_SLOT_ATTRIBUTE,
 						validSlotNames: slots.map(s => s.name),
 						htmlNode,
-						message: `Missing slot attribute. Parent element <${htmlNode.tagName}> only allows named slots as children.`,
+						message: `Missing slot attribute. Parent element <${parentTagName}> only allows named slots as children.`,
 						severity: litDiagnosticRuleSeverity(config, "no-unknown-slot"),
 						source: "no-unknown-slot",
 						location: { document, ...htmlNode.location.name }
