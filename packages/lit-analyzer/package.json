@@ -45,10 +45,10 @@
 		"ts-simple-type": "~0.3.6",
 		"vscode-css-languageservice": "4.0.2-next.1",
 		"vscode-html-languageservice": "2.1.12",
-		"web-component-analyzer": "~0.1.11"
+		"web-component-analyzer": "~0.1.17"
 	},
 	"devDependencies": {
-		"@appnest/readme": "^1.2.3",
+		"@appnest/readme": "^1.2.4",
 		"@types/node": "^10.12.24",
 		"@wessberg/rollup-plugin-ts": "^1.1.62",
 		"ava": "^2.2.0",

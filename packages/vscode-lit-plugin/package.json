@@ -39,7 +39,7 @@
 		"vscode-styled-components": "https://github.com/styled-components/vscode-styled-components#f806f23a027e3458e9d77001851b428f1cb992d5"
 	},
 	"devDependencies": {
-		"@appnest/readme": "^1.2.3",
+		"@appnest/readme": "^1.2.4",
 		"@types/node": "^10.12.24",
 		"typescript": "^3.5.3",
 		"vsce": "^1.58.0",

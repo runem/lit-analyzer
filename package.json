@@ -42,7 +42,7 @@
 	},
 	"dependencies": {},
 	"devDependencies": {
-		"@appnest/readme": "^1.2.3",
+		"@appnest/readme": "^1.2.4",
 		"@typescript-eslint/eslint-plugin": "^1.13.0",
 		"@typescript-eslint/parser": "^1.13.0",
 		"eslint": "^6.1.0",
