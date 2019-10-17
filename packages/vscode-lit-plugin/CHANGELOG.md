@@ -9,6 +9,27 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 <!-- ### Removed -->
 <!-- ### Fixed -->
 
+## [1.1.9] - 2019-10-17
+
+### Added
+- New rule `no-unintended-mixed-binding` to prevent bugs like `<input value=${"foo"}} />` ([#44](https://github.com/runem/lit-analyzer/issues/44))
+- Hex colors within html/css templates are now highlighted in the vscode plugin ([#30](https://github.com/runem/lit-analyzer/issues/30))
+
+### Fixed
+- Big internal refactor, including adding a lot of tests ([#49](https://github.com/runem/lit-analyzer/pull/49))
+- Fixed problem where closing tags weren't auto-completed properly ([#37cba351](https://github.com/runem/lit-analyzer/commit/37cba3519762a1b8c6f6522baa40842e1b5ac504))
+- Fixed problem where lit-analyzer would crash when running with a newer version of Typescript ([#58](https://github.com/runem/lit-analyzer/issues/58))
+
+
+## [1.1.8] - 2019-08-13
+
+### Added
+- Export Bazel plugin ([#39](https://github.com/runem/lit-analyzer/issues/39))
+- Support css snippets and % units ([#40](https://github.com/runem/lit-analyzer/issues/40))
+
+### Fixed
+- Fix problem where the value of attributes on the form attr='val' could get parsed incorrectly. ([#36](https://github.com/runem/lit-analyzer/issues/36))
+
 ## [1.1.4] - 2019-08-05
 
 ### Added
@@ -17,9 +38,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
 - When using the @property decorator from "lit-element" the type of "{type: ...}" is checked against the actual property type.
 - Support for using components built with mixins
-- Warning when using boolean type expression in attribute binding ([#15](https://github.com/runem/ts-lit-plugin/issues/15))
-- Allow "null" and "undefined" as values always when using "?" attr binding ([#16](https://github.com/runem/ts-lit-plugin/issues/16))
-- Suggested code fix: Please use the `ifDefined` directive. ([#17](https://github.com/runem/ts-lit-plugin/issues/17))
+- Warning when using boolean type expression in attribute binding ([#15](https://github.com/runem/lit-analyzer/issues/15))
+- Allow "null" and "undefined" as values always when using "?" attr binding ([#16](https://github.com/runem/lit-analyzer/issues/16))
+- Suggested code fix: Please use the `ifDefined` directive. ([#17](https://github.com/runem/lit-analyzer/issues/17))
 - The usage of built-in directives is now checked to make sure that they are used correctly.
 - Experimental: It's now possible to refactor custom element tag names.
 
