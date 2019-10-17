@@ -25,7 +25,8 @@ export enum LitHtmlDiagnosticKind {
 	INVALID_ATTRIBUTE_EXPRESSION_TYPE = "INVALID_ATTRIBUTE_EXPRESSION_TYPE",
 	INVALID_SLOT_NAME = "INVALID_SLOT_NAME",
 	MISSING_SLOT_ATTRIBUTE = "MISSING_SLOT_ATTRIBUTE",
-	DIRECTIVE_NOT_ALLOWED_HERE = "DIRECTIVE_NOT_ALLOWED_HERE"
+	DIRECTIVE_NOT_ALLOWED_HERE = "DIRECTIVE_NOT_ALLOWED_HERE",
+	INVALID_MIXED_BINDING = "INVALID_MIXED_BINDING"
 }
 
 export type LitDiagnosticSeverity = "error" | "warning";
@@ -150,6 +151,10 @@ export interface LitHtmlDiagnosticMissingSlotAttr extends LitDocumentDiagnosticB
 	validSlotNames: string[];
 }
 
+export interface LitHtmlDiagnosticInvalidMixedBinding extends LitDocumentDiagnosticBase {
+	kind: LitHtmlDiagnosticKind.INVALID_MIXED_BINDING;
+}
+
 export type LitHtmlDiagnostic =
 	| LitHtmlDiagnosticUnknownTag
 	| LitHtmlDiagnosticMissingImport
@@ -167,6 +172,7 @@ export type LitHtmlDiagnostic =
 	| LitHtmlDiagnosticHtmlExpressionOnlyAssignableWithBooleanBinding
 	| LitHtmlDiagnosticInvalidSlotName
 	| LitHtmlDiagnosticMissingSlotAttr
+	| LitHtmlDiagnosticInvalidMixedBinding
 	| LitHtmlDiagnosticTagNotClosed;
 
 export interface LitCssDiagnostic extends LitDocumentDiagnosticBase {}

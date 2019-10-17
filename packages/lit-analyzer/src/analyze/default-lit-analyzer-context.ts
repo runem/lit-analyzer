@@ -9,6 +9,7 @@ import noComplexAttributeBindingRule from "../rules/no-complex-attribute-binding
 import noExpressionlessPropertyBindingRule from "../rules/no-expressionless-property-binding";
 import noIncompatibleTypeBindingRule from "../rules/no-incompatible-type-binding";
 import noInvalidDirectiveBindingRule from "../rules/no-invalid-directive-binding";
+import noUnintendedMixedBindingRule from "../rules/no-unintended-mixed-binding";
 import noNoncallableEventBindingRule from "../rules/no-noncallable-event-binding";
 import noNullableAttributeBindingRule from "../rules/no-nullable-attribute-binding";
 import noUnknownSlotRule from "../rules/no-unknown-slot";
@@ -33,6 +34,7 @@ import { changedSourceFileIterator } from "./util/changed-source-file-iterator";
 
 const rules: RuleModule[] = [
 	noExpressionlessPropertyBindingRule,
+	noUnintendedMixedBindingRule,
 	noUnknownSlotRule,
 	noNoncallableEventBindingRule,
 	noNullableAttributeBindingRule,
