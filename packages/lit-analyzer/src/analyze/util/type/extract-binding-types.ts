@@ -14,7 +14,13 @@ import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../types/
 import { HtmlNodeAttrKind } from "../../types/html-node/html-node-attr-types";
 import { getDirective } from "../directive/get-directive";
 
+const cache = new WeakMap<HtmlNodeAttrAssignment, { typeA: SimpleType; typeB: SimpleType }>();
+
 export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, request: LitAnalyzerRequest): { typeA: SimpleType; typeB: SimpleType } {
+	if (cache.has(assignment)) {
+		return cache.get(assignment)!;
+	}
+
 	const checker = request.program.getTypeChecker();
 
 	// Relax the type we are looking at an expression in javascript files
@@ -44,7 +50,11 @@ export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, request:
 		typeB = directive.actualType;
 	}
 
-	return { typeA, typeB };
+	// Cache the result
+	const result = { typeA, typeB };
+	cache.set(assignment, result);
+
+	return result;
 }
 
 export function inferTypeFromAssignment(assignment: HtmlNodeAttrAssignment, checker: TypeChecker): SimpleType | Type {
