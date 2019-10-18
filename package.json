@@ -28,7 +28,7 @@
 	"scripts": {
 		"prettier:check": "prettier --list-different \"**/*\"",
 		"prettier:write": "prettier --write \"**/*\"",
-		"publish": "lerna run prepare && lerna publish --exact && lerna run install:safe --scope lit-plugin",
+		"publish": "lerna run prepare && lerna publish --exact && lerna run install:safe --scope lit-plugin && echo \"🎉 Published successfully! You can now publish the vscode extension seperately by running 'cd packages/vscode-lit-plugin && npm run publish'\"",
 		"bootstrap": "lerna clean --yes && lerna bootstrap --hoist --ignore lit-plugin && lerna run install:safe --scope lit-plugin",
 		"lint": "eslint 'packages/**/*.{ts,js}'",
 		"build": "lerna run build --parallel --stream",
@@ -38,7 +38,7 @@
 		"readme": "lerna run readme && readme generate -i readme.blueprint.md -c readme.config.json",
 		"dev": "cd dev && TSS_LOG=\"-traceToConsole true -level verbose -file $(pwd)/ts-server-log.txt\" TSS_DEBUG=5999 code . --disable-extension runem.lit-plugin",
 		"dev:logs": "touch dev/lit-plugin.log && tail -f dev/lit-plugin.log",
-		"copylink": "node scripts.js copylink"
+		"copylink": "nodemon --exec \"node scripts.js copylink\""
 	},
 	"dependencies": {},
 	"devDependencies": {
@@ -50,6 +50,7 @@
 		"fs-extra": "^8.1.0",
 		"husky": "^1.3.1",
 		"lerna": "^3.16.1",
+		"nodemon": "^1.19.4",
 		"prettier": "^1.16.4",
 		"pretty-quick": "^1.10.0",
 		"typescript": "^3.5.3"

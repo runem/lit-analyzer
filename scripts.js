@@ -31,6 +31,7 @@ run(command).catch(console.log);
  * @returns {Promise<void>}
  */
 async function copyPackage(linkPackageName, destPackageName) {
+	// eslint-disable-next-line no-console
 	console.log(`Copying ${linkPackageName} to ${destPackageName}/node_modules`);
 	await copy(`./packages/${linkPackageName}/lib`, `./packages/${destPackageName}/node_modules/${linkPackageName}/lib`);
 	await copy(`./packages/${linkPackageName}/package.json`, `./packages/${destPackageName}/node_modules/${linkPackageName}/package.json`);

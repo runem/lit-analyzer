@@ -1,0 +1,8 @@
+{
+	"watch": [
+		"./packages/lit-analyzer/lib/",
+		"./packages/lit-analyzer/package.json",
+		"./packages/ts-lit-plugin/lib/",
+		"./packages/ts-lit-plugin/package.json"
+	]
+}
