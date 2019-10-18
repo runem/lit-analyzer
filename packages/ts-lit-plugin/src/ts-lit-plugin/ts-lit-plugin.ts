@@ -16,7 +16,9 @@ import {
 	RenameInfoOptions,
 	RenameLocation,
 	TextChange,
-	UserPreferences
+	UserPreferences,
+	SignatureHelpItemsOptions,
+	SignatureHelpItems
 } from "typescript";
 import { LitPluginContext } from "./lit-plugin-context";
 import { translateCodeFixes } from "./translate/translate-code-fixes";
@@ -111,6 +113,21 @@ export class TsLitPlugin {
 		const file = this.program.getSourceFile(fileName)!;
 		const result = this.litAnalyzer.getClosingTagAtPosition(file, position);
 		return result || this.prevLangService.getJsxClosingTagAtPosition(fileName, position);
+	}
+
+	getSignatureHelpItems(fileName: string, position: number, options: SignatureHelpItemsOptions | undefined): SignatureHelpItems | undefined {
+		const result = this.prevLangService.getSignatureHelpItems(fileName, position, options);
+
+		// Test if the signature is "html" or "css
+		// Don't return a signature if trying to show signature fo the html/css tagged template literal
+		if (result != null && result.items.length === 1) {
+			const displayPart = result.items[0].prefixDisplayParts[0];
+			if (displayPart.kind === "aliasName" && (displayPart.text === "html" || displayPart.text === "css")) {
+				return undefined;
+			}
+		}
+
+		return result;
 	}
 
 	findRenameLocations(
