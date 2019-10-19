@@ -38,7 +38,8 @@
 		"readme": "lerna run readme && readme generate -i readme.blueprint.md -c readme.config.json",
 		"dev": "cd dev && TSS_LOG=\"-traceToConsole true -level verbose -file $(pwd)/ts-server-log.txt\" TSS_DEBUG=5999 code . --disable-extension runem.lit-plugin",
 		"dev:logs": "touch dev/lit-plugin.log && tail -f dev/lit-plugin.log",
-		"copylink": "nodemon --exec \"node scripts.js copylink\""
+		"copylink": "node scripts.js copylink",
+		"copylink:watch": "nodemon --exec \"npm run copylink\""
 	},
 	"dependencies": {},
 	"devDependencies": {
