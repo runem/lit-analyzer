@@ -98,6 +98,13 @@ test("Attribute binding: Boolean attribute is assignable to boolean", t => {
 	hasNoDiagnostics(t, diagnostics);
 });
 
+test("Attribute binding: Boolean type expression is assignable to 'true'|'false'", t => {
+	const { diagnostics } = getDiagnostics('let b = true; html`<input aria-expanded="${b}" />`', {
+		rules: { "no-boolean-in-attribute-binding": false }
+	});
+	hasNoDiagnostics(t, diagnostics);
+});
+
 test("Attribute binding: Boolean type expression (true) is assignable to 'true'|'false'", t => {
 	const { diagnostics } = getDiagnostics('html`<input aria-expanded="${true}" />`', { rules: { "no-boolean-in-attribute-binding": false } });
 	hasNoDiagnostics(t, diagnostics);

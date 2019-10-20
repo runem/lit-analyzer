@@ -57,7 +57,7 @@ export function isAssignableInAttributeBinding(
  * @param typeB
  * @param options
  */
-function isAssignableToTypeWithStringCoercion(typeA: SimpleType, typeB: SimpleType, options: SimpleTypeComparisonOptions) {
+export function isAssignableToTypeWithStringCoercion(typeA: SimpleType, typeB: SimpleType, options: SimpleTypeComparisonOptions) {
 	const safeOptions = { ...options, isAssignable: undefined };
 
 	switch (typeB.kind) {

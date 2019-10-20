@@ -1,10 +1,11 @@
-import { isAssignableToSimpleTypeKind, SimpleTypeKind, toTypeString } from "ts-simple-type";
+import { isAssignableToSimpleTypeKind, SimpleTypeKind } from "ts-simple-type";
 import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
 import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
 import { extractBindingTypes } from "../analyze/util/type/extract-binding-types";
+import { isAssignableToTypeWithStringCoercion } from "../analyze/util/type/is-assignable-in-attribute-binding";
 import { isAssignableToType } from "../analyze/util/type/is-assignable-to-type";
 
 /**
@@ -34,12 +35,17 @@ const rule: RuleModule = {
 			!isAssignableToSimpleTypeKind(typeB, [SimpleTypeKind.ANY, SimpleTypeKind.UNKNOWN], { op: "or" }) &&
 			isAssignableToType({ typeA: { kind: SimpleTypeKind.BOOLEAN }, typeB }, request)
 		) {
+			// Don't emit error if typeB is assignable to typeA with string coercion.
+			if (isAssignableToType({ typeA, typeB }, request, { isAssignable: isAssignableToTypeWithStringCoercion })) {
+				return;
+			}
+
 			return [
 				{
 					kind: LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING,
 					severity: litDiagnosticRuleSeverity(request.config, "no-boolean-in-attribute-binding"),
 					source: "no-boolean-in-attribute-binding",
-					message: `The type '${toTypeString(typeB)}' is a boolean type but you are not using a boolean binding.`,
+					message: `The value being assigned is a boolean type, but you are not using a boolean binding.`,
 					fix: "Change to boolean binding?",
 					location: { document: request.document, ...htmlAttr.location.name },
 					htmlAttr,

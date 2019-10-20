@@ -16,3 +16,10 @@ test("Non-boolean-binding on a boolean type attribute with a non-boolean type ex
 	const { diagnostics } = getDiagnostics('html`<input required="${{} as string}" />`', { rules: { "no-boolean-in-attribute-binding": true } });
 	hasDiagnostic(t, diagnostics, "no-boolean-in-attribute-binding");
 });
+
+test("Boolean assigned to 'true|'false' doesn't emit 'no-boolean-in-attribute-binding' warning", t => {
+	const { diagnostics } = getDiagnostics('let b: boolean = true; html`<input aria-expanded="${b}" />`', {
+		rules: { "no-boolean-in-attribute-binding": true }
+	});
+	hasNoDiagnostics(t, diagnostics);
+});
