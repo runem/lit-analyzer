@@ -136,9 +136,12 @@ export function litDiagnosticRuleSeverity(config: LitAnalyzerConfig, ruleName: L
 
 export type LitAnalyzerLogging = "off" | "error" | "warn" | "debug" | "verbose";
 
+export type LitSecuritySystem = "off" | "ClosureSafeTypes";
+
 export interface LitAnalyzerConfig {
 	strict: boolean;
 	rules: LitAnalyzerRules;
+	securitySystem: LitSecuritySystem;
 
 	disable: boolean;
 	logging: LitAnalyzerLogging;
@@ -165,6 +168,7 @@ export function makeConfig(userOptions: Partial<LitAnalyzerConfig> = {}): LitAna
 	return {
 		strict: userOptions.strict || false,
 		rules: makeRules(userOptions),
+		securitySystem: userOptions.securitySystem || "off",
 
 		disable: userOptions.disable || false,
 		logging: userOptions.logging || "off",

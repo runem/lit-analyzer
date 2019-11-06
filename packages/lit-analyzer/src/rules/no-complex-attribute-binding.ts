@@ -5,6 +5,7 @@ import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
 import { isLitDirective } from "../analyze/util/directive/is-lit-directive";
 import { extractBindingTypes } from "../analyze/util/type/extract-binding-types";
+import { isAssignableBindingUnderSecuritySystem } from "../analyze/util/type/is-assignable-binding-under-security-system";
 
 /**
  * This rule validates that complex types are not used within an expression in an attribute binding.
@@ -23,6 +24,12 @@ const rule: RuleModule = {
 
 		// Only primitive types should be allowed as "typeB"
 		if (!isAssignableToPrimitiveType(typeB)) {
+			if (isAssignableBindingUnderSecuritySystem(htmlAttr, { typeA, typeB }, request, this.name) !== undefined) {
+				// This is binding via a security sanitization system, let it do
+				// this check. Apparently complex values are OK to assign here.
+				return undefined;
+			}
+
 			return [
 				{
 					kind: LitHtmlDiagnosticKind.COMPLEX_NOT_BINDABLE_IN_ATTRIBUTE_BINDING,

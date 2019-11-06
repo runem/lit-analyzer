@@ -6,6 +6,7 @@ import { HtmlNodeAttr } from "../../types/html-node/html-node-attr-types";
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../types/lit-diagnostic";
 import { isAssignableToType } from "./is-assignable-to-type";
 import { isLitDirective } from "../directive/is-lit-directive";
+import { isAssignableBindingUnderSecuritySystem } from "./is-assignable-binding-under-security-system";
 
 export function isAssignableInAttributeBinding(
 	htmlAttr: HtmlNodeAttr,
@@ -31,6 +32,21 @@ export function isAssignableInAttributeBinding(
 			];
 		}
 	} else {
+		if (assignment.kind !== HtmlNodeAttrAssignmentKind.STRING) {
+			// Purely static attributes are never security checked, they're handled
+			// in the lit-html internals as trusted by default, because they can
+			// not contain untrusted data, they were written by the developer.
+			//
+			// For everything else, we may need to apply a different type comparison
+			// for some security-sensitive built in attributes and properties (like
+			// <script src>).
+			const securityDiagnostics = isAssignableBindingUnderSecuritySystem(htmlAttr, { typeA, typeB }, request, "no-incompatible-type-binding");
+			if (securityDiagnostics !== undefined) {
+				// The security diagnostics are binding. Note that this may be an
+				// empty array.
+				return securityDiagnostics;
+			}
+		}
 		if (!isAssignableToType({ typeA, typeB }, request, { isAssignable: isAssignableToTypeWithStringCoercion })) {
 			return [
 				{
