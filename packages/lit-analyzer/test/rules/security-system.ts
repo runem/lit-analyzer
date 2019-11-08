@@ -70,7 +70,7 @@ test(testName, t => {
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
-testName = "May pass either a SafeUrl or a TrustedResourceUrl to img src with ClosureSafeTypes config";
+testName = "May pass either a SafeUrl or a TrustedResourceUrl or a string to img src with ClosureSafeTypes config";
 test(testName, t => {
 	const { diagnostics } = getDiagnostics(preface + "html`<img src=${safeUrl}></script>`", { securitySystem: "ClosureSafeTypes" });
 	hasNoDiagnostics(t, diagnostics);
@@ -79,9 +79,14 @@ test(testName, t => {
 		securitySystem: "ClosureSafeTypes"
 	});
 	hasNoDiagnostics(t, moreDiagnostics);
+
+	const { diagnostics: evenMoreDiagnostics } = getDiagnostics(preface + "html`<img src=${'/img.webp'}></script>`", {
+		securitySystem: "ClosureSafeTypes"
+	});
+	hasNoDiagnostics(t, evenMoreDiagnostics);
 });
 
-testName = "May pass either a SafeUrl or a TrustedResourceUrl to img .src with ClosureSafeTypes config";
+testName = "May pass either a SafeUrl or a TrustedResourceUrl or a string to img .src with ClosureSafeTypes config";
 test(testName, t => {
 	const { diagnostics } = getDiagnostics(preface + "html`<img .src=${safeUrl}></script>`", { securitySystem: "ClosureSafeTypes" });
 	hasNoDiagnostics(t, diagnostics);
@@ -90,24 +95,23 @@ test(testName, t => {
 		securitySystem: "ClosureSafeTypes"
 	});
 	hasNoDiagnostics(t, moreDiagnostics);
+
+	const { diagnostics: evenMoreDiagnostics } = getDiagnostics(preface + "html`<img .src=${'/img.webp'}></script>`", {
+		securitySystem: "ClosureSafeTypes"
+	});
+	hasNoDiagnostics(t, evenMoreDiagnostics);
 });
 
-testName = "May not pass a string to img src with ClosureSafeTypes config";
-test(testName, t => {
-	const { diagnostics } = getDiagnostics(preface + 'html`<img src=${"/foo.webp"}></script>`', { securitySystem: "ClosureSafeTypes" });
-	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
-});
-
-testName = "May not pass a string to style with ClosureSafeTypes config";
+testName = "May pass a string to style with ClosureSafeTypes config";
 test(testName, t => {
 	const { diagnostics } = getDiagnostics(preface + 'html`<div style=${"color: red"}></div>`', { securitySystem: "ClosureSafeTypes" });
-	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+	hasNoDiagnostics(t, diagnostics);
 });
 
-testName = "May not pass a string to .style with ClosureSafeTypes config";
+testName = "May pass a string to .style with ClosureSafeTypes config";
 test(testName, t => {
 	const { diagnostics } = getDiagnostics(preface + 'html`<div .style=${"color: red"}></div>`', { securitySystem: "ClosureSafeTypes" });
-	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+	hasNoDiagnostics(t, diagnostics);
 });
 
 testName = "May pass a SafeStyle to style with ClosureSafeTypes config";
