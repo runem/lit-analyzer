@@ -65,7 +65,7 @@
 			"ts"
 		],
 		"require": [
-			"ts-node/register"
+			"ts-node/register/transpile-only"
 		],
 		"snapshotDir": "test/snapshots/results",
 		"files": [
