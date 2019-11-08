@@ -160,11 +160,27 @@ export interface LitAnalyzerConfig {
 	customHtmlData: (string | HtmlData)[] | string | HtmlData;
 }
 
+function expectNever(never: never) {
+	return never;
+}
+
 /**
  * Parses a partial user configuration and returns a full options object with defaults.
  * @param userOptions
  */
 export function makeConfig(userOptions: Partial<LitAnalyzerConfig> = {}): LitAnalyzerConfig {
+	let securitySystem = userOptions.securitySystem || "off";
+	switch (securitySystem) {
+		case "off":
+		case "ClosureSafeTypes":
+			break; // legal values
+		default:
+			// Log an error here? Or maybe throw?
+			expectNever(securitySystem);
+			// Unknown values get converted to "off".
+			securitySystem = "off";
+	}
+
 	return {
 		strict: userOptions.strict || false,
 		rules: makeRules(userOptions),
