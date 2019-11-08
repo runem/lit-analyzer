@@ -42,8 +42,8 @@ export function isAssignableInAttributeBinding(
 			// <script src>).
 			const securityDiagnostics = isAssignableBindingUnderSecuritySystem(htmlAttr, { typeA, typeB }, request, "no-incompatible-type-binding");
 			if (securityDiagnostics !== undefined) {
-				// The security diagnostics are binding. Note that this may be an
-				// empty array.
+				// The security diagnostics take precedence here, and we should not
+				// do any more checking. Note that this may be an empty array.
 				return securityDiagnostics;
 			}
 		}
