@@ -82,7 +82,7 @@ function checkClosureSecurityAssignability(
 		return [
 			{
 				kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE,
-				message: `Type '${toTypeString(typeB)}' is not assignable to '${overriddenTypes.join(" | ")}'.`,
+				message: `Type '${toTypeString(typeB)}' is not assignable to '${overriddenTypes.join(" | ")}'. This is due to Closure Safe Type enforcement.`,
 				severity: "error",
 				source,
 				location: { document: request.document, ...htmlAttr.location.name },
