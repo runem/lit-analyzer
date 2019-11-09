@@ -31,8 +31,8 @@ const rule: RuleModule = {
 			return [
 				{
 					kind: LitHtmlDiagnosticKind.UNKNOWN_TAG,
-					message: `Unknown tag "${htmlNode.tagName}".`,
-					fix: suggestedName == null ? undefined : `Did you mean '${suggestedName}'?`,
+					message: `Unknown tag <${htmlNode.tagName}>.`,
+					fix: suggestedName == null ? undefined : `Did you mean <${suggestedName}>?`,
 					location: { document, ...htmlNode.location.name },
 					source: "no-unknown-tag-name",
 					severity: litDiagnosticRuleSeverity(config, "no-unknown-tag-name"),
