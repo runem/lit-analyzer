@@ -17,11 +17,13 @@ function translateDiagnostic(report: LitDiagnostic, file: SourceFile, context: L
 					messageText: `${report.message}${report.fix == null ? "" : ` ${report.fix}`}`,
 					code,
 					category,
-					next: {
-						messageText: report.suggestion,
-						code: 0,
-						category: context.ts.DiagnosticCategory.Suggestion
-					}
+					next: [
+						{
+							messageText: report.suggestion,
+							code: 0,
+							category: context.ts.DiagnosticCategory.Suggestion
+						}
+					]
 			  }
 			: report.message;
 
