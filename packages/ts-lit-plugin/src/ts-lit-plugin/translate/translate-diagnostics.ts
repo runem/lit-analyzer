@@ -17,15 +17,19 @@ function translateDiagnostic(report: LitDiagnostic, file: SourceFile, context: L
 					messageText: `${report.message}${report.fix == null ? "" : ` ${report.fix}`}`,
 					code,
 					category,
-					next: [
-						{
-							messageText: report.suggestion,
-							code: 0,
-							category: context.ts.DiagnosticCategory.Suggestion
-						}
-					]
+					next: {
+						messageText: report.suggestion,
+						code: 0,
+						category: context.ts.DiagnosticCategory.Suggestion
+					}
 			  }
 			: report.message;
+	if (Number(context.ts.versionMajorMinor) >= 3.6) {
+		// The format of DiagnosticMessageChain#next changed in 3.6 to be an array.
+		if (typeof messageText === "object" && messageText.next != null) {
+			messageText.next = ([messageText.next] as unknown) as DiagnosticMessageChain;
+		}
+	}
 
 	return {
 		...span,
