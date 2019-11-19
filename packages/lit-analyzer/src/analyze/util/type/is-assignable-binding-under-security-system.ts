@@ -3,6 +3,7 @@ import { SimpleType, toTypeString, SimpleTypeKind } from "ts-simple-type";
 import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../types/lit-diagnostic";
 import { LitAnalyzerRuleName } from "../../lit-analyzer-config";
+import { isLitDirective } from "../directive/is-lit-directive";
 
 /**
  * If the user's security policy overrides normal type checking for this
@@ -69,10 +70,11 @@ function checkClosureSecurityAssignability(
 	if (overriddenTypes === undefined) {
 		return undefined;
 	}
-	const typeMatch = matchesAtLeastOneNominalType(overriddenTypes, typeB);
-	if (typeMatch === undefined) {
+	// Directives are responsible for their own security.
+	if (isLitDirective(typeB)) {
 		return undefined;
 	}
+	const typeMatch = matchesAtLeastOneNominalType(overriddenTypes, typeB);
 	if (typeMatch === false) {
 		const nominalType: SimpleType = {
 			kind: SimpleTypeKind.INTERFACE,
@@ -95,11 +97,7 @@ function checkClosureSecurityAssignability(
 	return [];
 }
 
-function matchesAtLeastOneNominalType(typeNames: string[], typeB: SimpleType): boolean | undefined {
-	// Directives are out of scope of lit's security system.
-	if (looksLikeADirective(typeB)) {
-		return undefined;
-	}
+function matchesAtLeastOneNominalType(typeNames: string[], typeB: SimpleType): boolean {
 	if (typeB.name !== undefined && typeNames.includes(typeB.name)) {
 		return true;
 	}
@@ -114,26 +112,4 @@ function matchesAtLeastOneNominalType(typeNames: string[], typeB: SimpleType): b
 		default:
 			return false;
 	}
-}
-
-function looksLikeADirective(type: SimpleType): boolean {
-	// If it has this type name, probably a directive.
-	if (type.name === "DirectiveFn") {
-		return true;
-	}
-	// Otherwise, look for a function that takes a part and returns nothing.
-	if (type.kind !== "FUNCTION" && type.kind !== "METHOD") {
-		return false;
-	}
-	if (type.argTypes === undefined || type.argTypes.length !== 1) {
-		return false;
-	}
-	const [argType] = type.argTypes;
-	if (argType.type.name !== "Part" && argType.type.name !== "NodePart") {
-		return false;
-	}
-	if (type.returnType === undefined || type.returnType.kind !== SimpleTypeKind.VOID) {
-		return false;
-	}
-	return true;
 }
