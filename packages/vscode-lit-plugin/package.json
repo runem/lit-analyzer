@@ -91,6 +91,15 @@
 						"description": "Enable strict mode.",
 						"default": false
 					},
+					"lit-plugin.securitySystem": {
+						"type": "string",
+						"description": "The lit-html security sanitization strategy to assume.",
+						"default": "off",
+						"enum": [
+							"off",
+							"ClosureSafeTypes"
+						]
+					},
 					"lit-plugin.htmlTemplateTags": {
 						"type": "array",
 						"description": "List of template tags to enable html support in.",

@@ -105,6 +105,9 @@ function getConfig(): Partial<LitAnalyzerConfig> {
 	withConfigValue(config, "strict", value => {
 		outConfig.strict = value;
 	});
+	withConfigValue(config, "securitySystem", value => {
+		outConfig.securitySystem = value;
+	});
 
 	// Template tags
 	withConfigValue(config, "htmlTemplateTags", value => {
