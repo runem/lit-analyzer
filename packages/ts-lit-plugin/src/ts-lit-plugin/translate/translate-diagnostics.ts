@@ -24,6 +24,12 @@ function translateDiagnostic(report: LitDiagnostic, file: SourceFile, context: L
 					}
 			  }
 			: report.message;
+	if (Number(context.ts.versionMajorMinor) >= 3.6) {
+		// The format of DiagnosticMessageChain#next changed in 3.6 to be an array.
+		if (typeof messageText === "object" && messageText.next != null) {
+			messageText.next = ([messageText.next] as unknown) as DiagnosticMessageChain;
+		}
+	}
 
 	return {
 		...span,
