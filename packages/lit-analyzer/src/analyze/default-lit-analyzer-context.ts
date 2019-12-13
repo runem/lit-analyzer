@@ -1,4 +1,4 @@
-import * as tsModule from "typescript";
+import * as tsMod from "typescript";
 import { Program, SourceFile, TypeChecker } from "typescript";
 import * as tsServer from "typescript/lib/tsserverlibrary";
 import { analyzeComponents, analyzeLibDomHtmlElement } from "web-component-analyzer";
@@ -56,7 +56,7 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 	protected _config: LitAnalyzerConfig = makeConfig({});
 
 	get ts() {
-		return this.handler.ts || tsModule;
+		return this.handler.ts || tsMod;
 	}
 
 	get program(): Program {

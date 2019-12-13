@@ -1,4 +1,4 @@
-import * as tsModule from "typescript";
+import * as tsMod from "typescript";
 import * as tsServer from "typescript/lib/tsserverlibrary";
 import { Program, SourceFile } from "typescript";
 import { RuleModule } from "./types/rule-module";
@@ -11,7 +11,7 @@ import { AnalyzerDocumentStore } from "./store/analyzer-document-store";
 import { AnalyzerHtmlStore } from "./store/analyzer-html-store";
 
 export interface LitAnalyzerContext {
-	readonly ts: typeof tsModule;
+	readonly ts: typeof tsMod;
 	readonly program: Program;
 	readonly project: tsServer.server.Project | undefined;
 	readonly config: LitAnalyzerConfig;
@@ -32,7 +32,7 @@ export interface LitAnalyzerRequest extends LitAnalyzerContext {
 }
 
 export interface LitPluginContextHandler {
-	ts?: typeof tsModule;
+	ts?: typeof tsMod;
 	getProgram(): Program;
 	getProject?(): tsServer.server.Project;
 }

@@ -35,8 +35,8 @@
 		"lit-analyzer": "1.1.9"
 	},
 	"devDependencies": {
-		"@types/node": "^10.12.24",
-		"typescript": "^3.5.3"
+		"@types/node": "^12.12.17",
+		"typescript": "^3.6.4"
 	},
 	"contributors": [
 		{

@@ -8,7 +8,7 @@
 		"ts-lit-plugin": "file:../packages/ts-lit-plugin"
 	},
 	"devDependencies": {
-		"typescript": "^3.5.3"
+		"typescript": "^3.6.4"
 	},
 	"keywords": [],
 	"author": "",

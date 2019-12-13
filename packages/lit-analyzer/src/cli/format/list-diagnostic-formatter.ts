@@ -24,7 +24,6 @@ ${chalk.underline(`${relativeFileName(file.fileName)}`)}
 ${diagnosticText}`;
 }
 
-// @ts-ignore
 function litDiagnosticToErrorText(file: SourceFile, diagnostic: LitDiagnostic): string {
 	const textSpan = translateRange(diagnostic.location);
 	const lineContext = file.getLineAndCharacterOfPosition(textSpan.start);

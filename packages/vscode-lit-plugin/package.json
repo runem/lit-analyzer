@@ -41,7 +41,7 @@
 	"devDependencies": {
 		"@appnest/readme": "^1.2.4",
 		"@types/node": "^10.12.24",
-		"typescript": "^3.5.3",
+		"typescript": "^3.6.4",
 		"vsce": "^1.58.0",
 		"vscode": "^1.1.29"
 	},

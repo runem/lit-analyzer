@@ -101,7 +101,7 @@ export interface DescriptionOptions {
 	markdown?: boolean;
 }
 
-function descriptionHeader(title: string, titleLevel: number = 0, { markdown }: DescriptionOptions) {
+function descriptionHeader(title: string, titleLevel = 0, { markdown }: DescriptionOptions) {
 	return markdown ? (titleLevel === 0 ? `**${title.trim()}**` : `${"#".repeat(titleLevel)} ${title}`) : title;
 }
 

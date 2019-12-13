@@ -103,7 +103,7 @@ const DEFAULT_RULES_STRICT: Required<LitAnalyzerRules> = {
 export function ruleSeverity(rules: LitAnalyzerConfig | LitAnalyzerRules, ruleName: LitAnalyzerRuleName): LitAnalyzerRuleSeverity {
 	if ("rules" in rules) return ruleSeverity(rules.rules, ruleName);
 
-	let ruleConfig = rules[ruleName] || "off";
+	const ruleConfig = rules[ruleName] || "off";
 	return Array.isArray(ruleConfig) ? ruleConfig[0] : ruleConfig;
 }
 

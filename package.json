@@ -29,7 +29,7 @@
 		"prettier:check": "prettier --list-different \"**/*\"",
 		"prettier:write": "prettier --write \"**/*\"",
 		"publish": "lerna run prepare && lerna publish --exact && lerna run install:safe --scope lit-plugin && echo \"🎉 Published successfully! You can now publish the vscode extension seperately by running 'cd packages/vscode-lit-plugin && npm run publish'\"",
-		"bootstrap": "lerna clean --yes && lerna bootstrap --hoist --ignore lit-plugin && lerna run install:safe --scope lit-plugin",
+		"bootstrap": "lerna clean --yes && lerna bootstrap --hoist --ignore lit-plugin && lerna run install:safe --scope lit-plugin && npm run copylink",
 		"lint": "eslint 'packages/**/*.{ts,js}'",
 		"build": "lerna run build --parallel --stream",
 		"watch": "lerna run watch --parallel --stream",
@@ -43,18 +43,18 @@
 	},
 	"dependencies": {},
 	"devDependencies": {
-		"@appnest/readme": "^1.2.4",
-		"@typescript-eslint/eslint-plugin": "^1.13.0",
-		"@typescript-eslint/parser": "^1.13.0",
-		"eslint": "^6.1.0",
-		"eslint-config-prettier": "^6.0.0",
+		"@appnest/readme": "^1.2.5",
+		"@typescript-eslint/eslint-plugin": "^2.11.0",
+		"@typescript-eslint/parser": "^2.11.0",
+		"eslint": "^6.7.2",
+		"eslint-config-prettier": "^6.7.0",
 		"fs-extra": "^8.1.0",
-		"husky": "^1.3.1",
-		"lerna": "^3.16.1",
-		"nodemon": "^1.19.4",
-		"prettier": "^1.16.4",
-		"pretty-quick": "^1.10.0",
-		"typescript": "^3.5.3"
+		"husky": "^3.1.0",
+		"lerna": "^3.19.0",
+		"nodemon": "^2.0.2",
+		"prettier": "^1.19.1",
+		"pretty-quick": "^2.0.1",
+		"typescript": "^3.6.4"
 	},
 	"husky": {
 		"hooks": {
