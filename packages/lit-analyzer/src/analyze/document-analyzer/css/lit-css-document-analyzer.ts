@@ -54,7 +54,7 @@ export class LitCssDocumentAnalyzer {
 			return {
 				kind: DefinitionKind.COMPONENT,
 				fromRange: { document, start, end },
-				target: definition.declaration
+				target: definition.declaration()
 			};
 		}
 		return undefined;

@@ -5,6 +5,7 @@ import { HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types"
 import { CodeFixKind, LitCodeFix } from "../../../types/lit-code-fix";
 import { CodeActionKind, LitCodeFixAction } from "../../../types/lit-code-fix-action";
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../../types/lit-diagnostic";
+import { iterableFirst } from "../../../util/iterable-util";
 
 export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document, htmlStore }: LitAnalyzerRequest): LitCodeFix[] {
 	switch (htmlReport.kind) {
@@ -135,7 +136,9 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 			return [
 				{
 					kind: CodeFixKind.IMPORT_COMPONENT,
-					message: `Import "${htmlReport.definition.declaration.className || "component"}" from module "${htmlReport.importPath}"`,
+					message: `Import "${iterableFirst(htmlReport.definition.identifierNodes)?.getText() || "component"}" from module "${
+						htmlReport.importPath
+					}"`,
 					htmlReport,
 					actions: [
 						{

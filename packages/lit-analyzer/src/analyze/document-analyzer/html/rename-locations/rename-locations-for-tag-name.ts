@@ -4,6 +4,7 @@ import { HtmlDocument } from "../../../parse/document/text-document/html-documen
 import { HtmlNode } from "../../../types/html-node/html-node-types";
 import { LitRenameLocation } from "../../../types/lit-rename-location";
 import { findChild } from "../../../util/ast-util";
+import { iterableFirst } from "../../../util/iterable-util";
 
 export function renameLocationsForTagName(tagName: string, request: LitAnalyzerContext): LitRenameLocation[] {
 	const locations: LitRenameLocation[] = [];
@@ -28,38 +29,41 @@ export function renameLocationsForTagName(tagName: string, request: LitAnalyzerC
 
 	const definition = request.definitionStore.getDefinitionForTagName(tagName);
 	if (definition != null) {
-		const { node: definitionNode } = definition;
+		// TODO
+		const definitionNode = iterableFirst(definition.tagNameNodes);
 
-		const fileName = definitionNode.getSourceFile().fileName;
+		if (definitionNode != null) {
+			const fileName = definitionNode.getSourceFile().fileName;
 
-		if (request.ts.isCallLikeExpression(definitionNode)) {
-			const stringLiteralNode = findChild(definitionNode, child => request.ts.isStringLiteralLike(child) && child.text === tagName);
+			if (request.ts.isCallLikeExpression(definitionNode)) {
+				const stringLiteralNode = findChild(definitionNode, child => request.ts.isStringLiteralLike(child) && child.text === tagName);
 
-			if (stringLiteralNode != null) {
-				locations.push({
-					fileName,
-					range: { start: stringLiteralNode.getStart() + 1, end: stringLiteralNode.getEnd() - 1 }
-				});
-			}
-		} else if (definitionNode.kind === request.ts.SyntaxKind.JSDocTag) {
-			const jsDocTagNode = definitionNode as JSDocUnknownTag;
+				if (stringLiteralNode != null) {
+					locations.push({
+						fileName,
+						range: { start: stringLiteralNode.getStart() + 1, end: stringLiteralNode.getEnd() - 1 }
+					});
+				}
+			} else if (definitionNode.kind === request.ts.SyntaxKind.JSDocTag) {
+				const jsDocTagNode = definitionNode as JSDocUnknownTag;
 
-			if (jsDocTagNode.comment != null) {
-				const start = jsDocTagNode.tagName.getEnd() + 1;
+				if (jsDocTagNode.comment != null) {
+					const start = jsDocTagNode.tagName.getEnd() + 1;
 
-				locations.push({
-					fileName,
-					range: { start, end: start + jsDocTagNode.comment.length }
-				});
-			}
-		} else if (request.ts.isInterfaceDeclaration(definitionNode)) {
-			const stringLiteralNode = findChild(definitionNode, child => request.ts.isStringLiteralLike(child) && child.text === tagName);
+					locations.push({
+						fileName,
+						range: { start, end: start + jsDocTagNode.comment.length }
+					});
+				}
+			} else if (request.ts.isInterfaceDeclaration(definitionNode)) {
+				const stringLiteralNode = findChild(definitionNode, child => request.ts.isStringLiteralLike(child) && child.text === tagName);
 
-			if (stringLiteralNode != null) {
-				locations.push({
-					fileName,
-					range: { start: stringLiteralNode.getStart() + 1, end: stringLiteralNode.getEnd() - 1 }
-				});
+				if (stringLiteralNode != null) {
+					locations.push({
+						fileName,
+						range: { start: stringLiteralNode.getStart() + 1, end: stringLiteralNode.getEnd() - 1 }
+					});
+				}
 			}
 		}
 	}
