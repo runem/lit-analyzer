@@ -1,12 +1,13 @@
-import { Node, SourceFile } from "typescript";
-import { AnalyzeComponentsResult, ComponentDefinition, ComponentDiagnostic } from "web-component-analyzer";
+import { SourceFile } from "typescript";
+import { ComponentDefinition } from "web-component-analyzer";
+import { AnalyzerResult } from "web-component-analyzer/lib/cjs/chunk-7b58dea0";
 import { AnalyzerDefinitionStore } from "../analyzer-definition-store";
 
 export class DefaultAnalyzerDefinitionStore implements AnalyzerDefinitionStore {
-	private analysisResultForFile = new Map<string, AnalyzeComponentsResult>();
+	private analysisResultForFile = new Map<string, AnalyzerResult>();
 	private definitionForTagName = new Map<string, ComponentDefinition>();
 
-	absorbAnalysisResult(sourceFile: SourceFile, result: AnalyzeComponentsResult) {
+	absorbAnalysisResult(sourceFile: SourceFile, result: AnalyzerResult) {
 		this.analysisResultForFile.set(sourceFile.fileName, result);
 
 		result.componentDefinitions.forEach(definition => {
@@ -25,26 +26,14 @@ export class DefaultAnalyzerDefinitionStore implements AnalyzerDefinitionStore {
 		this.analysisResultForFile.delete(sourceFile.fileName);
 	}
 
-	getAnalysisResultForFile(sourceFile: SourceFile): AnalyzeComponentsResult | undefined {
+	getAnalysisResultForFile(sourceFile: SourceFile): AnalyzerResult | undefined {
 		return this.analysisResultForFile.get(sourceFile.fileName);
 	}
 
-	getAnalysisDiagnosticsInFile(sourceFile: SourceFile): ComponentDiagnostic[] {
-		const diagnosticForNode = new Map<Node, ComponentDiagnostic>();
-		this.analysisResultForFile.forEach(def =>
-			def.diagnostics.forEach(diagnostic => {
-				if (diagnostic.node.getSourceFile() === sourceFile) {
-					diagnosticForNode.set(diagnostic.node, diagnostic);
-				}
-			})
-		);
-		//flatten(Array.from(this.analysisResultForFile.values()).map(def => def.diagnostics.filter(diagnostic => diagnostic.node.getSourceFile() === sourceFile)));
-		return Array.from(diagnosticForNode.values());
-	}
-
 	getDefinitionsWithDeclarationInFile(sourceFile: SourceFile): ComponentDefinition[] {
+		// TODO
 		return Array.from(this.definitionForTagName.values()).filter(d =>
-			[d.declaration.node, ...(d.declaration.inheritNodes || [])].map(n => n.getSourceFile()).find(sf => sf.fileName === sourceFile.fileName)
+			[...d.declaration().declarationNodes].map(n => n.getSourceFile()).find(sf => sf.fileName === sourceFile.fileName)
 		);
 	}
 

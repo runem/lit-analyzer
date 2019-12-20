@@ -1,4 +1,4 @@
-import { ComponentDeclaration, ComponentMember, EventDeclaration } from "web-component-analyzer";
+import { ComponentDeclaration, ComponentEvent, ComponentMember } from "web-component-analyzer";
 import { DocumentRange } from "./lit-range";
 
 export enum DefinitionKind {
@@ -23,7 +23,7 @@ export interface DefinitionMember extends DefinitionBase {
 
 export interface DefinitionEvent extends DefinitionBase {
 	kind: DefinitionKind.EVENT;
-	target: EventDeclaration;
+	target: ComponentEvent;
 }
 
 export type LitDefinition = DefinitionComponent | DefinitionMember | DefinitionEvent;

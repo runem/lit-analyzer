@@ -1,7 +1,8 @@
 import { isSimpleType, SimpleType, SimpleTypeKind, toSimpleType } from "ts-simple-type";
 import { TypeChecker } from "typescript";
-import { AnalyzeComponentsResult, ComponentDeclaration, ComponentDefinition, JsDoc } from "web-component-analyzer";
-import { lazy } from "../util/general-util";
+import { AnalyzerResult, ComponentDeclaration, ComponentDefinition } from "web-component-analyzer";
+import { isCustomElementTagName, lazy } from "../util/general-util";
+import { iterableFirst } from "../util/iterable-util";
 import { HtmlDataCollection, HtmlMemberBase, HtmlTag } from "./parse-html-data/html-tag";
 
 export interface AnalyzeResultConversionOptions {
@@ -9,8 +10,8 @@ export interface AnalyzeResultConversionOptions {
 	checker: TypeChecker;
 }
 
-export function convertAnalyzeResultToHtmlCollection(result: AnalyzeComponentsResult, options: AnalyzeResultConversionOptions): HtmlDataCollection {
-	const tags = result.componentDefinitions.map(definition => convertComponentDeclarationToHtmlTag(definition.declaration, definition, options));
+export function convertAnalyzeResultToHtmlCollection(result: AnalyzerResult, options: AnalyzeResultConversionOptions): HtmlDataCollection {
+	const tags = result.componentDefinitions.map(definition => convertComponentDeclarationToHtmlTag(definition.declaration(), definition, options));
 
 	return {
 		tags,
@@ -24,15 +25,15 @@ export function convertComponentDeclarationToHtmlTag(
 	definition: ComponentDefinition | undefined,
 	{ checker, addDeclarationPropertiesAsAttributes }: AnalyzeResultConversionOptions
 ): HtmlTag {
-	const tagName = (definition && definition.tagName) || "";
+	const tagName = definition?.tagName || "";
 
-	const builtIn = definition == null || definition.fromLib;
+	const builtIn = definition == null || isCustomElementTagName(definition.tagName);
 
 	const htmlTag: HtmlTag = {
 		declaration,
 		tagName,
 		builtIn,
-		description: descriptionFromJsDoc(declaration.jsDoc),
+		description: declaration.jsDoc?.description,
 		attributes: [],
 		properties: [],
 		slots: [],
@@ -42,9 +43,17 @@ export function convertComponentDeclarationToHtmlTag(
 	for (const event of declaration.events) {
 		htmlTag.events.push({
 			declaration: event,
-			description: descriptionFromJsDoc(event.jsDoc),
+			description: declaration.jsDoc?.description,
 			name: event.name,
-			getType: lazy(() => (isSimpleType(event.type) ? event.type : toSimpleType(event.type, checker))),
+			getType: lazy(() => {
+				const type = event.type?.();
+
+				if (type == null) {
+					return { kind: SimpleTypeKind.ANY };
+				}
+
+				return isSimpleType(type) ? type : toSimpleType(type, checker);
+			}),
 			fromTagName: tagName,
 			builtIn
 		});
@@ -52,7 +61,7 @@ export function convertComponentDeclarationToHtmlTag(
 		htmlTag.attributes.push({
 			kind: "attribute",
 			name: `on${event.name}`,
-			description: descriptionFromJsDoc(event.jsDoc),
+			description: declaration.jsDoc?.description,
 			getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
 			fromTagName: tagName,
 			declaration: {
@@ -60,7 +69,7 @@ export function convertComponentDeclarationToHtmlTag(
 				jsDoc: event.jsDoc,
 				kind: "attribute",
 				node: event.node,
-				type: { kind: SimpleTypeKind.ANY }
+				type: () => ({ kind: SimpleTypeKind.ANY })
 			},
 			builtIn
 		});
@@ -69,7 +78,7 @@ export function convertComponentDeclarationToHtmlTag(
 	for (const slot of declaration.slots) {
 		htmlTag.slots.push({
 			declaration: slot,
-			description: descriptionFromJsDoc(slot.jsDoc),
+			description: slot.jsDoc?.description,
 			name: slot.name || "",
 			fromTagName: tagName
 		});
@@ -78,13 +87,19 @@ export function convertComponentDeclarationToHtmlTag(
 	for (const member of declaration.members) {
 		const base: HtmlMemberBase = {
 			declaration: member,
-			description: descriptionFromJsDoc(member.jsDoc),
-			getType: lazy(() => (isSimpleType(member.type) ? member.type : toSimpleType(member.type, checker))),
+			description: member.jsDoc?.description,
+			getType: lazy(() => {
+				const type = member.type?.();
+
+				if (type == null) {
+					return { kind: SimpleTypeKind.ANY };
+				}
+
+				return isSimpleType(type) ? type : toSimpleType(type, checker);
+			}),
 			fromTagName: tagName,
 			builtIn
 		};
-
-		if (member.kind === "method") continue;
 
 		if (member.kind === "property") {
 			htmlTag.properties.push({
@@ -94,8 +109,8 @@ export function convertComponentDeclarationToHtmlTag(
 				required: member.required
 			});
 
-			if (!("attrName" in member) && addDeclarationPropertiesAsAttributes && (definition != null && !definition.fromLib)) {
-				if (declaration.node.getSourceFile().isDeclarationFile) {
+			if (!("attrName" in member) && addDeclarationPropertiesAsAttributes && !builtIn) {
+				if (iterableFirst(declaration.declarationNodes)!.getSourceFile().isDeclarationFile) {
 					htmlTag.attributes.push({
 						...base,
 						kind: "attribute",
@@ -116,8 +131,4 @@ export function convertComponentDeclarationToHtmlTag(
 	}
 
 	return htmlTag;
-}
-
-function descriptionFromJsDoc(jsDoc: JsDoc | undefined): string | undefined {
-	return (jsDoc && jsDoc.comment) || undefined;
 }

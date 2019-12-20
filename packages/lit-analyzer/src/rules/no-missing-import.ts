@@ -3,6 +3,7 @@ import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
 import { isCustomElementTagName } from "../analyze/util/general-util";
+import { iterableFirst } from "../analyze/util/iterable-util";
 
 /**
  * This rule makes sure that all custom elements used are imported in a given file.
@@ -30,7 +31,7 @@ const rule: RuleModule = {
 		// Report diagnostic if the html tag hasn't been imported.
 		if (!isDefinitionImported) {
 			// Get the import path and the position where it can be placed
-			const importPath = getRelativePathForImport(fromFileName, definition.node.getSourceFile().fileName);
+			const importPath = getRelativePathForImport(fromFileName, iterableFirst(definition.tagNameNodes)!.getSourceFile().fileName);
 
 			const report: LitHtmlDiagnostic = {
 				kind: LitHtmlDiagnosticKind.MISSING_IMPORT,

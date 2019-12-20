@@ -13,7 +13,7 @@ import { LitCodeFix } from "./types/lit-code-fix";
 import { LitCompletion } from "./types/lit-completion";
 import { LitCompletionDetails } from "./types/lit-completion-details";
 import { LitDefinition } from "./types/lit-definition";
-import { LitDiagnostic, LitSourceFileDiagnostic } from "./types/lit-diagnostic";
+import { LitDiagnostic } from "./types/lit-diagnostic";
 import { LitFormatEdit } from "./types/lit-format-edit";
 import { LitOutliningSpan } from "./types/lit-outlining-span";
 import { LitQuickInfo } from "./types/lit-quick-info";
@@ -22,6 +22,7 @@ import { LitRenameLocation } from "./types/lit-rename-location";
 import { Range } from "./types/range";
 import { getNodeAtPosition, nodeIntersects } from "./util/ast-util";
 import { flatten } from "./util/general-util";
+import { iterableFirst } from "./util/iterable-util";
 
 export class LitAnalyzer {
 	private litHtmlDocumentAnalyzer = new LitHtmlDocumentAnalyzer();
@@ -102,7 +103,7 @@ export class LitAnalyzer {
 				const tagName = nodeUnderCursor.text;
 				const definition = this.context.definitionStore.getDefinitionForTagName(tagName);
 
-				if (definition != null && nodeIntersects(nodeUnderCursor, definition.node)) {
+				if (definition != null && nodeIntersects(nodeUnderCursor, iterableFirst(definition.tagNameNodes)!)) {
 					return {
 						fullDisplayName: tagName,
 						displayName: tagName,
@@ -184,7 +185,7 @@ export class LitAnalyzer {
 		this.context.updateComponents(file);
 		this.context.updateDependencies(file);
 
-		const documentDiagnostics = flatten(
+		return flatten(
 			documents.map(document => {
 				const request = this.makeRequest({ document, file });
 
@@ -197,21 +198,6 @@ export class LitAnalyzer {
 				return [];
 			})
 		);
-
-		const analyzeDiagnostics = this.context.definitionStore.getAnalysisDiagnosticsInFile(file).map(
-			diagnostic =>
-				({
-					file: diagnostic.node.getSourceFile(),
-					message: diagnostic.message,
-					severity: diagnostic.severity,
-					location: {
-						start: diagnostic.node.getStart(),
-						end: diagnostic.node.getEnd()
-					}
-				} as LitSourceFileDiagnostic)
-		);
-
-		return [...documentDiagnostics, ...analyzeDiagnostics];
 	}
 
 	getCodeFixesAtPositionRange(file: SourceFile, positionRange: Range): LitCodeFix[] {

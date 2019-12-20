@@ -4,7 +4,7 @@ import { tsModule } from "../../ts-module";
 import { translateRange } from "./translate-range";
 
 export function translateDefinition(definition: LitDefinition): DefinitionInfoAndBoundSpan {
-	const targetNode = definition.target.node;
+	const targetNode = "declarationNodes" in definition.target ? definition.target.declarationNodes.values().next().value : definition.target.node;
 
 	const targetStart = targetNode.getStart();
 	const targetEnd = targetNode.getEnd();
