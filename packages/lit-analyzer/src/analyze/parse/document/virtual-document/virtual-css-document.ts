@@ -3,7 +3,7 @@ import { VirtualAstDocument } from "./virtual-ast-document";
 
 export class VirtualAstCssDocument extends VirtualAstDocument {
 	protected substituteExpression(length: number, expression: Expression, prev: string, next: string | undefined): string {
-		const hasLeftColon = prev.match(/:\s*\${$/) != null;
+		const hasLeftColon = prev.match(/:[^;{]*\${$/) != null;
 		const hasRightColon = next != null && next.match(/^}\s*:\s+/) != null;
 		const hasRightSemicolon = next != null && next.match(/^}\s*;/) != null;
 		const hasRightPercentage = next != null && next.match(/^}%/) != null;
