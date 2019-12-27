@@ -8,7 +8,7 @@ test("Non-boolean-binding with an empty string value is valid", t => {
 });
 
 test("Non-boolean-binding with a boolean type expression is not valid", t => {
-	const { diagnostics } = getDiagnostics('html`<input max="${true}" />`', { rules: { "no-boolean-in-attribute-binding": true } });
+	const { diagnostics } = getDiagnostics('html`<input maxlength="${true}" />`', { rules: { "no-boolean-in-attribute-binding": true } });
 	hasDiagnostic(t, diagnostics, "no-boolean-in-attribute-binding");
 });
 

@@ -3,17 +3,17 @@ import { getDiagnostics } from "../helpers/analyze";
 import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert";
 
 test("Cannot use 'ifDefined' directive in boolean attribute binding", t => {
-	const { diagnostics } = getDiagnostics('type ifDefined = Function; html`<input ?max="${ifDefined({} as number | undefined)}" />`');
+	const { diagnostics } = getDiagnostics('type ifDefined = Function; html`<input ?maxlength="${ifDefined({} as number | undefined)}" />`');
 	hasDiagnostic(t, diagnostics, "no-invalid-directive-binding");
 });
 
 test("Can use 'ifDefined' directive in attribute binding", t => {
-	const { diagnostics } = getDiagnostics('type ifDefined = Function; html`<input max="${ifDefined({} as number | undefined)}" />`');
+	const { diagnostics } = getDiagnostics('type ifDefined = Function; html`<input maxlength="${ifDefined({} as number | undefined)}" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
 test("Cannot use 'ifDefined' directive in property binding", t => {
-	const { diagnostics } = getDiagnostics('type ifDefined = Function; html`<input .max="${ifDefined({} as number | undefined)}" />`');
+	const { diagnostics } = getDiagnostics('type ifDefined = Function; html`<input .maxLength="${ifDefined({} as number | undefined)}" />`');
 	hasDiagnostic(t, diagnostics, "no-invalid-directive-binding");
 });
 
@@ -53,7 +53,7 @@ test("Cannot use 'styleMap' directive in property binding", t => {
 });
 
 test("Cannot use 'unsafeHTML' directive in attribute binding", t => {
-	const { diagnostics } = getDiagnostics('type unsafeHTML = Function; html`<input max="${unsafeHTML("<h1>Hello</h1>")}" />`');
+	const { diagnostics } = getDiagnostics('type unsafeHTML = Function; html`<input maxlength="${unsafeHTML("<h1>Hello</h1>")}" />`');
 	hasDiagnostic(t, diagnostics, "no-invalid-directive-binding");
 });
 

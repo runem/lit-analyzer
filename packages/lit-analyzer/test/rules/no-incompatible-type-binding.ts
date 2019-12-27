@@ -4,47 +4,47 @@ import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert";
 import { makeElement } from "../helpers/generate-test-file";
 
 test("Attribute binding: 'no-incompatible-type-binding' is not emitted when the rule is turned off", t => {
-	const { diagnostics } = getDiagnostics('html`<input max="foo" />`', { rules: { "no-incompatible-type-binding": "off" } });
+	const { diagnostics } = getDiagnostics('html`<input maxlength="foo" />`', { rules: { "no-incompatible-type-binding": "off" } });
 	hasNoDiagnostics(t, diagnostics);
 });
 
 test("Attribute binding: String literal (a number) is assignable to number", t => {
-	const { diagnostics } = getDiagnostics('html`<input max="123" />`');
+	const { diagnostics } = getDiagnostics('html`<input maxlength="123" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
 test("Attribute binding: String literal (not a number) is not assignable to number", t => {
-	const { diagnostics } = getDiagnostics('html`<input max="foo" />`');
+	const { diagnostics } = getDiagnostics('html`<input maxlength="foo" />`');
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
 test("Attribute binding: Number type expression is assignable to number", t => {
-	const { diagnostics } = getDiagnostics('html`<input max="${123}" />`');
+	const { diagnostics } = getDiagnostics('html`<input maxlength="${123}" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
 test("Attribute binding: String literal type expression (a number) is assignable to number", t => {
-	const { diagnostics } = getDiagnostics('html`<input max="${"123"}" />`');
+	const { diagnostics } = getDiagnostics('html`<input maxlength="${"123"}" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
 test("Attribute binding: String literal type expression (not a number) is not assignable to number", t => {
-	const { diagnostics } = getDiagnostics('html`<input max="${"foo"}" />`');
+	const { diagnostics } = getDiagnostics('html`<input maxlength="${"foo"}" />`');
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
 test("Attribute binding: String type expression is not assignable to number", t => {
-	const { diagnostics } = getDiagnostics('html`<input max="${{} as string}" />`');
+	const { diagnostics } = getDiagnostics('html`<input maxlength="${{} as string}" />`');
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
 test("Attribute binding: Expression of type union with two string literals (numbers) is assignable to number", t => {
-	const { diagnostics } = getDiagnostics('html`<input max="${{} as "123" | "321"}" />`');
+	const { diagnostics } = getDiagnostics('html`<input maxlength="${{} as "123" | "321"}" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
 test("Attribute binding: Expression of type union with two string literals (one not being a number) is not assignable to number", t => {
-	const { diagnostics } = getDiagnostics('html`<input max="${{} as "123" | "foo"}" />`');
+	const { diagnostics } = getDiagnostics('html`<input maxlength="${{} as "123" | "foo"}" />`');
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
@@ -69,7 +69,7 @@ test("Attribute binding: Number type expression is assignable to string", t => {
 });
 
 test("Attribute binding: String literal (0 length) is assignable to number", t => {
-	const { diagnostics } = getDiagnostics('html`<input max="" />`');
+	const { diagnostics } = getDiagnostics('html`<input maxlength="" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
@@ -156,12 +156,12 @@ test("Property binding: Boolean type expression is not assignable to boolean pro
 });
 
 test("Attribute binding: 'ifDefined' directive correctly removes 'undefined' from the type union 1", t => {
-	const { diagnostics } = getDiagnostics('type ifDefined = Function; html`<input max="${ifDefined({} as number | undefined)}" />`');
+	const { diagnostics } = getDiagnostics('type ifDefined = Function; html`<input maxlength="${ifDefined({} as number | undefined)}" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
 test("Attribute binding: 'ifDefined' directive correctly removes 'undefined' from the type union 2", t => {
-	const { diagnostics } = getDiagnostics('type ifDefined = Function; html`<input max="${ifDefined({} as number | string | undefined)}" />`');
+	const { diagnostics } = getDiagnostics('type ifDefined = Function; html`<input maxlength="${ifDefined({} as number | string | undefined)}" />`');
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
@@ -171,6 +171,6 @@ test("Attribute binding: 'guard' directive correctly infers correct type from th
 });
 
 test("Attribute binding: 'guard' directive correctly infers correct type from the callback 2", t => {
-	const { diagnostics } = getDiagnostics('type guard = Function; html`<input max="${guard([""], () => ({} as string | number))}" />`');
+	const { diagnostics } = getDiagnostics('type guard = Function; html`<input maxlength="${guard([""], () => ({} as string | number))}" />`');
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
