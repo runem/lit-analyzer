@@ -161,7 +161,13 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 		const analyzeResult = analyzeSourceFile(sourceFile, {
 			program: this.program,
 			ts: this.ts,
-			config: { analyzeGlobalFeatures: true, analyzeLibDom: false, analyzeLib: true, excludedDeclarationNames: ["HTMLElement"] }
+			config: {
+				features: ["event", "member", "slot"],
+				analyzeGlobalFeatures: true,
+				analyzeLibDom: false,
+				analyzeLib: true,
+				excludedDeclarationNames: ["HTMLElement"]
+			}
 		});
 
 		// Forget
@@ -170,8 +176,12 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 			this.htmlStore.forgetCollection(
 				{
 					tags: existingResult.componentDefinitions.map(d => d.tagName),
-					events: existingResult.globalFeatures?.events.map(e => e.name),
-					attrs: []
+					global: {
+						events: existingResult.globalFeatures?.events.map(e => e.name),
+						slots: existingResult.globalFeatures?.slots.map(s => s.name || ""),
+						attributes: existingResult.globalFeatures?.members.filter(m => m.kind === "attribute").map(m => m.attrName || ""),
+						properties: existingResult.globalFeatures?.members.filter(m => m.kind === "property").map(m => m.propName || "")
+					}
 				},
 				HtmlDataSourceKind.DECLARED
 			);

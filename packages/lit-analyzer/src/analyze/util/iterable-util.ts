@@ -44,7 +44,11 @@ export function iterableDefined<T>(iterable: (T | undefined | null)[]): T[] {
 	return iterable.filter((i): i is T => i != null);
 }
 
-export function iterableFirst<T>(iterable: Iterator<T> | Set<T> | Map<unknown, T>): T | undefined {
+export function iterableFirst<T>(iterable: Iterator<T> | Set<T> | Map<unknown, T> | undefined): T | undefined {
+	if (iterable == null) {
+		return iterable;
+	}
+
 	if (iterable instanceof Map || iterable instanceof Set) {
 		return iterableFirst(iterable.values());
 	}

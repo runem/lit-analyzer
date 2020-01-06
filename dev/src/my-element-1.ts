@@ -12,6 +12,7 @@ export class MyElement extends LitElement {
 				<div slot=""></div>
 				<div slot="right"></div>
 			</my-element2>
+			<my-element></my-element>
 			<input @hehehehe="${() => {}}" />
 			<my-element></my-element>
 			<my-element></my-element>

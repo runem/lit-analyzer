@@ -9,10 +9,13 @@ import {
 	HtmlTag,
 	mergeHtmlAttrs,
 	mergeHtmlEvents,
-	mergeHtmlTags
+	mergeHtmlProps,
+	mergeHtmlSlots,
+	mergeHtmlTags,
+	NamedHtmlDataCollection
 } from "../../parse/parse-html-data/html-tag";
-import { iterableDefined } from "../../util/iterable-util";
 import { lazy } from "../../util/general-util";
+import { iterableDefined } from "../../util/iterable-util";
 import { HtmlDataSource } from "./html-data-source";
 
 export enum HtmlDataSourceKind {
@@ -45,19 +48,22 @@ export class HtmlDataSourceMerged {
 		return this.combinedHtmlDataSource.globalTags;
 	}
 
-	invalidateCache(collection?: Partial<Record<keyof HtmlDataCollection, string[]>>) {
+	invalidateCache(collection?: NamedHtmlDataCollection) {
 		if (collection == null) {
 			Object.values(this.relatedForTagName).forEach(map => map.clear());
 			return;
 		}
 
-		const { events, attrs, tags } = collection;
+		const {
+			tags,
+			global: { attributes, events }
+		} = collection;
 
 		if (tags && tags.length > 0) {
 			Object.values(this.relatedForTagName).forEach(map => tags.forEach(tagName => map.delete(tagName)));
 		}
 
-		if (attrs && attrs.length > 0) {
+		if (attributes && attributes.length > 0) {
 			this.relatedForTagName.attrs.clear();
 		}
 
@@ -66,8 +72,11 @@ export class HtmlDataSourceMerged {
 		}
 	}
 
-	mergeDataSourcesAndInvalidate(collection: Partial<Record<keyof HtmlDataCollection, string[]>>) {
-		const { tags, attrs, events } = collection;
+	mergeDataSourcesAndInvalidate(collection: NamedHtmlDataCollection) {
+		const {
+			tags,
+			global: { events, attributes, properties, slots }
+		} = collection;
 
 		if (tags != null) {
 			for (const tagName of tags) {
@@ -80,13 +89,13 @@ export class HtmlDataSourceMerged {
 			}
 		}
 
-		if (attrs != null) {
-			for (const attrName of attrs) {
+		if (attributes != null) {
+			for (const attrName of attributes) {
 				const allAttrs = iterableDefined(this.htmlDataSources.map(r => r.getGlobalAttribute(attrName)));
 
 				if (allAttrs.length > 0) {
 					const mergedAttrs = allAttrs.length === 1 ? allAttrs : mergeHtmlAttrs(allAttrs);
-					this.combinedHtmlDataSource.absorbCollection({ attrs: mergedAttrs });
+					this.combinedHtmlDataSource.absorbCollection({ global: { attributes: mergedAttrs } });
 				}
 			}
 		}
@@ -97,7 +106,29 @@ export class HtmlDataSourceMerged {
 
 				if (allEvents.length > 0) {
 					const mergedEvents = allEvents.length === 1 ? allEvents : mergeHtmlEvents(allEvents);
-					this.combinedHtmlDataSource.absorbCollection({ events: mergedEvents });
+					this.combinedHtmlDataSource.absorbCollection({ global: { events: mergedEvents } });
+				}
+			}
+		}
+
+		if (properties != null) {
+			for (const propName of properties) {
+				const allProps = iterableDefined(this.htmlDataSources.map(r => r.getGlobalProperty(propName)));
+
+				if (allProps.length > 0) {
+					const mergedProps = allProps.length === 1 ? allProps : mergeHtmlProps(allProps);
+					this.combinedHtmlDataSource.absorbCollection({ global: { properties: mergedProps } });
+				}
+			}
+		}
+
+		if (slots != null) {
+			for (const slotName of slots) {
+				const allSlots = iterableDefined(this.htmlDataSources.map(r => r.getGlobalSlot(slotName)));
+
+				if (allSlots.length > 0) {
+					const mergedSlots = allSlots.length === 1 ? allSlots : mergeHtmlSlots(allSlots);
+					this.combinedHtmlDataSource.absorbCollection({ global: { slots: mergedSlots } });
 				}
 			}
 		}
@@ -105,7 +136,7 @@ export class HtmlDataSourceMerged {
 		this.invalidateCache(collection);
 	}
 
-	forgetCollection(collection: Partial<Record<keyof HtmlDataCollection, string[]>>, dataSource?: HtmlDataSourceKind) {
+	forgetCollection(collection: NamedHtmlDataCollection, dataSource?: HtmlDataSourceKind) {
 		if (dataSource == null) {
 			this.htmlDataSources.forEach(ds => ds.forgetCollection(collection));
 		} else {
@@ -121,8 +152,12 @@ export class HtmlDataSourceMerged {
 
 		this.mergeDataSourcesAndInvalidate({
 			tags: collection.tags.map(t => t.tagName),
-			events: collection.events.map(t => t.name),
-			attrs: collection.attrs.map(t => t.name)
+			global: {
+				events: collection.global?.events?.map(t => t.name),
+				attributes: collection.global?.attributes?.map(a => a.name),
+				properties: collection.global?.properties?.map(p => p.name),
+				slots: collection.global?.slots?.map(s => s.name)
+			}
 		});
 	}
 
@@ -180,6 +215,14 @@ export class HtmlDataSourceMerged {
 		return this.combinedHtmlDataSource.globalEvents.values();
 	}
 
+	private iterateGlobalProperties(): Iterable<HtmlProp> {
+		return this.combinedHtmlDataSource.globalProperties.values();
+	}
+
+	private iterateGlobalSlots(): Iterable<HtmlSlot> {
+		return this.combinedHtmlDataSource.globalSlots.values();
+	}
+
 	private *iterateAllPropertiesForNode(tagName: string): Iterable<HtmlProp> {
 		// Html tag properties
 		const htmlTag = this.getHtmlTag(tagName);
@@ -190,6 +233,9 @@ export class HtmlDataSourceMerged {
 		for (const extTag of extensions) {
 			yield* extTag.properties;
 		}
+
+		// Global propertjes
+		yield* this.iterateGlobalProperties();
 	}
 
 	private *iterateAllEventsForNode(tagName: string): Iterable<HtmlEvent> {
@@ -261,6 +307,9 @@ export class HtmlDataSourceMerged {
 		for (const extTag of extensions) {
 			yield* extTag.slots;
 		}
+
+		// Global slots
+		yield* this.iterateGlobalSlots();
 	}
 }
 

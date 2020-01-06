@@ -1,6 +1,5 @@
 import { SourceFile } from "typescript";
-import { ComponentDefinition } from "web-component-analyzer";
-import { AnalyzerResult } from "web-component-analyzer/lib/cjs/chunk-7b58dea0";
+import { AnalyzerResult, ComponentDefinition } from "web-component-analyzer";
 import { AnalyzerDefinitionStore } from "../analyzer-definition-store";
 
 export class DefaultAnalyzerDefinitionStore implements AnalyzerDefinitionStore {
@@ -31,7 +30,6 @@ export class DefaultAnalyzerDefinitionStore implements AnalyzerDefinitionStore {
 	}
 
 	getDefinitionsWithDeclarationInFile(sourceFile: SourceFile): ComponentDefinition[] {
-		// TODO
 		return Array.from(this.definitionForTagName.values()).filter(d =>
 			[...d.declaration().declarationNodes].map(n => n.getSourceFile()).find(sf => sf.fileName === sourceFile.fileName)
 		);

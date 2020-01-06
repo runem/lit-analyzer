@@ -36,7 +36,7 @@
 	"dependencies": {
 		"lit-html": "https://github.com/mjbvz/vscode-lit-html.git#1.11.0",
 		"ts-lit-plugin": "1.1.9",
-		"web-component-analyzer": "~1.0.0",
+		"web-component-analyzer": "~1.0.1",
 		"vscode-styled-components": "https://github.com/styled-components/vscode-styled-components#f806f23a027e3458e9d77001851b428f1cb992d5"
 	},
 	"devDependencies": {

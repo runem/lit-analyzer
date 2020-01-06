@@ -6,7 +6,8 @@ import {
 	HtmlMember,
 	HtmlProp,
 	HtmlSlot,
-	HtmlTag
+	HtmlTag,
+	NamedHtmlDataCollection
 } from "../../parse/parse-html-data/html-tag";
 import {
 	HtmlNodeAttr,
@@ -31,7 +32,7 @@ export class DefaultAnalyzerHtmlStore implements AnalyzerHtmlStore {
 		this.dataSource.absorbCollection(collection, register);
 	}
 
-	forgetCollection(collection: Partial<Record<keyof HtmlDataCollection, string[]>>, register: HtmlDataSourceKind) {
+	forgetCollection(collection: NamedHtmlDataCollection, register: HtmlDataSourceKind) {
 		this.dataSource.forgetCollection(collection, register);
 	}
 

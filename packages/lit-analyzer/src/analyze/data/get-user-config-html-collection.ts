@@ -8,7 +8,7 @@ import { lazy } from "../util/general-util";
 
 export function getUserConfigHtmlCollection(config: LitAnalyzerConfig): HtmlDataCollection {
 	const collection = (() => {
-		let collection: HtmlDataCollection = { tags: [], events: [], attrs: [] };
+		let collection: HtmlDataCollection = { tags: [], global: {} };
 		for (const customHtmlData of Array.isArray(config.customHtmlData) ? config.customHtmlData : [config.customHtmlData]) {
 			try {
 				const data: HtmlData =
@@ -18,8 +18,10 @@ export function getUserConfigHtmlCollection(config: LitAnalyzerConfig): HtmlData
 				const parsedCollection = parseHtmlData(data);
 				collection = {
 					tags: mergeHtmlTags([...collection.tags, ...parsedCollection.tags]),
-					attrs: mergeHtmlAttrs([...collection.attrs, ...parsedCollection.attrs]),
-					events: mergeHtmlEvents([...collection.events, ...parsedCollection.events])
+					global: {
+						attributes: mergeHtmlAttrs([...(collection.global.attributes || []), ...(parsedCollection.global.attributes || [])]),
+						events: mergeHtmlEvents([...(collection.global.events || []), ...(parsedCollection.global.events || [])])
+					}
 				};
 			} catch (e) {
 				//logger.error("Error parsing user configuration 'customHtmlData'", e, customHtmlData);
@@ -59,7 +61,9 @@ export function getUserConfigHtmlCollection(config: LitAnalyzerConfig): HtmlData
 
 	return {
 		tags: [...tags, ...collection.tags],
-		attrs: [...attrs, ...collection.attrs],
-		events: [...events, ...collection.events]
+		global: {
+			attributes: [...attrs, ...(collection.global.attributes || [])],
+			events: [...events, ...(collection.global.events || [])]
+		}
 	};
 }

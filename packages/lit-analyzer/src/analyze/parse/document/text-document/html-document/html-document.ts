@@ -1,12 +1,12 @@
 import { Range } from "../../../../types/range";
 import { intersects } from "../../../../util/general-util";
-import { VirtualAstHtmlDocument } from "../../virtual-document/virtual-html-document";
+import { VirtualDocument } from "../../virtual-document/virtual-document";
 import { TextDocument } from "../text-document";
 import { HtmlNodeAttr } from "../../../../types/html-node/html-node-attr-types";
 import { HtmlNode } from "../../../../types/html-node/html-node-types";
 
 export class HtmlDocument extends TextDocument {
-	constructor(virtualDocument: VirtualAstHtmlDocument, public rootNodes: HtmlNode[]) {
+	constructor(virtualDocument: VirtualDocument, public rootNodes: HtmlNode[]) {
 		super(virtualDocument);
 	}
 

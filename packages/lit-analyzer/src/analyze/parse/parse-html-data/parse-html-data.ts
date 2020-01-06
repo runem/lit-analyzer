@@ -14,14 +14,11 @@ function parseDataV1(data: HtmlDataV1): HtmlDataCollection {
 	const valueSetTypeMap = valueSetsToTypeMap(data.valueSets || []);
 	valueSetTypeMap.set("v", { kind: SimpleTypeKind.BOOLEAN });
 
-	const tags = (data.tags || []).map(tagData => tagDataToHtmlTag(tagData, valueSetTypeMap));
-
-	const attrs = (data.globalAttributes || []).map(tagDataAttr => tagDataToHtmlTagAttr(tagDataAttr, valueSetTypeMap));
-
 	return {
-		tags,
-		attrs,
-		events: []
+		tags: (data.tags || []).map(tagData => tagDataToHtmlTag(tagData, valueSetTypeMap)),
+		global: {
+			attributes: (data.globalAttributes || []).map(tagDataAttr => tagDataToHtmlTagAttr(tagDataAttr, valueSetTypeMap))
+		}
 	};
 }
 

@@ -77,41 +77,41 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 		description: ""
 	});
 
-	result.attrs.push({
-		kind: "attribute",
-		name: "slot",
-		getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
-		builtIn: true
-	});
-
-	result.attrs.push({
-		kind: "attribute",
-		name: "part",
-		description: `This attribute specifies a "styleable" part on the element in your shadow tree.`,
-		getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
-		builtIn: true
-	});
-
-	result.attrs.push({
-		kind: "attribute",
-		name: "theme",
-		description: `This attribute specifies a global "styleable" part on the element.`,
-		getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
-		builtIn: true
-	});
-
-	result.attrs.push({
-		kind: "attribute",
-		name: "exportparts",
-		description: `This attribute is used to explicitly forward a child’s part to be styleable outside of the parent’s shadow tree.
+	result.global.attributes = [
+		...(result.global.attributes || []),
+		{
+			kind: "attribute",
+			name: "slot",
+			getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
+			builtIn: true
+		},
+		{
+			kind: "attribute",
+			name: "part",
+			description: `This attribute specifies a "styleable" part on the element in your shadow tree.`,
+			getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
+			builtIn: true
+		},
+		{
+			kind: "attribute",
+			name: "theme",
+			description: `This attribute specifies a global "styleable" part on the element.`,
+			getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
+			builtIn: true
+		},
+		{
+			kind: "attribute",
+			name: "exportparts",
+			description: `This attribute is used to explicitly forward a child’s part to be styleable outside of the parent’s shadow tree.
 
 The value must be a comma-separated list of part mappings:
   - "some-box, some-input"
   - "some-input: foo-input"
 `,
-		getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
-		builtIn: true
-	});
+			getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
+			builtIn: true
+		}
+	];
 
 	const textareaElement = result.tags.find(t => t.tagName === "textarea");
 	if (textareaElement != null) {
@@ -211,14 +211,15 @@ The value must be a comma-separated list of part mappings:
 		];
 	}
 
-	for (const globalEvent of ALL_HTML5_EVENTS) {
-		result.events.push({
+	result.global.events = [
+		...(result.global.events || []),
+		...ALL_HTML5_EVENTS.map(globalEvent => ({
 			name: globalEvent.name.replace(/^on/, ""),
 			description: globalEvent.description,
 			getType: lazy(() => ({ kind: SimpleTypeKind.ANY } as SimpleType)),
 			builtIn: true
-		});
-	}
+		}))
+	];
 
 	return {
 		...result,
@@ -227,8 +228,10 @@ The value must be a comma-separated list of part mappings:
 			builtIn: true,
 			attributes: addMissingAttrTypes(tag.attributes.map(attr => ({ ...attr, builtIn: true })))
 		})),
-		attrs: addMissingAttrTypes(result.attrs.map(attr => ({ ...attr, builtIn: true }))),
-		events: result.events.map(event => ({ ...event, builtIn: true }))
+		global: {
+			attributes: addMissingAttrTypes(result.global.attributes?.map(attr => ({ ...attr, builtIn: true })) || []),
+			events: result.global.events?.map(event => ({ ...event, builtIn: true }))
+		}
 	};
 }
 
