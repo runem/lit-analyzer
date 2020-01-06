@@ -37,7 +37,12 @@ export function parseDocumentsInSourceFile(
 	if (result == null) return undefined;
 
 	if (Array.isArray(result)) {
-		return flatten(result.map(document => [document, ...(unpackHtmlDocument(document, position) || [])]));
+		return flatten(
+			result.map(document => {
+				const res = unpackHtmlDocument(document, position);
+				return [document, ...(res == null ? [] : Array.isArray(res) ? res : [res])];
+			})
+		);
 	} else {
 		const nestedDocuments = unpackHtmlDocument(result, position);
 		if (position != null && nestedDocuments != null) {
@@ -57,8 +62,8 @@ function taggedTemplateToDocument(taggedTemplate: TaggedTemplateExpression, { cs
 	}
 }
 
-function unpackHtmlDocument(textDocument: TextDocument, position?: number): TextDocument | undefined;
-function unpackHtmlDocument(textDocument: TextDocument): TextDocument[];
+function unpackHtmlDocument(textDocument: TextDocument, position: number): TextDocument | undefined;
+function unpackHtmlDocument(textDocument: TextDocument, position?: number): TextDocument | TextDocument[];
 function unpackHtmlDocument(textDocument: TextDocument, position?: number): TextDocument[] | TextDocument | undefined {
 	const documents: TextDocument[] = [];
 

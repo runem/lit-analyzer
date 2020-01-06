@@ -74,10 +74,10 @@ function getSuggestionText({
 		return undefined;
 	}
 
-	const definition = definitionStore.getDefinitionForTagName(htmlTag.tagName);
 	const tagHasDeclaration = htmlTag.declaration != null;
 	const tagIsBuiltIn = htmlTag.builtIn || false;
-	const tagIsFromLibrary = definition != null && iterableFirst(definition.declaration().declarationNodes)!.getSourceFile().isDeclarationFile;
+	const tagIsFromLibrary =
+		iterableFirst(definitionStore.getDefinitionForTagName(htmlTag.tagName)?.identifierNodes)?.getSourceFile().isDeclarationFile || false;
 
 	return tagIsBuiltIn
 		? `This is a built in tag. Please consider disabling the 'no-unknown-property' rule.`

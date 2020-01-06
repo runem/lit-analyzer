@@ -2,22 +2,29 @@ import { isAssignableToSimpleTypeKind, SimpleType, SimpleTypeKind, toTypeString 
 import { ComponentDeclaration, ComponentEvent, ComponentMember, ComponentSlot } from "web-component-analyzer";
 import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../constants";
 
-export type HtmlDataCollection = {
-	tags: HtmlTag[];
-	attrs: HtmlAttr[];
+export interface HtmlDataFeatures {
+	attributes: HtmlAttr[];
+	properties: HtmlProp[];
 	events: HtmlEvent[];
-};
+	slots: HtmlSlot[];
+}
 
-export interface HtmlTag {
+export interface HtmlDataCollection {
+	tags: HtmlTag[];
+	global: Partial<HtmlDataFeatures>;
+}
+
+export interface NamedHtmlDataCollection {
+	tags: string[];
+	global: Partial<Record<keyof HtmlDataFeatures, string[]>>;
+}
+
+export interface HtmlTag extends HtmlDataFeatures {
 	tagName: string;
 	description?: string;
 	builtIn?: boolean;
 	global?: boolean;
 	declaration?: ComponentDeclaration;
-	attributes: HtmlAttr[];
-	properties: HtmlProp[];
-	events: HtmlEvent[];
-	slots: HtmlSlot[];
 }
 
 export type HtmlTagMemberKind = "attribute" | "property";

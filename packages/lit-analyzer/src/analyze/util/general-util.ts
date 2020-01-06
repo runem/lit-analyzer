@@ -54,7 +54,7 @@ export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
  * @param attributeName
  */
 export function parseLitAttrName(attributeName: string): { name: string; modifier?: LitHtmlAttributeModifier } {
-	const [, modifier, name] = attributeName.match(/^([.?@])?(.*)/);
+	const [, modifier, name] = attributeName.match(/^([.?@])?(.*)/) || ["", "", ""];
 	return { name, modifier: modifier as LitHtmlAttributeModifier };
 }
 
