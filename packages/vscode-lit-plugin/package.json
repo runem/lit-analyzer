@@ -24,13 +24,14 @@
 	},
 	"main": "./out/extension",
 	"scripts": {
+		"clean": "rimraf out",
 		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
+		"compile": "npm run clean & tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"postinstall": "node ./node_modules/vscode/bin/install",
 		"publish": "vsce publish",
 		"package": "vsce package",
-		"install:safe": "npm install --ignore-scripts --no-package-lock && npm i --no-package-lock # use this script in order to install directly from the github repositories",
+		"install:safe": "npm install --ignore-scripts --no-package-lock && npm i --no-package-lock",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json"
 	},
 	"dependencies": {
@@ -40,6 +41,7 @@
 		"vscode-styled-components": "https://github.com/styled-components/vscode-styled-components#f806f23a027e3458e9d77001851b428f1cb992d5"
 	},
 	"devDependencies": {
+		"rimraf": "^3.0.0",
 		"@types/node": "^10.12.24",
 		"typescript": "^3.6.4",
 		"vsce": "^1.58.0",

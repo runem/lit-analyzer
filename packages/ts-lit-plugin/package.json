@@ -21,9 +21,10 @@
 		"template"
 	],
 	"scripts": {
+		"clean": "rimraf lib",
 		"prepare": "npm run build",
 		"watch": "tsc --watch",
-		"build": "rm -rf lib && tsc",
+		"build": "npm run clean & tsc",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json"
 	},
 	"main": "lib/index.js",
@@ -35,6 +36,7 @@
 		"lit-analyzer": "1.1.9"
 	},
 	"devDependencies": {
+		"rimraf": "^3.0.0",
 		"@types/node": "^12.12.17",
 		"typescript": "^3.6.4"
 	},

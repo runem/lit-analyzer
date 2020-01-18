@@ -24,12 +24,13 @@
 		"lit-analyzer": "cli.js"
 	},
 	"scripts": {
+		"clean": "rimraf lib",
 		"prepare": "npm run build",
-		"build": "rollup -c",
+		"build": "npm run clean & rollup -c",
 		"watch": "rollup -c --watch",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
 		"test": "cross-env TS_MODULE=current ava --color",
-		"test:all": "ava --color",
+		"test:all": "ava --color --fail-fast",
 		"test:watch": "cross-env TS_MODULE=current ava --watch --color"
 	},
 	"main": "lib/index.cjs.js",
@@ -49,6 +50,7 @@
 		"web-component-analyzer": "~1.0.2"
 	},
 	"devDependencies": {
+		"rimraf": "^3.0.0",
 		"@appnest/readme": "^1.2.5",
 		"@types/node": "^12.12.17",
 		"@wessberg/rollup-plugin-ts": "^1.2.3",
