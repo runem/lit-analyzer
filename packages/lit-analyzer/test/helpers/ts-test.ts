@@ -103,6 +103,7 @@ function setupTest(testFunction: TestFunction, tsModuleKind: TsModuleKind | unde
 
 		// Reset the selected TS_MODULE
 		setCurrentTsModuleKind(undefined);
+		setTypescriptModule(getTsModuleWithKind("current"));
 
 		return res;
 	});

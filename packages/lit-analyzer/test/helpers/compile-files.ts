@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { CompilerHost, CompilerOptions, ModuleKind, Program, ScriptKind, ScriptTarget, SourceFile } from "typescript";
-import { getCurrentTsModule } from "./ts-test";
+import { getCurrentTsModule, getCurrentTsModuleDirectory } from "./ts-test";
 
 // tslint:disable:no-any
 
@@ -19,7 +19,6 @@ export type TestFile = ITestFile | string;
  */
 export function compileFiles(inputFiles: TestFile[] | TestFile = []): { program: Program; sourceFile: SourceFile } {
 	const ts = getCurrentTsModule();
-	const cwd = process.cwd();
 
 	const files: ITestFile[] = (Array.isArray(inputFiles) ? inputFiles : [inputFiles])
 		.map(file =>
@@ -34,7 +33,7 @@ export function compileFiles(inputFiles: TestFile[] | TestFile = []): { program:
 						fileName: file.fileName || `auto-generated-${Math.floor(Math.random() * 100000)}.ts`
 				  }
 		)
-		.map(file => ({ ...file, fileName: join(cwd, file.fileName) }));
+		.map(file => ({ ...file, fileName: file.fileName }));
 
 	const entryFile = files.find(file => file.entry === true) || files[0];
 
@@ -47,7 +46,7 @@ export function compileFiles(inputFiles: TestFile[] | TestFile = []): { program:
 		}
 
 		if (includeLib) {
-			fileName = fileName.includes("/") ? fileName : `node_modules/typescript/lib/${fileName}`;
+			fileName = fileName.match(/[/\\]/) ? fileName : join(getCurrentTsModuleDirectory(), fileName);
 		}
 
 		if (existsSync(fileName)) {
