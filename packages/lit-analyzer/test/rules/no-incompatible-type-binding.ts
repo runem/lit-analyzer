@@ -2,83 +2,84 @@ import test from "ava";
 import { getDiagnostics } from "../helpers/analyze";
 import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert";
 import { makeElement } from "../helpers/generate-test-file";
+import { tsTest } from "../helpers/ts-test";
 
-test("Attribute binding: 'no-incompatible-type-binding' is not emitted when the rule is turned off", t => {
+tsTest("Attribute binding: 'no-incompatible-type-binding' is not emitted when the rule is turned off", t => {
 	const { diagnostics } = getDiagnostics('html`<input maxlength="foo" />`', { rules: { "no-incompatible-type-binding": "off" } });
 	hasNoDiagnostics(t, diagnostics);
 });
 
-test("Attribute binding: String literal (a number) is assignable to number", t => {
+tsTest("Attribute binding: String literal (a number) is assignable to number", t => {
 	const { diagnostics } = getDiagnostics('html`<input maxlength="123" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
-test("Attribute binding: String literal (not a number) is not assignable to number", t => {
+tsTest("Attribute binding: String literal (not a number) is not assignable to number", t => {
 	const { diagnostics } = getDiagnostics('html`<input maxlength="foo" />`');
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
-test("Attribute binding: Number type expression is assignable to number", t => {
+tsTest("Attribute binding: Number type expression is assignable to number", t => {
 	const { diagnostics } = getDiagnostics('html`<input maxlength="${123}" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
-test("Attribute binding: String literal type expression (a number) is assignable to number", t => {
+tsTest("Attribute binding: String literal type expression (a number) is assignable to number", t => {
 	const { diagnostics } = getDiagnostics('html`<input maxlength="${"123"}" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
-test("Attribute binding: String literal type expression (not a number) is not assignable to number", t => {
+tsTest("Attribute binding: String literal type expression (not a number) is not assignable to number", t => {
 	const { diagnostics } = getDiagnostics('html`<input maxlength="${"foo"}" />`');
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
-test("Attribute binding: String type expression is not assignable to number", t => {
+tsTest("Attribute binding: String type expression is not assignable to number", t => {
 	const { diagnostics } = getDiagnostics('html`<input maxlength="${{} as string}" />`');
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
-test("Attribute binding: Expression of type union with two string literals (numbers) is assignable to number", t => {
+tsTest("Attribute binding: Expression of type union with two string literals (numbers) is assignable to number", t => {
 	const { diagnostics } = getDiagnostics('html`<input maxlength="${{} as "123" | "321"}" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
-test("Attribute binding: Expression of type union with two string literals (one not being a number) is not assignable to number", t => {
+tsTest("Attribute binding: Expression of type union with two string literals (one not being a number) is not assignable to number", t => {
 	const { diagnostics } = getDiagnostics('html`<input maxlength="${{} as "123" | "foo"}" />`');
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
-test("Attribute binding: String literal is assignable to string", t => {
+tsTest("Attribute binding: String literal is assignable to string", t => {
 	const { diagnostics } = getDiagnostics('html`<input placeholder="foo" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
-test("Attribute binding: String literal (a number) is assignable to string", t => {
+tsTest("Attribute binding: String literal (a number) is assignable to string", t => {
 	const { diagnostics } = getDiagnostics('html`<input placeholder="123" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
-test("Attribute binding: String literal expression is assignable to string", t => {
+tsTest("Attribute binding: String literal expression is assignable to string", t => {
 	const { diagnostics } = getDiagnostics('html`<input placeholder="${"foo"}" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
-test("Attribute binding: Number type expression is assignable to string", t => {
+tsTest("Attribute binding: Number type expression is assignable to string", t => {
 	const { diagnostics } = getDiagnostics('html`<input placeholder="${123}" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
-test("Attribute binding: String literal (0 length) is assignable to number", t => {
+tsTest("Attribute binding: String literal (0 length) is assignable to number", t => {
 	const { diagnostics } = getDiagnostics('html`<input maxlength="" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
-test("Attribute binding: String literal (0 length) is assignable to string", t => {
+tsTest("Attribute binding: String literal (0 length) is assignable to string", t => {
 	const { diagnostics } = getDiagnostics('html`<input placeholder="" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
-test("Attribute binding: String literal (0 length) is assignable to boolean", t => {
+tsTest("Attribute binding: String literal (0 length) is assignable to boolean", t => {
 	const { diagnostics } = getDiagnostics('html`<input required="" />`');
 	hasNoDiagnostics(t, diagnostics);
 });

@@ -28,8 +28,9 @@
 		"build": "rollup -c",
 		"watch": "rollup -c --watch",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
-		"test": "ava --color",
-		"test:watch": "ava --watch --color"
+		"test": "cross-env TS_MODULE=current ava --color",
+		"test:all": "ava --color",
+		"test:watch": "cross-env TS_MODULE=current ava --watch --color"
 	},
 	"main": "lib/index.cjs.js",
 	"typings": "lib/index.cjs.d.ts",
@@ -45,7 +46,7 @@
 		"ts-simple-type": "~0.3.6",
 		"vscode-css-languageservice": "4.0.2-next.1",
 		"vscode-html-languageservice": "2.1.12",
-		"web-component-analyzer": "~1.0.0"
+		"web-component-analyzer": "~1.0.2"
 	},
 	"devDependencies": {
 		"@appnest/readme": "^1.2.5",
@@ -53,11 +54,16 @@
 		"@wessberg/rollup-plugin-ts": "^1.2.3",
 		"ava": "^2.4.0",
 		"rollup": "^1.27.12",
+		"cross-env": "^6.0.3",
 		"rollup-plugin-node-resolve": "^5.2.0",
 		"rollup-plugin-replace": "^2.2.0",
 		"ts-node": "^8.5.4",
 		"tslib": "^1.10.0",
-		"typescript": "^3.6.4"
+		"typescript": "^3.6.4",
+		"typescript-3.5": "npm:typescript@~3.5.3",
+		"typescript-3.6": "npm:typescript@~3.6.4",
+		"typescript-3.7": "npm:typescript@~3.7.4",
+		"typescript-3.8": "npm:typescript@~3.8.0-beta"
 	},
 	"ava": {
 		"compileEnhancements": false,

@@ -34,6 +34,7 @@
 		"build": "lerna run build --parallel --stream",
 		"watch": "lerna run watch --parallel --stream",
 		"test": "lerna run test --parallel --stream",
+		"test:all": "lerna run test:all --parallel --stream",
 		"test:watch": "lerna run test:watch --parallel --stream",
 		"readme": "lerna run readme && readme generate -i readme.blueprint.md -c readme.config.json",
 		"dev": "cd dev && TSS_DEBUG=5999 code . --disable-extension runem.lit-plugin",
