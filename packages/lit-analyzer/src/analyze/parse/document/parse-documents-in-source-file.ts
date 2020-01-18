@@ -1,10 +1,10 @@
 import { SourceFile, TaggedTemplateExpression } from "typescript";
+import { HtmlNodeKind, IHtmlNodeStyleTag } from "../../types/html-node/html-node-types";
 import { flatten, intersects } from "../../util/general-util";
 import { findTaggedTemplates } from "../tagged-template/find-tagged-templates";
 import { CssDocument } from "./text-document/css-document/css-document";
 import { HtmlDocument } from "./text-document/html-document/html-document";
 import { parseHtmlDocument } from "./text-document/html-document/parse-html-document";
-import { HtmlNodeKind, IHtmlNodeStyleTag } from "../../types/html-node/html-node-types";
 import { TextDocument } from "./text-document/text-document";
 import { VirtualAstCssDocument } from "./virtual-document/virtual-css-document";
 
@@ -23,7 +23,6 @@ export function parseDocumentsInSourceFile(
 	// Parse html tags in the relevant source file
 	const templateTags = [...options.cssTags, ...options.htmlTags];
 	const taggedTemplates = findTaggedTemplates(sourceFile, templateTags, position);
-
 	let result: TextDocument[] | TextDocument | undefined = undefined;
 
 	if (taggedTemplates == null) {

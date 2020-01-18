@@ -1,18 +1,7 @@
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
-import {
-	CompilerHost,
-	CompilerOptions,
-	createProgram,
-	createSourceFile,
-	getDefaultLibFileName,
-	ModuleKind,
-	Program,
-	ScriptKind,
-	ScriptTarget,
-	SourceFile,
-	sys
-} from "typescript";
+import { CompilerHost, CompilerOptions, ModuleKind, Program, ScriptKind, ScriptTarget, SourceFile } from "typescript";
+import { getCurrentTsModule } from "./ts-test";
 
 // tslint:disable:no-any
 
@@ -27,12 +16,9 @@ export type TestFile = ITestFile | string;
 
 /**
  * Compiles 'virtual' files with Typescript
- * @param {ITestFile[]|TestFile} inputFiles
- * @returns {Promise<{fileName: string, result: AnalyzeComponentsResult}[]>}
  */
-export function compileFiles(): { program: Program };
-export function compileFiles(inputFiles: TestFile[] | TestFile): { program: Program; sourceFile: SourceFile };
-export function compileFiles(inputFiles: TestFile[] | TestFile = []): { program: Program; sourceFile?: SourceFile } {
+export function compileFiles(inputFiles: TestFile[] | TestFile = []): { program: Program; sourceFile: SourceFile } {
+	const ts = getCurrentTsModule();
 	const cwd = process.cwd();
 
 	const files: ITestFile[] = (Array.isArray(inputFiles) ? inputFiles : [inputFiles])
@@ -50,7 +36,7 @@ export function compileFiles(inputFiles: TestFile[] | TestFile = []): { program:
 		)
 		.map(file => ({ ...file, fileName: join(cwd, file.fileName) }));
 
-	const entryFile = (files.find(file => file.entry === true) || files[0]) as ITestFile | undefined;
+	const entryFile = files.find(file => file.entry === true) || files[0];
 
 	const includeLib = files.find(file => file.includeLib) != null;
 
@@ -90,7 +76,7 @@ export function compileFiles(inputFiles: TestFile[] | TestFile = []): { program:
 			const sourceText = this.readFile(fileName);
 			if (sourceText == null) return undefined;
 
-			return createSourceFile(fileName, sourceText, languageVersion, true, ScriptKind.TS);
+			return ts.createSourceFile(fileName, sourceText, languageVersion, true, ScriptKind.TS);
 		},
 
 		getCurrentDirectory() {
@@ -98,11 +84,11 @@ export function compileFiles(inputFiles: TestFile[] | TestFile = []): { program:
 		},
 
 		getDirectories(directoryName: string) {
-			return sys.getDirectories(directoryName);
+			return ts.sys.getDirectories(directoryName);
 		},
 
 		getDefaultLibFileName(options: CompilerOptions): string {
-			return getDefaultLibFileName(options);
+			return ts.getDefaultLibFileName(options);
 		},
 
 		getCanonicalFileName(fileName: string): string {
@@ -110,22 +96,22 @@ export function compileFiles(inputFiles: TestFile[] | TestFile = []): { program:
 		},
 
 		getNewLine(): string {
-			return sys.newLine;
+			return ts.sys.newLine;
 		},
 
 		useCaseSensitiveFileNames() {
-			return sys.useCaseSensitiveFileNames;
+			return ts.sys.useCaseSensitiveFileNames;
 		}
 	};
 
-	const program = createProgram({
+	const program = ts.createProgram({
 		//rootNames: [...files.map(file => file.fileName!), ...(includeLib ? ["node_modules/typescript/lib/lib.dom.d.ts"] : [])],
 		rootNames: files.map(file => file.fileName!),
 		options: compilerOptions,
 		host: compilerHost
 	});
 
-	const entrySourceFile = entryFile != null && entryFile.fileName != null ? program.getSourceFile(entryFile.fileName) : undefined;
+	const entrySourceFile = entryFile.fileName != null ? program.getSourceFile(entryFile.fileName)! : program.getSourceFiles()[0];
 
 	return {
 		program,
