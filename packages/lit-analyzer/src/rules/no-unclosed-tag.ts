@@ -17,7 +17,7 @@ const rule: RuleModule = {
 			return [
 				{
 					kind: LitHtmlDiagnosticKind.TAG_NOT_CLOSED,
-					message: `${htmlNode.selfClosed}, This tag isn't closed.${isCustomElement ? " Custom elements cannot be self closing." : ""}`,
+					message: `This tag isn't closed.${isCustomElement ? " Custom elements cannot be self closing." : ""}`,
 					severity: litDiagnosticRuleSeverity(request.config, "no-unclosed-tag"),
 					source: "no-unclosed-tag",
 					location: { document: request.document, ...htmlNode.location.name },
