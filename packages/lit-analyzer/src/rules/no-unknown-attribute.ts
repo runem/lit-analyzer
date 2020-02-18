@@ -7,13 +7,14 @@ import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
 import { suggestTargetForHtmlAttr } from "../analyze/util/attribute-util";
 import { iterableFirst } from "../analyze/util/iterable-util";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/lit-range-util";
 
 /**
  * This rule validates that only known attributes are used in attribute bindings.
  */
 const rule: RuleModule = {
 	name: "no-unknown-attribute",
-	visitHtmlAttribute(htmlAttr, { htmlStore, config, definitionStore, document }) {
+	visitHtmlAttribute(htmlAttr, { htmlStore, config, definitionStore, document, file }) {
 		// Ignore "style" and "svg" attrs because I don't yet have all data for them.
 		if (htmlAttr.htmlNode.kind !== HtmlNodeKind.NODE) return;
 
@@ -41,9 +42,10 @@ const rule: RuleModule = {
 					kind: LitHtmlDiagnosticKind.UNKNOWN_TARGET,
 					message: `Unknown attribute '${htmlAttr.name}'.`,
 					fix: suggestedMemberName == null ? undefined : `Did you mean '${suggestedMemberName}'?`,
-					location: { document, ...htmlAttr.location.name },
 					source: "no-unknown-attribute",
 					severity: litDiagnosticRuleSeverity(config, "no-unknown-attribute"),
+					location: rangeFromHtmlNodeAttr(document, htmlAttr),
+					file,
 					suggestion,
 					htmlAttr,
 					suggestedTarget

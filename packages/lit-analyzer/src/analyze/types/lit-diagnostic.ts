@@ -6,7 +6,7 @@ import { HtmlAttr, HtmlAttrTarget } from "../parse/parse-html-data/html-tag";
 import { IHtmlNodeAttrAssignmentExpression } from "./html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttr, IHtmlNodeAttr } from "./html-node/html-node-attr-types";
 import { HtmlNode } from "./html-node/html-node-types";
-import { DocumentRange, SourceFileRange } from "./lit-range";
+import { LitRange } from "./lit-range";
 
 export enum LitHtmlDiagnosticKind {
 	MISSING_IMPORT = "MISSING_IMPORT",
@@ -26,136 +26,135 @@ export enum LitHtmlDiagnosticKind {
 	INVALID_SLOT_NAME = "INVALID_SLOT_NAME",
 	MISSING_SLOT_ATTRIBUTE = "MISSING_SLOT_ATTRIBUTE",
 	DIRECTIVE_NOT_ALLOWED_HERE = "DIRECTIVE_NOT_ALLOWED_HERE",
-	INVALID_MIXED_BINDING = "INVALID_MIXED_BINDING"
+	INVALID_MIXED_BINDING = "INVALID_MIXED_BINDING",
+	INVALID_TAG_NAME = "INVALID_TAG_NAME"
 }
 
 export type LitDiagnosticSeverity = "error" | "warning";
 
 export interface LitDiagnosticBase {
-	location: SourceFileRange;
+	location: LitRange;
 	message: string;
 	fix?: string;
 	source: LitAnalyzerRuleName;
 	suggestion?: string;
 	severity: LitDiagnosticSeverity;
-}
-
-export interface LitDocumentDiagnosticBase extends LitDiagnosticBase {
-	location: DocumentRange;
-}
-
-export interface LitSourceFileDiagnosticBase extends LitDiagnosticBase {
 	file: SourceFile;
 }
 
-export interface LitHtmlDiagnosticUnknownTag extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticUnknownTag extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.UNKNOWN_TAG;
 	suggestedName?: string;
 	htmlNode: HtmlNode;
 }
 
-export interface LitHtmlDiagnosticUnknownMember extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticUnknownMember extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.UNKNOWN_TARGET;
 	htmlAttr: HtmlNodeAttr;
 	suggestedTarget?: HtmlAttrTarget;
 }
 
-export interface LitHtmlDiagnosticMissingImport extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticMissingImport extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.MISSING_IMPORT;
 	htmlNode: HtmlNode;
 	definition: ComponentDefinition;
 	importPath: string;
 }
 
-export interface LitHtmlDiagnosticMissingProps extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticMissingProps extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.MISSING_REQUIRED_ATTRS;
 	attrs: HtmlAttr[];
 	htmlNode: HtmlNode;
 }
 
-export interface LitHtmlDiagnosticTagNotClosed extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticTagNotClosed extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.TAG_NOT_CLOSED;
 	htmlNode: HtmlNode;
 }
 
-export interface LitHtmlDiagnosticHtmlBoolMod extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticHtmlBoolMod extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.BOOL_MOD_ON_NON_BOOL;
 	htmlAttr: HtmlNodeAttr;
 	typeA: SimpleType;
 	typeB: SimpleType;
 }
 
-export interface LitHtmlDiagnosticPrimitiveNotAssignableToComplex extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticPrimitiveNotAssignableToComplex extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.PRIMITIVE_NOT_ASSIGNABLE_TO_COMPLEX;
 	htmlAttr: HtmlNodeAttr;
 	typeA: SimpleType;
 	typeB: SimpleType;
 }
 
-export interface LitHtmlDiagnosticHtmlNoEventListenerFunction extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticHtmlNoEventListenerFunction extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.NO_EVENT_LISTENER_FUNCTION;
 	typeB: SimpleType;
 }
 
-export interface LitHtmlDiagnosticHtmlInvalidAttributeExpressionType extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticHtmlInvalidAttributeExpressionType extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE;
 	htmlAttr: HtmlNodeAttr;
 	typeA: SimpleType;
 	typeB: SimpleType;
 }
 
-export interface LitHtmlDiagnosticHtmlInvalidAttributeExpressionTypeUndefined extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticHtmlInvalidAttributeExpressionTypeUndefined extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_UNDEFINED;
 	htmlAttr: IHtmlNodeAttr & { assignment: IHtmlNodeAttrAssignmentExpression };
 	typeA: SimpleType;
 	typeB: SimpleType;
 }
 
-export interface LitHtmlDiagnosticHtmlInvalidAttributeExpressionTypeNull extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticHtmlInvalidAttributeExpressionTypeNull extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE_NULL;
 	htmlAttr: IHtmlNodeAttr & { assignment: IHtmlNodeAttrAssignmentExpression };
 	typeA: SimpleType;
 	typeB: SimpleType;
 }
 
-export interface LitHtmlDiagnosticHtmlExpressionOnlyAssignableWithBooleanBinding extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticHtmlExpressionOnlyAssignableWithBooleanBinding extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.EXPRESSION_ONLY_ASSIGNABLE_WITH_BOOLEAN_BINDING;
 	htmlAttr: HtmlNodeAttr;
 	typeA: SimpleType;
 	typeB: SimpleType;
 }
 
-export interface LitHtmlDiagnosticComplexNotBindableInAttributeBinding extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticComplexNotBindableInAttributeBinding extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.COMPLEX_NOT_BINDABLE_IN_ATTRIBUTE_BINDING;
 	htmlAttr: HtmlNodeAttr;
 	typeA: SimpleType;
 	typeB: SimpleType;
 }
 
-export interface LitHtmlDiagnosticHtmlPropertyNeedsExpression extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticHtmlPropertyNeedsExpression extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.PROPERTY_NEEDS_EXPRESSION;
 }
 
-export interface LitHtmlDiagnosticHtmlDirectiveNotAllowedHere extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticHtmlDirectiveNotAllowedHere extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWED_HERE;
 }
 
-export interface LitHtmlDiagnosticInvalidSlotName extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticInvalidSlotName extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.INVALID_SLOT_NAME;
 	validSlotNames: (string | undefined)[];
 }
 
-export interface LitHtmlDiagnosticMissingSlotAttr extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticMissingSlotAttr extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.MISSING_SLOT_ATTRIBUTE;
 	htmlNode: HtmlNode;
 	validSlotNames: string[];
 }
 
-export interface LitHtmlDiagnosticInvalidMixedBinding extends LitDocumentDiagnosticBase {
+export interface LitHtmlDiagnosticInvalidMixedBinding extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.INVALID_MIXED_BINDING;
 }
 
+export interface LitHtmlDiagnosticInvalidTagName extends LitDiagnosticBase {
+	kind: LitHtmlDiagnosticKind.INVALID_TAG_NAME;
+}
+
 export type LitHtmlDiagnostic =
+	| LitHtmlDiagnosticInvalidTagName
 	| LitHtmlDiagnosticUnknownTag
 	| LitHtmlDiagnosticMissingImport
 	| LitHtmlDiagnosticMissingProps
@@ -175,8 +174,8 @@ export type LitHtmlDiagnostic =
 	| LitHtmlDiagnosticInvalidMixedBinding
 	| LitHtmlDiagnosticTagNotClosed;
 
-export interface LitCssDiagnostic extends LitDocumentDiagnosticBase {}
+export interface LitCssDiagnostic extends LitDiagnosticBase {}
 
-export interface LitSourceFileDiagnostic extends LitSourceFileDiagnosticBase {}
+//export interface LitSourceFileDiagnostic extends LitSourceFileDiagnosticBase {}
 
-export type LitDiagnostic = LitHtmlDiagnostic | LitCssDiagnostic | LitSourceFileDiagnostic;
+export type LitDiagnostic = LitHtmlDiagnostic | LitCssDiagnostic /* | LitSourceFileDiagnostic*/;

@@ -4,6 +4,7 @@ import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-type
 import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
 import { getDirective } from "../analyze/util/directive/get-directive";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/lit-range-util";
 
 /**
  * This rule validates that directives are used properly.
@@ -37,7 +38,8 @@ const rule: RuleModule = {
 									source: "no-invalid-directive-binding",
 									severity: litDiagnosticRuleSeverity(request.config, "no-invalid-directive-binding"),
 									message: `The 'ifDefined' directive has no effect here.`,
-									location: { document, ...htmlAttr.location.name }
+									location: rangeFromHtmlNodeAttr(document, htmlAttr),
+									file: request.file
 								}
 							];
 						}
@@ -54,7 +56,8 @@ const rule: RuleModule = {
 								message: `The 'classMap' directive can only be used in an attribute binding for the 'class' attribute`,
 								source: "no-invalid-directive-binding",
 								severity: litDiagnosticRuleSeverity(request.config, "no-invalid-directive-binding"),
-								location: { document, ...htmlAttr.location.name }
+								location: rangeFromHtmlNodeAttr(document, htmlAttr),
+								file: request.file
 							}
 						];
 					}
@@ -69,7 +72,8 @@ const rule: RuleModule = {
 								message: `The 'styleMap' directive can only be used in an attribute binding for the 'style' attribute`,
 								source: "no-invalid-directive-binding",
 								severity: litDiagnosticRuleSeverity(request.config, "no-invalid-directive-binding"),
-								location: { document, ...htmlAttr.location.name }
+								location: rangeFromHtmlNodeAttr(document, htmlAttr),
+								file: request.file
 							}
 						];
 					}
@@ -88,7 +92,8 @@ const rule: RuleModule = {
 							message: `The '${directive.kind}' directive can only be used within a text binding.`,
 							source: "no-invalid-directive-binding",
 							severity: litDiagnosticRuleSeverity(request.config, "no-invalid-directive-binding"),
-							location: { document, ...htmlAttr.location.name }
+							location: rangeFromHtmlNodeAttr(document, htmlAttr),
+							file: request.file
 						}
 					];
 			}

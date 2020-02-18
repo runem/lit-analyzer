@@ -1,12 +1,12 @@
 import { JSDocUnknownTag } from "typescript";
-import { LitAnalyzerContext } from "../../../lit-analyzer-context";
+import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { HtmlDocument } from "../../../parse/document/text-document/html-document/html-document";
 import { HtmlNode } from "../../../types/html-node/html-node-types";
 import { LitRenameLocation } from "../../../types/lit-rename-location";
 import { findChild } from "../../../util/ast-util";
 import { iterableFirst } from "../../../util/iterable-util";
 
-export function renameLocationsForTagName(tagName: string, request: LitAnalyzerContext): LitRenameLocation[] {
+export function renameLocationsForTagName(tagName: string, request: LitAnalyzerRequest): LitRenameLocation[] {
 	const locations: LitRenameLocation[] = [];
 
 	for (const sourceFile of request.program.getSourceFiles()) {
@@ -41,7 +41,7 @@ export function renameLocationsForTagName(tagName: string, request: LitAnalyzerC
 				if (stringLiteralNode != null) {
 					locations.push({
 						fileName,
-						range: { start: stringLiteralNode.getStart() + 1, end: stringLiteralNode.getEnd() - 1 }
+						range: { file: request.file, start: stringLiteralNode.getStart() + 1, end: stringLiteralNode.getEnd() - 1 }
 					});
 				}
 			} else if (definitionNode.kind === request.ts.SyntaxKind.JSDocTag) {
@@ -52,7 +52,7 @@ export function renameLocationsForTagName(tagName: string, request: LitAnalyzerC
 
 					locations.push({
 						fileName,
-						range: { start, end: start + jsDocTagNode.comment.length }
+						range: { file: request.file, start, end: start + jsDocTagNode.comment.length }
 					});
 				}
 			} else if (request.ts.isInterfaceDeclaration(definitionNode)) {
@@ -61,7 +61,7 @@ export function renameLocationsForTagName(tagName: string, request: LitAnalyzerC
 				if (stringLiteralNode != null) {
 					locations.push({
 						fileName,
-						range: { start: stringLiteralNode.getStart() + 1, end: stringLiteralNode.getEnd() - 1 }
+						range: { file: request.file, start: stringLiteralNode.getStart() + 1, end: stringLiteralNode.getEnd() - 1 }
 					});
 				}
 			}

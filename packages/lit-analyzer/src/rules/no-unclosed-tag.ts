@@ -1,7 +1,8 @@
 import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
 import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
-import { isCustomElementTagName } from "../analyze/util/general-util";
+import { isCustomElementTagName } from "../analyze/util/is-valid-name";
+import { rangeFromHtmlNode } from "../analyze/util/lit-range-util";
 
 /**
  * This rule validates that all tags are closed properly.
@@ -16,12 +17,14 @@ const rule: RuleModule = {
 
 			return [
 				{
-					kind: LitHtmlDiagnosticKind.TAG_NOT_CLOSED,
 					message: `This tag isn't closed.${isCustomElement ? " Custom elements cannot be self closing." : ""}`,
-					severity: litDiagnosticRuleSeverity(request.config, "no-unclosed-tag"),
+					location: rangeFromHtmlNode(request.document, htmlNode),
+					htmlNode,
+
+					kind: LitHtmlDiagnosticKind.TAG_NOT_CLOSED,
 					source: "no-unclosed-tag",
-					location: { document: request.document, ...htmlNode.location.name },
-					htmlNode
+					severity: litDiagnosticRuleSeverity(request.config, "no-unclosed-tag"),
+					file: request.file
 				}
 			];
 		}

@@ -1,9 +1,10 @@
-import { HtmlNodeAttr } from "../../types/html-node/html-node-attr-types";
-import { SimpleType, toTypeString, SimpleTypeKind } from "ts-simple-type";
-import { LitAnalyzerRequest } from "../../lit-analyzer-context";
-import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../types/lit-diagnostic";
+import { SimpleType, SimpleTypeKind, toTypeString } from "ts-simple-type";
 import { LitAnalyzerRuleName } from "../../lit-analyzer-config";
+import { LitAnalyzerRequest } from "../../lit-analyzer-context";
+import { HtmlNodeAttr } from "../../types/html-node/html-node-attr-types";
+import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../types/lit-diagnostic";
 import { isLitDirective } from "../directive/is-lit-directive";
+import { rangeFromHtmlNodeAttr } from "../lit-range-util";
 
 /**
  * If the user's security policy overrides normal type checking for this
@@ -87,7 +88,8 @@ function checkClosureSecurityAssignability(
 				message: `Type '${toTypeString(typeB)}' is not assignable to '${overriddenTypes.join(" | ")}'. This is due to Closure Safe Type enforcement.`,
 				severity: "error",
 				source,
-				location: { document: request.document, ...htmlAttr.location.name },
+				location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
+				file: request.file,
 				htmlAttr,
 				typeA: nominalType,
 				typeB

@@ -2,15 +2,16 @@ import { basename, dirname, relative } from "path";
 import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
-import { isCustomElementTagName } from "../analyze/util/general-util";
+import { isCustomElementTagName } from "../analyze/util/is-valid-name";
 import { iterableFirst } from "../analyze/util/iterable-util";
+import { rangeFromHtmlNode } from "../analyze/util/lit-range-util";
 
 /**
  * This rule makes sure that all custom elements used are imported in a given file.
  */
 const rule: RuleModule = {
 	name: "no-missing-import",
-	visitHtmlNode(htmlNode, { htmlStore, config, definitionStore, dependencyStore, document }) {
+	visitHtmlNode(htmlNode, { htmlStore, config, definitionStore, dependencyStore, document, file }) {
 		// Return if the html tag doesn't exists or if the html tag doesn't have a declaration
 		const htmlTag = htmlStore.getHtmlTag(htmlNode);
 		if (htmlTag == null) return;
@@ -25,13 +26,12 @@ const rule: RuleModule = {
 		if (definition == null) return;
 
 		// Check if the tag name has been imported in the file of the template.
-		const fromFileName = document.virtualDocument.fileName;
-		const isDefinitionImported = dependencyStore.hasTagNameBeenImported(fromFileName, htmlNode.tagName);
+		const isDefinitionImported = dependencyStore.hasTagNameBeenImported(file.fileName, htmlNode.tagName);
 
 		// Report diagnostic if the html tag hasn't been imported.
 		if (!isDefinitionImported) {
 			// Get the import path and the position where it can be placed
-			const importPath = getRelativePathForImport(fromFileName, iterableFirst(definition.tagNameNodes)!.getSourceFile().fileName);
+			const importPath = getRelativePathForImport(file.fileName, iterableFirst(definition.tagNameNodes)!.getSourceFile().fileName);
 
 			const report: LitHtmlDiagnostic = {
 				kind: LitHtmlDiagnosticKind.MISSING_IMPORT,
@@ -39,7 +39,8 @@ const rule: RuleModule = {
 				suggestion: config.dontSuggestConfigChanges ? undefined : `You can disable this check by disabling the 'no-missing-import' rule.`,
 				source: "no-missing-import",
 				severity: litDiagnosticRuleSeverity(config, "no-missing-import"),
-				location: { document, ...htmlNode.location.name },
+				location: rangeFromHtmlNode(document, htmlNode),
+				file,
 				htmlNode,
 				definition,
 				importPath

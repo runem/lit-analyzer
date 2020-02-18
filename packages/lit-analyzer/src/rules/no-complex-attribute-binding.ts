@@ -4,6 +4,7 @@ import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-type
 import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
 import { isLitDirective } from "../analyze/util/directive/is-lit-directive";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/lit-range-util";
 import { extractBindingTypes } from "../analyze/util/type/extract-binding-types";
 import { isAssignableBindingUnderSecuritySystem } from "../analyze/util/type/is-assignable-binding-under-security-system";
 
@@ -37,7 +38,8 @@ const rule: RuleModule = {
 					source: "no-complex-attribute-binding",
 					message: `You are binding a non-primitive type '${toTypeString(typeB)}'. This could result in binding the string "[object Object]".`,
 					fix: "Use '.' binding instead?",
-					location: { document: request.document, ...htmlAttr.location.name },
+					location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
+					file: request.file,
 					htmlAttr,
 					typeA,
 					typeB
@@ -56,7 +58,8 @@ const rule: RuleModule = {
 					source: "no-complex-attribute-binding",
 					message,
 					fix: "Use '.' binding instead?",
-					location: { document: request.document, ...htmlAttr.location.name },
+					location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
+					file: request.file,
 					htmlAttr,
 					typeA,
 					typeB

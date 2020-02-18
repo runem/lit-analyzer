@@ -2,6 +2,7 @@ import { HtmlData } from "./parse/parse-html-data/html-data-tag";
 import { LitDiagnosticSeverity } from "./types/lit-diagnostic";
 
 export type LitAnalyzerRuleName =
+	| "no-invalid-property"
 	| "no-unknown-tag-name"
 	| "no-missing-import"
 	| "no-unclosed-tag"
@@ -53,6 +54,7 @@ export type LitAnalyzerRuleSeverity = "off" | "warn" | "warning" | "error" | 0 |
 export type LitAnalyzerRules = Partial<Record<LitAnalyzerRuleName, LitAnalyzerRuleSeverity | [LitAnalyzerRuleSeverity]>>;
 
 const DEFAULT_RULES_NOSTRICT: Required<LitAnalyzerRules> = {
+	"no-invalid-property": "warn",
 	"no-unknown-tag-name": "off",
 	"no-missing-import": "off",
 	"no-unclosed-tag": "warn",
@@ -77,6 +79,7 @@ const DEFAULT_RULES_NOSTRICT: Required<LitAnalyzerRules> = {
 };
 
 const DEFAULT_RULES_STRICT: Required<LitAnalyzerRules> = {
+	"no-invalid-property": "warn",
 	"no-unknown-tag-name": "warn",
 	"no-missing-import": "warn",
 	"no-unclosed-tag": "error",

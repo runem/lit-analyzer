@@ -3,6 +3,7 @@ import { litDiagnosticRuleSeverity } from "../../lit-analyzer-config";
 import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 import { HtmlNodeAttr } from "../../types/html-node/html-node-attr-types";
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../types/lit-diagnostic";
+import { rangeFromHtmlNodeAttr } from "../lit-range-util";
 import { isAssignableToType } from "./is-assignable-to-type";
 
 export function isAssignableInBooleanBinding(
@@ -18,7 +19,8 @@ export function isAssignableInBooleanBinding(
 				message: `Type '${toTypeString(typeB)}' is not assignable to 'boolean'`,
 				severity: litDiagnosticRuleSeverity(request.config, "no-incompatible-type-binding"),
 				source: "no-incompatible-type-binding",
-				location: { document: request.document, ...htmlAttr.location.name },
+				location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
+				file: request.file,
 				htmlAttr,
 				typeA,
 				typeB
@@ -34,7 +36,8 @@ export function isAssignableInBooleanBinding(
 				message: `You are using a boolean binding on a non boolean type '${toTypeString(typeA)}'`,
 				severity: litDiagnosticRuleSeverity(request.config, "no-incompatible-type-binding"),
 				source: "no-incompatible-type-binding",
-				location: { document: request.document, ...htmlAttr.location.name },
+				location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
+				file: request.file,
 				htmlAttr,
 				typeA: { kind: SimpleTypeKind.BOOLEAN },
 				typeB

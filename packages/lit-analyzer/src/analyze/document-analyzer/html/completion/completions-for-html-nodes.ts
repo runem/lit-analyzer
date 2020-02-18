@@ -2,8 +2,9 @@ import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
 import { documentationForHtmlTag } from "../../../parse/parse-html-data/html-tag";
 import { HtmlNode } from "../../../types/html-node/html-node-types";
 import { LitCompletion } from "../../../types/lit-completion";
-import { isCustomElementTagName, lazy } from "../../../util/general-util";
+import { lazy } from "../../../util/general-util";
 import { DocumentPositionContext } from "../../../util/get-position-context-in-document";
+import { isCustomElementTagName } from "../../../util/is-valid-name";
 
 export function completionsForHtmlNodes(
 	intersectingClosestNode: HtmlNode | undefined,

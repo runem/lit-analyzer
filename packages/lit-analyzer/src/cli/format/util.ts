@@ -1,6 +1,6 @@
 import chalk from "chalk";
-import { DocumentRange } from "../../analyze/types/lit-range";
 import { TextSpan } from "typescript";
+import { LitRange } from "../../analyze/types/lit-range";
 import { AnalysisStats } from "./diagnostic-formatter";
 
 export function generalReport(stats: AnalysisStats): string {
@@ -35,8 +35,8 @@ export function textPad(str: string, { width, fill, dir }: { width: number; fill
 	return `${dir !== "right" ? padding : ""}${str}${dir === "right" ? padding : ""}`;
 }
 
-export function translateRange(range: DocumentRange): TextSpan {
-	if (range.document != null) {
+export function translateRange(range: LitRange): TextSpan {
+	if ("document" in range) {
 		return {
 			start: range.document.virtualDocument.offsetToSCPosition(range.start),
 			length: range.end - range.start

@@ -7,7 +7,7 @@ import { CodeActionKind, LitCodeFixAction } from "../../../types/lit-code-fix-ac
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../../types/lit-diagnostic";
 import { iterableFirst } from "../../../util/iterable-util";
 
-export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document, htmlStore }: LitAnalyzerRequest): LitCodeFix[] {
+export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document, file, htmlStore }: LitAnalyzerRequest): LitCodeFix[] {
 	switch (htmlReport.kind) {
 		case LitHtmlDiagnosticKind.UNKNOWN_TARGET: {
 			const fixes: LitCodeFix[] = [];
@@ -21,10 +21,10 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 						htmlReport,
 						actions: [
 							{
-								kind: CodeActionKind.DOCUMENT_TEXT_CHANGE,
+								kind: CodeActionKind.TEXT_CHANGE,
 								change: {
 									range: {
-										document,
+										document: document!,
 										start: htmlReport.htmlAttr.location.name.start,
 										end: htmlReport.htmlAttr.location.name.start
 									},
@@ -44,11 +44,11 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 					htmlReport,
 					actions: [
 						{
-							kind: CodeActionKind.DOCUMENT_TEXT_CHANGE,
+							kind: CodeActionKind.TEXT_CHANGE,
 							change: {
 								// Make a range that includes the modifier.
 								range: {
-									document,
+									document: document!,
 									start: htmlReport.htmlAttr.location.start,
 									end: htmlReport.htmlAttr.location.name.end
 								},
@@ -74,9 +74,9 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 					htmlReport,
 					actions: [
 						{
-							kind: CodeActionKind.DOCUMENT_TEXT_CHANGE,
+							kind: CodeActionKind.TEXT_CHANGE,
 							change: {
-								range: { document, ...htmlReport.location },
+								range: htmlReport.location,
 								newText: htmlReport.suggestedName
 							}
 						},
@@ -84,10 +84,10 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 							? []
 							: [
 									{
-										kind: CodeActionKind.DOCUMENT_TEXT_CHANGE,
+										kind: CodeActionKind.TEXT_CHANGE,
 										change: {
 											range: {
-												document,
+												document: document!,
 												start: endTagRange.start + 2,
 												end: endTagRange.end - 1
 											},
@@ -117,10 +117,10 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 					htmlReport,
 					actions: [
 						{
-							kind: CodeActionKind.DOCUMENT_TEXT_CHANGE,
+							kind: CodeActionKind.TEXT_CHANGE,
 							change: {
 								range: {
-									document,
+									document: document!,
 									start: htmlAttr.location.name.start - existingModifierLength,
 									end: htmlAttr.location.name.start
 								},
@@ -157,10 +157,10 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 					htmlReport,
 					actions: [
 						{
-							kind: CodeActionKind.DOCUMENT_TEXT_CHANGE,
+							kind: CodeActionKind.TEXT_CHANGE,
 							change: {
 								range: {
-									document,
+									document: document!,
 									start: htmlReport.htmlNode.location.name.end,
 									end: htmlReport.htmlNode.location.name.end
 								},
@@ -181,10 +181,10 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 					htmlReport,
 					actions: [
 						{
-							kind: CodeActionKind.DOCUMENT_TEXT_CHANGE,
+							kind: CodeActionKind.TEXT_CHANGE,
 							change: {
 								range: {
-									document,
+									document: document!,
 									...htmlReport.htmlAttr.location.name
 								},
 								newText
@@ -204,10 +204,10 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 					htmlReport,
 					actions: [
 						{
-							kind: CodeActionKind.DOCUMENT_TEXT_CHANGE,
+							kind: CodeActionKind.TEXT_CHANGE,
 							change: {
 								range: {
-									document,
+									document: document!,
 									start: assignment.location.start + 2, // Offset 2 for '${'
 									end: assignment.location.end - 1 // Offset 1 for '}'
 								},
@@ -229,10 +229,10 @@ export function codeFixesForHtmlReport(htmlReport: LitHtmlDiagnostic, { document
 					htmlReport,
 					actions: [
 						{
-							kind: CodeActionKind.DOCUMENT_TEXT_CHANGE,
+							kind: CodeActionKind.TEXT_CHANGE,
 							change: {
 								range: {
-									document,
+									document: document!,
 									start: assignment.location.start + 2, // Offset 2 for '${'
 									end: assignment.location.end - 1 // Offset 1 for '}'
 								},

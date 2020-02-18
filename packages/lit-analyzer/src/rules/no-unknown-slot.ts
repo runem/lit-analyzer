@@ -3,6 +3,7 @@ import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
+import { rangeFromHtmlNode, rangeFromHtmlNodeAttr } from "../analyze/util/lit-range-util";
 
 /**
  * This rule checks validates the slot attribute
@@ -10,7 +11,7 @@ import { RuleModule } from "../analyze/types/rule-module";
  */
 const rule: RuleModule = {
 	name: "no-unknown-slot",
-	visitHtmlNode(htmlNode, { htmlStore, document, config }) {
+	visitHtmlNode(htmlNode, { htmlStore, document, config, file }) {
 		// This visitor function validates that a "slot" attribute is present on children elements if a slot name is required.
 
 		// Get available slot names from the parent node of this node, because this node defined what slots are available.
@@ -36,7 +37,8 @@ const rule: RuleModule = {
 						message: `Missing slot attribute. Parent element <${parentTagName}> only allows named slots as children.`,
 						severity: litDiagnosticRuleSeverity(config, "no-unknown-slot"),
 						source: "no-unknown-slot",
-						location: { document, ...htmlNode.location.name }
+						location: rangeFromHtmlNode(document, htmlNode),
+						file
 					}
 				];
 			}
@@ -87,7 +89,8 @@ const rule: RuleModule = {
 					validSlotNames,
 					source: "no-unknown-slot",
 					severity: litDiagnosticRuleSeverity(request.config, "no-unknown-slot"),
-					location: { document: request.document, ...htmlAttr.location.name }
+					location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
+					file: request.file
 				}
 			];
 		}

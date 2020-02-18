@@ -3,6 +3,7 @@ import { SourceFile } from "typescript";
 import { LitCssDocumentAnalyzer } from "./document-analyzer/css/lit-css-document-analyzer";
 import { LitHtmlDocumentAnalyzer } from "./document-analyzer/html/lit-html-document-analyzer";
 import { renameLocationsForTagName } from "./document-analyzer/html/rename-locations/rename-locations-for-tag-name";
+import { isRuleEnabled } from "./lit-analyzer-config";
 import { LitAnalyzerContext, LitAnalyzerRequest } from "./lit-analyzer-context";
 import { CssDocument } from "./parse/document/text-document/css-document/css-document";
 import { HtmlDocument } from "./parse/document/text-document/html-document/html-document";
@@ -107,7 +108,7 @@ export class LitAnalyzer {
 					return {
 						fullDisplayName: tagName,
 						displayName: tagName,
-						range: { start: nodeUnderCursor.getStart() + 1, end: nodeUnderCursor.getEnd() - 1 },
+						range: { file, start: nodeUnderCursor.getStart() + 1, end: nodeUnderCursor.getEnd() - 1 },
 						kind: "label",
 						target: definition
 					};
@@ -132,7 +133,8 @@ export class LitAnalyzer {
 				return this.litHtmlDocumentAnalyzer.getRenameLocationsAtOffset(document, offset, request);
 			}
 		} else {
-			return renameLocationsForTagName(renameInfo.target.tagName, this.context);
+			const request = this.makeRequest({ file });
+			return renameLocationsForTagName(renameInfo.target.tagName, request);
 		}
 	}
 
@@ -180,24 +182,63 @@ export class LitAnalyzer {
 	}
 
 	getDiagnosticsInFile(file: SourceFile): LitDiagnostic[] {
+		const diagnostics: LitDiagnostic[] = [];
+
 		const documents = this.getDocumentsInFile(file);
 
 		this.context.updateComponents(file);
 		this.context.updateDependencies(file);
 
-		return flatten(
-			documents.map(document => {
-				const request = this.makeRequest({ document, file });
+		const analysisResult = this.context.definitionStore.getAnalysisResultForFile(file);
+		if (analysisResult != null) {
+			const request = this.makeRequest({ file });
 
-				if (document instanceof CssDocument) {
-					return this.litCssDocumentAnalyzer.getDiagnostics(document, request);
-				} else if (document instanceof HtmlDocument) {
-					return this.litHtmlDocumentAnalyzer.getDiagnostics(document, request);
+			for (const definition of analysisResult.componentDefinitions) {
+				const declaration = definition.declaration();
+
+				for (const member of declaration.members) {
+					for (const rule of this.context.rules) {
+						if (isRuleEnabled(this.context.config, rule.name)) {
+							const result = rule.visitComponentMember?.(member, request);
+							if (result != null) {
+								diagnostics.push(...result);
+							}
+						}
+					}
 				}
 
-				return [];
-			})
-		);
+				for (const rule of this.context.rules) {
+					if (isRuleEnabled(this.context.config, rule.name)) {
+						if (rule.visitComponentDefinition != null) {
+							const result = rule.visitComponentDefinition(definition, request);
+							if (result != null) {
+								diagnostics.push(...result);
+							}
+						}
+
+						if (rule.visitComponentDeclaration != null) {
+							const result = rule.visitComponentDeclaration(declaration, request);
+
+							if (result != null) {
+								diagnostics.push(...result);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		for (const document of documents) {
+			const request = this.makeRequest({ document, file });
+
+			if (document instanceof CssDocument) {
+				diagnostics.push(...this.litCssDocumentAnalyzer.getDiagnostics(document, request));
+			} else if (document instanceof HtmlDocument) {
+				diagnostics.push(...this.litHtmlDocumentAnalyzer.getDiagnostics(document, request));
+			}
+		}
+
+		return diagnostics;
 	}
 
 	getCodeFixesAtPositionRange(file: SourceFile, positionRange: Range): LitCodeFix[] {
@@ -276,7 +317,7 @@ export class LitAnalyzer {
 	 }
 	 }*/
 
-	private makeRequest(options: { document: TextDocument; file: SourceFile }): LitAnalyzerRequest {
+	private makeRequest(options: { document?: TextDocument; file: SourceFile }): LitAnalyzerRequest {
 		const {
 			project,
 			htmlStore,

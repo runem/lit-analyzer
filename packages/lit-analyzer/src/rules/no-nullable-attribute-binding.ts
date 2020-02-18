@@ -4,6 +4,7 @@ import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/lit-range-util";
 import { extractBindingTypes } from "../analyze/util/type/extract-binding-types";
 
 /**
@@ -30,8 +31,9 @@ const rule: RuleModule = {
 					fix: "Use the 'ifDefined' directive and strict null check?",
 					source: "no-nullable-attribute-binding",
 					severity: litDiagnosticRuleSeverity(request.config, "no-nullable-attribute-binding"),
-					location: { document: request.document, ...htmlAttr.location.name },
-					htmlAttr: htmlAttr as typeof htmlAttr & ({ assignment: typeof assignment }),
+					location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
+					file: request.file,
+					htmlAttr: htmlAttr as typeof htmlAttr & { assignment: typeof assignment },
 					typeA,
 					typeB
 				}
@@ -47,8 +49,9 @@ const rule: RuleModule = {
 					fix: "Use the 'ifDefined' directive?",
 					source: "no-nullable-attribute-binding",
 					severity: litDiagnosticRuleSeverity(request.config, "no-nullable-attribute-binding"),
-					location: { document: request.document, ...htmlAttr.location.name },
-					htmlAttr: htmlAttr as typeof htmlAttr & ({ assignment: typeof assignment }),
+					location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
+					file: request.file,
+					htmlAttr: htmlAttr as typeof htmlAttr & { assignment: typeof assignment },
 					typeA,
 					typeB
 				}
