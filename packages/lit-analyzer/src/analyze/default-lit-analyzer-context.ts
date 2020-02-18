@@ -6,7 +6,10 @@ import noBooleanInAttributeBindingRule from "../rules/no-boolean-in-attribute-bi
 import noComplexAttributeBindingRule from "../rules/no-complex-attribute-binding";
 import noExpressionlessPropertyBindingRule from "../rules/no-expressionless-property-binding";
 import noIncompatibleTypeBindingRule from "../rules/no-incompatible-type-binding";
+import noInvalidAttributeName from "../rules/no-invalid-attribute-name";
 import noInvalidDirectiveBindingRule from "../rules/no-invalid-directive-binding";
+import noInvalidProperty from "../rules/no-invalid-property";
+import noInvalidTagName from "../rules/no-invalid-tag-name";
 import noMissingImport from "../rules/no-missing-import";
 import noNoncallableEventBindingRule from "../rules/no-noncallable-event-binding";
 import noNullableAttributeBindingRule from "../rules/no-nullable-attribute-binding";
@@ -48,7 +51,10 @@ const rules: RuleModule[] = [
 	noUnknownTagName,
 	noUnknownAttribute,
 	noUnknownProperty,
-	noUnknownEvent
+	noUnknownEvent,
+	noInvalidProperty,
+	noInvalidTagName,
+	noInvalidAttributeName
 ];
 
 export class DefaultLitAnalyzerContext implements LitAnalyzerContext {

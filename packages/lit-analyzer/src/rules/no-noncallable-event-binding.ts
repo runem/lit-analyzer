@@ -3,6 +3,7 @@ import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/lit-range-util";
 import { extractBindingTypes } from "../analyze/util/type/extract-binding-types";
 
 /**
@@ -26,7 +27,8 @@ const rule: RuleModule = {
 					message: `You are setting up an event listener with a non-callable type '${toTypeString(typeB)}'`,
 					source: "no-noncallable-event-binding",
 					severity: litDiagnosticRuleSeverity(request.config, "no-noncallable-event-binding"),
-					location: { document: request.document, ...htmlAttr.location.name },
+					location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
+					file: request.file,
 					typeB
 				}
 			];

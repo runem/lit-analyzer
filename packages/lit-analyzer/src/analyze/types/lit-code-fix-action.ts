@@ -1,23 +1,18 @@
-import { DocumentRange, SourceFileRange } from "./lit-range";
-
-export interface DocumentTextChange {
-	range: DocumentRange;
-	newText: string;
-}
+import { LitRange } from "./lit-range";
 
 export interface TextChange {
-	range: SourceFileRange;
+	range: LitRange;
 	newText: string;
 }
 
 export enum CodeActionKind {
-	DOCUMENT_TEXT_CHANGE = "TEXT_CHANGE",
+	TEXT_CHANGE = "TEXT_CHANGE",
 	IMPORT_COMPONENT = "IMPORT_COMPONENT"
 }
 
 export interface CodeActionTextChange {
-	kind: CodeActionKind.DOCUMENT_TEXT_CHANGE;
-	change: DocumentTextChange;
+	kind: CodeActionKind.TEXT_CHANGE;
+	change: TextChange;
 }
 
 export interface CodeActionImportComponent {

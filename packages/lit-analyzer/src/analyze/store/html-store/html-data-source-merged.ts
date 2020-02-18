@@ -313,25 +313,25 @@ export class HtmlDataSourceMerged {
 	}
 }
 
-function mergeRelatedMembers<T extends HtmlMember>(attrs: Iterable<T>): ReadonlyMap<string, T> {
+function mergeRelatedMembers<T extends HtmlMember>(members: Iterable<T>): ReadonlyMap<string, T> {
 	const mergedMembers = new Map<string, T>();
-	for (const attr of attrs) {
+	for (const member of members) {
 		// For now, lowercase all names because "parse5" doesn't distinguish between uppercase and lowercase
-		const name = attr.name.toLowerCase();
+		const name = member.name.toLowerCase();
 
-		const existingAttr = mergedMembers.get(name);
-		if (existingAttr == null) {
-			mergedMembers.set(name, attr);
+		const existingMember = mergedMembers.get(name);
+		if (existingMember == null) {
+			mergedMembers.set(name, member);
 		} else {
-			const prevType = existingAttr.getType;
+			const prevType = existingMember.getType;
 			mergedMembers.set(name, {
-				...existingAttr,
+				...existingMember,
 				description: undefined,
-				required: existingAttr.required && attr.required,
-				builtIn: existingAttr.required && attr.required,
-				fromTagName: existingAttr.fromTagName || attr.fromTagName,
-				getType: lazy(() => mergeRelatedTypeToUnion(prevType(), attr.getType())),
-				related: existingAttr.related == null ? [existingAttr, attr] : [...existingAttr.related, attr]
+				required: existingMember.required && member.required,
+				builtIn: existingMember.required && member.required,
+				fromTagName: existingMember.fromTagName || member.fromTagName,
+				getType: lazy(() => mergeRelatedTypeToUnion(prevType(), member.getType())),
+				related: existingMember.related == null ? [existingMember, member] : [...existingMember.related, member]
 			});
 		}
 	}

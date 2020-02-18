@@ -3,8 +3,9 @@ import { litDiagnosticRuleSeverity } from "../../lit-analyzer-config";
 import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 import { HtmlNodeAttr } from "../../types/html-node/html-node-attr-types";
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../types/lit-diagnostic";
-import { isAssignableToType } from "./is-assignable-to-type";
+import { rangeFromHtmlNodeAttr } from "../lit-range-util";
 import { isAssignableBindingUnderSecuritySystem } from "./is-assignable-binding-under-security-system";
+import { isAssignableToType } from "./is-assignable-to-type";
 
 export function isAssignableInPropertyBinding(
 	htmlAttr: HtmlNodeAttr,
@@ -25,7 +26,8 @@ export function isAssignableInPropertyBinding(
 				message: `Type '${toTypeString(typeB)}' is not assignable to '${toTypeString(typeA)}'`,
 				severity: litDiagnosticRuleSeverity(request.config, "no-incompatible-type-binding"),
 				source: "no-incompatible-type-binding",
-				location: { document: request.document, ...htmlAttr.location.name },
+				location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
+				file: request.file,
 				htmlAttr,
 				typeA,
 				typeB

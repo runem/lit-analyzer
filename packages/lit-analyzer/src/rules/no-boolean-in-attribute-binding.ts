@@ -4,6 +4,7 @@ import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/lit-range-util";
 import { extractBindingTypes } from "../analyze/util/type/extract-binding-types";
 import { isAssignableToTypeWithStringCoercion } from "../analyze/util/type/is-assignable-in-attribute-binding";
 import { isAssignableToType } from "../analyze/util/type/is-assignable-to-type";
@@ -47,7 +48,8 @@ const rule: RuleModule = {
 					source: "no-boolean-in-attribute-binding",
 					message: `The value being assigned is a boolean type, but you are not using a boolean binding.`,
 					fix: "Change to boolean binding?",
-					location: { document: request.document, ...htmlAttr.location.name },
+					location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
+					file: request.file,
 					htmlAttr,
 					typeA,
 					typeB
@@ -75,7 +77,8 @@ const rule: RuleModule = {
 					source: "no-boolean-in-attribute-binding",
 					message: `The '${htmlAttr.name}' attribute is of boolean type but you are not using a boolean binding.`,
 					fix: "Change to boolean binding?",
-					location: { document: request.document, ...htmlAttr.location.name },
+					location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
+					file: request.file,
 					htmlAttr,
 					typeA,
 					typeB

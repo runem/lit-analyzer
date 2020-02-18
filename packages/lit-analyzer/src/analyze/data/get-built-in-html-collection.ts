@@ -35,16 +35,23 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 		valueSets: EXTENDED_HTML5_VALUE_MAP
 	});
 
+	// Force all tags to be built in
+	for (const tag of result.tags) {
+		tag.builtIn = true;
+	}
+
 	result.tags.push({
 		attributes: [],
 		properties: [],
 		events: [],
 		slots: [],
 		tagName: "svg",
-		description: ""
+		description: "",
+		builtIn: true
 	});
 
 	result.tags.push({
+		builtIn: true,
 		properties: [],
 		events: [
 			{

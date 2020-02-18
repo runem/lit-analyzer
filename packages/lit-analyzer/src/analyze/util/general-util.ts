@@ -69,7 +69,3 @@ export function lazy<T extends Function>(func: T): T {
 		return (value = func(...args));
 	}) as unknown) as T;
 }
-
-export function isCustomElementTagName(tagName: string): boolean {
-	return tagName.includes("-");
-}

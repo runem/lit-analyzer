@@ -3,6 +3,7 @@ import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/lit-range-util";
 
 const CONTROL_CHARACTERS = ["'", '"', "}", "/"];
 
@@ -55,10 +56,11 @@ const rule: RuleModule = {
 			return [
 				{
 					kind: LitHtmlDiagnosticKind.INVALID_MIXED_BINDING,
-					severity: litDiagnosticRuleSeverity(request.config, "no-unintended-mixed-binding"),
 					source: "no-unintended-mixed-binding",
-					message,
-					location: { document: request.document, ...assignment.htmlAttr.location.name }
+					severity: litDiagnosticRuleSeverity(request.config, "no-unintended-mixed-binding"),
+					location: rangeFromHtmlNodeAttr(request.document, assignment.htmlAttr),
+					file: request.file,
+					message
 				}
 			];
 		}

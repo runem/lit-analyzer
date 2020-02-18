@@ -28,7 +28,7 @@ export interface LitAnalyzerContext {
 
 export interface LitAnalyzerRequest extends LitAnalyzerContext {
 	file: SourceFile;
-	document: TextDocument;
+	document?: TextDocument;
 }
 
 export interface LitPluginContextHandler {

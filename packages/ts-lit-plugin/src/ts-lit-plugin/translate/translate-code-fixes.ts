@@ -17,7 +17,7 @@ export function translateCodeFix(file: SourceFile, codeFix: LitCodeFix): CodeFix
 
 function translateCodeFixAction(file: SourceFile, action: LitCodeFixAction): FileTextChanges {
 	switch (action.kind) {
-		case CodeActionKind.DOCUMENT_TEXT_CHANGE:
+		case CodeActionKind.TEXT_CHANGE:
 			return {
 				fileName: file.fileName,
 				textChanges: [

@@ -6,13 +6,14 @@ import { HtmlNodeKind } from "../analyze/types/html-node/html-node-types";
 import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
 import { suggestTargetForHtmlAttr } from "../analyze/util/attribute-util";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/lit-range-util";
 
 /**
  * This rule validates that only known events are used in event listener bindings.
  */
 const rule: RuleModule = {
 	name: "no-unknown-event",
-	visitHtmlAttribute(htmlAttr, { htmlStore, config, definitionStore, document }) {
+	visitHtmlAttribute(htmlAttr, { htmlStore, config, definitionStore, file, document }) {
 		// Ignore "style" and "svg" attrs because I don't yet have all data for them.
 		if (htmlAttr.htmlNode.kind !== HtmlNodeKind.NODE) return;
 
@@ -37,9 +38,10 @@ const rule: RuleModule = {
 					kind: LitHtmlDiagnosticKind.UNKNOWN_TARGET,
 					message: `Unknown event '${htmlAttr.name}'.`,
 					fix: suggestedMemberName == null ? undefined : `Did you mean '${suggestedMemberName}'?`,
-					location: { document, ...htmlAttr.location.name },
 					source: "no-unknown-event",
 					severity: litDiagnosticRuleSeverity(config, "no-unknown-event"),
+					location: rangeFromHtmlNodeAttr(document, htmlAttr),
+					file,
 					suggestion,
 					htmlAttr,
 					suggestedTarget

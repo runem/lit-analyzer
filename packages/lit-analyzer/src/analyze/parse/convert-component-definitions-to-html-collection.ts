@@ -1,7 +1,8 @@
 import { isSimpleType, SimpleType, SimpleTypeKind, toSimpleType } from "ts-simple-type";
 import { TypeChecker } from "typescript";
 import { AnalyzerResult, ComponentDeclaration, ComponentDefinition, ComponentFeatures } from "web-component-analyzer";
-import { isCustomElementTagName, lazy } from "../util/general-util";
+import { lazy } from "../util/general-util";
+import { iterableFirst } from "../util/iterable-util";
 import { HtmlDataCollection, HtmlDataFeatures, HtmlMemberBase, HtmlTag } from "./parse-html-data/html-tag";
 
 export interface AnalyzeResultConversionOptions {
@@ -27,7 +28,11 @@ export function convertComponentDeclarationToHtmlTag(
 ): HtmlTag {
 	const tagName = definition?.tagName;
 
-	const builtIn = definition == null || isCustomElementTagName(definition.tagName);
+	const builtIn =
+		definition == null ||
+		iterableFirst(declaration.declarationNodes)
+			?.getSourceFile()
+			.fileName.endsWith("lib.dom.d.ts");
 
 	const htmlTag: HtmlTag = {
 		declaration,
