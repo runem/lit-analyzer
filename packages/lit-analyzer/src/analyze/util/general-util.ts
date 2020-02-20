@@ -24,14 +24,6 @@ export function intersects(position: number | Range, { start, end }: Range): boo
 	}
 }
 
-/**
- * Flattens a nested array
- * @param items
- */
-export function flatten<T>(items: T[][]): T[] {
-	return items.reduce((acc, item) => [...acc, ...item], []);
-}
-
 export function rangeToTSSpan({ start, end }: Range): { start: number; length: number } {
 	return { start, length: end - start };
 }

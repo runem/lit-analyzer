@@ -43,7 +43,6 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | Rule    | Description | Severity normal | Severity strict |
 | :------ | ----------- | --------------- | --------------- |
 | [no-incompatible-property-type](#-no-incompatible-property-type) | When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type | error | error |
-| [no-unknown-property-converter](#-no-unknown-property-converter) | LitElement provides default converters. For example 'Function' is not a valid default converter type for a LitElement-managed property. | error | error |
 | [no-invalid-attribute-name](#-no-invalid-attribute-name)         | When using the property option `attribute`, the value is checked to make sure it's a valid attribute name. | error | error |
 | [no-invalid-tag-name](#-no-invalid-tag-name)                     | When defining a custom element the tag name is checked to make sure it's valid. | error | error |
 
@@ -398,7 +397,15 @@ html`<input @input="${console.log}" />`
 
 #### 💞 no-incompatible-property-type
 
-When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type.
+This rule checks that LitElement-controlled properties are correctly configured in accordance with the default value converter.
+
+The following is a summary of what this rule does:
+
+1. The `type` given to the LitElement property configuration is checked against the actual Typescript type of the property.
+2. The default converter only accepts the types `String`, `Boolean`, `Number`, `Array` and `Object`, so all other values for `type` are considered warnings.
+3. The absence of a `type` is only considered a warning if the property is not assignable to the `string` type.
+
+This rule will not check for a given LitElement-controlled property if the property has custom converter configured.
 
 The following examples are considered warnings:
 
@@ -409,30 +416,7 @@ class MyElement extends LitElement {
   @property({type: Boolean}) count: number;
   @property({type: String}) disabled: boolean;
   @property({type: Object}) list: ListItem[];
-}
-```
 
-The following examples are not considered warnings:
-
-<!-- prettier-ignore -->
-```js
-class MyElement extends LitElement {
-  @property({type: String}) text: string;
-  @property({type: Number}) count: number;
-  @property({type: Boolean}) disabled: boolean;
-  @property({type: Array}) list: ListItem[];
-}
-```
-
-#### 👎 no-unknown-property-converter
-
-The default converter in LitElement only accepts `String`, `Boolean`, `Number`, `Array` and `Object`, so all other values for `type` are considered warnings. This check doesn't run if a custom converter is used.
-
-The following example is considered a warning:
-
-<!-- prettier-ignore -->
-```js
-class MyElement extends LitElement {
   static get properties () {
     return {
       callback: {
@@ -446,11 +430,16 @@ class MyElement extends LitElement {
 }
 ```
 
-The following example is not considered a warning:
+The following examples are not considered warnings:
 
 <!-- prettier-ignore -->
 ```js
 class MyElement extends LitElement {
+  @property({type: String}) text: string;
+  @property({type: Number}) count: number;
+  @property({type: Boolean}) disabled: boolean;
+  @property({type: Array}) list: ListItem[];
+
   static get properties () {
     return {
       callback: {
@@ -462,6 +451,7 @@ class MyElement extends LitElement {
       }
     }
   }
+
 }
 ```
 

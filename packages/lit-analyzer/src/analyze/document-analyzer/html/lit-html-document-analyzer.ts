@@ -15,8 +15,9 @@ import { LitOutliningSpan, LitOutliningSpanKind } from "../../types/lit-outlinin
 import { LitQuickInfo } from "../../types/lit-quick-info";
 import { LitRenameInfo } from "../../types/lit-rename-info";
 import { LitRenameLocation } from "../../types/lit-rename-location";
+import { flatten } from "../../util/array-util";
 import { iterableDefined } from "../../util/iterable-util";
-import { flatten, intersects } from "../../util/general-util";
+import { intersects } from "../../util/general-util";
 import { codeFixesForHtmlReport } from "./code-fix/code-fixes-for-html-report";
 import { completionsAtOffset } from "./completion/completions-at-offset";
 import { definitionForHtmlAttr } from "./definition/definition-for-html-attr";

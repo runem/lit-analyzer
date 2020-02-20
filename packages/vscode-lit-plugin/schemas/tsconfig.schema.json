@@ -173,11 +173,6 @@
 											"description": "Check the 'type' key of the @property decorator against the actual property type.",
 											"enum": ["off", "warning", "error"]
 										},
-										"no-unknown-property-converter": {
-											"type": "string",
-											"description": "Check that the converter of @property decorators exists.",
-											"enum": ["off", "warning", "error"]
-										},
 										"no-invalid-attribute-name": {
 											"type": "string",
 											"description": "Check the validity of the attribute names.",

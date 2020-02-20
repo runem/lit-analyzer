@@ -27,7 +27,9 @@ export enum LitHtmlDiagnosticKind {
 	MISSING_SLOT_ATTRIBUTE = "MISSING_SLOT_ATTRIBUTE",
 	DIRECTIVE_NOT_ALLOWED_HERE = "DIRECTIVE_NOT_ALLOWED_HERE",
 	INVALID_MIXED_BINDING = "INVALID_MIXED_BINDING",
-	INVALID_TAG_NAME = "INVALID_TAG_NAME"
+	INVALID_TAG_NAME = "INVALID_TAG_NAME",
+	INVALID_ATTRIBUTE_NAME = "INVALID_ATTRIBUTE_NAME",
+	INVALID_PROPERTY_TYPE = "INVALID_PROPERTY_TYPE"
 }
 
 export type LitDiagnosticSeverity = "error" | "warning";
@@ -153,7 +155,17 @@ export interface LitHtmlDiagnosticInvalidTagName extends LitDiagnosticBase {
 	kind: LitHtmlDiagnosticKind.INVALID_TAG_NAME;
 }
 
+export interface LitHtmlDiagnosticInvalidAttributeName extends LitDiagnosticBase {
+	kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_NAME;
+}
+
+export interface LitHtmlDiagnosticInvalidPropertyType extends LitDiagnosticBase {
+	kind: LitHtmlDiagnosticKind.INVALID_PROPERTY_TYPE;
+}
+
 export type LitHtmlDiagnostic =
+	| LitHtmlDiagnosticInvalidPropertyType
+	| LitHtmlDiagnosticInvalidAttributeName
 	| LitHtmlDiagnosticInvalidTagName
 	| LitHtmlDiagnosticUnknownTag
 	| LitHtmlDiagnosticMissingImport

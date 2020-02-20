@@ -21,8 +21,8 @@ import { LitQuickInfo } from "./types/lit-quick-info";
 import { LitRenameInfo } from "./types/lit-rename-info";
 import { LitRenameLocation } from "./types/lit-rename-location";
 import { Range } from "./types/range";
+import { flatten } from "./util/array-util";
 import { getNodeAtPosition, nodeIntersects } from "./util/ast-util";
-import { flatten } from "./util/general-util";
 import { iterableFirst } from "./util/iterable-util";
 
 export class LitAnalyzer {

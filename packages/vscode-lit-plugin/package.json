@@ -342,17 +342,6 @@
 							"error"
 						]
 					},
-					"lit-plugin.rules.no-unknown-property-converter": {
-						"type": "string",
-						"description": "Check that the converter of @property decorators exists.",
-						"default": "default",
-						"enum": [
-							"default",
-							"off",
-							"warning",
-							"error"
-						]
-					},
 					"lit-plugin.rules.no-invalid-attribute-name": {
 						"type": "string",
 						"description": "Check the validity of the attribute names.",

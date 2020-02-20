@@ -75,7 +75,6 @@ export async function cli() {
                           o  no-incompatible-type-binding
                           o  no-invalid-directive-binding
                           o  no-incompatible-property-type
-                          o  no-unknown-property-converter
                           o  no-invalid-attribute-name
                           o  no-invalid-tag-name
                           o  no-invalid-css

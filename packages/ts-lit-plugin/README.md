@@ -13,9 +13,12 @@
 <a href="https://github.com/runem/lit-analyzer/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/runem/lit-analyzer.svg" height="20"/></a>
 	</p>
 
+
 <p align="center">
   <img src="https://user-images.githubusercontent.com/5372940/62078476-02c1ec00-b24d-11e9-8de5-1322012cbde2.gif" alt="Lit plugin GIF"/>
 </p>
+
+
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#installation)
 
@@ -49,6 +52,7 @@ Finally, restart you Typescript Language Service, and you should start getting d
 
 - If you use Visual Studio Code you can also install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension.
 - If you would rather use a CLI, you can install the [lit-analyzer](https://github.com/runem/lit-analyzer/blob/master/packages/lit-analyzer).
+
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#configuration)
 
@@ -91,6 +95,8 @@ You can configure this plugin through your `tsconfig.json`.
 | `globalAttributes` | List of html attributes names that you expect to be present at all times. | `string[]` | |
 | `globalEvents` | List of event names that you expect to be present at all times | `string[]` | |
 | `customHtmlData` | This plugin supports the [custom vscode html data format](https://code.visualstudio.com/updates/v1_31#_html-and-css-custom-data-support) through this setting. | [Vscode Custom HTML Data Format](https://github.com/Microsoft/vscode-html-languageservice/blob/master/docs/customData.md). Supports arrays, objects and relative file paths | |
+
+
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#rules)
 
@@ -139,7 +145,6 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | Rule    | Description | Severity normal | Severity strict |
 | :------ | ----------- | --------------- | --------------- |
 | [no-incompatible-property-type](#-no-incompatible-property-type) | When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type | error | error |
-| [no-unknown-property-converter](#-no-unknown-property-converter) | LitElement provides default converters. For example 'Function' is not a valid default converter type for a LitElement-managed property. | error | error |
 | [no-invalid-attribute-name](#-no-invalid-attribute-name)         | When using the property option `attribute`, the value is checked to make sure it's a valid attribute name. | error | error |
 | [no-invalid-tag-name](#-no-invalid-tag-name)                     | When defining a custom element the tag name is checked to make sure it's valid. | error | error |
 
@@ -494,7 +499,15 @@ html`<input @input="${console.log}" />`
 
 #### 💞 no-incompatible-property-type
 
-When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type.
+This rule checks that LitElement-controlled properties are correctly configured in accordance with the default value converter.
+
+The following is a summary of what this rule does:
+
+1. The `type` given to the LitElement property configuration is checked against the actual Typescript type of the property.
+2. The default converter only accepts the types `String`, `Boolean`, `Number`, `Array` and `Object`, so all other values for `type` are considered warnings.
+3. The absence of a `type` is only considered a warning if the property is not assignable to the `string` type.
+
+This rule will not check for a given LitElement-controlled property if the property has custom converter configured.
 
 The following examples are considered warnings:
 
@@ -505,30 +518,7 @@ class MyElement extends LitElement {
   @property({type: Boolean}) count: number;
   @property({type: String}) disabled: boolean;
   @property({type: Object}) list: ListItem[];
-}
-```
 
-The following examples are not considered warnings:
-
-<!-- prettier-ignore -->
-```js
-class MyElement extends LitElement {
-  @property({type: String}) text: string;
-  @property({type: Number}) count: number;
-  @property({type: Boolean}) disabled: boolean;
-  @property({type: Array}) list: ListItem[];
-}
-```
-
-#### 👎 no-unknown-property-converter
-
-The default converter in LitElement only accepts `String`, `Boolean`, `Number`, `Array` and `Object`, so all other values for `type` are considered warnings. This check doesn't run if a custom converter is used.
-
-The following example is considered a warning:
-
-<!-- prettier-ignore -->
-```js
-class MyElement extends LitElement {
   static get properties () {
     return {
       callback: {
@@ -542,11 +532,16 @@ class MyElement extends LitElement {
 }
 ```
 
-The following example is not considered a warning:
+The following examples are not considered warnings:
 
 <!-- prettier-ignore -->
 ```js
 class MyElement extends LitElement {
+  @property({type: String}) text: string;
+  @property({type: Number}) count: number;
+  @property({type: Boolean}) disabled: boolean;
+  @property({type: Array}) list: ListItem[];
+
   static get properties () {
     return {
       callback: {
@@ -558,6 +553,7 @@ class MyElement extends LitElement {
       }
     }
   }
+
 }
 ```
 
@@ -636,6 +632,7 @@ css`
 `
 ```
 
+
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#documenting-slots-events-attributes-and-properties)
 
 ## ➤ Documenting slots, events, attributes and properties
@@ -662,16 +659,20 @@ class MyElement extends HTMLElement {
 customElements.define("my-element", MyElement);
 ```
 
+
+
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#contributors)
 
 ## ➤ Contributors
+	
 
 | [<img alt="Rune Mehlsen" src="https://avatars2.githubusercontent.com/u/5372940?s=460&v=4" width="100">](https://twitter.com/runemehlsen) | [<img alt="Andreas Mehlsen" src="https://avatars1.githubusercontent.com/u/6267397?s=460&v=4" width="100">](https://twitter.com/andreasmehlsen) | [<img alt="You?" src="https://joeschmoe.io/api/v1/random" width="100">](https://github.com/runem/lit-analyzer/blob/master/CONTRIBUTING.md) |
-| :--------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: |
-|                                             [Rune Mehlsen](https://twitter.com/runemehlsen)                                              |                                             [Andreas Mehlsen](https://twitter.com/andreasmehlsen)                                              |                                 [You?](https://github.com/runem/lit-analyzer/blob/master/CONTRIBUTING.md)                                  |
+|:--------------------------------------------------:|:--------------------------------------------------:|:--------------------------------------------------:|
+| [Rune Mehlsen](https://twitter.com/runemehlsen)  | [Andreas Mehlsen](https://twitter.com/andreasmehlsen) | [You?](https://github.com/runem/lit-analyzer/blob/master/CONTRIBUTING.md) |
+
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#license)
 
 ## ➤ License
-
+	
 Licensed under [MIT](https://opensource.org/licenses/MIT).
