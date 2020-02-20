@@ -1,6 +1,7 @@
 import { SourceFile, TaggedTemplateExpression } from "typescript";
 import { HtmlNodeKind, IHtmlNodeStyleTag } from "../../types/html-node/html-node-types";
-import { flatten, intersects } from "../../util/general-util";
+import { flatten } from "../../util/array-util";
+import { intersects } from "../../util/general-util";
 import { findTaggedTemplates } from "../tagged-template/find-tagged-templates";
 import { CssDocument } from "./text-document/css-document/css-document";
 import { HtmlDocument } from "./text-document/html-document/html-document";

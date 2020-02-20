@@ -2,7 +2,7 @@ import { async } from "fast-glob";
 import { existsSync, lstatSync } from "fs";
 import { join } from "path";
 import { Diagnostic, flattenDiagnosticMessageText, Program, SourceFile } from "typescript";
-import { flatten } from "../analyze/util/general-util";
+import { flatten } from "../analyze/util/array-util";
 import { CompileResult, compileTypescript } from "./compile";
 import { LitAnalyzerCliConfig } from "./lit-analyzer-cli-config";
 

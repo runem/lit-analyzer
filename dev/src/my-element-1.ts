@@ -3,11 +3,15 @@ import "./my-element-2";
 
 @customElement("my-element")
 export class MyElement extends LitElement {
-	@property({ attribute: "hello" }) test: number | undefined;
+	@property({ attribute: "hell>o" }) test: number | undefined;
 
-	@property({ type: String }) test2: number | undefined;
+	@property({ type: Date }) test2: number | undefined;
 
 	@internalProperty() internal: number | undefined;
+
+	static get observedAttributes() {
+		return ["this is a test", "testing"];
+	}
 
 	render() {
 		return html`

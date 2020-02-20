@@ -2,7 +2,6 @@ import { HtmlData } from "./parse/parse-html-data/html-data-tag";
 import { LitDiagnosticSeverity } from "./types/lit-diagnostic";
 
 export type LitAnalyzerRuleName =
-	| "no-invalid-property"
 	| "no-unknown-tag-name"
 	| "no-missing-import"
 	| "no-unclosed-tag"
@@ -20,7 +19,6 @@ export type LitAnalyzerRuleName =
 	| "no-incompatible-type-binding"
 	| "no-invalid-directive-binding"
 	| "no-incompatible-property-type"
-	| "no-unknown-property-converter"
 	| "no-invalid-attribute-name"
 	| "no-invalid-tag-name"
 	| "no-invalid-css";
@@ -43,7 +41,6 @@ export const ALL_RULE_NAMES: LitAnalyzerRuleName[] = [
 	"no-incompatible-type-binding",
 	"no-invalid-directive-binding",
 	"no-incompatible-property-type",
-	"no-unknown-property-converter",
 	"no-invalid-attribute-name",
 	"no-invalid-tag-name",
 	"no-invalid-css"
@@ -54,7 +51,6 @@ export type LitAnalyzerRuleSeverity = "off" | "warn" | "warning" | "error" | 0 |
 export type LitAnalyzerRules = Partial<Record<LitAnalyzerRuleName, LitAnalyzerRuleSeverity | [LitAnalyzerRuleSeverity]>>;
 
 const DEFAULT_RULES_NOSTRICT: Required<LitAnalyzerRules> = {
-	"no-invalid-property": "warn",
 	"no-unknown-tag-name": "off",
 	"no-missing-import": "off",
 	"no-unclosed-tag": "warn",
@@ -72,14 +68,12 @@ const DEFAULT_RULES_NOSTRICT: Required<LitAnalyzerRules> = {
 	"no-incompatible-type-binding": "error",
 	"no-invalid-directive-binding": "error",
 	"no-incompatible-property-type": "error",
-	"no-unknown-property-converter": "error",
 	"no-invalid-attribute-name": "error",
 	"no-invalid-tag-name": "error",
 	"no-invalid-css": "warn"
 };
 
 const DEFAULT_RULES_STRICT: Required<LitAnalyzerRules> = {
-	"no-invalid-property": "warn",
 	"no-unknown-tag-name": "warn",
 	"no-missing-import": "warn",
 	"no-unclosed-tag": "error",
@@ -97,7 +91,6 @@ const DEFAULT_RULES_STRICT: Required<LitAnalyzerRules> = {
 	"no-incompatible-type-binding": "error",
 	"no-invalid-directive-binding": "error",
 	"no-incompatible-property-type": "error",
-	"no-unknown-property-converter": "error",
 	"no-invalid-attribute-name": "error",
 	"no-invalid-tag-name": "error",
 	"no-invalid-css": "error"

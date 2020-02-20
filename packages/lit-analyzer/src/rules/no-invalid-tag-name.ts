@@ -15,7 +15,8 @@ const rule: RuleModule = {
 		if (!isValidCustomElementName(definition.tagName)) {
 			const node = iterableFirst(definition.tagNameNodes) || iterableFirst(definition.identifierNodes);
 
-			// Only report diagnostic if the tag is not built in
+			// Only report diagnostic if the tag is not built in,
+			//  because this function among other things tests for missing "-" in custom element names
 			const tag = request.htmlStore.getHtmlTag(definition.tagName);
 			if (node != null && tag != null && !tag.builtIn) {
 				return [

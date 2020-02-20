@@ -8,7 +8,7 @@ import noExpressionlessPropertyBindingRule from "../rules/no-expressionless-prop
 import noIncompatibleTypeBindingRule from "../rules/no-incompatible-type-binding";
 import noInvalidAttributeName from "../rules/no-invalid-attribute-name";
 import noInvalidDirectiveBindingRule from "../rules/no-invalid-directive-binding";
-import noInvalidProperty from "../rules/no-invalid-property";
+import noIncompatiblePropertyType from "../rules/no-incompatible-property-type";
 import noInvalidTagName from "../rules/no-invalid-tag-name";
 import noMissingImport from "../rules/no-missing-import";
 import noNoncallableEventBindingRule from "../rules/no-noncallable-event-binding";
@@ -52,7 +52,7 @@ const rules: RuleModule[] = [
 	noUnknownAttribute,
 	noUnknownProperty,
 	noUnknownEvent,
-	noInvalidProperty,
+	noIncompatiblePropertyType,
 	noInvalidTagName,
 	noInvalidAttributeName
 ];

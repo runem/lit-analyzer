@@ -33,13 +33,10 @@ export async function cli() {
 	}
 
 	// Always convert "rules" to "dash case" because "rules" expects it.
-	config.rules = Object.entries(config.rules || {}).reduce(
-		(acc, [k, v]) => {
-			acc[camelToDashCase(k) as LitAnalyzerRuleName] = v;
-			return acc;
-		},
-		{} as LitAnalyzerRules
-	);
+	config.rules = Object.entries(config.rules || {}).reduce((acc, [k, v]) => {
+		acc[camelToDashCase(k) as LitAnalyzerRuleName] = v;
+		return acc;
+	}, {} as LitAnalyzerRules);
 
 	if (config.help) {
 		// eslint-disable-next-line no-console
@@ -78,7 +75,6 @@ export async function cli() {
                           o  no-incompatible-type-binding
                           o  no-invalid-directive-binding
                           o  no-incompatible-property-type
-                          o  no-unknown-property-converter
                           o  no-invalid-attribute-name
                           o  no-invalid-tag-name
                           o  no-invalid-css
