@@ -109,6 +109,8 @@ function matchesAtLeastOneNominalType(typeNames: string[], typeB: SimpleType): b
 			return typeNames.includes("string");
 		case "GENERIC_ARGUMENTS":
 			return matchesAtLeastOneNominalType(typeNames, typeB.target);
+		case "CIRCULAR_TYPE_REF":
+			return matchesAtLeastOneNominalType(typeNames, typeB.ref);
 		default:
 			return false;
 	}
