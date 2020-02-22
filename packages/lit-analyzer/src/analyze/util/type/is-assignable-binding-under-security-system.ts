@@ -97,21 +97,32 @@ function checkClosureSecurityAssignability(
 	return [];
 }
 
-function matchesAtLeastOneNominalType(typeNames: string[], typeB: SimpleType): boolean {
+function matchesAtLeastOneNominalType(typeNames: string[], typeB: SimpleType, visited = new Set<SimpleType>()): boolean {
 	if (typeB.name !== undefined && typeNames.includes(typeB.name)) {
 		return true;
 	}
+	if (visited.has(typeB)) {
+		return false;
+	}
+	visited.add(typeB);
+	let result;
 	switch (typeB.kind) {
 		case "UNION":
-			return typeB.types.every(t => matchesAtLeastOneNominalType(typeNames, t));
+			result = typeB.types.every(t => matchesAtLeastOneNominalType(typeNames, t, visited));
+			break;
 		case "STRING_LITERAL":
 		case "STRING":
-			return typeNames.includes("string");
+			result = typeNames.includes("string");
+			break;
 		case "GENERIC_ARGUMENTS":
-			return matchesAtLeastOneNominalType(typeNames, typeB.target);
+			result = matchesAtLeastOneNominalType(typeNames, typeB.target, visited);
+			break;
 		case "CIRCULAR_TYPE_REF":
-			return matchesAtLeastOneNominalType(typeNames, typeB.ref);
+			result = matchesAtLeastOneNominalType(typeNames, typeB.ref, visited);
+			break;
 		default:
-			return false;
+			result = false;
 	}
+	visited.delete(typeB);
+	return result;
 }
