@@ -1,7 +1,7 @@
 import { HtmlData } from "./parse/parse-html-data/html-data-tag";
 import { LitDiagnosticSeverity } from "./types/lit-diagnostic";
 
-export type LitAnalyzerRuleName =
+export type LitAnalyzerRuleId =
 	| "no-unknown-tag-name"
 	| "no-missing-import"
 	| "no-unclosed-tag"
@@ -23,7 +23,7 @@ export type LitAnalyzerRuleName =
 	| "no-invalid-tag-name"
 	| "no-invalid-css";
 
-export const ALL_RULE_NAMES: LitAnalyzerRuleName[] = [
+export const ALL_RULE_NAMES: LitAnalyzerRuleId[] = [
 	"no-unknown-tag-name",
 	"no-missing-import",
 	"no-unclosed-tag",
@@ -48,7 +48,7 @@ export const ALL_RULE_NAMES: LitAnalyzerRuleName[] = [
 
 export type LitAnalyzerRuleSeverity = "off" | "warn" | "warning" | "error" | 0 | 1 | 2 | true | false;
 
-export type LitAnalyzerRules = Partial<Record<LitAnalyzerRuleName, LitAnalyzerRuleSeverity | [LitAnalyzerRuleSeverity]>>;
+export type LitAnalyzerRules = Partial<Record<LitAnalyzerRuleId, LitAnalyzerRuleSeverity | [LitAnalyzerRuleSeverity]>>;
 
 const DEFAULT_RULES_NOSTRICT: Required<LitAnalyzerRules> = {
 	"no-unknown-tag-name": "off",
@@ -96,23 +96,23 @@ const DEFAULT_RULES_STRICT: Required<LitAnalyzerRules> = {
 	"no-invalid-css": "error"
 };
 
-export function ruleSeverity(rules: LitAnalyzerConfig | LitAnalyzerRules, ruleName: LitAnalyzerRuleName): LitAnalyzerRuleSeverity {
-	if ("rules" in rules) return ruleSeverity(rules.rules, ruleName);
+export function ruleSeverity(rules: LitAnalyzerConfig | LitAnalyzerRules, ruleId: LitAnalyzerRuleId): LitAnalyzerRuleSeverity {
+	if ("rules" in rules) return ruleSeverity(rules.rules, ruleId);
 
-	const ruleConfig = rules[ruleName] || "off";
+	const ruleConfig = rules[ruleId] || "off";
 	return Array.isArray(ruleConfig) ? ruleConfig[0] : ruleConfig;
 }
 
-export function isRuleDisabled(config: LitAnalyzerConfig, ruleName: LitAnalyzerRuleName): boolean {
-	return ["off", 0, false].includes(ruleSeverity(config, ruleName));
+export function isRuleDisabled(config: LitAnalyzerConfig, ruleId: LitAnalyzerRuleId): boolean {
+	return ["off", 0, false].includes(ruleSeverity(config, ruleId));
 }
 
-export function isRuleEnabled(config: LitAnalyzerConfig, ruleName: LitAnalyzerRuleName): boolean {
-	return !isRuleDisabled(config, ruleName);
+export function isRuleEnabled(config: LitAnalyzerConfig, ruleId: LitAnalyzerRuleId): boolean {
+	return !isRuleDisabled(config, ruleId);
 }
 
-export function litDiagnosticRuleSeverity(config: LitAnalyzerConfig, ruleName: LitAnalyzerRuleName): LitDiagnosticSeverity {
-	switch (ruleSeverity(config, ruleName)) {
+export function litDiagnosticRuleSeverity(config: LitAnalyzerConfig, ruleId: LitAnalyzerRuleId): LitDiagnosticSeverity {
+	switch (ruleSeverity(config, ruleId)) {
 		case "off":
 		case false:
 		case 0:

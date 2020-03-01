@@ -1,17 +1,20 @@
 import { basename, dirname, relative } from "path";
-import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
-import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
-import { RuleModule } from "../analyze/types/rule-module";
+import { RuleModule } from "../analyze/types/rule/rule-module";
 import { isCustomElementTagName } from "../analyze/util/is-valid-name";
 import { iterableFirst } from "../analyze/util/iterable-util";
-import { rangeFromHtmlNode } from "../analyze/util/lit-range-util";
+import { rangeFromHtmlNode } from "../analyze/util/range-util";
 
 /**
  * This rule makes sure that all custom elements used are imported in a given file.
  */
 const rule: RuleModule = {
-	name: "no-missing-import",
-	visitHtmlNode(htmlNode, { htmlStore, config, definitionStore, dependencyStore, document, file }) {
+	id: "no-missing-import",
+	meta: {
+		priority: "low"
+	},
+	visitHtmlNode(htmlNode, context) {
+		const { htmlStore, config, definitionStore, dependencyStore, file } = context;
+
 		// Return if the html tag doesn't exists or if the html tag doesn't have a declaration
 		const htmlTag = htmlStore.getHtmlTag(htmlNode);
 		if (htmlTag == null) return;
@@ -30,30 +33,26 @@ const rule: RuleModule = {
 
 		// Report diagnostic if the html tag hasn't been imported.
 		if (!isDefinitionImported) {
-			// Get the import path and the position where it can be placed
-			const importPath = getRelativePathForImport(file.fileName, iterableFirst(definition.tagNameNodes)!.getSourceFile().fileName);
-
-			const report: LitHtmlDiagnostic = {
-				kind: LitHtmlDiagnosticKind.MISSING_IMPORT,
+			context.report({
+				location: rangeFromHtmlNode(htmlNode),
 				message: `Missing import for <${htmlNode.tagName}>`,
 				suggestion: config.dontSuggestConfigChanges ? undefined : `You can disable this check by disabling the 'no-missing-import' rule.`,
-				source: "no-missing-import",
-				severity: litDiagnosticRuleSeverity(config, "no-missing-import"),
-				location: rangeFromHtmlNode(document, htmlNode),
-				file,
-				htmlNode,
-				definition,
-				importPath
-			};
+				fix: () => {
+					const importPath = getRelativePathForImport(file.fileName, iterableFirst(definition.tagNameNodes)!.getSourceFile().fileName);
 
-			if (config.dontSuggestConfigChanges) {
-				report.suggestion = undefined;
-			}
-
-			return [report];
+					return {
+						message: `Import "${iterableFirst(definition.identifierNodes)?.getText() || "component"}" from module "${importPath}"`,
+						actions: [
+							{
+								kind: "import",
+								path: importPath,
+								file: context.file
+							}
+						]
+					};
+				}
+			});
 		}
-
-		return;
 	}
 };
 

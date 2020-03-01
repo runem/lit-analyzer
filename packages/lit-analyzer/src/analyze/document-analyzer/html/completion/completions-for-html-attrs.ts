@@ -9,10 +9,10 @@ import { HtmlNode } from "../../../types/html-node/html-node-types";
 import { DocumentPositionContext } from "../../../util/get-position-context-in-document";
 import { iterableFilter, iterableMap } from "../../../util/iterable-util";
 import { lazy } from "../../../util/general-util";
-import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
+import { LitAnalyzerContext } from "../../../lit-analyzer-context";
 import { LitCompletion } from "../../../types/lit-completion";
 
-export function completionsForHtmlAttrs(htmlNode: HtmlNode, location: DocumentPositionContext, { htmlStore }: LitAnalyzerRequest): LitCompletion[] {
+export function completionsForHtmlAttrs(htmlNode: HtmlNode, location: DocumentPositionContext, { htmlStore }: LitAnalyzerContext): LitCompletion[] {
 	const onTagName = htmlNode.tagName;
 
 	// Code completions for ".[...]";

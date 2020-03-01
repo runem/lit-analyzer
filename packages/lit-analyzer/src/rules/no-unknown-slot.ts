@@ -1,17 +1,20 @@
-import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
 import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
-import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
-import { RuleModule } from "../analyze/types/rule-module";
-import { rangeFromHtmlNode, rangeFromHtmlNodeAttr } from "../analyze/util/lit-range-util";
+import { RuleModule } from "../analyze/types/rule/rule-module";
+import { rangeFromHtmlNode, rangeFromHtmlNodeAttr } from "../analyze/util/range-util";
 
 /**
  * This rule checks validates the slot attribute
  *   and makes sure that slot names used have been defined using jsdoc.
  */
 const rule: RuleModule = {
-	name: "no-unknown-slot",
-	visitHtmlNode(htmlNode, { htmlStore, document, config, file }) {
+	id: "no-unknown-slot",
+	meta: {
+		priority: "high"
+	},
+	visitHtmlNode(htmlNode, context) {
+		const { htmlStore } = context;
+
 		// This visitor function validates that a "slot" attribute is present on children elements if a slot name is required.
 
 		// Get available slot names from the parent node of this node, because this node defined what slots are available.
@@ -29,24 +32,27 @@ const rule: RuleModule = {
 			if (slotAttr == null) {
 				const parentTagName = (htmlNode.parent && htmlNode.parent.tagName) || "";
 				// The slot attribute is missing, and it's not possible to use an unnamed slot.
-				return [
-					{
-						kind: LitHtmlDiagnosticKind.MISSING_SLOT_ATTRIBUTE,
-						validSlotNames: slots.map(s => s.name),
-						htmlNode,
-						message: `Missing slot attribute. Parent element <${parentTagName}> only allows named slots as children.`,
-						severity: litDiagnosticRuleSeverity(config, "no-unknown-slot"),
-						source: "no-unknown-slot",
-						location: rangeFromHtmlNode(document, htmlNode),
-						file
-					}
-				];
+
+				//validSlotNames: slots.map(s => s.name),
+				context.report({
+					location: rangeFromHtmlNode(htmlNode),
+					message: `Missing slot attribute. Parent element <${parentTagName}> only allows named slots as children.`,
+					fix: () => ({
+						message: `Add slot attribute.`,
+						actions: [
+							{
+								kind: "addAttribute",
+								htmlNode,
+								name: "slot",
+								value: `""`
+							}
+						]
+					})
+				});
 			}
 		}
-
-		return;
 	},
-	visitHtmlAssignment(assignment, request) {
+	visitHtmlAssignment(assignment, context) {
 		// This visitor function validates that the value of a "slot" attribute is valid.
 		const { htmlAttr } = assignment;
 
@@ -64,14 +70,14 @@ const rule: RuleModule = {
 		if (parent == null) return;
 
 		// Validate slots for this attribute if any slots have been defined on the parent element, else opt out.
-		const parentHtmlTag = request.htmlStore.getHtmlTag(parent.tagName);
+		const parentHtmlTag = context.htmlStore.getHtmlTag(parent.tagName);
 		if (parentHtmlTag == null || parentHtmlTag.slots.length === 0) return;
 
 		// Grab the slot name of the "slot" attribute.
 		const slotName = assignment.value;
 
 		// Find which slots names are valid, and find if the slot name matches any of these.
-		const validSlots = Array.from(request.htmlStore.getAllSlotsForTag(parentHtmlTag.tagName));
+		const validSlots = Array.from(context.htmlStore.getAllSlotsForTag(parentHtmlTag.tagName));
 		const matchingSlot = validSlots.find(slot => slot.name === slotName);
 
 		if (matchingSlot == null) {
@@ -82,20 +88,11 @@ const rule: RuleModule = {
 					? `Invalid slot name '${slotName}'. Only the unnamed slot is valid for <${parentHtmlTag.tagName}>`
 					: `Invalid slot name '${slotName}'. Valid slot names for <${parentHtmlTag.tagName}> are: ${validSlotNames.map(n => `'${n}'`).join(" | ")}`;
 
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.INVALID_SLOT_NAME,
-					message,
-					validSlotNames,
-					source: "no-unknown-slot",
-					severity: litDiagnosticRuleSeverity(request.config, "no-unknown-slot"),
-					location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
-					file: request.file
-				}
-			];
+			context.report({
+				location: rangeFromHtmlNodeAttr(htmlAttr),
+				message
+			});
 		}
-
-		return;
 	}
 };
 

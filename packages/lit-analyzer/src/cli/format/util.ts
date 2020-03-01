@@ -1,6 +1,5 @@
 import chalk from "chalk";
 import { TextSpan } from "typescript";
-import { LitRange } from "../../analyze/types/lit-range";
 import { AnalysisStats } from "./diagnostic-formatter";
 
 export function generalReport(stats: AnalysisStats): string {
@@ -33,18 +32,4 @@ export function markText(text: string, range: TextSpan, colorFunction: (str: str
 export function textPad(str: string, { width, fill, dir }: { width: number; fill?: string; dir?: "left" | "right" }): string {
 	const padding = (fill || " ").repeat(Math.max(0, width - str.length));
 	return `${dir !== "right" ? padding : ""}${str}${dir === "right" ? padding : ""}`;
-}
-
-export function translateRange(range: LitRange): TextSpan {
-	if ("document" in range) {
-		return {
-			start: range.document.virtualDocument.offsetToSCPosition(range.start),
-			length: range.end - range.start
-		};
-	}
-
-	return {
-		start: range.start,
-		length: range.end - range.start
-	};
 }

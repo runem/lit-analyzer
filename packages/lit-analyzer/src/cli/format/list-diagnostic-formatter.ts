@@ -2,7 +2,7 @@ import chalk from "chalk";
 import { SourceFile } from "typescript";
 import { LitDiagnostic } from "../../analyze/types/lit-diagnostic";
 import { AnalysisStats, DiagnosticFormatter } from "./diagnostic-formatter";
-import { generalReport, relativeFileName, textPad, translateRange } from "./util";
+import { generalReport, relativeFileName, textPad } from "./util";
 
 export class ListDiagnosticFormatter implements DiagnosticFormatter {
 	report(stats: AnalysisStats): string | undefined {
@@ -25,8 +25,7 @@ ${diagnosticText}`;
 }
 
 function litDiagnosticToErrorText(file: SourceFile, diagnostic: LitDiagnostic): string {
-	const textSpan = translateRange(diagnostic.location);
-	const lineContext = file.getLineAndCharacterOfPosition(textSpan.start);
+	const lineContext = file.getLineAndCharacterOfPosition(diagnostic.location.start);
 	const linePart = `${textPad(`${lineContext.line + 1}`, { width: 5 })}:${textPad(`${lineContext.character}`, {
 		width: 4,
 		dir: "right"

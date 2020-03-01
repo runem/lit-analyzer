@@ -1,16 +1,18 @@
-import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
 import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
-import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
-import { RuleModule } from "../analyze/types/rule-module";
-import { rangeFromHtmlNodeAttr } from "../analyze/util/lit-range-util";
+import { RuleModule } from "../analyze/types/rule/rule-module";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/range-util";
 
 /**
  * This rule validates that non-attribute bindings are always used with an expression.
  */
 const rule: RuleModule = {
-	name: "no-expressionless-property-binding",
-	visitHtmlAssignment(assignment, request) {
+	id: "no-expressionless-property-binding",
+	meta: {
+		priority: "high"
+	},
+
+	visitHtmlAssignment(assignment, context) {
 		const { htmlAttr } = assignment;
 
 		// Only make this check non-expression type assignments.
@@ -19,42 +21,25 @@ const rule: RuleModule = {
 			case HtmlNodeAttrAssignmentKind.BOOLEAN:
 				switch (htmlAttr.kind) {
 					case HtmlNodeAttrKind.EVENT_LISTENER:
-						return [
-							{
-								kind: LitHtmlDiagnosticKind.PROPERTY_NEEDS_EXPRESSION,
-								message: `You are using an event listener binding without an expression`,
-								severity: litDiagnosticRuleSeverity(request.config, "no-expressionless-property-binding"),
-								source: "no-expressionless-property-binding",
-								location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
-								file: request.file
-							}
-						];
+						context.report({
+							location: rangeFromHtmlNodeAttr(htmlAttr),
+							message: `You are using an event listener binding without an expression`
+						});
+						break;
 					case HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE:
-						return [
-							{
-								kind: LitHtmlDiagnosticKind.PROPERTY_NEEDS_EXPRESSION,
-								message: `You are using a boolean attribute binding without an expression`,
-								severity: litDiagnosticRuleSeverity(request.config, "no-expressionless-property-binding"),
-								source: "no-expressionless-property-binding",
-								location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
-								file: request.file
-							}
-						];
+						context.report({
+							location: rangeFromHtmlNodeAttr(htmlAttr),
+							message: `You are using a boolean attribute binding without an expression`
+						});
+						break;
 					case HtmlNodeAttrKind.PROPERTY:
-						return [
-							{
-								kind: LitHtmlDiagnosticKind.PROPERTY_NEEDS_EXPRESSION,
-								message: `You are using a property binding without an expression`,
-								severity: litDiagnosticRuleSeverity(request.config, "no-expressionless-property-binding"),
-								source: "no-expressionless-property-binding",
-								location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
-								file: request.file
-							}
-						];
+						context.report({
+							location: rangeFromHtmlNodeAttr(htmlAttr),
+							message: `You are using a property binding without an expression`
+						});
+						break;
 				}
 		}
-
-		return;
 	}
 };
 

@@ -1,16 +1,16 @@
-import { Range } from "../../../../types/range";
-import { intersects } from "../../../../util/general-util";
-import { VirtualDocument } from "../../virtual-document/virtual-document";
-import { TextDocument } from "../text-document";
 import { HtmlNodeAttr } from "../../../../types/html-node/html-node-attr-types";
 import { HtmlNode } from "../../../../types/html-node/html-node-types";
+import { DocumentOffset, DocumentRange } from "../../../../types/range";
+import { intersects } from "../../../../util/range-util";
+import { VirtualDocument } from "../../virtual-document/virtual-document";
+import { TextDocument } from "../text-document";
 
 export class HtmlDocument extends TextDocument {
 	constructor(virtualDocument: VirtualDocument, public rootNodes: HtmlNode[]) {
 		super(virtualDocument);
 	}
 
-	htmlAttrAreaAtOffset(offset: number | Range): HtmlNode | undefined {
+	htmlAttrAreaAtOffset(offset: DocumentOffset | DocumentRange): HtmlNode | undefined {
 		return this.mapFindOne(node => {
 			if (offset > node.location.name.end && intersects(offset, node.location.startTag)) {
 				// Check if the position intersects any attributes. Break if so.
@@ -26,23 +26,23 @@ export class HtmlDocument extends TextDocument {
 		});
 	}
 
-	htmlAttrAssignmentAtOffset(offset: number | Range): HtmlNodeAttr | undefined {
+	htmlAttrAssignmentAtOffset(offset: DocumentOffset | DocumentRange): HtmlNodeAttr | undefined {
 		return this.findAttr(attr =>
 			attr.assignment != null && attr.assignment.location != null ? intersects(offset, attr.assignment.location) : false
 		);
 	}
 
-	htmlAttrNameAtOffset(offset: number | Range): HtmlNodeAttr | undefined {
+	htmlAttrNameAtOffset(offset: DocumentOffset | DocumentRange): HtmlNodeAttr | undefined {
 		return this.findAttr(attr => intersects(offset, attr.location.name));
 	}
 
-	htmlNodeNameAtOffset(offset: number | Range): HtmlNode | undefined {
+	htmlNodeNameAtOffset(offset: DocumentOffset | DocumentRange): HtmlNode | undefined {
 		return this.findNode(
 			node => intersects(offset, node.location.name) || (node.location.endTag != null && intersects(offset, node.location.endTag))
 		);
 	}
 
-	htmlNodeOrAttrAtOffset(offset: number | Range): HtmlNode | HtmlNodeAttr | undefined {
+	htmlNodeOrAttrAtOffset(offset: DocumentOffset | DocumentRange): HtmlNode | HtmlNodeAttr | undefined {
 		const htmlNode = this.htmlNodeNameAtOffset(offset);
 		if (htmlNode != null) return htmlNode;
 
@@ -56,7 +56,7 @@ export class HtmlDocument extends TextDocument {
 	 * This method can be used to find out which tag to close in the HTML.
 	 * @param offset
 	 */
-	htmlNodeClosestToOffset(offset: number): HtmlNode | undefined {
+	htmlNodeClosestToOffset(offset: DocumentOffset): HtmlNode | undefined {
 		let closestNode: HtmlNode | undefined = undefined;
 
 		// Use 'findNode' to iterate nodes. Keep track of the closest node.

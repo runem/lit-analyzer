@@ -1,14 +1,14 @@
 import { ComponentDefinition } from "web-component-analyzer";
 import { HtmlDocument } from "../parse/document/text-document/html-document/html-document";
 import { HtmlNode } from "./html-node/html-node-types";
-import { DocumentRange, SourceFileRange } from "./lit-range";
 import { LitTargetKind } from "./lit-target-kind";
+import { SourceFileRange } from "./range";
 
 export interface RenameInfoBase {
 	kind: LitTargetKind;
 	displayName: string;
 	fullDisplayName: string;
-	range: SourceFileRange | DocumentRange;
+	range: SourceFileRange;
 }
 
 export interface RenameHtmlNodeInfo extends RenameInfoBase {

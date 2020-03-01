@@ -1,4 +1,4 @@
-import { DocumentRange } from "./lit-range";
+import { SourceFileRange } from "./range";
 
 export enum LitOutliningSpanKind {
 	Comment = "comment",
@@ -8,7 +8,7 @@ export enum LitOutliningSpanKind {
 }
 
 export interface LitOutliningSpan {
-	location: DocumentRange;
+	location: SourceFileRange;
 	bannerText: string;
 	autoCollapse?: boolean;
 	kind: LitOutliningSpanKind;

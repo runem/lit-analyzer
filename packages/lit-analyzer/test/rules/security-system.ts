@@ -38,12 +38,10 @@ tsTest(testName, t => {
 	hasDiagnostic(t, diagnostics, "no-complex-attribute-binding");
 });
 
-// Commented out because we're missing properties on built in elements like
-// script.
 testName = "May not pass a TrustedResourceUrl to script .src with default config";
-tsTest.skip(testName, t => {
+tsTest(testName, t => {
 	const { diagnostics } = getDiagnostics(preface + "html`<script .src=${trustedResourceUrl}></script>`");
-	hasDiagnostic(t, diagnostics, "no-complex-attribute-binding");
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
 testName = "May pass a TrustedResourceUrl to script src with ClosureSafeTypes config";
@@ -61,7 +59,7 @@ tsTest(testName, t => {
 testName = "May not pass a SafeUrl to script src with ClosureSafeTypes config";
 tsTest(testName, t => {
 	const { diagnostics } = getDiagnostics(preface + "html`<script src=${safeUrl}></script>`", { securitySystem: "ClosureSafeTypes" });
-	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+	hasDiagnostic(t, diagnostics, "no-complex-attribute-binding");
 });
 
 testName = "May not pass a SafeUrl to script .src with ClosureSafeTypes config";

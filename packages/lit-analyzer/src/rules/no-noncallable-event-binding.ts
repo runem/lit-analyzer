@@ -1,40 +1,32 @@
 import { isAssignableToSimpleTypeKind, SimpleType, SimpleTypeKind, toTypeString } from "ts-simple-type";
-import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
-import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
-import { RuleModule } from "../analyze/types/rule-module";
-import { rangeFromHtmlNodeAttr } from "../analyze/util/lit-range-util";
-import { extractBindingTypes } from "../analyze/util/type/extract-binding-types";
+import { RuleModule } from "../analyze/types/rule/rule-module";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/range-util";
+import { extractBindingTypes } from "./util/type/extract-binding-types";
 
 /**
  * This rule validates that only callable types are used within event binding expressions.
  * This rule catches typos like: @click="onClick()"
  */
 const rule: RuleModule = {
-	name: "no-noncallable-event-binding",
-	visitHtmlAssignment(assignment, request) {
+	id: "no-noncallable-event-binding",
+	meta: {
+		priority: "high"
+	},
+	visitHtmlAssignment(assignment, context) {
 		// Only validate event listener bindings.
 		const { htmlAttr } = assignment;
 		if (htmlAttr.kind !== HtmlNodeAttrKind.EVENT_LISTENER) return;
 
-		const { typeB } = extractBindingTypes(assignment, request);
+		const { typeB } = extractBindingTypes(assignment, context);
 
 		// Make sure that the expression given to the event listener binding a function or an object with "handleEvent" property.
 		if (!isTypeBindableToEventListener(typeB)) {
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.NO_EVENT_LISTENER_FUNCTION,
-					message: `You are setting up an event listener with a non-callable type '${toTypeString(typeB)}'`,
-					source: "no-noncallable-event-binding",
-					severity: litDiagnosticRuleSeverity(request.config, "no-noncallable-event-binding"),
-					location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
-					file: request.file,
-					typeB
-				}
-			];
+			context.report({
+				location: rangeFromHtmlNodeAttr(htmlAttr),
+				message: `You are setting up an event listener with a non-callable type '${toTypeString(typeB)}'`
+			});
 		}
-
-		return;
 	}
 };
 

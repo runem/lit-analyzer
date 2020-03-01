@@ -1,7 +1,7 @@
 import { Expression, Node, TaggedTemplateExpression } from "typescript";
 import { tsModule } from "../../../ts-module";
-import { Range } from "../../../types/range";
-import { intersects } from "../../../util/general-util";
+import { DocumentOffset, DocumentRange, Range, SourceFilePosition, SourceFileRange } from "../../../types/range";
+import { intersects, makeSourceFileRange } from "../../../util/range-util";
 import { VirtualDocument } from "./virtual-document";
 
 function getPartLength(part: Node): number {
@@ -11,7 +11,7 @@ function getPartLength(part: Node): number {
 
 export class VirtualAstDocument implements VirtualDocument {
 	readonly fileName: string;
-	readonly location: Range;
+	readonly location: SourceFileRange;
 	private readonly parts: (Expression | string)[];
 
 	private _text?: string;
@@ -40,7 +40,7 @@ export class VirtualAstDocument implements VirtualDocument {
 		return this._text;
 	}
 
-	getPartsAtOffsetRange(range: Range): (Expression | string)[] {
+	getPartsAtDocumentRange(range: DocumentRange): (Expression | string)[] {
 		if (range == null) {
 			return this.parts;
 		}
@@ -65,7 +65,8 @@ export class VirtualAstDocument implements VirtualDocument {
 
 				if (
 					(range.start < literalPartRange.start && range.end > literalPartRange.end) ||
-					(intersects(range.start + 1, literalPartRange) || intersects(range.end - 1, literalPartRange))
+					intersects(range.start + 1, literalPartRange) ||
+					intersects(range.end - 1, literalPartRange)
 				) {
 					const strStart = Math.max(literalPartRange.start, range.start);
 					const strEnd = Math.min(literalPartRange.end, range.end);
@@ -90,17 +91,17 @@ export class VirtualAstDocument implements VirtualDocument {
 		return resultParts;
 	}
 
-	scPositionToOffset(position: number): number {
+	sfPositionToDocumentOffset(position: SourceFilePosition): DocumentOffset {
 		return position - this.location.start;
 	}
 
-	offsetToSCPosition(offset: number): number {
+	documentOffsetToSFPosition(offset: DocumentOffset): SourceFilePosition {
 		return this.location.start + offset;
 	}
 
-	constructor(parts: (Expression | string)[], location: Range, fileName: string);
+	constructor(parts: (Expression | string)[], location: SourceFileRange, fileName: string);
 	constructor(astNode: TaggedTemplateExpression);
-	constructor(astNodeOrParts: TaggedTemplateExpression | (Expression | string)[], location?: Range, fileName?: string) {
+	constructor(astNodeOrParts: TaggedTemplateExpression | (Expression | string)[], location?: SourceFileRange, fileName?: string) {
 		if (Array.isArray(astNodeOrParts)) {
 			this.parts = astNodeOrParts.map((p, i) =>
 				typeof p === "string" ? `${i !== 0 ? "}" : ""}${p}${i !== astNodeOrParts.length - 1 ? "${" : ""}` : p
@@ -119,10 +120,10 @@ export class VirtualAstDocument implements VirtualDocument {
 				if (expressionPart != null) this.parts.push(expressionPart);
 			});
 
-			this.location = {
+			this.location = makeSourceFileRange({
 				start: astNodeOrParts.template.getStart() + 1,
 				end: astNodeOrParts.template.getEnd() - 1
-			};
+			});
 
 			this.fileName = this.fileName = astNodeOrParts.getSourceFile().fileName;
 		}

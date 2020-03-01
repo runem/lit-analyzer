@@ -1,30 +1,31 @@
-import { isAssignableToSimpleTypeKind, SimpleType, SimpleTypeKind, toSimpleType, toTypeString } from "ts-simple-type";
+import { isAssignableToSimpleTypeKind, isSimpleType, SimpleType, SimpleTypeKind, toSimpleType, toTypeString } from "ts-simple-type";
 import { Node } from "typescript";
-import { ComponentMember } from "web-component-analyzer";
 import { LitElementPropertyConfig } from "web-component-analyzer/lib/cjs/lit-element-property-config-a6e5ad36";
-import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
-import { LitAnalyzerRequest } from "../analyze/lit-analyzer-context";
-import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
-import { RuleModule } from "../analyze/types/rule-module";
+import { RuleModule } from "../analyze/types/rule/rule-module";
+import { RuleModuleContext } from "../analyze/types/rule/rule-module-context";
 import { joinArray } from "../analyze/util/array-util";
 import { lazy } from "../analyze/util/general-util";
-import { rangeFromNode } from "../analyze/util/lit-range-util";
+import { rangeFromNode } from "../analyze/util/range-util";
 
 const rule: RuleModule = {
-	name: "no-incompatible-property-type",
+	id: "no-incompatible-property-type",
+	meta: {
+		priority: "medium"
+	},
+	visitComponentMember(member, context) {
+		if (member.kind !== "property" || member.meta == null) return;
 
-	visitComponentMember(member: ComponentMember, request: LitAnalyzerRequest): LitHtmlDiagnostic[] | void {
-		if (member.meta == null) return;
+		// Grab the type and fallback to "any"
+		const type = member.type?.() || { kind: SimpleTypeKind.ANY };
 
-		const checker = request.program.getTypeChecker();
 		return validateLitPropertyConfig(
 			member.meta.node?.type || member.meta.node?.decorator?.expression || member.node,
 			member.meta,
 			{
-				propName: member.propName || "",
-				simplePropType: toSimpleType(member.node, checker)
+				propName: member.propName,
+				simplePropType: isSimpleType(type) ? type : toSimpleType(type, context.program.getTypeChecker())
 			},
-			request
+			context
 		);
 	}
 };
@@ -108,26 +109,20 @@ function prepareSimpleAssignabilityTester(
  * @param litConfig
  * @param propName
  * @param simplePropType
- * @param request
+ * @param context
  */
 function validateLitPropertyConfig(
 	node: Node,
 	litConfig: LitElementPropertyConfig,
 	{ propName, simplePropType }: { propName: string; simplePropType: SimpleType },
-	request: LitAnalyzerRequest
-): LitHtmlDiagnostic[] | void {
+	context: RuleModuleContext
+) {
 	// Check if "type" is one of the built in default type converter hint
 	if (typeof litConfig.type === "string" && !litConfig.hasConverter) {
-		return [
-			{
-				kind: LitHtmlDiagnosticKind.INVALID_PROPERTY_TYPE,
-				source: "no-incompatible-property-type",
-				severity: litDiagnosticRuleSeverity(request.config, "no-incompatible-property-type"),
-				message: `'${litConfig.type}' is not a valid type for the default converter. Have you considered {attribute: false} instead?`,
-				file: request.file,
-				location: rangeFromNode(node)
-			}
-		];
+		context.report({
+			location: rangeFromNode(node),
+			message: `'${litConfig.type}' is not a valid type for the default converter. Have you considered {attribute: false} instead?`
+		});
 	}
 
 	// Don't continue if we don't know the property type (eg if we are in a js file)
@@ -150,31 +145,19 @@ function validateLitPropertyConfig(
 					"or"
 				);
 
-				return [
-					{
-						kind: LitHtmlDiagnosticKind.INVALID_PROPERTY_TYPE,
-						source: "no-incompatible-property-type",
-						severity: litDiagnosticRuleSeverity(request.config, "no-incompatible-property-type"),
-						message: `@property type should be ${potentialKindText} instead of '${toLitPropertyTypeString(litConfig.type.kind)}'`,
-						file: request.file,
-						location: rangeFromNode(node)
-					}
-				];
+				context.report({
+					location: rangeFromNode(node),
+					message: `@property type should be ${potentialKindText} instead of '${toLitPropertyTypeString(litConfig.type.kind)}'`
+				});
 			}
 
 			// If no suggesting can be provided, report that they are not assignable
 			// The OBJECT @property type is an escape from this error
 			else if (litConfig.type.kind !== SimpleTypeKind.OBJECT) {
-				return [
-					{
-						kind: LitHtmlDiagnosticKind.INVALID_PROPERTY_TYPE,
-						source: "no-incompatible-property-type",
-						severity: litDiagnosticRuleSeverity(request.config, "no-incompatible-property-type"),
-						message: `@property type '${toTypeString(litConfig.type)}' is not assignable to the actual type '${toTypeString(simplePropType)}'`,
-						file: request.file,
-						location: rangeFromNode(node)
-					}
-				];
+				context.report({
+					location: rangeFromNode(node),
+					message: `@property type '${toTypeString(litConfig.type)}' is not assignable to the actual type '${toTypeString(simplePropType)}'`
+				});
 			}
 		}
 	}
@@ -203,29 +186,17 @@ function validateLitPropertyConfig(
 				"or"
 			);
 
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.INVALID_PROPERTY_TYPE,
-					source: "no-incompatible-property-type",
-					severity: litDiagnosticRuleSeverity(request.config, "no-incompatible-property-type"),
-					message: `Missing ${acceptedTypeText} on @property decorator for '${propName}'`,
-					file: request.file,
-					location: rangeFromNode(node)
-				}
-			];
+			context.report({
+				location: rangeFromNode(node),
+				message: `Missing ${acceptedTypeText} on @property decorator for '${propName}'`
+			});
 		} else {
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.INVALID_PROPERTY_TYPE,
-					source: "no-incompatible-property-type",
-					severity: litDiagnosticRuleSeverity(request.config, "no-incompatible-property-type"),
-					message: `The built in converter doesn't handle the property type '${toTypeString(
-						simplePropType
-					)}'. Please add '{attribute: false}' on @property decorator for '${propName}'`,
-					file: request.file,
-					location: rangeFromNode(node)
-				}
-			];
+			context.report({
+				location: rangeFromNode(node),
+				message: `The built in converter doesn't handle the property type '${toTypeString(
+					simplePropType
+				)}'. Please add '{attribute: false}' on @property decorator for '${propName}'`
+			});
 		}
 	}
 

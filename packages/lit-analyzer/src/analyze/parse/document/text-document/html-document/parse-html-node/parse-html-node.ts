@@ -1,7 +1,7 @@
 import { TS_IGNORE_FLAG } from "../../../../../constants";
 import { HtmlNode, HtmlNodeKind, IHtmlNodeBase, IHtmlNodeSourceCodeLocation } from "../../../../../types/html-node/html-node-types";
 import { isCommentNode, isTagNode } from "../parse-html-p5/parse-html";
-import { IP5TagNode, P5Node, getSourceLocation } from "../parse-html-p5/parse-html-types";
+import { getSourceLocation, IP5TagNode, P5Node } from "../parse-html-p5/parse-html-types";
 import { parseHtmlNodeAttrs } from "./parse-html-attribute";
 import { ParseHtmlContext } from "./parse-html-context";
 
@@ -53,6 +53,7 @@ export function parseHtmlNode(p5Node: IP5TagNode, parent: HtmlNode | undefined, 
 		attributes: [],
 		location: makeHtmlNodeLocation(p5Node, context),
 		children: [],
+		document: context.document,
 		parent
 	};
 

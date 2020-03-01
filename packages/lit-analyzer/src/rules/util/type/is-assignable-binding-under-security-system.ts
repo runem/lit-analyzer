@@ -1,10 +1,8 @@
-import { SimpleType, SimpleTypeKind, toTypeString } from "ts-simple-type";
-import { LitAnalyzerRuleName } from "../../lit-analyzer-config";
-import { LitAnalyzerRequest } from "../../lit-analyzer-context";
-import { HtmlNodeAttr } from "../../types/html-node/html-node-attr-types";
-import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../types/lit-diagnostic";
+import { SimpleType, toTypeString } from "ts-simple-type";
+import { HtmlNodeAttr } from "../../../analyze/types/html-node/html-node-attr-types";
+import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
 import { isLitDirective } from "../directive/is-lit-directive";
-import { rangeFromHtmlNodeAttr } from "../lit-range-util";
+import { rangeFromHtmlNodeAttr } from "../../../analyze/util/range-util";
 
 /**
  * If the user's security policy overrides normal type checking for this
@@ -15,18 +13,17 @@ import { rangeFromHtmlNodeAttr } from "../lit-range-util";
 export function isAssignableBindingUnderSecuritySystem(
 	htmlAttr: HtmlNodeAttr,
 	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },
-	request: LitAnalyzerRequest,
-	source: LitAnalyzerRuleName
-): LitHtmlDiagnostic[] | undefined {
-	const securityPolicy = request.config.securitySystem;
+	context: RuleModuleContext
+): boolean | undefined {
+	const securityPolicy = context.config.securitySystem;
 	switch (securityPolicy) {
 		case "off":
 			return undefined; // No security checks apply.
 		case "ClosureSafeTypes":
-			return checkClosureSecurityAssignability(typeB, htmlAttr, request, source);
+			return checkClosureSecurityAssignability(typeB, htmlAttr, context);
 		default: {
 			const never: never = securityPolicy;
-			request.logger.error(`Unexpected security policy: ${never}`);
+			context.logger.error(`Unexpected security policy: ${never}`);
 			return undefined;
 		}
 	}
@@ -60,12 +57,7 @@ const closureGlobalOverrides: SecurityOverrideMap = {
 	style: ["SafeStyle", "string"]
 };
 
-function checkClosureSecurityAssignability(
-	typeB: SimpleType,
-	htmlAttr: HtmlNodeAttr,
-	request: LitAnalyzerRequest,
-	source: LitAnalyzerRuleName
-): LitHtmlDiagnostic[] | undefined {
+function checkClosureSecurityAssignability(typeB: SimpleType, htmlAttr: HtmlNodeAttr, context: RuleModuleContext): boolean | undefined {
 	const scopedOverride = closureScopedOverrides[htmlAttr.htmlNode.tagName];
 	const overriddenTypes = (scopedOverride && scopedOverride[htmlAttr.name]) || closureGlobalOverrides[htmlAttr.name];
 	if (overriddenTypes === undefined) {
@@ -75,28 +67,23 @@ function checkClosureSecurityAssignability(
 	if (isLitDirective(typeB)) {
 		return undefined;
 	}
+
 	const typeMatch = matchesAtLeastOneNominalType(overriddenTypes, typeB);
 	if (typeMatch === false) {
-		const nominalType: SimpleType = {
+		/*const nominalType: SimpleType = {
 			kind: SimpleTypeKind.INTERFACE,
 			members: [],
 			name: "A security type"
-		};
-		return [
-			{
-				kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE,
-				message: `Type '${toTypeString(typeB)}' is not assignable to '${overriddenTypes.join(" | ")}'. This is due to Closure Safe Type enforcement.`,
-				severity: "error",
-				source,
-				location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
-				file: request.file,
-				htmlAttr,
-				typeA: nominalType,
-				typeB
-			}
-		];
+		};*/
+
+		context.report({
+			location: rangeFromHtmlNodeAttr(htmlAttr),
+			message: `Type '${toTypeString(typeB)}' is not assignable to '${overriddenTypes.join(" | ")}'. This is due to Closure Safe Type enforcement.`
+		});
+		return false;
 	}
-	return [];
+
+	return true;
 }
 
 function matchesAtLeastOneNominalType(typeNames: string[], typeB: SimpleType): boolean {

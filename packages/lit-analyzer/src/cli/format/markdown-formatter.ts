@@ -2,7 +2,7 @@ import { SourceFile } from "typescript";
 import { LitDiagnostic } from "../../analyze/types/lit-diagnostic";
 import { AnalysisStats, DiagnosticFormatter } from "./diagnostic-formatter";
 import { markdownHeader, markdownHighlight, markdownTable } from "./markdown-util";
-import { relativeFileName, translateRange } from "./util";
+import { relativeFileName } from "./util";
 
 export class MarkdownDiagnosticFormatter implements DiagnosticFormatter {
 	report(stats: AnalysisStats): string | undefined {
@@ -27,8 +27,7 @@ function markdownDiagnosticTable(file: SourceFile, diagnostics: LitDiagnostic[])
 	const headerRow: string[] = ["Line", "Column", "Type", "Rule", "Message"];
 
 	const rows: string[][] = diagnostics.map((diagnostic): string[] => {
-		const textSpan = translateRange(diagnostic.location);
-		const lineContext = file.getLineAndCharacterOfPosition(textSpan.start);
+		const lineContext = file.getLineAndCharacterOfPosition(diagnostic.location.start);
 
 		return [
 			(lineContext.line + 1).toString(),

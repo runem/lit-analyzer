@@ -1,5 +1,6 @@
-import { HtmlNodeAttr } from "./html-node-attr-types";
+import { HtmlDocument } from "../../parse/document/text-document/html-document/html-document";
 import { Range } from "../range";
+import { HtmlNodeAttr } from "./html-node-attr-types";
 
 export interface IHtmlNodeSourceCodeLocation extends Range {
 	name: Range;
@@ -20,6 +21,7 @@ export interface IHtmlNodeBase {
 	parent?: HtmlNode;
 	children: HtmlNode[];
 	selfClosed: boolean;
+	document: HtmlDocument;
 }
 
 export interface IHtmlNode extends IHtmlNodeBase {

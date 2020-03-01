@@ -1,7 +1,7 @@
 import { SimpleType, SimpleTypeKind, toSimpleType } from "ts-simple-type";
 import { Expression } from "typescript";
-import { LitAnalyzerRequest } from "../../lit-analyzer-context";
-import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../types/html-node/html-node-attr-assignment-types";
+import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../analyze/types/html-node/html-node-attr-assignment-types";
+import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
 import { removeUndefinedFromType } from "../type/remove-undefined-from-type";
 import { isLitDirective } from "./is-lit-directive";
 
@@ -26,8 +26,8 @@ interface Directive {
 	args: Expression[];
 }
 
-export function getDirective(assignment: HtmlNodeAttrAssignment, request: LitAnalyzerRequest): Directive | undefined {
-	const { ts, program } = request;
+export function getDirective(assignment: HtmlNodeAttrAssignment, context: RuleModuleContext): Directive | undefined {
+	const { ts, program } = context;
 	const checker = program.getTypeChecker();
 
 	if (assignment.kind !== HtmlNodeAttrAssignmentKind.EXPRESSION) return;

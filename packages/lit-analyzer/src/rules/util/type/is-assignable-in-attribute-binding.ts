@@ -1,37 +1,28 @@
 import { isAssignableToType as _isAssignableToType, SimpleType, SimpleTypeComparisonOptions, SimpleTypeKind, toTypeString } from "ts-simple-type";
-import { litDiagnosticRuleSeverity } from "../../lit-analyzer-config";
-import { LitAnalyzerRequest } from "../../lit-analyzer-context";
-import { HtmlNodeAttrAssignmentKind } from "../../types/html-node/html-node-attr-assignment-types";
-import { HtmlNodeAttr } from "../../types/html-node/html-node-attr-types";
-import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../../types/lit-diagnostic";
-import { rangeFromHtmlNodeAttr } from "../lit-range-util";
-import { isAssignableToType } from "./is-assignable-to-type";
+import { HtmlNodeAttrAssignmentKind } from "../../../analyze/types/html-node/html-node-attr-assignment-types";
+import { HtmlNodeAttr } from "../../../analyze/types/html-node/html-node-attr-types";
+import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
 import { isLitDirective } from "../directive/is-lit-directive";
+import { rangeFromHtmlNodeAttr } from "../../../analyze/util/range-util";
 import { isAssignableBindingUnderSecuritySystem } from "./is-assignable-binding-under-security-system";
+import { isAssignableToType } from "./is-assignable-to-type";
 
 export function isAssignableInAttributeBinding(
 	htmlAttr: HtmlNodeAttr,
 	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },
-	request: LitAnalyzerRequest
-): LitHtmlDiagnostic[] | undefined {
+	context: RuleModuleContext
+): boolean | undefined {
 	const { assignment } = htmlAttr;
 	if (assignment == null) return undefined;
 
 	if (assignment.kind === HtmlNodeAttrAssignmentKind.BOOLEAN) {
-		if (!isAssignableToType({ typeA, typeB }, request)) {
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE,
-					message: `Type '${toTypeString(typeB)}' is not assignable to '${toTypeString(typeA)}'`,
-					severity: litDiagnosticRuleSeverity(request.config, "no-incompatible-type-binding"),
-					source: "no-incompatible-type-binding",
-					location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
-					file: request.file,
-					htmlAttr,
-					typeA,
-					typeB
-				}
-			];
+		if (!isAssignableToType({ typeA, typeB }, context)) {
+			context.report({
+				location: rangeFromHtmlNodeAttr(htmlAttr),
+				message: `Type '${toTypeString(typeB)}' is not assignable to '${toTypeString(typeA)}'`
+			});
+
+			return false;
 		}
 	} else {
 		if (assignment.kind !== HtmlNodeAttrAssignmentKind.STRING) {
@@ -42,31 +33,25 @@ export function isAssignableInAttributeBinding(
 			// For everything else, we may need to apply a different type comparison
 			// for some security-sensitive built in attributes and properties (like
 			// <script src>).
-			const securityDiagnostics = isAssignableBindingUnderSecuritySystem(htmlAttr, { typeA, typeB }, request, "no-incompatible-type-binding");
-			if (securityDiagnostics !== undefined) {
-				// The security diagnostics take precedence here, and we should not
-				// do any more checking. Note that this may be an empty array.
-				return securityDiagnostics;
+			const securitySystemResult = isAssignableBindingUnderSecuritySystem(htmlAttr, { typeA, typeB }, context);
+			if (securitySystemResult !== undefined) {
+				// The security diagnostics take precedence here,
+				// and we should not do any more checking.
+				return securitySystemResult;
 			}
 		}
-		if (!isAssignableToType({ typeA, typeB }, request, { isAssignable: isAssignableToTypeWithStringCoercion })) {
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_EXPRESSION_TYPE,
-					message: `Type '${toTypeString(typeB)}' is not assignable to '${toTypeString(typeA)}'`,
-					severity: litDiagnosticRuleSeverity(request.config, "no-incompatible-type-binding"),
-					source: "no-incompatible-type-binding",
-					location: rangeFromHtmlNodeAttr(request.document, htmlAttr),
-					file: request.file,
-					htmlAttr,
-					typeA,
-					typeB
-				}
-			];
+
+		if (!isAssignableToType({ typeA, typeB }, context, { isAssignable: isAssignableToTypeWithStringCoercion })) {
+			context.report({
+				location: rangeFromHtmlNodeAttr(htmlAttr),
+				message: `Type '${toTypeString(typeB)}' is not assignable to '${toTypeString(typeA)}'`
+			});
+
+			return false;
 		}
 	}
 
-	return undefined;
+	return true;
 }
 
 /**

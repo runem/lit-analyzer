@@ -1,7 +1,7 @@
-import { DocumentRange } from "./lit-range";
+import { SourceFileRange } from "./range";
 
 export interface LitQuickInfo {
-	range: DocumentRange;
+	range: SourceFileRange;
 	primaryInfo: string;
 	secondaryInfo?: string;
 }

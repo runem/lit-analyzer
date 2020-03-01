@@ -1,8 +1,8 @@
 import { ExecutionContext } from "ava";
-import { LitAnalyzerRuleName } from "../../src/analyze/lit-analyzer-config";
+import { LitAnalyzerRuleId } from "../../src/analyze/lit-analyzer-config";
 import { LitDiagnostic } from "../../src/analyze/types/lit-diagnostic";
 
-export function hasDiagnostic(t: ExecutionContext, diagnostics: LitDiagnostic[], ruleName: LitAnalyzerRuleName) {
+export function hasDiagnostic(t: ExecutionContext, diagnostics: LitDiagnostic[], ruleName: LitAnalyzerRuleId) {
 	if (diagnostics.length !== 1) {
 		prettyLogDiagnostics(t, diagnostics);
 	}

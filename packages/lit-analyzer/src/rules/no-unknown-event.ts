@@ -1,19 +1,23 @@
-import { LitAnalyzerConfig, litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
+import { LitAnalyzerConfig } from "../analyze/lit-analyzer-config";
 import { HtmlTag, litAttributeModifierForTarget } from "../analyze/parse/parse-html-data/html-tag";
 import { AnalyzerDefinitionStore } from "../analyze/store/analyzer-definition-store";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { HtmlNodeKind } from "../analyze/types/html-node/html-node-types";
-import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
-import { RuleModule } from "../analyze/types/rule-module";
+import { RuleModule } from "../analyze/types/rule/rule-module";
 import { suggestTargetForHtmlAttr } from "../analyze/util/attribute-util";
-import { rangeFromHtmlNodeAttr } from "../analyze/util/lit-range-util";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/range-util";
 
 /**
  * This rule validates that only known events are used in event listener bindings.
  */
 const rule: RuleModule = {
-	name: "no-unknown-event",
-	visitHtmlAttribute(htmlAttr, { htmlStore, config, definitionStore, file, document }) {
+	id: "no-unknown-event",
+	meta: {
+		priority: "low"
+	},
+	visitHtmlAttribute(htmlAttr, context) {
+		const { htmlStore, config, definitionStore } = context;
+
 		// Ignore "style" and "svg" attrs because I don't yet have all data for them.
 		if (htmlAttr.htmlNode.kind !== HtmlNodeKind.NODE) return;
 
@@ -33,23 +37,26 @@ const rule: RuleModule = {
 
 			const suggestion = getSuggestionText({ config, definitionStore, htmlTag });
 
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.UNKNOWN_TARGET,
-					message: `Unknown event '${htmlAttr.name}'.`,
-					fix: suggestedMemberName == null ? undefined : `Did you mean '${suggestedMemberName}'?`,
-					source: "no-unknown-event",
-					severity: litDiagnosticRuleSeverity(config, "no-unknown-event"),
-					location: rangeFromHtmlNodeAttr(document, htmlAttr),
-					file,
-					suggestion,
-					htmlAttr,
-					suggestedTarget
-				}
-			];
+			context.report({
+				location: rangeFromHtmlNodeAttr(htmlAttr),
+				message: `Unknown event '${htmlAttr.name}'.`,
+				fixMessage: suggestedMemberName == null ? undefined : `Did you mean '${suggestedMemberName}'?`,
+				suggestion,
+				fix:
+					suggestedMemberName == null
+						? undefined
+						: () => ({
+								message: `Change event to '${suggestedMemberName}'`,
+								actions: [
+									{
+										kind: "changeAttributeName",
+										newName: suggestedMemberName,
+										htmlAttr
+									}
+								]
+						  })
+			});
 		}
-
-		return;
 	}
 };
 

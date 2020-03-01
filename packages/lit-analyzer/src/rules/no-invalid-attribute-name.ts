@@ -1,16 +1,14 @@
 import { Node } from "typescript";
-import { ComponentMember } from "web-component-analyzer";
-import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
-import { LitAnalyzerRequest } from "../analyze/lit-analyzer-context";
-import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
-import { RuleModule } from "../analyze/types/rule-module";
+import { RuleModule } from "../analyze/types/rule/rule-module";
 import { isValidAttributeName } from "../analyze/util/is-valid-name";
-import { rangeFromNode } from "../analyze/util/lit-range-util";
+import { rangeFromNode } from "../analyze/util/range-util";
 
 const rule: RuleModule = {
-	name: "no-invalid-attribute-name",
-
-	visitComponentMember(member: ComponentMember, request: LitAnalyzerRequest): LitHtmlDiagnostic[] | void {
+	id: "no-invalid-attribute-name",
+	meta: {
+		priority: "low"
+	},
+	visitComponentMember(member, context) {
 		// Check if the tag name is invalid
 		let attrName: undefined | string;
 		let attrNameNode: undefined | Node;
@@ -24,16 +22,10 @@ const rule: RuleModule = {
 		}
 
 		if (attrName != null && attrNameNode != null && !isValidAttributeName(attrName)) {
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.INVALID_ATTRIBUTE_NAME,
-					source: "no-invalid-attribute-name",
-					severity: litDiagnosticRuleSeverity(request.config, "no-invalid-attribute-name"),
-					message: `'${attrName}' is not a valid attribute name.`,
-					file: request.file,
-					location: rangeFromNode(attrNameNode)
-				}
-			];
+			context.report({
+				location: rangeFromNode(attrNameNode),
+				message: `'${attrName}' is not a valid attribute name.`
+			});
 		}
 	}
 };

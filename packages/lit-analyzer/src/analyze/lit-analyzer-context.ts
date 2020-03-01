@@ -1,10 +1,9 @@
 import * as tsMod from "typescript";
-import * as tsServer from "typescript/lib/tsserverlibrary";
 import { Program, SourceFile } from "typescript";
-import { RuleModule } from "./types/rule-module";
+import * as tsServer from "typescript/lib/tsserverlibrary";
 import { LitAnalyzerConfig } from "./lit-analyzer-config";
 import { LitAnalyzerLogger } from "./lit-analyzer-logger";
-import { TextDocument } from "./parse/document/text-document/text-document";
+import { RuleCollection } from "./rule-collection";
 import { AnalyzerDefinitionStore } from "./store/analyzer-definition-store";
 import { AnalyzerDependencyStore } from "./store/analyzer-dependency-store";
 import { AnalyzerDocumentStore } from "./store/analyzer-document-store";
@@ -20,15 +19,14 @@ export interface LitAnalyzerContext {
 	readonly documentStore: AnalyzerDocumentStore;
 	readonly definitionStore: AnalyzerDefinitionStore;
 	readonly logger: LitAnalyzerLogger;
-	readonly rules: RuleModule[];
+	readonly rules: RuleCollection;
+	readonly currentFile: SourceFile;
+
 	updateConfig(config: LitAnalyzerConfig): void;
 	updateDependencies(file: SourceFile): void;
 	updateComponents(file: SourceFile): void;
-}
 
-export interface LitAnalyzerRequest extends LitAnalyzerContext {
-	file: SourceFile;
-	document?: TextDocument;
+	setCurrentFile(file: SourceFile | undefined): void;
 }
 
 export interface LitPluginContextHandler {

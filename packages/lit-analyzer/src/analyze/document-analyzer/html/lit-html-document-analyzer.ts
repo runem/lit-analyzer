@@ -1,6 +1,5 @@
 import { FormatCodeSettings } from "typescript";
-import { Range } from "../../types/range";
-import { LitAnalyzerRequest } from "../../lit-analyzer-context";
+import { LitAnalyzerContext } from "../../lit-analyzer-context";
 import { HtmlDocument } from "../../parse/document/text-document/html-document/html-document";
 import { isHTMLAttr } from "../../types/html-node/html-node-attr-types";
 import { isHTMLNode } from "../../types/html-node/html-node-types";
@@ -9,16 +8,16 @@ import { LitCodeFix } from "../../types/lit-code-fix";
 import { LitCompletion } from "../../types/lit-completion";
 import { LitCompletionDetails } from "../../types/lit-completion-details";
 import { LitDefinition } from "../../types/lit-definition";
-import { LitHtmlDiagnostic } from "../../types/lit-diagnostic";
+import { LitDiagnostic } from "../../types/lit-diagnostic";
 import { LitFormatEdit } from "../../types/lit-format-edit";
 import { LitOutliningSpan, LitOutliningSpanKind } from "../../types/lit-outlining-span";
 import { LitQuickInfo } from "../../types/lit-quick-info";
 import { LitRenameInfo } from "../../types/lit-rename-info";
 import { LitRenameLocation } from "../../types/lit-rename-location";
-import { flatten } from "../../util/array-util";
+import { DocumentOffset, DocumentRange } from "../../types/range";
 import { iterableDefined } from "../../util/iterable-util";
-import { intersects } from "../../util/general-util";
-import { codeFixesForHtmlReport } from "./code-fix/code-fixes-for-html-report";
+import { documentRangeToSFRange } from "../../util/range-util";
+import { codeFixesForHtmlDocument } from "./code-fix/code-fixes-for-html-document";
 import { completionsAtOffset } from "./completion/completions-at-offset";
 import { definitionForHtmlAttr } from "./definition/definition-for-html-attr";
 import { definitionForHtmlNode } from "./definition/definition-for-html-node";
@@ -32,7 +31,12 @@ export class LitHtmlDocumentAnalyzer {
 	private vscodeHtmlService = new LitHtmlVscodeService();
 	private completionsCache: LitCompletion[] = [];
 
-	getCompletionDetailsAtOffset(document: HtmlDocument, offset: number, name: string, request: LitAnalyzerRequest): LitCompletionDetails | undefined {
+	getCompletionDetailsAtOffset(
+		document: HtmlDocument,
+		offset: DocumentOffset,
+		name: string,
+		context: LitAnalyzerContext
+	): LitCompletionDetails | undefined {
 		const completionWithName = this.completionsCache.find(completion => completion.name === name);
 
 		if (completionWithName == null || completionWithName.documentation == null) return undefined;
@@ -47,40 +51,39 @@ export class LitHtmlDocumentAnalyzer {
 		};
 	}
 
-	getCompletionsAtOffset(document: HtmlDocument, offset: number, request: LitAnalyzerRequest): LitCompletion[] {
-		this.completionsCache = completionsAtOffset(document, offset, request);
-		return completionsAtOffset(document, offset, request);
+	getCompletionsAtOffset(document: HtmlDocument, offset: DocumentOffset, context: LitAnalyzerContext): LitCompletion[] {
+		this.completionsCache = completionsAtOffset(document, offset, context);
+		return completionsAtOffset(document, offset, context);
 	}
 
-	getDiagnostics(document: HtmlDocument, request: LitAnalyzerRequest): LitHtmlDiagnostic[] {
-		return validateHTMLDocument(document, request);
+	getDiagnostics(document: HtmlDocument, context: LitAnalyzerContext): LitDiagnostic[] {
+		return validateHTMLDocument(document, context);
 	}
 
-	getClosingTagAtOffset(document: HtmlDocument, offset: number): LitClosingTagInfo | undefined {
+	getClosingTagAtOffset(document: HtmlDocument, offset: DocumentOffset): LitClosingTagInfo | undefined {
 		return this.vscodeHtmlService.getClosingTagAtOffset(document, offset);
 	}
 
-	getCodeFixesAtOffsetRange(document: HtmlDocument, offsetRange: Range, request: LitAnalyzerRequest): LitCodeFix[] {
+	getCodeFixesAtOffsetRange(document: HtmlDocument, offsetRange: DocumentRange, context: LitAnalyzerContext): LitCodeFix[] {
 		const hit = document.htmlNodeOrAttrAtOffset(offsetRange);
 		if (hit == null) return [];
 
-		const reports = validateHTMLDocument(document, request);
-		return flatten(reports.filter(report => intersects(offsetRange, report.location)).map(report => codeFixesForHtmlReport(report, request)));
+		return codeFixesForHtmlDocument(document, offsetRange, context);
 	}
 
-	getDefinitionAtOffset(document: HtmlDocument, offset: number, request: LitAnalyzerRequest): LitDefinition | undefined {
+	getDefinitionAtOffset(document: HtmlDocument, offset: DocumentOffset, context: LitAnalyzerContext): LitDefinition | undefined {
 		const hit = document.htmlNodeOrAttrAtOffset(offset);
 		if (hit == null) return undefined;
 
 		if (isHTMLNode(hit)) {
-			return definitionForHtmlNode(hit, request);
+			return definitionForHtmlNode(hit, context);
 		} else if (isHTMLAttr(hit)) {
-			return definitionForHtmlAttr(hit, request);
+			return definitionForHtmlAttr(hit, context);
 		}
 		return;
 	}
 
-	getRenameInfoAtOffset(document: HtmlDocument, offset: number, request: LitAnalyzerRequest): LitRenameInfo | undefined {
+	getRenameInfoAtOffset(document: HtmlDocument, offset: DocumentOffset, context: LitAnalyzerContext): LitRenameInfo | undefined {
 		const hit = document.htmlNodeOrAttrAtOffset(offset);
 		if (hit == null) return undefined;
 
@@ -89,7 +92,7 @@ export class LitHtmlDocumentAnalyzer {
 				kind: "memberVariableElement",
 				fullDisplayName: hit.tagName,
 				displayName: hit.tagName,
-				range: { document, ...hit.location.name },
+				range: documentRangeToSFRange(document, { ...hit.location.name }),
 				document,
 				target: hit
 			};
@@ -97,20 +100,20 @@ export class LitHtmlDocumentAnalyzer {
 		return;
 	}
 
-	getRenameLocationsAtOffset(document: HtmlDocument, offset: number, request: LitAnalyzerRequest): LitRenameLocation[] {
-		return renameLocationsAtOffset(document, offset, request);
+	getRenameLocationsAtOffset(document: HtmlDocument, offset: DocumentOffset, context: LitAnalyzerContext): LitRenameLocation[] {
+		return renameLocationsAtOffset(document, offset, context);
 	}
 
-	getQuickInfoAtOffset(document: HtmlDocument, offset: number, request: LitAnalyzerRequest): LitQuickInfo | undefined {
+	getQuickInfoAtOffset(document: HtmlDocument, offset: DocumentOffset, context: LitAnalyzerContext): LitQuickInfo | undefined {
 		const hit = document.htmlNodeOrAttrAtOffset(offset);
 		if (hit == null) return undefined;
 
 		if (isHTMLNode(hit)) {
-			return quickInfoForHtmlNode(hit, request);
+			return quickInfoForHtmlNode(hit, context);
 		}
 
 		if (isHTMLAttr(hit)) {
-			return quickInfoForHtmlAttr(hit, request);
+			return quickInfoForHtmlAttr(hit, context);
 		}
 		return;
 	}
@@ -136,7 +139,7 @@ export class LitHtmlDocumentAnalyzer {
 					autoCollapse: false,
 					bannerText: node.tagName,
 					kind: LitOutliningSpanKind.Code,
-					location: { document, start: node.location.startTag.end, end: endIndex }
+					location: documentRangeToSFRange(document, { start: node.location.startTag.end, end: endIndex })
 				} as LitOutliningSpan;
 			})
 		);

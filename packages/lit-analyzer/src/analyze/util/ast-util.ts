@@ -1,7 +1,7 @@
 import { Node } from "typescript";
 import { tsModule } from "../ts-module";
 import { Range } from "../types/range";
-import { intersects } from "./general-util";
+import { intersects } from "./range-util";
 
 /**
  * Tests nodes recursively walking up the tree using parent nodes.

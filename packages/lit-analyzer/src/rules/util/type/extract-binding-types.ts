@@ -9,19 +9,19 @@ import {
 	toSimpleType
 } from "ts-simple-type";
 import { Type, TypeChecker, Expression } from "typescript";
-import { LitAnalyzerRequest } from "../../lit-analyzer-context";
-import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../types/html-node/html-node-attr-assignment-types";
-import { HtmlNodeAttrKind } from "../../types/html-node/html-node-attr-types";
+import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../analyze/types/html-node/html-node-attr-assignment-types";
+import { HtmlNodeAttrKind } from "../../../analyze/types/html-node/html-node-attr-types";
+import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
 import { getDirective } from "../directive/get-directive";
 
 const cache = new WeakMap<HtmlNodeAttrAssignment, { typeA: SimpleType; typeB: SimpleType }>();
 
-export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, request: LitAnalyzerRequest): { typeA: SimpleType; typeB: SimpleType } {
+export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, context: RuleModuleContext): { typeA: SimpleType; typeB: SimpleType } {
 	if (cache.has(assignment)) {
 		return cache.get(assignment)!;
 	}
 
-	const checker = request.program.getTypeChecker();
+	const checker = context.program.getTypeChecker();
 
 	// Relax the type we are looking at an expression in javascript files
 	//const inJavascriptFile = request.file.fileName.endsWith(".js");
@@ -39,13 +39,13 @@ export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, request:
 	})();
 
 	// Find a corresponding target for this attribute
-	const htmlAttrTarget = request.htmlStore.getHtmlAttrTarget(assignment.htmlAttr);
+	const htmlAttrTarget = context.htmlStore.getHtmlAttrTarget(assignment.htmlAttr);
 	//if (htmlAttrTarget == null) return [];
 
 	const typeA = htmlAttrTarget == null ? ({ kind: SimpleTypeKind.ANY } as SimpleType) : htmlAttrTarget.getType();
 
 	// Handle directives
-	const directive = getDirective(assignment, request);
+	const directive = getDirective(assignment, context);
 	if (directive != null && directive.actualType != null) {
 		typeB = directive.actualType;
 	}

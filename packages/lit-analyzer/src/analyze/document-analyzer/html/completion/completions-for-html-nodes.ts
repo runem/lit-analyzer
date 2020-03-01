@@ -1,15 +1,18 @@
-import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
+import { LitAnalyzerContext } from "../../../lit-analyzer-context";
+import { HtmlDocument } from "../../../parse/document/text-document/html-document/html-document";
 import { documentationForHtmlTag } from "../../../parse/parse-html-data/html-tag";
 import { HtmlNode } from "../../../types/html-node/html-node-types";
 import { LitCompletion } from "../../../types/lit-completion";
 import { lazy } from "../../../util/general-util";
 import { DocumentPositionContext } from "../../../util/get-position-context-in-document";
 import { isCustomElementTagName } from "../../../util/is-valid-name";
+import { documentRangeToSFRange } from "../../../util/range-util";
 
 export function completionsForHtmlNodes(
+	document: HtmlDocument,
 	intersectingClosestNode: HtmlNode | undefined,
 	{ offset, leftWord, rightWord, beforeWord, afterWord }: DocumentPositionContext,
-	{ document, htmlStore, logger }: LitAnalyzerRequest
+	{ htmlStore }: LitAnalyzerContext
 ): LitCompletion[] {
 	const isClosingTag = beforeWord === "/";
 
@@ -26,11 +29,10 @@ export function completionsForHtmlNodes(
 				insert,
 				kind: "enumElement",
 				importance: "high",
-				range: {
-					document,
+				range: documentRangeToSFRange(document, {
 					start: offset - leftWord.length - 2,
 					end: offset + rightWord.length
-				},
+				}),
 				documentation: lazy(() => {
 					const htmlTag = htmlStore.getHtmlTag(intersectingClosestNode);
 					return htmlTag != null ? documentationForHtmlTag(htmlTag) : undefined;
@@ -52,11 +54,10 @@ export function completionsForHtmlNodes(
 			insert,
 			kind: isBuiltIn ? "enumElement" : hasDeclaration ? "member" : "label",
 			importance: isBuiltIn ? "low" : hasDeclaration ? "high" : "medium",
-			range: {
-				document,
+			range: documentRangeToSFRange(document, {
 				start: offset - leftWord.length - (isClosingTag ? 2 : 0),
 				end: offset + rightWord.length + (isClosingTag && afterWord === ">" ? 1 : 0)
-			},
+			}),
 			documentation: lazy(() => documentationForHtmlTag(htmlTag))
 		} as LitCompletion;
 	});
