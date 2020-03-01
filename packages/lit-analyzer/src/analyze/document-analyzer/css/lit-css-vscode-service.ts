@@ -1,15 +1,17 @@
 import * as vscode from "vscode-css-languageservice";
 import { IAtDirectiveData, ICSSDataProvider, IPropertyData, IPseudoClassData, IPseudoElementData } from "vscode-css-languageservice";
 import { isRuleDisabled } from "../../lit-analyzer-config";
-import { LitAnalyzerRequest } from "../../lit-analyzer-context";
+import { LitAnalyzerContext } from "../../lit-analyzer-context";
 import { CssDocument } from "../../parse/document/text-document/css-document/css-document";
 import { AnalyzerHtmlStore } from "../../store/analyzer-html-store";
 import { LitCompletion } from "../../types/lit-completion";
-import { LitCssDiagnostic } from "../../types/lit-diagnostic";
+import { LitDiagnostic } from "../../types/lit-diagnostic";
 import { LitQuickInfo } from "../../types/lit-quick-info";
 import { LitTargetKind } from "../../types/lit-target-kind";
+import { DocumentOffset } from "../../types/range";
 import { lazy } from "../../util/general-util";
 import { iterableFilter, iterableMap } from "../../util/iterable-util";
+import { documentRangeToSFRange } from "../../util/range-util";
 
 function makeVscTextDocument(cssDocument: CssDocument): vscode.TextDocument {
 	return vscode.TextDocument.create("untitled://embedded.css", "css", 1, cssDocument.virtualDocument.text);
@@ -26,7 +28,7 @@ export class LitCssVscodeService {
 		return vscode.getSCSSLanguageService({ customDataProviders: [this.dataProvider.provider] });
 	}
 
-	getDiagnostics(document: CssDocument, context: LitAnalyzerRequest): LitCssDiagnostic[] {
+	getDiagnostics(document: CssDocument, context: LitAnalyzerContext): LitDiagnostic[] {
 		this.dataProvider.update(context.htmlStore);
 
 		const vscTextDocument = makeVscTextDocument(document);
@@ -50,17 +52,18 @@ export class LitCssVscodeService {
 				diagnostic =>
 					({
 						severity: diagnostic.severity === vscode.DiagnosticSeverity.Error ? "error" : "warning",
-						location: {
-							document,
+						source: "no-invalid-css",
+						location: documentRangeToSFRange(document, {
 							start: vscTextDocument.offsetAt(diagnostic.range.start),
 							end: vscTextDocument.offsetAt(diagnostic.range.end)
-						},
-						message: diagnostic.message
-					} as LitCssDiagnostic)
+						}),
+						message: diagnostic.message,
+						file: context.currentFile
+					} as LitDiagnostic)
 			);
 	}
 
-	getQuickInfo(document: CssDocument, offset: number, context: LitAnalyzerRequest): LitQuickInfo | undefined {
+	getQuickInfo(document: CssDocument, offset: DocumentOffset, context: LitAnalyzerContext): LitQuickInfo | undefined {
 		this.dataProvider.update(context.htmlStore);
 
 		const vscTextDocument = makeVscTextDocument(document);
@@ -88,16 +91,12 @@ export class LitCssVscodeService {
 		return {
 			primaryInfo: primaryInfo || "",
 			secondaryInfo,
-			range: {
-				document,
-				start: vscTextDocument.offsetAt(hover.range.start),
-				end: vscTextDocument.offsetAt(hover.range.end)
-			}
+			range: documentRangeToSFRange(document, { start: vscTextDocument.offsetAt(hover.range.start), end: vscTextDocument.offsetAt(hover.range.end) })
 		};
 	}
 
-	getCompletions(document: CssDocument, offset: number, request: LitAnalyzerRequest): LitCompletion[] {
-		this.dataProvider.update(request.htmlStore);
+	getCompletions(document: CssDocument, offset: DocumentOffset, context: LitAnalyzerContext): LitCompletion[] {
+		this.dataProvider.update(context.htmlStore);
 
 		const vscTextDocument = makeVscTextDocument(document);
 		const vscStylesheet = this.makeVscStylesheet(vscTextDocument);

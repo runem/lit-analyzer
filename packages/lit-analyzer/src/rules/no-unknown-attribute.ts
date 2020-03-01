@@ -1,20 +1,25 @@
-import { LitAnalyzerConfig, litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
+import { LitAnalyzerConfig } from "../analyze/lit-analyzer-config";
 import { HtmlTag, litAttributeModifierForTarget } from "../analyze/parse/parse-html-data/html-tag";
 import { AnalyzerDefinitionStore } from "../analyze/store/analyzer-definition-store";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { HtmlNodeKind } from "../analyze/types/html-node/html-node-types";
-import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
-import { RuleModule } from "../analyze/types/rule-module";
+import { RuleFix } from "../analyze/types/rule/rule-fix";
+import { RuleModule } from "../analyze/types/rule/rule-module";
 import { suggestTargetForHtmlAttr } from "../analyze/util/attribute-util";
 import { iterableFirst } from "../analyze/util/iterable-util";
-import { rangeFromHtmlNodeAttr } from "../analyze/util/lit-range-util";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/range-util";
 
 /**
  * This rule validates that only known attributes are used in attribute bindings.
  */
 const rule: RuleModule = {
-	name: "no-unknown-attribute",
-	visitHtmlAttribute(htmlAttr, { htmlStore, config, definitionStore, document, file }) {
+	id: "no-unknown-attribute",
+	meta: {
+		priority: "low"
+	},
+	visitHtmlAttribute(htmlAttr, context) {
+		const { htmlStore, config, definitionStore } = context;
+
 		// Ignore "style" and "svg" attrs because I don't yet have all data for them.
 		if (htmlAttr.htmlNode.kind !== HtmlNodeKind.NODE) return;
 
@@ -33,24 +38,49 @@ const rule: RuleModule = {
 
 			// Get suggested target
 			const suggestedTarget = suggestTargetForHtmlAttr(htmlAttr, htmlStore);
-			const suggestedMemberName = (suggestedTarget && `${litAttributeModifierForTarget(suggestedTarget)}${suggestedTarget.name}`) || undefined;
+			const suggestedModifier = suggestedTarget == null ? undefined : litAttributeModifierForTarget(suggestedTarget);
+			const suggestedMemberName = suggestedTarget == null ? undefined : suggestedTarget.name;
 
 			const suggestion = getSuggestionText({ config, htmlTag, definitionStore });
 
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.UNKNOWN_TARGET,
-					message: `Unknown attribute '${htmlAttr.name}'.`,
-					fix: suggestedMemberName == null ? undefined : `Did you mean '${suggestedMemberName}'?`,
-					source: "no-unknown-attribute",
-					severity: litDiagnosticRuleSeverity(config, "no-unknown-attribute"),
-					location: rangeFromHtmlNodeAttr(document, htmlAttr),
-					file,
-					suggestion,
-					htmlAttr,
-					suggestedTarget
-				}
-			];
+			context.report({
+				location: rangeFromHtmlNodeAttr(htmlAttr),
+				message: `Unknown attribute '${htmlAttr.name}'.`,
+				fixMessage: suggestedMemberName == null ? undefined : `Did you mean '${suggestedModifier}${suggestedMemberName}'?`,
+				suggestion,
+				fix: () =>
+					[
+						{
+							message: `Change attribute to 'data-${htmlAttr.name}'`,
+							actions: [
+								{
+									kind: "CHANGE_ATTRIBUTE_NAME",
+									newName: `data-${htmlAttr.name}`,
+									htmlAttr
+								}
+							]
+						},
+						...(suggestedMemberName == null
+							? []
+							: [
+									{
+										message: `Change attribute to '${suggestedModifier}${suggestedMemberName}'`,
+										actions: [
+											{
+												kind: "CHANGE_ATTRIBUTE_NAME",
+												newName: suggestedMemberName,
+												htmlAttr
+											},
+											{
+												kind: "CHANGE_ATTRIBUTE_MODIFIER",
+												newModifier: suggestedModifier,
+												htmlAttr
+											}
+										]
+									}
+							  ])
+					] as RuleFix[]
+			});
 		}
 
 		return;

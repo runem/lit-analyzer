@@ -1,6 +1,6 @@
-import { DocumentRange } from "./lit-range";
+import { SourceFileRange } from "./range";
 
 export interface LitFormatEdit {
-	range: DocumentRange;
+	range: SourceFileRange;
 	newText: string;
 }

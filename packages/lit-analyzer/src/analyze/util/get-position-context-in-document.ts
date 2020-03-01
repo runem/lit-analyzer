@@ -1,8 +1,9 @@
 import { TextDocument } from "../parse/document/text-document/text-document";
+import { DocumentOffset } from "../types/range";
 
 export interface DocumentPositionContext {
 	text: string;
-	offset: number;
+	offset: DocumentOffset;
 	word: string;
 	leftWord: string;
 	rightWord: string;
@@ -15,7 +16,7 @@ export interface DocumentPositionContext {
  * @param document
  * @param offset
  */
-export function getPositionContextInDocument(document: TextDocument, offset: number): DocumentPositionContext {
+export function getPositionContextInDocument(document: TextDocument, offset: DocumentOffset): DocumentPositionContext {
 	const text = document.virtualDocument.text;
 
 	const leftWord = grabWordInDirection({
@@ -65,7 +66,7 @@ function grabWordInDirection({
 	stopChar: RegExp;
 	direction: "left" | "right";
 	text: string;
-	startOffset: number;
+	startOffset: DocumentOffset;
 }): string {
 	const dir = direction === "left" ? -1 : 1;
 	let curPosition = startOffset - (dir < 0 ? 1 : 0);

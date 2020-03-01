@@ -1,5 +1,5 @@
 import { ComponentDeclaration, ComponentEvent, ComponentMember } from "web-component-analyzer";
-import { DocumentRange } from "./lit-range";
+import { SourceFileRange } from "./range";
 
 export enum DefinitionKind {
 	COMPONENT = "COMPONENT",
@@ -8,7 +8,7 @@ export enum DefinitionKind {
 }
 
 export interface DefinitionBase {
-	fromRange: DocumentRange;
+	fromRange: SourceFileRange;
 }
 
 export interface DefinitionComponent extends DefinitionBase {

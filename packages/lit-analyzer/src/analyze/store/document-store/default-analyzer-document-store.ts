@@ -1,10 +1,12 @@
+import { SourceFile } from "typescript";
+import { LitAnalyzerConfig } from "../../lit-analyzer-config";
 import { parseDocumentsInSourceFile } from "../../parse/document/parse-documents-in-source-file";
 import { TextDocument } from "../../parse/document/text-document/text-document";
-import { LitAnalyzerConfig } from "../../lit-analyzer-config";
-import { SourceFile } from "typescript";
+import { SourceFilePosition } from "../../types/range";
+import { AnalyzerDocumentStore } from "../analyzer-document-store";
 
-export class DefaultAnalyzerDocumentStore {
-	getDocumentAtPosition(sourceFile: SourceFile, position: number, options: LitAnalyzerConfig): TextDocument | undefined {
+export class DefaultAnalyzerDocumentStore implements AnalyzerDocumentStore {
+	getDocumentAtPosition(sourceFile: SourceFile, position: SourceFilePosition, options: LitAnalyzerConfig): TextDocument | undefined {
 		return parseDocumentsInSourceFile(
 			sourceFile,
 			{

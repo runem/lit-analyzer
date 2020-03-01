@@ -37,7 +37,7 @@ export function compileFiles(inputFiles: TestFile[] | TestFile = []): { program:
 
 	const entryFile = files.find(file => file.entry === true) || files[0];
 
-	const includeLib = files.find(file => file.includeLib) != null;
+	const includeLib = true; //files.find(file => file.includeLib) != null;
 
 	const readFile = (fileName: string): string | undefined => {
 		const matchedFile = files.find(currentFile => currentFile.fileName === fileName);
@@ -64,7 +64,7 @@ export function compileFiles(inputFiles: TestFile[] | TestFile = []): { program:
 		target: ScriptTarget.ESNext,
 		allowJs: true,
 		sourceMap: false,
-		strict: true // if strict = false, "undefined" and "null" will be removed from type unions.
+		strict: true // if strict = false, "undefined" and "null" will be removed from unions types.
 	};
 
 	const compilerHost: CompilerHost = {
@@ -104,8 +104,9 @@ export function compileFiles(inputFiles: TestFile[] | TestFile = []): { program:
 	};
 
 	const program = ts.createProgram({
-		//rootNames: [...files.map(file => file.fileName!), ...(includeLib ? ["node_modules/typescript/lib/lib.dom.d.ts"] : [])],
-		rootNames: files.map(file => file.fileName!),
+		//rootNames: [...files.map(file => file.fileName!), "node_modules/typescript/lib/lib.dom.d.ts"],
+		rootNames: [...files.map(file => file.fileName!), ...(includeLib ? ["node_modules/typescript/lib/lib.dom.d.ts"] : [])],
+		//rootNames: files.map(file => file.fileName!),
 		options: compilerOptions,
 		host: compilerHost
 	});

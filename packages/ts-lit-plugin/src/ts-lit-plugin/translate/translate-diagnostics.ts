@@ -11,7 +11,7 @@ export function translateDiagnostics(reports: LitDiagnostic[], file: SourceFile,
  * @param diagnostic
  */
 function getMessageTextFromDiagnostic(diagnostic: LitDiagnostic): string {
-	return `${diagnostic.message}${diagnostic.fix == null ? "" : ` ${diagnostic.fix}`}`;
+	return `${diagnostic.message}${diagnostic.fixMessage == null ? "" : ` ${diagnostic.fixMessage}`}`;
 }
 
 function translateDiagnostic(diagnostic: LitDiagnostic, file: SourceFile, context: LitAnalyzerContext): DiagnosticWithLocation {

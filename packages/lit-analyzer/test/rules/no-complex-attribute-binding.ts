@@ -9,7 +9,7 @@ tsTest("Complex types are not assignable using an attribute binding", t => {
 });
 
 tsTest("Complex types are assignable using a property binding", t => {
-	const { diagnostics } = getDiagnostics('html`<input .placeholder="${{foo: "bar"}}" />`');
+	const { diagnostics } = getDiagnostics('html`<input .onclick="${() => {}}" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 

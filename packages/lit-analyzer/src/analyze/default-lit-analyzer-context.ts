@@ -5,10 +5,10 @@ import { analyzeHTMLElement, analyzeSourceFile } from "web-component-analyzer";
 import noBooleanInAttributeBindingRule from "../rules/no-boolean-in-attribute-binding";
 import noComplexAttributeBindingRule from "../rules/no-complex-attribute-binding";
 import noExpressionlessPropertyBindingRule from "../rules/no-expressionless-property-binding";
+import noIncompatiblePropertyType from "../rules/no-incompatible-property-type";
 import noIncompatibleTypeBindingRule from "../rules/no-incompatible-type-binding";
 import noInvalidAttributeName from "../rules/no-invalid-attribute-name";
 import noInvalidDirectiveBindingRule from "../rules/no-invalid-directive-binding";
-import noIncompatiblePropertyType from "../rules/no-incompatible-property-type";
 import noInvalidTagName from "../rules/no-invalid-tag-name";
 import noMissingImport from "../rules/no-missing-import";
 import noNoncallableEventBindingRule from "../rules/no-noncallable-event-binding";
@@ -27,16 +27,17 @@ import { LitAnalyzerContext, LitPluginContextHandler } from "./lit-analyzer-cont
 import { DefaultLitAnalyzerLogger, LitAnalyzerLoggerLevel } from "./lit-analyzer-logger";
 import { convertAnalyzeResultToHtmlCollection, convertComponentDeclarationToHtmlTag } from "./parse/convert-component-definitions-to-html-collection";
 import { parseDependencies } from "./parse/parse-dependencies/parse-dependencies";
+import { RuleCollection } from "./rule-collection";
 import { DefaultAnalyzerDefinitionStore } from "./store/definition-store/default-analyzer-definition-store";
 import { DefaultAnalyzerDependencyStore } from "./store/dependency-store/default-analyzer-dependency-store";
 import { DefaultAnalyzerDocumentStore } from "./store/document-store/default-analyzer-document-store";
 import { DefaultAnalyzerHtmlStore } from "./store/html-store/default-analyzer-html-store";
 import { HtmlDataSourceKind } from "./store/html-store/html-data-source-merged";
-import { RuleModule } from "./types/rule-module";
+import { RuleModule } from "./types/rule/rule-module";
 import { changedSourceFileIterator } from "./util/changed-source-file-iterator";
 import { iterableFirst } from "./util/iterable-util";
 
-const rules: RuleModule[] = [
+const ALL_RULES: RuleModule[] = [
 	noExpressionlessPropertyBindingRule,
 	noUnintendedMixedBindingRule,
 	noUnknownSlotRule,
@@ -78,14 +79,33 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 		return this._config;
 	}
 
+	private _currentFile: SourceFile | undefined;
+	get currentFile(): SourceFile {
+		if (this._currentFile == null) {
+			throw new Error("Current file is not set");
+		}
+
+		return this._currentFile;
+	}
+
 	readonly htmlStore = new DefaultAnalyzerHtmlStore();
 	readonly dependencyStore = new DefaultAnalyzerDependencyStore();
 	readonly documentStore = new DefaultAnalyzerDocumentStore();
 	readonly definitionStore = new DefaultAnalyzerDefinitionStore();
 	readonly logger = new DefaultLitAnalyzerLogger();
 
-	get rules(): RuleModule[] {
-		return rules;
+	private _rules: RuleCollection | undefined;
+	get rules(): RuleCollection {
+		if (this._rules == null) {
+			this._rules = new RuleCollection();
+			this._rules.push(...ALL_RULES);
+		}
+
+		return this._rules;
+	}
+
+	public setCurrentFile(file: SourceFile | undefined): void {
+		this._currentFile = file;
 	}
 
 	public updateConfig(config: LitAnalyzerConfig) {
@@ -170,7 +190,7 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 			config: {
 				features: ["event", "member", "slot"],
 				analyzeGlobalFeatures: true,
-				analyzeLibDom: false,
+				analyzeLibDom: true,
 				analyzeLib: true,
 				excludedDeclarationNames: ["HTMLElement"]
 			}

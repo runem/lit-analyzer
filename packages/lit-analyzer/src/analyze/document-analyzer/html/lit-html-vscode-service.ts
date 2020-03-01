@@ -4,6 +4,8 @@ import { HtmlDocument } from "../../parse/document/text-document/html-document/h
 import { textPartsToRanges } from "../../parse/document/virtual-document/virtual-document";
 import { LitClosingTagInfo } from "../../types/lit-closing-tag-info";
 import { LitFormatEdit } from "../../types/lit-format-edit";
+import { DocumentOffset } from "../../types/range";
+import { documentRangeToSFRange, makeDocumentRange } from "../../util/range-util";
 
 const htmlService = vscode.getLanguageService();
 
@@ -16,7 +18,7 @@ function makeVscHtmlDocument(vscTextDocument: vscode.TextDocument) {
 }
 
 export class LitHtmlVscodeService {
-	getClosingTagAtOffset(document: HtmlDocument, offset: number): LitClosingTagInfo | undefined {
+	getClosingTagAtOffset(document: HtmlDocument, offset: DocumentOffset): LitClosingTagInfo | undefined {
 		const vscTextDocument = makeVscTextDocument(document);
 		const vscHtmlDocument = makeVscHtmlDocument(vscTextDocument);
 		const htmlLSPosition = vscTextDocument.positionAt(offset);
@@ -31,10 +33,12 @@ export class LitHtmlVscodeService {
 	}
 
 	format(document: HtmlDocument, settings: ts.FormatCodeSettings): LitFormatEdit[] {
-		const parts = document.virtualDocument.getPartsAtOffsetRange({
-			start: 0,
-			end: document.virtualDocument.location.end - document.virtualDocument.location.start
-		});
+		const parts = document.virtualDocument.getPartsAtDocumentRange(
+			makeDocumentRange({
+				start: 0,
+				end: document.virtualDocument.location.end - document.virtualDocument.location.start
+			})
+		);
 
 		const ranges = textPartsToRanges(parts);
 		const originalHtml = parts.map(p => (typeof p === "string" ? p : `[#${"#".repeat(p.getText().length)}]`)).join("");
@@ -64,7 +68,7 @@ export class LitHtmlVscodeService {
 
 		return splitted.map((newText, i) => {
 			const range = ranges[i];
-			return { range: { document, ...range }, newText };
+			return { range: documentRangeToSFRange(document, range), newText };
 		});
 	}
 }

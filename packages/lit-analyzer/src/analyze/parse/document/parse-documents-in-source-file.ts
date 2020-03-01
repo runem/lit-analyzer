@@ -1,7 +1,8 @@
 import { SourceFile, TaggedTemplateExpression } from "typescript";
 import { HtmlNodeKind, IHtmlNodeStyleTag } from "../../types/html-node/html-node-types";
-import { flatten } from "../../util/array-util";
-import { intersects } from "../../util/general-util";
+import { SourceFilePosition } from "../../types/range";
+import { arrayFlat } from "../../util/array-util";
+import { documentRangeToSFRange, intersects, makeDocumentRange } from "../../util/range-util";
 import { findTaggedTemplates } from "../tagged-template/find-tagged-templates";
 import { CssDocument } from "./text-document/css-document/css-document";
 import { HtmlDocument } from "./text-document/html-document/html-document";
@@ -15,11 +16,15 @@ export interface ParseDocumentOptions {
 }
 
 export function parseDocumentsInSourceFile(sourceFile: SourceFile, options: ParseDocumentOptions): TextDocument[];
-export function parseDocumentsInSourceFile(sourceFile: SourceFile, options: ParseDocumentOptions, position: number): TextDocument | undefined;
 export function parseDocumentsInSourceFile(
 	sourceFile: SourceFile,
 	options: ParseDocumentOptions,
-	position?: number
+	position: SourceFilePosition
+): TextDocument | undefined;
+export function parseDocumentsInSourceFile(
+	sourceFile: SourceFile,
+	options: ParseDocumentOptions,
+	position?: SourceFilePosition
 ): TextDocument[] | TextDocument | undefined {
 	// Parse html tags in the relevant source file
 	const templateTags = [...options.cssTags, ...options.htmlTags];
@@ -37,7 +42,7 @@ export function parseDocumentsInSourceFile(
 	if (result == null) return undefined;
 
 	if (Array.isArray(result)) {
-		return flatten(
+		return arrayFlat(
 			result.map(document => {
 				const res = unpackHtmlDocument(document, position);
 				return [document, ...(res == null ? [] : Array.isArray(res) ? res : [res])];
@@ -62,9 +67,9 @@ function taggedTemplateToDocument(taggedTemplate: TaggedTemplateExpression, { cs
 	}
 }
 
-function unpackHtmlDocument(textDocument: TextDocument, position: number): TextDocument | undefined;
-function unpackHtmlDocument(textDocument: TextDocument, position?: number): TextDocument | TextDocument[];
-function unpackHtmlDocument(textDocument: TextDocument, position?: number): TextDocument[] | TextDocument | undefined {
+function unpackHtmlDocument(textDocument: TextDocument, position: SourceFilePosition): TextDocument | undefined;
+function unpackHtmlDocument(textDocument: TextDocument, position?: SourceFilePosition): TextDocument | TextDocument[];
+function unpackHtmlDocument(textDocument: TextDocument, position?: SourceFilePosition): TextDocument[] | TextDocument | undefined {
 	const documents: TextDocument[] = [];
 
 	if (textDocument instanceof HtmlDocument) {
@@ -76,7 +81,7 @@ function unpackHtmlDocument(textDocument: TextDocument, position?: number): Text
 						documents.push(nestedDocument);
 					}
 				} else if (
-					intersects(textDocument.virtualDocument.scPositionToOffset(position), {
+					intersects(textDocument.virtualDocument.sfPositionToDocumentOffset(position), {
 						start: rootNode.location.startTag.end,
 						end: rootNode.location.endTag.start
 					})
@@ -95,17 +100,16 @@ function unpackHtmlDocument(textDocument: TextDocument, position?: number): Text
 function styleHtmlNodeToCssDocument(htmlDocument: HtmlDocument, styleNode: IHtmlNodeStyleTag): CssDocument | undefined {
 	if (styleNode.location.endTag == null) return undefined;
 
-	const cssDocumentParts = htmlDocument.virtualDocument.getPartsAtOffsetRange({
-		start: styleNode.location.startTag.end,
-		end: styleNode.location.endTag.start
-	});
+	const cssDocumentParts = htmlDocument.virtualDocument.getPartsAtDocumentRange(
+		makeDocumentRange({
+			start: styleNode.location.startTag.end,
+			end: styleNode.location.endTag.start
+		})
+	);
 
 	const cssVirtualDocument = new VirtualAstCssDocument(
 		cssDocumentParts,
-		{
-			start: htmlDocument.virtualDocument.offsetToSCPosition(styleNode.location.startTag.end),
-			end: htmlDocument.virtualDocument.offsetToSCPosition(styleNode.location.endTag.start)
-		},
+		documentRangeToSFRange(htmlDocument, styleNode.location.startTag),
 		htmlDocument.virtualDocument.fileName
 	);
 

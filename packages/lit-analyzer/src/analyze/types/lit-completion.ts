@@ -1,12 +1,12 @@
 import { LitTargetKind } from "./lit-target-kind";
-import { DocumentRange } from "./lit-range";
+import { SourceFileRange } from "./range";
 
 export interface LitCompletion {
 	name: string;
 	kind: LitTargetKind;
 	kindModifiers?: "color";
 	insert: string;
-	range?: DocumentRange;
+	range?: SourceFileRange;
 	importance?: "high" | "medium" | "low";
 	documentation?(): string | undefined;
 }

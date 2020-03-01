@@ -1,4 +1,4 @@
-import { LitAnalyzerRuleName, LitAnalyzerRules } from "../analyze/lit-analyzer-config";
+import { LitAnalyzerRuleId, LitAnalyzerRules } from "../analyze/lit-analyzer-config";
 import { analyzeCommand } from "./analyze-command";
 import { LitAnalyzerCliConfig } from "./lit-analyzer-cli-config";
 import { parseCliArguments } from "./parse-cli-arguments";
@@ -34,7 +34,7 @@ export async function cli() {
 
 	// Always convert "rules" to "dash case" because "rules" expects it.
 	config.rules = Object.entries(config.rules || {}).reduce((acc, [k, v]) => {
-		acc[camelToDashCase(k) as LitAnalyzerRuleName] = v;
+		acc[camelToDashCase(k) as LitAnalyzerRuleId] = v;
 		return acc;
 	}, {} as LitAnalyzerRules);
 
