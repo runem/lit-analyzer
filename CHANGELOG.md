@@ -9,30 +9,47 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 <!-- ### Removed -->
 <!-- ### Fixed -->
 
+## [1.1.10] - 2020-03-02
+
+### Added
+
+- Added basic support for type checking code with Safe Types sanitization in place ([#62](https://github.com/runem/lit-analyzer/pull/62))
+- VSCode parameter hints for html/css tagged template literal are now hidden ([#61](https://github.com/runem/lit-analyzer/issues/61))
+
+### Fixed
+
+- Fixed css list substitution bug ([#76](https://github.com/runem/lit-analyzer/pull/76))
+- Fixed problem where when input type is date, min and max should accept date string ([#77](https://github.com/runem/lit-analyzer/issues/77))
+- Fixed `no-boolean-in-attribute-binding` to allow assigning booleans that are coerced to string to 'true'|'false' where appropriate ([#dc6cdc6db](https://github.com/runem/lit-analyzer/commit/dc6cdc6dbf5388e55d2d0b93fce21074deceeaad))
+
 ## [1.1.9] - 2019-10-17
 
 ### Added
+
 - New rule `no-unintended-mixed-binding` to prevent bugs like `<input value=${"foo"}} />` ([#44](https://github.com/runem/lit-analyzer/issues/44))
 - Hex colors within html/css templates are now highlighted in the vscode plugin ([#30](https://github.com/runem/lit-analyzer/issues/30))
 
 ### Fixed
+
 - Big internal refactor, including adding a lot of tests ([#49](https://github.com/runem/lit-analyzer/pull/49))
 - Fixed problem where closing tags weren't auto-completed properly ([#37cba351](https://github.com/runem/lit-analyzer/commit/37cba3519762a1b8c6f6522baa40842e1b5ac504))
 - Fixed problem where lit-analyzer would crash when running with a newer version of Typescript ([#58](https://github.com/runem/lit-analyzer/issues/58))
 
-
 ## [1.1.8] - 2019-08-13
 
 ### Added
+
 - Export Bazel plugin ([#39](https://github.com/runem/lit-analyzer/issues/39))
 - Support css snippets and % units ([#40](https://github.com/runem/lit-analyzer/issues/40))
 
 ### Fixed
+
 - Fix problem where the value of attributes on the form attr='val' could get parsed incorrectly. ([#36](https://github.com/runem/lit-analyzer/issues/36))
 
 ## [1.1.4] - 2019-08-05
 
 ### Added
+
 - Some rules are disabled as default to give users a smoother on-boarding experience. To re-enable the stricter rules please set "strict: true". Consult the documentation for more information.
 - Functionality has been refactored into "rules" which can be enabled and disabled individually. It should now be much clearer how to enabled or disable individual functionality. Consult the documentation for more information.
 
