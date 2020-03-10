@@ -131,7 +131,7 @@ html`<input .value="${value}" type="button" />`
 
 #### ⚡️ no-unknown-event
 
-You can opt in to check for unknown event names. Using the `@fires` jsdoc or the statement `this.dispatch(new CustomElement("my-event))` will make the event name available. All event names are accepted globally because events bubble. 
+You can opt in to check for unknown event names. Using the `@fires` jsdoc or the statement `this.dispatch(new CustomEvent("my-event))` will make the event name available. All event names are accepted globally because events bubble. 
 
 The following example is considered a warning:
 ```js
