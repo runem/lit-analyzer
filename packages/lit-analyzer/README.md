@@ -13,10 +13,6 @@
 <a href="https://github.com/runem/lit-analyzer/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/runem/lit-analyzer.svg" height="20"/></a>
 	</p>
 
-
-
-
-
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#installation)
 
 ## ➤ Installation
@@ -27,8 +23,9 @@ npm install lit-analyzer -g
 ```
 
 **Note:**
-* If you use Visual Studio Code you can also install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension. 
-* If you use Typescript you can also install [ts-lit-plugin](https://github.com/runem/lit-analyzer/blob/master/packages/ts-lit-plugin).
+
+- If you use Visual Studio Code you can also install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension.
+- If you use Typescript you can also install [ts-lit-plugin](https://github.com/runem/lit-analyzer/blob/master/packages/ts-lit-plugin).
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#usage)
 
@@ -58,18 +55,17 @@ lit-analyzer --strict --rules.no-unknown-tag-name off --format markdown
 
 ### Available arguments
 
-| Option | Description | Type | Default |
-| :----- | ----------- | ---- | ------- |
-| `--help` | Print help message | `boolean` | |
-| `--rules.rule-name` | Enable or disable rules (example: --rules.no-unknown-tag-name off). Severity can be "off" \| "warn" \| "error". See a list of rules [here](https://github.com/runem/lit-analyzer/blob/master/docs/readme/rules.md). | `{"rule-name": "off" \| "warn" \| "error"}` |  |
-| `--strict` | Enable strict mode. This changes the default ruleset | `boolean` | |
-| `--format` | Change the format of how diagnostics are reported | `code` \| `list` \| `markdown` | code |
-| `--maxWarnings` | Fail only when the number of warnings is larger than this number | `number` | 0 |
-| `--outFile` | Emit all output to a single file  | `filePath` |  |
-| `--quiet` | Report only errors and not warnings | `boolean` |  |
-| `--failFast` | Exit the process right after the first problem has been found | `boolean` | |
-| `--debug` | Enable CLI debug mode | `boolean` |  |
-
+| Option              | Description                                                                                                                                                                                                         | Type                                        | Default |
+| :------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ------- |
+| `--help`            | Print help message                                                                                                                                                                                                  | `boolean`                                   |         |
+| `--rules.rule-name` | Enable or disable rules (example: --rules.no-unknown-tag-name off). Severity can be "off" \| "warn" \| "error". See a list of rules [here](https://github.com/runem/lit-analyzer/blob/master/docs/readme/rules.md). | `{"rule-name": "off" \| "warn" \| "error"}` |         |
+| `--strict`          | Enable strict mode. This changes the default ruleset                                                                                                                                                                | `boolean`                                   |         |
+| `--format`          | Change the format of how diagnostics are reported                                                                                                                                                                   | `code` \| `list` \| `markdown`              | code    |
+| `--maxWarnings`     | Fail only when the number of warnings is larger than this number                                                                                                                                                    | `number`                                    | 0       |
+| `--outFile`         | Emit all output to a single file                                                                                                                                                                                    | `filePath`                                  |         |
+| `--quiet`           | Report only errors and not warnings                                                                                                                                                                                 | `boolean`                                   |         |
+| `--failFast`        | Exit the process right after the first problem has been found                                                                                                                                                       | `boolean`                                   |         |
+| `--debug`           | Enable CLI debug mode                                                                                                                                                                                               | `boolean`                                   |         |
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#rules)
 
@@ -88,7 +84,6 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | [no-missing-import](#-no-missing-import)    | When using custom elements in HTML it is checked if the element has been imported and is available in the current context. | off | warning |
 | [no-unclosed-tag](#-no-unclosed-tag)         | Unclosed tags, and invalid self closing tags like custom elements tags, are checked. | warning | error |
 
-
 **Validating binding names**
 
 <!-- prettier-ignore -->
@@ -97,7 +92,6 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | [no-unknown-attribute](#-no-unknown-attribute-no-unknown-property)<br> [no-unknown-property](#-no-unknown-attribute-no-unknown-property) | You will get a warning whenever you use an unknown attribute or property within your `lit-html` template. | off | warning |
 | [no-unknown-event](#-no-unknown-event)       | When using event bindings it's checked that the event names are fired. | off | off |
 | [no-unknown-slot](#-no-unknown-slot)         | Using the "@slot" jsdoc tag on your custom element class, you can tell which slots are accepted for a particular element. | off | warning |
-
 
 **Validating binding types**
 
@@ -131,7 +125,6 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | :------ | ----------- | --------------- | --------------- |
 | [💅 no-invalid-css](#-no-invalid-css) | CSS within the tagged template literal `css` will be validated. | warning | error |
 
-
 ### Validating custom elements
 
 All web components in your code are analyzed using [web-component-analyzer](https://github.com/runem/web-component-analyzer) which supports native custom elements and web components built with LitElement.
@@ -144,9 +137,9 @@ Below you will see an example of what to add to your library typescript definiti
 
 ```typescript
 declare global {
-  interface HTMLElementTagNameMap {
-    "my-element": MyElement;
-  }
+	interface HTMLElementTagNameMap {
+		"my-element": MyElement;
+	}
 }
 ```
 
@@ -155,35 +148,56 @@ declare global {
 When using custom elements in HTML it is checked if the element has been imported and is available in the current context. It's considered imported if any imported module (or their imports) defines the custom element.
 
 The following example is considered a warning:
+
 ```js
 // No import of "my-element"
-html`<my-element></my-element>`
+html`
+	<my-element></my-element>
+`;
 ```
 
 The following example is not considered a warning:
+
 ```js
 import "my-element.js";
-html`<my-element></my-element>`
+html`
+	<my-element></my-element>
+`;
 ```
-
 
 #### ☯ no-unclosed-tag
 
 Unclosed tags, and invalid self closing tags like custom elements tags, are checked.
 
 The following examples are considered warnings:
+
 ```js
-html`<div>`
-html`<video />`
-html`<custom-element />`
+html`
+	<div></div>
+`;
+html`
+	<video />
+`;
+html`
+	<custom-element />
+`;
 ```
 
 The following examples are not considered warnings:
+
 ```js
-html`<div></div>`
-html`<custom-element></custom-element>`
-html`<video></video>`
-html`<input />`
+html`
+	<div></div>
+`;
+html`
+	<custom-element></custom-element>
+`;
+html`
+	<video></video>
+`;
+html`
+	<input />
+`;
 ```
 
 ### Validating binding names
@@ -192,30 +206,42 @@ Attributes, properties and events are picked up on custom elements using [web-co
 
 #### ✅ no-unknown-attribute, no-unknown-property
 
-You will get a warning whenever you use an unknown attribute or property. This check is made on both custom elements and built in elements. 
+You will get a warning whenever you use an unknown attribute or property. This check is made on both custom elements and built in elements.
 
 **The following example is considered a warning:**
+
 ```js
-html`<input .valuuue="${value}" unknownattribute="button" />`
+html`
+	<input .valuuue="${value}" unknownattribute="button" />
+`;
 ```
 
 **The following example is not considered a warning:**
+
 ```js
-html`<input .value="${value}" type="button" />`
+html`
+	<input .value="${value}" type="button" />
+`;
 ```
 
 #### ⚡️ no-unknown-event
 
-You can opt in to check for unknown event names. Using the `@fires` jsdoc or the statement `this.dispatch(new CustomElement("my-event))` will make the event name available. All event names are accepted globally because events bubble. 
+You can opt in to check for unknown event names. Using the `@fires` jsdoc or the statement `this.dispatch(new CustomEvent("my-event))` will make the event name available. All event names are accepted globally because events bubble.
 
 The following example is considered a warning:
+
 ```js
-html`<input @iinput="${console.log}" />`
+html`
+	<input @iinput="${console.log}" />
+`;
 ```
 
 The following example is not considered a warning:
+
 ```js
-html`<input @input="${console.log}" />`
+html`
+	<input @input="${console.log}" />
+`;
 ```
 
 #### 📬 no-unknown-slot
@@ -228,31 +254,31 @@ Using the "@slot" jsdoc tag on your custom element class, you can tell which slo
  * @slot right - Right content
  * @slot left
  */
-class MyElement extends HTMLElement {
-}
+class MyElement extends HTMLElement {}
 customElements.define("my-element", MyElement);
 ```
 
 The following example is considered a warning:
+
 ```js
 html`
-<my-element>
-  <div slot="not a slot name"></div>
-</my-element>
-`
+	<my-element>
+		<div slot="not a slot name"></div>
+	</my-element>
+`;
 ```
 
 The following example is not considered a warning:
+
 ```js
 html`
-<my-element>
-  <div></div>
-  <div slot="right"></div>
-  <div slot="left"></div>
-</my-element>
-`
+	<my-element>
+		<div></div>
+		<div slot="right"></div>
+		<div slot="left"></div>
+	</my-element>
+`;
 ```
-
 
 ### Validating binding types
 
@@ -263,13 +289,19 @@ Be aware that many checks involving analyzing bindings will work better in Types
 It never makes sense to use the boolean attribute binding on a non-boolean type.
 
 The following example is considered a warning:
+
 ```js
-html`<input ?type="${"button"}" />`
+html`
+	<input ?type="${"button"}" />
+`;
 ```
 
 The following example is not considered a warning:
+
 ```js
-html`<input ?disabled="${isDisabled}" />`
+html`
+	<input ?disabled="${isDisabled}" />
+`;
 ```
 
 #### ⚫️ no-expressionless-property-binding
@@ -277,29 +309,45 @@ html`<input ?disabled="${isDisabled}" />`
 Because of how `lit-html` [parses bindings internally](https://github.com/Polymer/lit-html/issues/843) you cannot use the property binding without an expression.
 
 The following example is considered a warning:
+
 ```js
-html`<input .value="text" />`
+html`
+	<input .value="text" />
+`;
 ```
 
 The following example is not considered a warning:
+
 ```js
-html`<input .value="${text}" />`
+html`
+	<input .value="${text}" />
+`;
 ```
 
 #### 🌀 no-noncallable-event-binding
 
-It's a common mistake to incorrectly call the function when setting up an event handler binding instead of passing a reference to the function. This makes the function call whenever the code evaluates. 
+It's a common mistake to incorrectly call the function when setting up an event handler binding instead of passing a reference to the function. This makes the function call whenever the code evaluates.
 
 The following examples are considered warnings:
+
 ```js
-html`<button @click="${myEventHandler()}">Click</button>`
-html`<button @click="${{hannndleEvent: console.log()}}">Click</button>`
+html`
+	<button @click="${myEventHandler()}">Click</button>
+`;
+html`
+	<button @click="${{ hannndleEvent: console.log() }}">Click</button>
+`;
 ```
 
 The following examples are not considered warnings:
+
 ```js
-html`<button @click="${myEventHandler}">Click</button>`
-html`<button @click="${{handleEvent: console.log}}">Click</button>`
+html`
+	<button @click="${myEventHandler}">Click</button>
+`;
+html`
+	<button @click="${{ handleEvent: console.log }}">Click</button>
+`;
 ```
 
 #### 😈 no-boolean-in-attribute-binding
@@ -309,13 +357,19 @@ You should not be binding to a boolean type using an attribute binding because i
 This error is particular tricky, because the string "false" is truthy when evaluated in a conditional.
 
 The following example is considered a warning:
+
 ```js
-html`<input disabled="${isDisabled}" />`
+html`
+	<input disabled="${isDisabled}" />
+`;
 ```
 
 The following example is not considered a warning:
+
 ```js
-html`<input ?disabled="${isDisabled}" />`
+html`
+	<input ?disabled="${isDisabled}" />
+`;
 ```
 
 #### ☢️ no-complex-attribute-binding
@@ -323,30 +377,45 @@ html`<input ?disabled="${isDisabled}" />`
 Binding an object using an attribute binding would result in binding the string "[object Object]" to the attribute. In this cases it's probably better to use a property binding instead.
 
 The following example is considered a warning:
+
 ```js
-html`<my-list listitems="${listItems}"></my-list>`
+html`
+	<my-list listitems="${listItems}"></my-list>
+`;
 ```
 
 The following example is not considered a warning:
+
 ```js
-html`<my-list .listItems="${listItems}"></my-list>`
+html`
+	<my-list .listItems="${listItems}"></my-list>
+`;
 ```
 
-
-#### ⭕️ no-nullable-attribute-binding 
+#### ⭕️ no-nullable-attribute-binding
 
 Binding `undefined` or `null` in an attribute binding will result in binding the string "undefined" or "null". Here you should probably wrap your expression in the "ifDefined" directive.
 
 The following examples are considered warnings:
+
 ```js
-html`<input value="${maybeUndefined}" />`
-html`<input value="${maybeNull}" />`
+html`
+	<input value="${maybeUndefined}" />
+`;
+html`
+	<input value="${maybeNull}" />
+`;
 ```
 
 The following examples are not considered warnings:
+
 ```js
-html`<input value="${ifDefined(maybeUndefined)}" />`
-html`<input value="${ifDefined(maybeNull === null ? undefined : maybeNull)}" />`
+html`
+	<input value="${ifDefined(maybeUndefined)}" />
+`;
+html`
+	<input value="${ifDefined(maybeNull === null ? undefined : maybeNull)}" />
+`;
 ```
 
 #### 💔 no-incompatible-type-binding
@@ -354,32 +423,52 @@ html`<input value="${ifDefined(maybeNull === null ? undefined : maybeNull)}" />`
 Assignments in your HTML are typed checked just like it would be in Typescript.
 
 The following examples are considered warnings:
+
 ```js
-html`<input type="wrongvalue" />`
-html`<input placeholder />`
-html`<input max="${"hello"}" />`
-html`<my-list .listItems="${123}"></my-list>`
+html`
+	<input type="wrongvalue" />
+`;
+html`
+	<input placeholder />
+`;
+html`
+	<input max="${"hello"}" />
+`;
+html`
+	<my-list .listItems="${123}"></my-list>
+`;
 ```
 
 The following examples are not considered warnings:
+
 ```js
-html`<input type="button" />`
-html`<input placeholder="a placeholder" />`
-html`<input max="${123}" />`
-html`<my-list .listItems="${listItems}"></my-list>`
+html`
+	<input type="button" />
+`;
+html`
+	<input placeholder="a placeholder" />
+`;
+html`
+	<input max="${123}" />
+`;
+html`
+	<my-list .listItems="${listItems}"></my-list>
+`;
 ```
 
 #### 💥 no-invalid-directive-binding
 
-Directives are checked to make sure that the following rules are met: 
-* `ifDefined` is only used in an attribute binding.
-* `class` is only used in an attribute binding on the 'class' attribute.
-* `style` is only used in an attribute binding on the 'style' attribute.
-* `unsafeHTML`, `cache`, `repeat`, `asyncReplace` and `asyncAppend` are only used within a text binding.
+Directives are checked to make sure that the following rules are met:
+
+- `ifDefined` is only used in an attribute binding.
+- `class` is only used in an attribute binding on the 'class' attribute.
+- `style` is only used in an attribute binding on the 'style' attribute.
+- `unsafeHTML`, `cache`, `repeat`, `asyncReplace` and `asyncAppend` are only used within a text binding.
 
 The directives already make these checks on runtime, so this will help you catch errors before runtime.
 
 The following examples are considered warnings:
+
 ```js
 html`<input value="${unsafeHTML(html)}" />`
 html`<input .value="${ifDefined(myValue)}" />`
@@ -387,6 +476,7 @@ html`<div role="${class(classMap)}"></div>`
 ```
 
 The following examples are not considered warnings:
+
 ```js
 html`<button>${unsafeHTML(html)}</button>`
 html`<input .value="${myValue}" />`
@@ -401,21 +491,38 @@ Sometimes unintended characters sneak into bindings. This often indicates a typo
 This rule disallows mixed value bindings where a character `'`, `"`, `}` or `/` is unintentionally included in the binding.
 
 The following examples are considered warnings:
+
 ```js
-html`<input .value=${"myvalue"}" />`
-html`<input value=${"myvalue"}} />`
-html`<input value=${"myvalue"}/>`
-html`<input ?required=${true}/>`
+html`
+	<input .value=${"myvalue"}" />
+`;
+html`
+	<input value="${"myvalue"}}" />
+`;
+html`
+	<input value=${"myvalue"} />
+`;
+html`
+	<input ?required=${true} />
+`;
 ```
 
 The following examples are not considered warnings:
-```js
-html`<input .value=${"myvalue"} />`
-html`<input value="${"myvalue"}" />`
-html`<input ?required=${true} />`
-html`<input @input="${console.log}" />`
-```
 
+```js
+html`
+	<input .value=${"myvalue"} />
+`;
+html`
+	<input value="${"myvalue"}" />
+`;
+html`
+	<input ?required=${true} />
+`;
+html`
+	<input @input="${console.log}" />
+`;
+```
 
 ### Validating LitElement
 
@@ -424,22 +531,24 @@ html`<input @input="${console.log}" />`
 When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type.
 
 The following examples are considered warnings:
+
 ```js
 class MyElement extends LitElement {
-  @property({type: Number}) text: string;
-  @property({type: Boolean}) count: number;
-  @property({type: String}) disabled: boolean;
-  @property({type: Object}) list: ListItem[];
+	@property({ type: Number }) text: string;
+	@property({ type: Boolean }) count: number;
+	@property({ type: String }) disabled: boolean;
+	@property({ type: Object }) list: ListItem[];
 }
 ```
 
 The following examples are not considered warnings:
+
 ```js
 class MyElement extends LitElement {
-  @property({type: String}) text: string;
-  @property({type: Number}) count: number;
-  @property({type: Boolean}) disabled: boolean;
-  @property({type: Array}) list: ListItem[];
+	@property({ type: String }) text: string;
+	@property({ type: Number }) count: number;
+	@property({ type: Boolean }) disabled: boolean;
+	@property({ type: Array }) list: ListItem[];
 }
 ```
 
@@ -448,53 +557,55 @@ class MyElement extends LitElement {
 The default converter in LitElement only accepts `String`, `Boolean`, `Number`, `Array` and `Object`, so all other values for `type` are considered warnings. This check doesn't run if a custom converter is used.
 
 The following example is considered a warning:
+
 ```js
 class MyElement extends LitElement {
-  static get properties () {
-    return {
-      callback: {
-        type: Function
-      },
-      text: {
-        type: MyElement
-      }
-    }
-  }
+	static get properties() {
+		return {
+			callback: {
+				type: Function
+			},
+			text: {
+				type: MyElement
+			}
+		};
+	}
 }
 ```
 
 The following example is not considered a warning:
+
 ```js
 class MyElement extends LitElement {
-  static get properties () {
-    return {
-      callback: {
-        type: Function,
-        converter: myCustomConverter
-      },
-      text: {
-        type: String
-      }
-    }
-  }
+	static get properties() {
+		return {
+			callback: {
+				type: Function,
+				converter: myCustomConverter
+			},
+			text: {
+				type: String
+			}
+		};
+	}
 }
 ```
-
 
 #### ⁉️ no-invalid-attribute-name
 
 When using the property option `attribute`, the value is checked to make sure it's a valid attribute name.
 
 The following example is considered a warning:
+
 ```js
 class MyElement extends LitElement {
-  static get properties () {
-    return {
-      text: {
-        attribute: "invald=name"
-      }
-    }
-  }
+	static get properties() {
+		return {
+			text: {
+				attribute: "invald=name"
+			}
+		};
+	}
 }
 ```
 
@@ -503,19 +614,19 @@ class MyElement extends LitElement {
 When defining a custom element, the tag name is checked to make sure it's a valid custom element name.
 
 The following example is considered a warning:
+
 ```js
 @customElement("wrongElementName")
-class MyElement extends LitElement {
-}
+class MyElement extends LitElement {}
 
 customElements.define("alsoWrongName", MyElement);
 ```
 
 The following example is not considered a warning:
+
 ```js
 @customElement("my-element")
-class MyElement extends LitElement {
-}
+class MyElement extends LitElement {}
 
 customElements.define("correct-element-name", MyElement);
 ```
@@ -526,24 +637,26 @@ customElements.define("correct-element-name", MyElement);
 
 #### 💅 no-invalid-css
 
-CSS within the tagged template literal `css` will be validated. 
+CSS within the tagged template literal `css` will be validated.
 
 The following example is considered a warning:
+
 ```js
 css`
   button
     background: red;
   }
-`
+`;
 ```
 
 The following example is not considered a warning:
+
 ```js
 css`
-  button {
-    background: red;
-  }
-`
+	button {
+		background: red;
+	}
+`;
 ```
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#documenting-slots-events-attributes-and-properties)
@@ -565,26 +678,21 @@ Code is analyzed using [web-component-analyzer](https://github.com/runem/web-com
  * @slot right - Right content
  * @slot left
  */
-class MyElement extends HTMLElement { 
-}
+class MyElement extends HTMLElement {}
 
 customElements.define("my-element", MyElement);
 ```
 
-
-
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#contributors)
 
 ## ➤ Contributors
-	
 
 | [<img alt="Rune Mehlsen" src="https://avatars2.githubusercontent.com/u/5372940?s=460&v=4" width="100">](https://twitter.com/runemehlsen) | [<img alt="Andreas Mehlsen" src="https://avatars1.githubusercontent.com/u/6267397?s=460&v=4" width="100">](https://twitter.com/andreasmehlsen) | [<img alt="You?" src="https://joeschmoe.io/api/v1/random" width="100">](https://github.com/runem/lit-analyzer/blob/master/CONTRIBUTING.md) |
-|:--------------------------------------------------:|:--------------------------------------------------:|:--------------------------------------------------:|
-| [Rune Mehlsen](https://twitter.com/runemehlsen)  | [Andreas Mehlsen](https://twitter.com/andreasmehlsen) | [You?](https://github.com/runem/lit-analyzer/blob/master/CONTRIBUTING.md) |
-
+| :--------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: |
+|                                             [Rune Mehlsen](https://twitter.com/runemehlsen)                                              |                                             [Andreas Mehlsen](https://twitter.com/andreasmehlsen)                                              |                                 [You?](https://github.com/runem/lit-analyzer/blob/master/CONTRIBUTING.md)                                  |
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#license)
 
 ## ➤ License
-	
+
 Licensed under [MIT](https://opensource.org/licenses/MIT).
