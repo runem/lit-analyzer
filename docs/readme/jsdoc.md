@@ -2,6 +2,7 @@
 
 Code is analyzed using [web-component-analyzer](https://github.com/runem/web-component-analyzer) in order to find properties, attributes and events. Unfortunately, sometimes it's not possible to analyze these things by looking at the code, and you will have to document how your component looks using `jsdoc`like this:
 
+<!-- prettier-ignore -->
 ```js
 /**
  * This is my element

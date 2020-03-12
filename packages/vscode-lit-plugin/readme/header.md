@@ -1,9 +1,8 @@
-
 <div align="center" markdown="1">
 
-  {{ template:logo }}
+{{ template:logo }}
 
-  {{ template:description }}
+{{ template:description }}
 
 [![](https://vsmarketplacebadge.apphb.com/version-short/runem.lit-plugin.svg)](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin)
 [![](https://vsmarketplacebadge.apphb.com/downloads-short/runem.lit-plugin.svg)](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin)

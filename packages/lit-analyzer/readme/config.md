@@ -2,6 +2,7 @@
 
 You can configure the CLI with arguments:
 
+<!-- prettier-ignore -->
 ```bash
 lit-analyzer --strict --rules.no-unknown-tag-name off --format markdown
 ```
@@ -10,6 +11,7 @@ lit-analyzer --strict --rules.no-unknown-tag-name off --format markdown
 
 ### Available arguments
 
+<!-- prettier-ignore -->
 | Option | Description | Type | Default |
 | :----- | ----------- | ---- | ------- |
 | `--help` | Print help message | `boolean` | |

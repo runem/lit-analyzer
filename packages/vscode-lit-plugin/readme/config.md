@@ -7,5 +7,3 @@ You can configure this plugin by going to `VS Code Settings` > `Extension` > `li
 ### Available options
 
 {{ load:./../../docs/readme/config-table.md }}
-
-

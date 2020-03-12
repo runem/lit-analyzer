@@ -18,11 +18,12 @@ Please run `npm run readme` when you want to rebuild all readme files.
 
 ### Debugging the CLI
 
-You can always try out the CLI by running `./cli.js path-to-a-file.js` from `packages/lit-analyzer`. 
+You can always try out the CLI by running `./cli.js path-to-a-file.js` from `packages/lit-analyzer`.
 
 ### Debugging the language service
 
 You can try out changes to lit-analyzer and/or ts-lit-plugin directly from the Typescript Language Service in VS Code:
+
 1. Run `npm run dev` from `/` to open a playground in VS Code (lit-plugin is disabled in that session to prevent interference).
 2. Run `npm run dev:logs` from `/` to watch logs in real time.
 
@@ -33,6 +34,7 @@ You can run either `npm run watch` or `npm run build` from the repository root o
 ## Contributing to vscode-lit-plugin
 
 ### Debugging
+
 In order to debug `vscode-lit-plugin` you can open vscode from `packages/vscode-lit-plugin` and press the **start debugging** button in vscode.
 
 ### `npm run package`
@@ -43,14 +45,12 @@ You can use this script if you want to generate an installable package of vscode
 
 Some dependencies are installed directly from Github URLs (see [syntaxes](#syntaxes)). In order to prevent `postinstall` scripts to run when installing these dependencies (which will crash), they are installed with `--ignore-scripts`. `npm run bootstrap` will make sure to execute `install:safe` when running.
 
-
 ### `npm run copylink` (main package.json)
 
-VS Code doesn't support debugging symlinked dependencies. Therefore there are no symlinked dependencies in `packages/vscode-lit-plugin`. This means that local changes to `lit-analyzer` are not automatically reflected when debugging `vscode-lit-plugin`. 
+VS Code doesn't support debugging symlinked dependencies. Therefore there are no symlinked dependencies in `packages/vscode-lit-plugin`. This means that local changes to `lit-analyzer` are not automatically reflected when debugging `vscode-lit-plugin`.
 
 Therefore you will have to run `npm run copylink` (from the main package.json) in order to test local changes. This script copies local js files directly from `lit-analyzer` into `packages/vscode-lit-plugin/node_modules/lit-analyzer`.
 
 ### Syntaxes
 
 All syntaxes come from [vscode-lit-html](https://github.com/mjbvz/vscode-lit-html) and [vscode-styled-components](https://github.com/styled-components/vscode-styled-components). Because these repositories are not published as npm-packages, they are instead installed from Github URLs. Therefore, as of now, changes to syntaxes must be upstreamed to one of these repositories.
-

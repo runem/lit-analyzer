@@ -13,7 +13,6 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | [no-missing-import](#-no-missing-import)    | When using custom elements in HTML it is checked if the element has been imported and is available in the current context. | off | warning |
 | [no-unclosed-tag](#-no-unclosed-tag)         | Unclosed tags, and invalid self closing tags like custom elements tags, are checked. | warning | error |
 
-
 **Validating binding names**
 
 <!-- prettier-ignore -->
@@ -22,7 +21,6 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | [no-unknown-attribute](#-no-unknown-attribute-no-unknown-property)<br> [no-unknown-property](#-no-unknown-attribute-no-unknown-property) | You will get a warning whenever you use an unknown attribute or property within your `lit-html` template. | off | warning |
 | [no-unknown-event](#-no-unknown-event)       | When using event bindings it's checked that the event names are fired. | off | off |
 | [no-unknown-slot](#-no-unknown-slot)         | Using the "@slot" jsdoc tag on your custom element class, you can tell which slots are accepted for a particular element. | off | warning |
-
 
 **Validating binding types**
 
@@ -56,7 +54,6 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | :------ | ----------- | --------------- | --------------- |
 | [💅 no-invalid-css](#-no-invalid-css) | CSS within the tagged template literal `css` will be validated. | warning | error |
 
-
 ### Validating custom elements
 
 All web components in your code are analyzed using [web-component-analyzer](https://github.com/runem/web-component-analyzer) which supports native custom elements and web components built with LitElement.
@@ -67,6 +64,7 @@ Web components defined in libraries need to either extend the global `HTMLElemen
 
 Below you will see an example of what to add to your library typescript definition files if you want type checking support for a given html tag name.
 
+<!-- prettier-ignore -->
 ```typescript
 declare global {
   interface HTMLElementTagNameMap {
@@ -80,23 +78,28 @@ declare global {
 When using custom elements in HTML it is checked if the element has been imported and is available in the current context. It's considered imported if any imported module (or their imports) defines the custom element.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 // No import of "my-element"
 html`<my-element></my-element>`
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 import "my-element.js";
 html`<my-element></my-element>`
 ```
-
 
 #### ☯ no-unclosed-tag
 
 Unclosed tags, and invalid self closing tags like custom elements tags, are checked.
 
 The following examples are considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<div>`
 html`<video />`
@@ -104,6 +107,8 @@ html`<custom-element />`
 ```
 
 The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<div></div>`
 html`<custom-element></custom-element>`
@@ -117,28 +122,36 @@ Attributes, properties and events are picked up on custom elements using [web-co
 
 #### ✅ no-unknown-attribute, no-unknown-property
 
-You will get a warning whenever you use an unknown attribute or property. This check is made on both custom elements and built in elements. 
+You will get a warning whenever you use an unknown attribute or property. This check is made on both custom elements and built in elements.
 
 **The following example is considered a warning:**
+
+<!-- prettier-ignore -->
 ```js
 html`<input .valuuue="${value}" unknownattribute="button" />`
 ```
 
 **The following example is not considered a warning:**
+
+<!-- prettier-ignore -->
 ```js
 html`<input .value="${value}" type="button" />`
 ```
 
 #### ⚡️ no-unknown-event
 
-You can opt in to check for unknown event names. Using the `@fires` jsdoc or the statement `this.dispatch(new CustomEvent("my-event))` will make the event name available. All event names are accepted globally because events bubble. 
+You can opt in to check for unknown event names. Using the `@fires` jsdoc or the statement `this.dispatch(new CustomEvent("my-event))` will make the event name available. All event names are accepted globally because events bubble.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<input @iinput="${console.log}" />`
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<input @input="${console.log}" />`
 ```
@@ -147,6 +160,7 @@ html`<input @input="${console.log}" />`
 
 Using the "@slot" jsdoc tag on your custom element class, you can tell which slots are accepted for a particular element. Then you will get warnings for invalid slot names and if you forget to add the slot attribute on elements without an unnamed slot.
 
+<!-- prettier-ignore -->
 ```js
 /**
  * @slot - This is a comment for the unnamed slot
@@ -159,6 +173,8 @@ customElements.define("my-element", MyElement);
 ```
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`
 <my-element>
@@ -168,6 +184,8 @@ html`
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`
 <my-element>
@@ -178,7 +196,6 @@ html`
 `
 ```
 
-
 ### Validating binding types
 
 Be aware that many checks involving analyzing bindings will work better in Typescript files because we have more information about the values being bound.
@@ -188,11 +205,15 @@ Be aware that many checks involving analyzing bindings will work better in Types
 It never makes sense to use the boolean attribute binding on a non-boolean type.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<input ?type="${"button"}" />`
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<input ?disabled="${isDisabled}" />`
 ```
@@ -202,26 +223,34 @@ html`<input ?disabled="${isDisabled}" />`
 Because of how `lit-html` [parses bindings internally](https://github.com/Polymer/lit-html/issues/843) you cannot use the property binding without an expression.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<input .value="text" />`
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<input .value="${text}" />`
 ```
 
 #### 🌀 no-noncallable-event-binding
 
-It's a common mistake to incorrectly call the function when setting up an event handler binding instead of passing a reference to the function. This makes the function call whenever the code evaluates. 
+It's a common mistake to incorrectly call the function when setting up an event handler binding instead of passing a reference to the function. This makes the function call whenever the code evaluates.
 
 The following examples are considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<button @click="${myEventHandler()}">Click</button>`
 html`<button @click="${{hannndleEvent: console.log()}}">Click</button>`
 ```
 
 The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<button @click="${myEventHandler}">Click</button>`
 html`<button @click="${{handleEvent: console.log}}">Click</button>`
@@ -234,11 +263,15 @@ You should not be binding to a boolean type using an attribute binding because i
 This error is particular tricky, because the string "false" is truthy when evaluated in a conditional.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<input disabled="${isDisabled}" />`
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<input ?disabled="${isDisabled}" />`
 ```
@@ -248,27 +281,34 @@ html`<input ?disabled="${isDisabled}" />`
 Binding an object using an attribute binding would result in binding the string "[object Object]" to the attribute. In this cases it's probably better to use a property binding instead.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<my-list listitems="${listItems}"></my-list>`
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<my-list .listItems="${listItems}"></my-list>`
 ```
 
-
-#### ⭕️ no-nullable-attribute-binding 
+#### ⭕️ no-nullable-attribute-binding
 
 Binding `undefined` or `null` in an attribute binding will result in binding the string "undefined" or "null". Here you should probably wrap your expression in the "ifDefined" directive.
 
 The following examples are considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<input value="${maybeUndefined}" />`
 html`<input value="${maybeNull}" />`
 ```
 
 The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<input value="${ifDefined(maybeUndefined)}" />`
 html`<input value="${ifDefined(maybeNull === null ? undefined : maybeNull)}" />`
@@ -279,6 +319,8 @@ html`<input value="${ifDefined(maybeNull === null ? undefined : maybeNull)}" />`
 Assignments in your HTML are typed checked just like it would be in Typescript.
 
 The following examples are considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<input type="wrongvalue" />`
 html`<input placeholder />`
@@ -287,6 +329,8 @@ html`<my-list .listItems="${123}"></my-list>`
 ```
 
 The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<input type="button" />`
 html`<input placeholder="a placeholder" />`
@@ -296,15 +340,18 @@ html`<my-list .listItems="${listItems}"></my-list>`
 
 #### 💥 no-invalid-directive-binding
 
-Directives are checked to make sure that the following rules are met: 
-* `ifDefined` is only used in an attribute binding.
-* `class` is only used in an attribute binding on the 'class' attribute.
-* `style` is only used in an attribute binding on the 'style' attribute.
-* `unsafeHTML`, `cache`, `repeat`, `asyncReplace` and `asyncAppend` are only used within a text binding.
+Directives are checked to make sure that the following rules are met:
+
+- `ifDefined` is only used in an attribute binding.
+- `class` is only used in an attribute binding on the 'class' attribute.
+- `style` is only used in an attribute binding on the 'style' attribute.
+- `unsafeHTML`, `cache`, `repeat`, `asyncReplace` and `asyncAppend` are only used within a text binding.
 
 The directives already make these checks on runtime, so this will help you catch errors before runtime.
 
 The following examples are considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<input value="${unsafeHTML(html)}" />`
 html`<input .value="${ifDefined(myValue)}" />`
@@ -312,6 +359,8 @@ html`<div role="${class(classMap)}"></div>`
 ```
 
 The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<button>${unsafeHTML(html)}</button>`
 html`<input .value="${myValue}" />`
@@ -326,6 +375,8 @@ Sometimes unintended characters sneak into bindings. This often indicates a typo
 This rule disallows mixed value bindings where a character `'`, `"`, `}` or `/` is unintentionally included in the binding.
 
 The following examples are considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<input .value=${"myvalue"}" />`
 html`<input value=${"myvalue"}} />`
@@ -334,13 +385,14 @@ html`<input ?required=${true}/>`
 ```
 
 The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<input .value=${"myvalue"} />`
 html`<input value="${"myvalue"}" />`
 html`<input ?required=${true} />`
 html`<input @input="${console.log}" />`
 ```
-
 
 ### Validating LitElement
 
@@ -349,6 +401,8 @@ html`<input @input="${console.log}" />`
 When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type.
 
 The following examples are considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 class MyElement extends LitElement {
   @property({type: Number}) text: string;
@@ -359,6 +413,8 @@ class MyElement extends LitElement {
 ```
 
 The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 class MyElement extends LitElement {
   @property({type: String}) text: string;
@@ -373,6 +429,8 @@ class MyElement extends LitElement {
 The default converter in LitElement only accepts `String`, `Boolean`, `Number`, `Array` and `Object`, so all other values for `type` are considered warnings. This check doesn't run if a custom converter is used.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 class MyElement extends LitElement {
   static get properties () {
@@ -389,6 +447,8 @@ class MyElement extends LitElement {
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 class MyElement extends LitElement {
   static get properties () {
@@ -405,12 +465,13 @@ class MyElement extends LitElement {
 }
 ```
 
-
 #### ⁉️ no-invalid-attribute-name
 
 When using the property option `attribute`, the value is checked to make sure it's a valid attribute name.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 class MyElement extends LitElement {
   static get properties () {
@@ -428,6 +489,8 @@ class MyElement extends LitElement {
 When defining a custom element, the tag name is checked to make sure it's a valid custom element name.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 @customElement("wrongElementName")
 class MyElement extends LitElement {
@@ -437,6 +500,8 @@ customElements.define("alsoWrongName", MyElement);
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 @customElement("my-element")
 class MyElement extends LitElement {
@@ -451,9 +516,11 @@ customElements.define("correct-element-name", MyElement);
 
 #### 💅 no-invalid-css
 
-CSS within the tagged template literal `css` will be validated. 
+CSS within the tagged template literal `css` will be validated.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 css`
   button
@@ -463,6 +530,8 @@ css`
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 css`
   button {
