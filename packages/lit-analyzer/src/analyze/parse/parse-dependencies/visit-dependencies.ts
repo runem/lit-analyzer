@@ -56,7 +56,9 @@ export function visitDependencies(node: Node, context: IVisitDependenciesContext
 			return;
 		}
 	} else if (context.ts.isImportDeclaration(node) || context.ts.isExportDeclaration(node)) {
-		if (node.moduleSpecifier != null && context.ts.isStringLiteral(node.moduleSpecifier)) {
+		if (node.moduleSpecifier != null && context.ts.isStringLiteral(node.moduleSpecifier) &&
+				context.ts.isSourceFile(node.parent) &&
+				!context.program.isSourceFileFromExternalLibrary(node.parent)) {
 			visitModuleWithName(node.moduleSpecifier.text, node, context);
 		}
 	} else if (context.ts.isCallExpression(node) && node.expression.kind === context.ts.SyntaxKind.ImportKeyword) {
