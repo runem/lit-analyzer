@@ -51,7 +51,7 @@
 		"@appnest/readme": "^1.2.5",
 		"@types/node": "^12.12.17",
 		"@wessberg/rollup-plugin-ts": "^1.1.83",
-		"ava": "^2.4.0",
+		"ava": "^3.7.1",
 		"rollup": "^1.27.12",
 		"rollup-plugin-node-resolve": "^5.2.0",
 		"rollup-plugin-replace": "^2.2.0",
@@ -60,7 +60,6 @@
 		"typescript": "^3.6.4"
 	},
 	"ava": {
-		"compileEnhancements": false,
 		"extensions": [
 			"ts"
 		],
@@ -69,13 +68,8 @@
 		],
 		"snapshotDir": "test/snapshots/results",
 		"files": [
-			"test/**/*.ts"
-		],
-		"helpers": [
-			"test/helpers/**/*"
-		],
-		"sources": [
-			"src/**/*"
+			"test/**/*.ts",
+			"!test/helpers"
 		]
 	},
 	"contributors": [
