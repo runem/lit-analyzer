@@ -45,7 +45,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// Register a color provider
 	const registration = vscode.languages.registerColorProvider(
-		[{ scheme: "file", language: "typescript" }, { scheme: "file", language: "javascript" }],
+		[
+			{ scheme: "file", language: "typescript" },
+			{ scheme: "file", language: "javascript" }
+		],
 		colorProvider
 	);
 	context.subscriptions.push(registration);

@@ -65,7 +65,8 @@ export class VirtualAstDocument implements VirtualDocument {
 
 				if (
 					(range.start < literalPartRange.start && range.end > literalPartRange.end) ||
-					(intersects(range.start + 1, literalPartRange) || intersects(range.end - 1, literalPartRange))
+					intersects(range.start + 1, literalPartRange) ||
+					intersects(range.end - 1, literalPartRange)
 				) {
 					const strStart = Math.max(literalPartRange.start, range.start);
 					const strEnd = Math.min(literalPartRange.end, range.end);

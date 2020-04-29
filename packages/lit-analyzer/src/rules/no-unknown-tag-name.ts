@@ -19,7 +19,10 @@ const rule: RuleModule = {
 		// Add diagnostics if the tag couldn't be found (not defined anywhere)
 		if (htmlTag == null) {
 			// Find a suggested name in the set of defined tag names. Maybe this tag name is a typo?
-			const suggestedName = findBestStringMatch(htmlNode.tagName, Array.from(htmlStore.getGlobalTags()).map(tag => tag.tagName));
+			const suggestedName = findBestStringMatch(
+				htmlNode.tagName,
+				Array.from(htmlStore.getGlobalTags()).map(tag => tag.tagName)
+			);
 
 			// Build a suggestion text
 			let suggestion = `Check that you've imported the element, and that it's declared on the HTMLElementTagNameMap.`;
