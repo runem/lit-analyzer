@@ -20,7 +20,7 @@ import noUnknownAttribute from "../rules/no-unknown-attribute";
 import noUnknownProperty from "../rules/no-unknown-property";
 import noUnknownEvent from "../rules/no-unknown-event";
 import { RuleModule } from "./types/rule-module";
-import { isRuleDisabled, LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config";
+import { isRuleEnabled, isRuleDisabled, LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config";
 import { LitAnalyzerContext, LitPluginContextHandler } from "./lit-analyzer-context";
 import { DefaultLitAnalyzerLogger, LitAnalyzerLoggerLevel } from "./lit-analyzer-logger";
 import { convertAnalyzeResultToHtmlCollection, convertComponentDeclarationToHtmlTag } from "./parse/convert-component-definitions-to-html-collection";
@@ -79,6 +79,10 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 
 	get rules(): RuleModule[] {
 		return rules;
+	}
+
+	get enabledRules(): RuleModule[] {
+		return this.rules.filter((rule) => isRuleEnabled(this.config, rule.name));
 	}
 
 	public updateConfig(config: LitAnalyzerConfig) {

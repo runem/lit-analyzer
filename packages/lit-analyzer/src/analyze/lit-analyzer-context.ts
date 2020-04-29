@@ -21,6 +21,7 @@ export interface LitAnalyzerContext {
 	readonly definitionStore: AnalyzerDefinitionStore;
 	readonly logger: LitAnalyzerLogger;
 	readonly rules: RuleModule[];
+	readonly enabledRules: RuleModule[];
 	updateConfig(config: LitAnalyzerConfig): void;
 	updateDependencies(file: SourceFile): void;
 	updateComponents(file: SourceFile): void;
