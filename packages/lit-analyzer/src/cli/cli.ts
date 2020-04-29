@@ -9,7 +9,7 @@ const DEFAULT_GLOB = "src/**/*.{js,jsx,ts,tsx}";
 const DEFAULT_CONFIG: LitAnalyzerCliConfig = {
 	noColor: false,
 	quiet: false,
-	maxWarnings: 0,
+	maxWarnings: -1,
 	debug: false,
 	help: false,
 	failFast: false,
