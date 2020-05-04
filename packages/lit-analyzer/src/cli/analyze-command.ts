@@ -111,7 +111,11 @@ export async function analyzeCommand(globs: string[], config: LitAnalyzerCliConf
 		printText(statsText, config);
 	}
 
-	return stats.diagnostics <= (config.maxWarnings || 0) || config.maxWarnings === -1;
+	if (stats.errors !== 0) {
+		return false;
+	}
+
+	return stats.warnings <= (config.maxWarnings || 0) || config.maxWarnings === -1;
 }
 
 function getFormatter(format: FormatterFormat): DiagnosticFormatter {

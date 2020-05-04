@@ -9,7 +9,7 @@ const DEFAULT_GLOB = "src/**/*.{js,jsx,ts,tsx}";
 const DEFAULT_CONFIG: LitAnalyzerCliConfig = {
 	noColor: false,
 	quiet: false,
-	maxWarnings: 0,
+	maxWarnings: -1,
 	debug: false,
 	help: false,
 	failFast: false,
@@ -33,13 +33,10 @@ export async function cli() {
 	}
 
 	// Always convert "rules" to "dash case" because "rules" expects it.
-	config.rules = Object.entries(config.rules || {}).reduce(
-		(acc, [k, v]) => {
-			acc[camelToDashCase(k) as LitAnalyzerRuleName] = v;
-			return acc;
-		},
-		{} as LitAnalyzerRules
-	);
+	config.rules = Object.entries(config.rules || {}).reduce((acc, [k, v]) => {
+		acc[camelToDashCase(k) as LitAnalyzerRuleName] = v;
+		return acc;
+	}, {} as LitAnalyzerRules);
 
 	if (config.help) {
 		// eslint-disable-next-line no-console

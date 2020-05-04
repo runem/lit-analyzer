@@ -56,7 +56,7 @@ const closureScopedOverrides: TagNameToSecurityOverrideMap = {
 	},
 	source: {
 		src: ["TrustedResourceUrl", "SafeUrl"]
-	},
+	}
 };
 const closureGlobalOverrides: SecurityOverrideMap = {
 	style: ["SafeStyle", "string"]

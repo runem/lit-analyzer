@@ -31,7 +31,7 @@ const rule: RuleModule = {
 					source: "no-nullable-attribute-binding",
 					severity: litDiagnosticRuleSeverity(request.config, "no-nullable-attribute-binding"),
 					location: { document: request.document, ...htmlAttr.location.name },
-					htmlAttr: htmlAttr as typeof htmlAttr & ({ assignment: typeof assignment }),
+					htmlAttr: htmlAttr as typeof htmlAttr & { assignment: typeof assignment },
 					typeA,
 					typeB
 				}
@@ -48,7 +48,7 @@ const rule: RuleModule = {
 					source: "no-nullable-attribute-binding",
 					severity: litDiagnosticRuleSeverity(request.config, "no-nullable-attribute-binding"),
 					location: { document: request.document, ...htmlAttr.location.name },
-					htmlAttr: htmlAttr as typeof htmlAttr & ({ assignment: typeof assignment }),
+					htmlAttr: htmlAttr as typeof htmlAttr & { assignment: typeof assignment },
 					typeA,
 					typeB
 				}

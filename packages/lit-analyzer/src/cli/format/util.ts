@@ -9,12 +9,16 @@ export function generalReport(stats: AnalysisStats): string {
 	}
 
 	if (stats.diagnostics > 0) {
-		return `\n${chalk.red(
-			`  ✖ ${numberStatText(stats.diagnostics, "problem")} in ${numberStatText(stats.filesWithProblems, "file")} (${numberStatText(
-				stats.errors,
-				"error"
-			)}, ${numberStatText(stats.warnings, "warning")})`
-		)}`;
+		const message = `  ✖ ${numberStatText(stats.diagnostics, "problem")} in ${numberStatText(stats.filesWithProblems, "file")} (${numberStatText(
+			stats.errors,
+			"error"
+		)}, ${numberStatText(stats.warnings, "warning")})`;
+
+		if (stats.errors > 0) {
+			return `\n${chalk.red(message)}`;
+		} else {
+			return `\n${chalk.yellow(message)}`;
+		}
 	} else {
 		return `\n${chalk.green(`  ✓ Found 0 problems in ${numberStatText(stats.totalFiles, "file")}`)}`;
 	}
