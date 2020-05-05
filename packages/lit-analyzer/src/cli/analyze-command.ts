@@ -21,6 +21,11 @@ function printText(text: string, config: LitAnalyzerCliConfig) {
 	}
 }
 
+/**
+ * Executes the configuration and returns a boolean indicating if the command ran successfully.
+ * @param globs
+ * @param config
+ */
 export async function analyzeCommand(globs: string[], config: LitAnalyzerCliConfig): Promise<boolean> {
 	let program: Program | undefined = undefined;
 	const context = new DefaultLitAnalyzerContext({
@@ -82,40 +87,44 @@ export async function analyzeCommand(globs: string[], config: LitAnalyzerCliConf
 		analyzeSourceFile(file: SourceFile, options: { program: Program }): void | boolean {
 			program = options.program;
 
+			// Get all diagnostics in the source file (errors and warnings)
 			let diagnostics = analyzer.getDiagnosticsInFile(file);
-			diagnostics = config.quiet ? diagnostics.filter(d => d.severity === "error") : diagnostics;
-			diagnostics = config.failFast && diagnostics.length > 1 ? [diagnostics[0]] : diagnostics;
 
+			// Filter all diagnostics by "error" if "quiet" option is active
+			diagnostics = config.quiet ? diagnostics.filter(d => d.severity === "error") : diagnostics;
+
+			// Print the diagnostic text based on the formatter
 			const fileDiagnosticsText = formatter.diagnosticTextForFile(file, diagnostics, config);
 			if (fileDiagnosticsText != null) {
 				printText(fileDiagnosticsText, config);
 			}
 
+			// Calculate stats
 			stats.diagnostics += diagnostics.length;
 			stats.totalFiles += 1;
 
+			// Add stats if there are more than 0 diagnostics
 			if (diagnostics.length > 0) {
-				stats.errors += diagnostics.filter(d => d.severity === "error").length;
-				stats.warnings += diagnostics.filter(d => d.severity === "warning").length;
+				stats.errors += diagnostics.reduce((sum, d) => (d.severity === "error" ? sum + 1 : sum), 0);
+				stats.warnings += diagnostics.reduce((sum, d) => (d.severity === "warning" ? sum + 1 : sum), 0);
 				stats.filesWithProblems += 1;
 
-				if (config.failFast) {
+				// Fail fast if "failFast" is true and the command is not successful
+				if (config.failFast && !isSuccessful(stats, config)) {
 					return false;
 				}
 			}
 		}
 	});
 
+	// Print summary text
 	const statsText = formatter.report(stats, config);
 	if (statsText != null) {
 		printText(statsText, config);
 	}
 
-	if (stats.errors !== 0) {
-		return false;
-	}
-
-	return stats.warnings <= (config.maxWarnings || 0) || config.maxWarnings === -1;
+	// Return if this command was successful or not
+	return isSuccessful(stats, config);
 }
 
 function getFormatter(format: FormatterFormat): DiagnosticFormatter {
@@ -129,4 +138,24 @@ function getFormatter(format: FormatterFormat): DiagnosticFormatter {
 		default:
 			throw new Error(`Unknown format: '${format}'`);
 	}
+}
+
+/**
+ * Returns a boolean based on a "stats" object that indicates if the command is successful or not.
+ * @param stats
+ * @param config
+ */
+function isSuccessful(stats: AnalysisStats, config: LitAnalyzerCliConfig): boolean {
+	const maxErrorCount = 0;
+	const maxWarningCount = config.maxWarnings != null ? config.maxWarnings : -1;
+
+	if (stats.errors > maxErrorCount) {
+		return false;
+	}
+
+	if (maxWarningCount !== -1 && stats.warnings > maxWarningCount) {
+		return false;
+	}
+
+	return true;
 }
