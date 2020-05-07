@@ -19,6 +19,7 @@ import noUnknownTagName from "../rules/no-unknown-tag-name";
 import noUnknownAttribute from "../rules/no-unknown-attribute";
 import noUnknownProperty from "../rules/no-unknown-property";
 import noUnknownEvent from "../rules/no-unknown-event";
+import noLegacyAttribute from "../rules/no-legacy-attribute";
 import { RuleModule } from "./types/rule-module";
 import { isRuleDisabled, LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config";
 import { LitAnalyzerContext, LitPluginContextHandler } from "./lit-analyzer-context";
@@ -47,7 +48,8 @@ const rules: RuleModule[] = [
 	noUnknownTagName,
 	noUnknownAttribute,
 	noUnknownProperty,
-	noUnknownEvent
+	noUnknownEvent,
+	noLegacyAttribute
 ];
 
 export class DefaultLitAnalyzerContext implements LitAnalyzerContext {

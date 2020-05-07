@@ -26,7 +26,8 @@ export enum LitHtmlDiagnosticKind {
 	INVALID_SLOT_NAME = "INVALID_SLOT_NAME",
 	MISSING_SLOT_ATTRIBUTE = "MISSING_SLOT_ATTRIBUTE",
 	DIRECTIVE_NOT_ALLOWED_HERE = "DIRECTIVE_NOT_ALLOWED_HERE",
-	INVALID_MIXED_BINDING = "INVALID_MIXED_BINDING"
+	INVALID_MIXED_BINDING = "INVALID_MIXED_BINDING",
+	LEGACY_SYNTAX = "LEGACY_SYNTAX"
 }
 
 export type LitDiagnosticSeverity = "error" | "warning";
@@ -155,6 +156,10 @@ export interface LitHtmlDiagnosticInvalidMixedBinding extends LitDocumentDiagnos
 	kind: LitHtmlDiagnosticKind.INVALID_MIXED_BINDING;
 }
 
+export interface LitHtmlDiagnosticLegacySyntax extends LitDocumentDiagnosticBase {
+	kind: LitHtmlDiagnosticKind.LEGACY_SYNTAX;
+}
+
 export type LitHtmlDiagnostic =
 	| LitHtmlDiagnosticUnknownTag
 	| LitHtmlDiagnosticMissingImport
@@ -173,7 +178,8 @@ export type LitHtmlDiagnostic =
 	| LitHtmlDiagnosticInvalidSlotName
 	| LitHtmlDiagnosticMissingSlotAttr
 	| LitHtmlDiagnosticInvalidMixedBinding
-	| LitHtmlDiagnosticTagNotClosed;
+	| LitHtmlDiagnosticTagNotClosed
+	| LitHtmlDiagnosticLegacySyntax;
 
 export interface LitCssDiagnostic extends LitDocumentDiagnosticBase {}
 
