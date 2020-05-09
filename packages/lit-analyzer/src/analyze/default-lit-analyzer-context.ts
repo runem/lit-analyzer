@@ -20,6 +20,7 @@ import noUnknownEvent from "../rules/no-unknown-event";
 import noUnknownProperty from "../rules/no-unknown-property";
 import noUnknownSlotRule from "../rules/no-unknown-slot";
 import noUnknownTagName from "../rules/no-unknown-tag-name";
+import noPropertyVisibilityMismatch from "../rules/no-property-visibility-mismatch";
 import { getBuiltInHtmlCollection } from "./data/get-built-in-html-collection";
 import { getUserConfigHtmlCollection } from "./data/get-user-config-html-collection";
 import { isRuleDisabled, LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config";
@@ -55,7 +56,8 @@ const ALL_RULES: RuleModule[] = [
 	noUnknownEvent,
 	noIncompatiblePropertyType,
 	noInvalidTagName,
-	noInvalidAttributeName
+	noInvalidAttributeName,
+	noPropertyVisibilityMismatch
 ];
 
 export class DefaultLitAnalyzerContext implements LitAnalyzerContext {

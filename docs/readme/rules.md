@@ -500,6 +500,25 @@ class MyElement extends LitElement {
 customElements.define("correct-element-name", MyElement);
 ```
 
+#### no-property-visibility-mismatch
+
+When using the `@property` decorator, your property should be publicly visible,
+expected to be exposed to consumers of the element. Private and protected
+properties however, should make use of the `@internalProperty` decorator
+instead.
+
+This rule will ensure public properties use `@property` and non-public
+properties use `@internalProperty`.
+
+The following example is considered a warning:
+
+<!-- prettier-ignore -->
+```ts
+class MyElement extends LitElement {
+	@property() private myProperty: string;
+}
+```
+
 ### Validating CSS
 
 `lit-analyzer` uses [vscode-css-languageservice](https://github.com/Microsoft/vscode-css-languageservice) to validate CSS.
