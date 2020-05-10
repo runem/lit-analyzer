@@ -2,6 +2,8 @@ import * as tsModule from "typescript";
 import { Node, Program, SourceFile } from "typescript";
 import { ComponentDefinition } from "web-component-analyzer";
 
+const MAX_DEPTH = 2;
+
 interface IVisitDependenciesContext {
 	program: Program;
 	ts: typeof tsModule;
@@ -11,6 +13,7 @@ interface IVisitDependenciesContext {
 	getImportedDefinitionsInFile(file: SourceFile): ComponentDefinition[] | undefined;
 	addDefinitionsForFile(file: SourceFile, results: ComponentDefinition[], isCircular: boolean): void;
 	addCircularReference(fromFile: SourceFile, toFile: SourceFile): void;
+	depth?: number;
 }
 
 /**
@@ -58,7 +61,7 @@ export function visitDependencies(node: Node, context: IVisitDependenciesContext
 	} else if (context.ts.isImportDeclaration(node) || context.ts.isExportDeclaration(node)) {
 		if (node.moduleSpecifier != null && context.ts.isStringLiteral(node.moduleSpecifier) &&
 				context.ts.isSourceFile(node.parent) &&
-				!context.program.isSourceFileFromExternalLibrary(node.parent)) {
+				((context.depth ?? 0) < MAX_DEPTH || !context.program.isSourceFileFromExternalLibrary(node.parent))) {
 			visitModuleWithName(node.moduleSpecifier.text, node, context);
 		}
 	} else if (context.ts.isCallExpression(node) && node.expression.kind === context.ts.SyntaxKind.ImportKeyword) {
@@ -89,7 +92,7 @@ function visitModuleWithName(moduleSpecifier: string, node: Node, context: IVisi
 		if (!isCircularImport) {
 			if (sourceFile != null) {
 				// Visit dependencies in the import recursively
-				visitDependencies(sourceFile, context);
+				visitDependencies(sourceFile, {...context, depth: (context.depth ?? 0) + 1});
 			}
 		} else if (sourceFile != null) {
 			// Stop! Prevent infinite loop due to circular imports
