@@ -1,15 +1,15 @@
-import * as ts from "typescript";
 import { ComponentMember } from "web-component-analyzer";
 import { RuleModule } from "../analyze/types/rule/rule-module";
 import { rangeFromNode } from "../analyze/util/range-util";
+import { RuleModuleContext } from "../analyze/types/rule/rule-module-context";
 
-const isInternalProperty = (member: ComponentMember): boolean => {
+const isInternalProperty = (context: RuleModuleContext, member: ComponentMember): boolean => {
 	return member.kind === "property" &&
-		ts.isPropertyDeclaration(member.node) &&
+		context.ts.isPropertyDeclaration(member.node) &&
 		member.node.decorators?.some((d) =>
-			ts.isCallExpression(d.expression) &&
-			ts.isIdentifier(d.expression.expression) &&
-			d.expression.expression.text === "internalProperty") === true;
+			context.ts.isCallExpression(d.expression) &&
+			context.ts.isIdentifier(d.expression.expression) &&
+			d.expression.expression.escapedText === "internalProperty") === true;
 };
 
 /**
@@ -23,7 +23,7 @@ const rule: RuleModule = {
 	},
 	visitComponentMember(member, context) {
 		if (member.kind === "property") {
-			const isInternal = isInternalProperty(member);
+			const isInternal = isInternalProperty(context, member);
 
 			if (isInternal && member.visibility === "public") {
 				context.report({
