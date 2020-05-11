@@ -10,7 +10,7 @@ function makeTestElement({ properties }: { properties?: Array<{ visibility: stri
 		class MyElement extends HTMElement {
 			${(properties || []).map(({ name, visibility, internal }) => `@${internal ? "internalProperty" : "property"}() ${visibility} ${name}`).join("\n")}
 		};
-		customElements.define("my-element", MyElement);	
+		customElements.define("my-element", MyElement);
 		`
 	};
 }

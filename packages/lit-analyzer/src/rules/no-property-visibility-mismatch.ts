@@ -1,9 +1,15 @@
+import * as ts from "typescript";
 import { ComponentMember } from "web-component-analyzer";
 import { RuleModule } from "../analyze/types/rule/rule-module";
 import { rangeFromNode } from "../analyze/util/range-util";
 
 const isInternalProperty = (member: ComponentMember): boolean => {
-	return member.kind === "property" && member.meta?.attribute === false;
+  return member.kind === "property" &&
+    ts.isPropertyDeclaration(member.node) &&
+    member.node.decorators?.some((d) =>
+      ts.isCallExpression(d.expression) &&
+      ts.isIdentifier(d.expression.expression) &&
+      d.expression.expression.text === "internalProperty") === true;
 };
 
 /**
