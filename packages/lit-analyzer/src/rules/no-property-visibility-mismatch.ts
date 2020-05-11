@@ -4,12 +4,12 @@ import { RuleModule } from "../analyze/types/rule/rule-module";
 import { rangeFromNode } from "../analyze/util/range-util";
 
 const isInternalProperty = (member: ComponentMember): boolean => {
-  return member.kind === "property" &&
-    ts.isPropertyDeclaration(member.node) &&
-    member.node.decorators?.some((d) =>
-      ts.isCallExpression(d.expression) &&
-      ts.isIdentifier(d.expression.expression) &&
-      d.expression.expression.text === "internalProperty") === true;
+	return member.kind === "property" &&
+		ts.isPropertyDeclaration(member.node) &&
+		member.node.decorators?.some((d) =>
+			ts.isCallExpression(d.expression) &&
+			ts.isIdentifier(d.expression.expression) &&
+			d.expression.expression.text === "internalProperty") === true;
 };
 
 /**
