@@ -5,11 +5,10 @@ import { RuleModuleContext } from "../analyze/types/rule/rule-module-context";
 
 const isInternalProperty = (context: RuleModuleContext, member: ComponentMember): boolean => {
 	return member.kind === "property" &&
-		context.ts.isPropertyDeclaration(member.node) &&
-		member.node.decorators?.some((d) =>
-			context.ts.isCallExpression(d.expression) &&
-			context.ts.isIdentifier(d.expression.expression) &&
-			d.expression.expression.escapedText === "internalProperty") === true;
+		member.meta?.node?.decorator !== undefined &&
+		context.ts.isCallExpression(member.meta.node.decorator) &&
+		context.ts.isIdentifier(member.meta.node.decorator.expression) &&
+		member.meta.node.decorator.expression.text === "internalProperty";
 };
 
 /**
