@@ -15,6 +15,7 @@ import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-conte
 import { getDirective } from "../directive/get-directive";
 
 const cache = new WeakMap<HtmlNodeAttrAssignment, { typeA: SimpleType; typeB: SimpleType }>();
+const typeCache = new WeakMap<Type, SimpleType>();
 
 export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, context: RuleModuleContext): { typeA: SimpleType; typeB: SimpleType } {
 	if (cache.has(assignment)) {
@@ -34,7 +35,7 @@ export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, context:
 
 	// Convert typeB to SimpleType
 	let typeB = (() => {
-		const type = isSimpleType(typeBInferred) ? typeBInferred : toSimpleType(typeBInferred, checker);
+		const type = isSimpleType(typeBInferred) ? typeBInferred : toSimpleType(typeBInferred, checker, typeCache);
 		return shouldRelaxTypeB ? relaxType(type) : type;
 	})();
 
