@@ -21,7 +21,8 @@ export type LitAnalyzerRuleId =
 	| "no-incompatible-property-type"
 	| "no-invalid-attribute-name"
 	| "no-invalid-tag-name"
-	| "no-invalid-css";
+	| "no-invalid-css"
+	| "no-property-visibility-mismatch";
 
 export const ALL_RULE_NAMES: LitAnalyzerRuleId[] = [
 	"no-unknown-tag-name",
@@ -43,7 +44,8 @@ export const ALL_RULE_NAMES: LitAnalyzerRuleId[] = [
 	"no-incompatible-property-type",
 	"no-invalid-attribute-name",
 	"no-invalid-tag-name",
-	"no-invalid-css"
+	"no-invalid-css",
+	"no-property-visibility-mismatch"
 ];
 
 export type LitAnalyzerRuleSeverity = "off" | "warn" | "warning" | "error" | 0 | 1 | 2 | true | false;
@@ -70,7 +72,8 @@ const DEFAULT_RULES_NOSTRICT: Required<LitAnalyzerRules> = {
 	"no-incompatible-property-type": "error",
 	"no-invalid-attribute-name": "error",
 	"no-invalid-tag-name": "error",
-	"no-invalid-css": "warn"
+	"no-invalid-css": "warn",
+	"no-property-visibility-mismatch": "off"
 };
 
 const DEFAULT_RULES_STRICT: Required<LitAnalyzerRules> = {
@@ -93,7 +96,8 @@ const DEFAULT_RULES_STRICT: Required<LitAnalyzerRules> = {
 	"no-incompatible-property-type": "error",
 	"no-invalid-attribute-name": "error",
 	"no-invalid-tag-name": "error",
-	"no-invalid-css": "error"
+	"no-invalid-css": "error",
+	"no-property-visibility-mismatch": "error"
 };
 
 export function ruleSeverity(rules: LitAnalyzerConfig | LitAnalyzerRules, ruleId: LitAnalyzerRuleId): LitAnalyzerRuleSeverity {
