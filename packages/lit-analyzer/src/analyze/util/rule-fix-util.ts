@@ -5,7 +5,7 @@ import { LitCodeFixAction } from "../types/lit-code-fix-action";
 import { RuleFix } from "../types/rule/rule-fix";
 import { RuleFixAction } from "../types/rule/rule-fix-action";
 import { arrayFlat } from "./array-util";
-import { documentRangeToSFRange, makeSourceFileRange, rangeFromHtmlNodeAttr } from "./range-util";
+import { documentRangeToSFRange, makeSourceFileRange, rangeFromHtmlNodeAttr, rangeFromNode } from "./range-util";
 
 export function converRuleFixToLitCodeFix(codeFix: RuleFix): LitCodeFix {
 	return {
@@ -108,6 +108,24 @@ function ruleFixActionConverter(action: RuleFixAction): LitCodeFixAction[] {
 						end: 0
 					}),
 					newText: `\nimport "${action.path}";`
+				}
+			];
+		}
+
+		case "changeIdentifier": {
+			return [
+				{
+					range: rangeFromNode(action.identifier),
+					newText: action.newText
+				}
+			];
+		}
+
+		case "changeRange": {
+			return [
+				{
+					range: action.range,
+					newText: action.newText
 				}
 			];
 		}

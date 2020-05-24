@@ -1,14 +1,23 @@
+import { Identifier } from "typescript";
 import { ComponentMember } from "web-component-analyzer";
+import { RuleFixActionChangeRange } from "../analyze/types/rule/rule-fix-action";
 import { RuleModule } from "../analyze/types/rule/rule-module";
-import { rangeFromNode } from "../analyze/util/range-util";
 import { RuleModuleContext } from "../analyze/types/rule/rule-module-context";
+import { makeSourceFileRange, rangeFromNode } from "../analyze/util/range-util";
 
-const isInternalProperty = (context: RuleModuleContext, member: ComponentMember): boolean => {
-	return member.kind === "property" &&
-		member.meta?.node?.decorator !== undefined &&
-		context.ts.isCallExpression(member.meta.node.decorator) &&
-		context.ts.isIdentifier(member.meta.node.decorator.expression) &&
-		member.meta.node.decorator.expression.text === "internalProperty";
+/**
+ * Returns the identifier of the decorator used on the member if any
+ * @param member
+ * @param context
+ */
+const getDecoratorIdentifier = (member: ComponentMember, context: RuleModuleContext): Identifier | undefined => {
+	const decorator = member.meta?.node?.decorator;
+
+	if (decorator !== undefined && context.ts.isCallExpression(decorator) && context.ts.isIdentifier(decorator.expression)) {
+		return decorator.expression;
+	}
+
+	return undefined;
 };
 
 /**
@@ -21,24 +30,112 @@ const rule: RuleModule = {
 		priority: "low"
 	},
 	visitComponentMember(member, context) {
-		if (member.kind === "property") {
-			const isInternal = isInternalProperty(context, member);
+		// Only run this rule on members of "property" kind
+		if (member.kind !== "property") {
+			return;
+		}
 
-			if (isInternal && member.visibility === "public") {
-				context.report({
-					location: rangeFromNode(member.node),
-					message: `'${member.propName}' is marked as an internal property (@internalProperty) but is publicly visible.`,
-					suggestion: "Change the property visibility to 'private' or 'protected'."
-				});
-			}
+		// Get the decorator of the property if any
+		const decoratorIdentifier = getDecoratorIdentifier(member, context);
+		if (decoratorIdentifier == null) {
+			return;
+		}
 
-			if (!isInternal && member.visibility !== "public") {
-				context.report({
-					location: rangeFromNode(member.node),
-					message: `'${member.propName}' is not publicy visible but is not marked as an internal property (@internalProperty).`,
-					suggestion: "Add the '@internalProperty' decorator instead of '@property'."
-				});
-			}
+		// Get the decorator of interest
+		const decoratorName = decoratorIdentifier.text;
+		const hasInternalDecorator = decoratorName === "internalProperty";
+		const hasPropertyDecorator = decoratorName === "property";
+
+		// Handle cases where @internalProperty decorator is used, but the property is public
+		if (hasInternalDecorator && member.visibility === "public") {
+			const inJsFile = context.file.fileName.endsWith(".js");
+
+			context.report({
+				location: rangeFromNode(decoratorIdentifier),
+				message: `'${member.propName}' is marked as an internal property (@internalProperty) but is publicly visible.`,
+				suggestion: "Change the property visibility to 'private' or 'protected'.",
+				...(inJsFile
+					? {
+							// We are in Javascript context. Add "@properted" or "@private" JSDoc
+					  }
+					: {
+							// We are in Typescript context. Add "protected" or "private" keyword
+							fixMessage: "Add protected or private modifier",
+							fix: () => {
+								// Make sure we operate on a property declaratino
+								const propertyDeclaration = member.node;
+								if (!context.ts.isPropertyDeclaration(propertyDeclaration)) {
+									return [];
+								}
+
+								// The modifiers the user can choose to add to fix this warning/error
+								const modifiers = ["protected", "private"];
+
+								// Get the public modifier if any. If one exists, we want to change that one.
+								const publicModifier = propertyDeclaration.modifiers?.find(modifier => modifier.kind === context.ts.SyntaxKind.PublicKeyword);
+
+								if (publicModifier != null) {
+									// Return actions that can replace the modifier
+									return modifiers.map(keyword => ({
+										message: `Change to '${keyword}'`,
+										actions: [
+											{
+												kind: "changeRange",
+												range: rangeFromNode(publicModifier),
+												newText: keyword
+											} as RuleFixActionChangeRange
+										]
+									}));
+								}
+
+								// If there is no existing visibility modifier, add a new modifier right in front of the property name (identifier)
+								const propertyIdentifier = propertyDeclaration.name;
+								if (propertyIdentifier != null) {
+									// Return actions that can add a modifier in front of the identifier
+									return modifiers.map(keyword => ({
+										message: `Add '${keyword}' modifier`,
+										actions: [
+											{
+												kind: "changeRange",
+												range: makeSourceFileRange({
+													start: propertyIdentifier.getStart() - 1,
+													end: propertyIdentifier.getStart() - 1
+												}),
+												newText: `${keyword} `
+											} as RuleFixActionChangeRange
+										]
+									}));
+								}
+
+								return [];
+							}
+					  })
+			});
+		}
+
+		// Handle cases where @property decorator is used, but the property is not public
+		else if (hasPropertyDecorator && member.visibility !== "public") {
+			context.report({
+				location: rangeFromNode(decoratorIdentifier),
+				message: `'${member.propName}' is not publicly visible but is not marked as an internal property (@internalProperty).`,
+				suggestion: "Add the '@internalProperty' decorator instead of '@property'.",
+				fixMessage: "Change to @internalProperty?",
+				fix: () => {
+					// Return a code action that can replace the identifier of the decorator
+					const newText = `internalProperty`;
+
+					return {
+						message: `Change to '${newText}'`,
+						actions: [
+							{
+								kind: "changeIdentifier",
+								identifier: decoratorIdentifier,
+								newText
+							}
+						]
+					};
+				}
+			});
 		}
 	}
 };

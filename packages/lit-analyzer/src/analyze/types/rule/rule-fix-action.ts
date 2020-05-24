@@ -1,9 +1,18 @@
-import { SourceFile } from "typescript";
+import { Identifier, SourceFile } from "typescript";
 import { HtmlNodeAttrAssignment } from "../html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttr } from "../html-node/html-node-attr-types";
 import { HtmlNode } from "../html-node/html-node-types";
+import { SourceFileRange } from "../range";
 
-export type RuleFixActionKind = "changeTagName" | "addAttribute" | "changeAttributeName" | "changeAttributeModifier" | "changeAssignment" | "import";
+export type RuleFixActionKind =
+	| "changeTagName"
+	| "addAttribute"
+	| "changeAttributeName"
+	| "changeAttributeModifier"
+	| "changeAssignment"
+	| "import"
+	| "changeRange"
+	| "changeIdentifier";
 
 export interface RuleFixActionBase {
 	kind: RuleFixActionKind;
@@ -41,11 +50,23 @@ export interface RuleFixActionChangeAssignment extends RuleFixActionBase {
 	newValue: string;
 }
 
+export interface RuleFixActionChangeIdentifier extends RuleFixActionBase {
+	kind: "changeIdentifier";
+	identifier: Identifier;
+	newText: string;
+}
+
 export interface RuleFixActionImport extends RuleFixActionBase {
 	kind: "import";
 	file: SourceFile;
 	path: string;
 	identifiers?: string[];
+}
+
+export interface RuleFixActionChangeRange extends RuleFixActionBase {
+	kind: "changeRange";
+	range: SourceFileRange;
+	newText: string;
 }
 
 export type RuleFixAction =
@@ -54,4 +75,6 @@ export type RuleFixAction =
 	| RuleFixActionChangeAttributeName
 	| RuleFixActionImport
 	| RuleFixActionChangeAttributeModifier
-	| RuleFixActionChangeAssignment;
+	| RuleFixActionChangeAssignment
+	| RuleFixActionChangeIdentifier
+	| RuleFixActionChangeRange;
