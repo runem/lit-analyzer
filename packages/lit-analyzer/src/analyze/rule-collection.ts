@@ -3,7 +3,7 @@ import { isRuleEnabled, LitAnalyzerRuleId } from "./lit-analyzer-config";
 import { LitAnalyzerContext } from "./lit-analyzer-context";
 import { HtmlDocument } from "./parse/document/text-document/html-document/html-document";
 import { HtmlNodeAttr } from "./types/html-node/html-node-attr-types";
-import { HtmlNode } from "./types/html-node/html-node-types";
+import { HtmlNode, HtmlNodeKind } from "./types/html-node/html-node-types";
 import { RuleDiagnostic } from "./types/rule/rule-diagnostic";
 import { RuleModule, RuleModuleImplementation } from "./types/rule/rule-module";
 import { RuleModuleContext } from "./types/rule/rule-module-context";
@@ -100,6 +100,11 @@ export class RuleCollection {
 
 		const iterateNodes = (nodes: HtmlNode[]) => {
 			for (const childNode of nodes) {
+				// Don't check SVG yet. We don't yet have all the data for it, and it hasn't been tested fully.
+				if (childNode.kind === HtmlNodeKind.SVG) {
+					continue;
+				}
+
 				this.invokeRule("visitHtmlNode", childNode, d => diagnostics.push(d), baseContext);
 
 				const iterateAttrs = (attrs: HtmlNodeAttr[]) => {

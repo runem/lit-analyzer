@@ -33,21 +33,24 @@ const rule: RuleModule = {
 				const parentTagName = (htmlNode.parent && htmlNode.parent.tagName) || "";
 				// The slot attribute is missing, and it's not possible to use an unnamed slot.
 
-				//validSlotNames: slots.map(s => s.name),
+				const validSlotNames = slots.map(s => s.name);
+
 				context.report({
 					location: rangeFromHtmlNode(htmlNode),
 					message: `Missing slot attribute. Parent element <${parentTagName}> only allows named slots as children.`,
-					fix: () => ({
-						message: `Add slot attribute.`,
-						actions: [
-							{
-								kind: "addAttribute",
-								htmlNode,
-								name: "slot",
-								value: `""`
-							}
-						]
-					})
+					fixMessage: `Add slot attribute with: ${validSlotNames.map(n => `'${n}'`).join(" | ")}?`,
+					fix: () =>
+						validSlotNames.map(slotName => ({
+							message: `Add slot attribute for '${slotName}'.`,
+							actions: [
+								{
+									kind: "addAttribute",
+									htmlNode,
+									name: "slot",
+									value: `"${slotName}"`
+								}
+							]
+						}))
 				});
 			}
 		}

@@ -121,7 +121,8 @@ function validateLitPropertyConfig(
 	if (typeof litConfig.type === "string" && !litConfig.hasConverter) {
 		context.report({
 			location: rangeFromNode(node),
-			message: `'${litConfig.type}' is not a valid type for the default converter. Have you considered {attribute: false} instead?`
+			message: `'${litConfig.type}' is not a valid type for the default converter.`,
+			fixMessage: litConfig.attribute !== false ? "Have you considered '{attribute: false}' instead?" : "Have you considered removing 'type'?"
 		});
 	}
 
@@ -193,9 +194,8 @@ function validateLitPropertyConfig(
 		} else {
 			context.report({
 				location: rangeFromNode(node),
-				message: `The built in converter doesn't handle the property type '${toTypeString(
-					simplePropType
-				)}'. Please add '{attribute: false}' on @property decorator for '${propName}'`
+				message: `The built in converter doesn't handle the property type '${toTypeString(simplePropType)}'.`,
+				fixMessage: `Please add '{attribute: false}' on @property decorator for '${propName}'`
 			});
 		}
 	}

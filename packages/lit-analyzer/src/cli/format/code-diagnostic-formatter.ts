@@ -62,7 +62,7 @@ function diagnosticTextForFile(file: SourceFile, diagnostic: LitDiagnostic) {
 	).replace(/^\s*/, " ");
 
 	const block = [
-		chalk.bold(diagnostic.message),
+		chalk.bold(`${diagnostic.message}${diagnostic.fixMessage ? ` ${diagnostic.fixMessage}` : ""}`),
 		`${chalk.gray(`${lineContext.line + 1}:`)} ${markedLine}`,
 		diagnostic.source == null ? undefined : chalk.gray(`${diagnostic.source}`)
 	]

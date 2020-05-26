@@ -47,22 +47,21 @@ const rule: RuleModule = {
 		const hasPropertyDecorator = decoratorName === "property";
 
 		// Handle cases where @internalProperty decorator is used, but the property is public
-		if (hasInternalDecorator && member.visibility === "public") {
+		if (hasInternalDecorator && (member.visibility === "public" || member.visibility == null)) {
 			const inJsFile = context.file.fileName.endsWith(".js");
 
 			context.report({
 				location: rangeFromNode(decoratorIdentifier),
-				message: `'${member.propName}' is marked as an internal property (@internalProperty) but is publicly visible.`,
-				suggestion: "Change the property visibility to 'private' or 'protected'.",
+				message: `'${member.propName}' is marked as an internal property (@internalProperty) but is publicly accessible.`,
 				...(inJsFile
 					? {
 							// We are in Javascript context. Add "@properted" or "@private" JSDoc
 					  }
 					: {
 							// We are in Typescript context. Add "protected" or "private" keyword
-							fixMessage: "Add protected or private modifier",
+							fixMessage: "Change the property access to 'private' or 'protected'?",
 							fix: () => {
-								// Make sure we operate on a property declaratino
+								// Make sure we operate on a property declaration
 								const propertyDeclaration = member.node;
 								if (!context.ts.isPropertyDeclaration(propertyDeclaration)) {
 									return [];
@@ -117,9 +116,8 @@ const rule: RuleModule = {
 		else if (hasPropertyDecorator && member.visibility !== "public") {
 			context.report({
 				location: rangeFromNode(decoratorIdentifier),
-				message: `'${member.propName}' is not publicly visible but is not marked as an internal property (@internalProperty).`,
-				suggestion: "Add the '@internalProperty' decorator instead of '@property'.",
-				fixMessage: "Change to @internalProperty?",
+				message: `'${member.propName}' is not publicly accessible but is marked as a public property (@property).`,
+				fixMessage: "Use the '@internalProperty' decorator instead?",
 				fix: () => {
 					// Return a code action that can replace the identifier of the decorator
 					const newText = `internalProperty`;
