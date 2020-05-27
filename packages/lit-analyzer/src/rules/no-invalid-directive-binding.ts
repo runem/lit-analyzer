@@ -1,3 +1,4 @@
+import { isAssignableToType, SimpleTypeKind } from "ts-simple-type";
 import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
 import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
@@ -45,6 +46,40 @@ const rule: RuleModule = {
 
 					break;
 
+				case "live":
+					switch (htmlAttr.kind) {
+						case HtmlNodeAttrKind.ATTRIBUTE: {
+							// Make sure that only strings are passed in when using the live directive in attribute bindings
+							const typeB = directive.actualType?.();
+							if (typeB != null && !isAssignableToType({ kind: SimpleTypeKind.STRING }, typeB)) {
+								return [
+									{
+										kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWED_HERE,
+										message: `If you use the 'live' directive in an attribute binding, make sure that only strings are passed in, or the binding will update every render`,
+										source: "no-invalid-directive-binding",
+										severity: litDiagnosticRuleSeverity(request.config, "no-invalid-directive-binding"),
+										location: { document, ...htmlAttr.location.name }
+									}
+								];
+							}
+
+							break;
+						}
+
+						case HtmlNodeAttrKind.EVENT_LISTENER:
+							return [
+								{
+									kind: LitHtmlDiagnosticKind.DIRECTIVE_NOT_ALLOWED_HERE,
+									message: `The 'live' directive can only be used in attribute and property bindings`,
+									source: "no-invalid-directive-binding",
+									severity: litDiagnosticRuleSeverity(request.config, "no-invalid-directive-binding"),
+									location: { document, ...htmlAttr.location.name }
+								}
+							];
+					}
+
+					break;
+
 				case "classMap":
 					// Report error if "classMap" is not being used on the "class" attribute.
 					if (htmlAttr.name !== "class" || htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE) {
@@ -76,8 +111,10 @@ const rule: RuleModule = {
 					break;
 
 				case "unsafeHTML":
+				case "unsafeSVG":
 				case "cache":
 				case "repeat":
+				case "templateContent":
 				case "asyncReplace":
 				case "asyncAppend":
 					// These directives can only be used within a text binding.

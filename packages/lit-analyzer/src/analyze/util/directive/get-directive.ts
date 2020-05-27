@@ -2,6 +2,7 @@ import { SimpleType, SimpleTypeKind, toSimpleType } from "ts-simple-type";
 import { Expression } from "typescript";
 import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../types/html-node/html-node-attr-assignment-types";
+import { lazy } from "../general-util";
 import { removeUndefinedFromType } from "../type/remove-undefined-from-type";
 import { isLitDirective } from "./is-lit-directive";
 
@@ -13,6 +14,9 @@ export type BuiltInDirectiveKind =
 	| "unsafeHTML"
 	| "cache"
 	| "repeat"
+	| "live"
+	| "templateContent"
+	| "unsafeSVG"
 	| "asyncReplace"
 	| "asyncAppend";
 
@@ -22,7 +26,7 @@ export interface UserDefinedDirectiveKind {
 
 interface Directive {
 	kind: BuiltInDirectiveKind | UserDefinedDirectiveKind;
-	actualType?: SimpleType;
+	actualType?: () => SimpleType | undefined;
 	args: Expression[];
 }
 
@@ -34,7 +38,7 @@ export function getDirective(assignment: HtmlNodeAttrAssignment, request: LitAna
 
 	// Type check lit-html directives
 	if (ts.isCallExpression(assignment.expression)) {
-		const functionName = assignment.expression.expression.getText();
+		const functionName = assignment.expression.expression.getText() as BuiltInDirectiveKind | string;
 		const args = Array.from(assignment.expression.arguments);
 
 		switch (functionName) {
@@ -42,14 +46,14 @@ export function getDirective(assignment: HtmlNodeAttrAssignment, request: LitAna
 				// Example: html`<img src="${ifDefined(imageUrl)}">`;
 				// Take the argument to ifDefined and remove undefined from the type union (if possible).
 				// This new type becomes the actual type of the expression
-				const actualType = (() => {
-					if (args.length === 1) {
+				const actualType = lazy(() => {
+					if (args.length >= 1) {
 						const returnType = toSimpleType(checker.getTypeAtLocation(args[0]), checker);
 						return removeUndefinedFromType(returnType);
 					}
 
 					return undefined;
-				})();
+				});
 
 				return {
 					kind: "ifDefined",
@@ -58,11 +62,29 @@ export function getDirective(assignment: HtmlNodeAttrAssignment, request: LitAna
 				};
 			}
 
+			case "live": {
+				// Example: html`<input .value=${live(x)}>`
+				// The actual type will be the type of the first argument to live
+				const actualType = lazy(() => {
+					if (args.length >= 1) {
+						return toSimpleType(checker.getTypeAtLocation(args[0]), checker);
+					}
+
+					return undefined;
+				});
+
+				return {
+					kind: "live",
+					actualType,
+					args
+				};
+			}
+
 			case "guard": {
 				// Example: html`<img src="${guard([imageUrl], () => Math.random() > 0.5 ? imageUrl : "nothing.png")}>`;
 				// The return type of the function becomes the actual type of the expression
-				const actualType = (() => {
-					if (args.length === 2) {
+				const actualType = lazy(() => {
+					if (args.length >= 2) {
 						const returnFunctionType = toSimpleType(checker.getTypeAtLocation(args[1]), checker);
 
 						if (returnFunctionType.kind === SimpleTypeKind.FUNCTION) {
@@ -71,7 +93,7 @@ export function getDirective(assignment: HtmlNodeAttrAssignment, request: LitAna
 					}
 
 					return undefined;
-				})();
+				});
 
 				return {
 					kind: "guard",
@@ -84,13 +106,15 @@ export function getDirective(assignment: HtmlNodeAttrAssignment, request: LitAna
 			case "styleMap":
 				return {
 					kind: functionName,
-					actualType: { kind: SimpleTypeKind.STRING },
+					actualType: () => ({ kind: SimpleTypeKind.STRING }),
 					args
 				};
 
 			case "unsafeHTML":
+			case "unsafeSVG":
 			case "cache":
 			case "repeat":
+			case "templateContent":
 			case "asyncReplace":
 			case "asyncAppend":
 				return {

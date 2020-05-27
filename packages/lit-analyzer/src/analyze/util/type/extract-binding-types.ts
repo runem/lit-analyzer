@@ -8,7 +8,7 @@ import {
 	SimpleTypeStringLiteral,
 	toSimpleType
 } from "ts-simple-type";
-import { Type, TypeChecker, Expression } from "typescript";
+import { Expression, Type, TypeChecker } from "typescript";
 import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttrKind } from "../../types/html-node/html-node-attr-types";
@@ -32,10 +32,21 @@ export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, request:
 	//const typeBInferred = shouldRelaxTypeB ? ({ kind: SimpleTypeKind.ANY } as SimpleType) : inferTypeFromAssignment(assignment, checker);
 	const typeBInferred = inferTypeFromAssignment(assignment, checker);
 
-	// Convert typeB to SimpleType
-	let typeB = (() => {
-		const type = isSimpleType(typeBInferred) ? typeBInferred : toSimpleType(typeBInferred, checker);
-		return shouldRelaxTypeB ? relaxType(type) : type;
+	const typeB = (() => {
+		// Handle that typeB could be inferred through getDirective
+		const directive = getDirective(assignment, request);
+		const actualTypeB = directive?.actualType?.();
+
+		// Return the type inferred through the directive
+		if (actualTypeB != null) {
+			return actualTypeB;
+		}
+
+		// Else, convert typeB to SimpleType
+		else {
+			const type = isSimpleType(typeBInferred) ? typeBInferred : toSimpleType(typeBInferred, checker);
+			return shouldRelaxTypeB ? relaxType(type) : type;
+		}
 	})();
 
 	// Find a corresponding target for this attribute
@@ -43,12 +54,6 @@ export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, request:
 	//if (htmlAttrTarget == null) return [];
 
 	const typeA = htmlAttrTarget == null ? ({ kind: SimpleTypeKind.ANY } as SimpleType) : htmlAttrTarget.getType();
-
-	// Handle directives
-	const directive = getDirective(assignment, request);
-	if (directive != null && directive.actualType != null) {
-		typeB = directive.actualType;
-	}
 
 	// Cache the result
 	const result = { typeA, typeB };
