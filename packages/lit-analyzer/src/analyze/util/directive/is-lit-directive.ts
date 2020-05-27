@@ -1,6 +1,13 @@
 import { SimpleType, SimpleTypeKind } from "ts-simple-type";
 
-const partTypeNames: ReadonlySet<string | undefined> = new Set(["Part", "NodePart", "AttributePart", "BooleanAttributePart", "PropertyPart"]);
+const partTypeNames: ReadonlySet<string | undefined> = new Set([
+	"Part",
+	"NodePart",
+	"AttributePart",
+	"BooleanAttributePart",
+	"PropertyPart",
+	"EventPart"
+]);
 
 /**
  * Checks whether a type is a lit directive.
