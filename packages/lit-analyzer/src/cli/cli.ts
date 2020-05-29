@@ -10,11 +10,11 @@ const DEFAULT_CONFIG: LitAnalyzerCliConfig = {
 	noColor: false,
 	quiet: false,
 	maxWarnings: -1,
-	debug: false,
+	//debug: false,
 	help: false,
 	failFast: false,
 	format: "code",
-	strict: false,
+	//strict: false,
 	rules: {}
 };
 

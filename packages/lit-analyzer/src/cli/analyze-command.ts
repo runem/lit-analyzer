@@ -5,7 +5,7 @@ import { DefaultLitAnalyzerContext } from "../analyze/default-lit-analyzer-conte
 import { LitAnalyzer } from "../analyze/lit-analyzer";
 import { LitAnalyzerConfig, makeConfig } from "../analyze/lit-analyzer-config";
 import { analyzeGlobs } from "./analyze-globs";
-import { readTsLitPluginConfig } from "./compile";
+import { readLitAnalyzerConfigFromTsConfig } from "./compile";
 import { CodeDiagnosticFormatter } from "./format/code-diagnostic-formatter";
 import { AnalysisStats, DiagnosticFormatter } from "./format/diagnostic-formatter";
 import { ListDiagnosticFormatter } from "./format/list-diagnostic-formatter";
@@ -24,9 +24,9 @@ function printText(text: string, config: LitAnalyzerCliConfig) {
 /**
  * Executes the configuration and returns a boolean indicating if the command ran successfully.
  * @param globs
- * @param config
+ * @param cliConfig
  */
-export async function analyzeCommand(globs: string[], config: LitAnalyzerCliConfig): Promise<boolean> {
+export async function analyzeCommand(globs: string[], cliConfig: LitAnalyzerCliConfig): Promise<boolean> {
 	let program: Program | undefined = undefined;
 	const context = new DefaultLitAnalyzerContext({
 		getProgram() {
@@ -34,41 +34,40 @@ export async function analyzeCommand(globs: string[], config: LitAnalyzerCliConf
 		}
 	});
 
-	// Read config from tsconfig
-	let newConfig = readTsLitPluginConfig();
+	// Read config from tsconfig.json
+	const configFromTS = readLitAnalyzerConfigFromTsConfig() || {};
 
-	// Create a default config
-	if (newConfig == null) {
-		const configSeed: Partial<LitAnalyzerConfig> = {};
+	// Read config from the CLI options
+	const configFromCLI = readLitAnalyzerConfigFromCliConfig(cliConfig);
 
-		// Assign "strict" setting from the CLI command (which overwrites tsconfig rules)
-		if (config.strict != null) {
-			configSeed.strict = config.strict;
+	// Make seed where options from CLI takes precedence over options from "tsconfig.json"
+	const configSeed = {
+		...configFromTS,
+		...configFromCLI,
+
+		// Also merge rules deep
+		rules: {
+			...(configFromTS.rules || {}),
+			...(configFromCLI.rules || {})
 		}
+	};
 
-		// Assign "logging" based on "debug" option from the CLI command
-		configSeed.logging = config.debug ? "verbose" : "off";
-
-		// Make config based on the seed
-		newConfig = makeConfig(configSeed);
-	}
-
-	// Assign rules from the CLI command (which overwrites tsconfig rules)
-	Object.assign(newConfig.rules, config.rules);
+	// Generate final config based on CLI and "tsconfig.json"
+	const tsPluginConfig = makeConfig(configSeed);
 
 	// Set the config on the context
-	context.updateConfig(newConfig);
+	context.updateConfig(tsPluginConfig);
 
 	// Debug config
-	context.logger.verbose("Lit Analyzer Configuration", newConfig);
+	context.logger.verbose("Lit Analyzer Configuration", tsPluginConfig);
 
 	const analyzer = new LitAnalyzer(context);
 
 	const stats: AnalysisStats = { errors: 0, warnings: 0, filesWithProblems: 0, totalFiles: 0, diagnostics: 0 };
 
-	const formatter = getFormatter(config.format || "code");
+	const formatter = getFormatter(cliConfig.format || "code");
 
-	await analyzeGlobs(globs, config, {
+	await analyzeGlobs(globs, cliConfig, {
 		didExpandGlobs(filePaths: string[]): void {
 			if (filePaths.length === 0) {
 				// eslint-disable-next-line no-console
@@ -80,8 +79,8 @@ export async function analyzeCommand(globs: string[], config: LitAnalyzerCliConf
 		},
 		willAnalyzeFiles(filePaths: string[]): void {
 			// Prepare output file
-			if (config.outFile != null) {
-				writeFileSync(config.outFile, "");
+			if (cliConfig.outFile != null) {
+				writeFileSync(cliConfig.outFile, "");
 			}
 		},
 		analyzeSourceFile(file: SourceFile, options: { program: Program }): void | boolean {
@@ -91,12 +90,12 @@ export async function analyzeCommand(globs: string[], config: LitAnalyzerCliConf
 			let diagnostics = analyzer.getDiagnosticsInFile(file);
 
 			// Filter all diagnostics by "error" if "quiet" option is active
-			diagnostics = config.quiet ? diagnostics.filter(d => d.severity === "error") : diagnostics;
+			diagnostics = cliConfig.quiet ? diagnostics.filter(d => d.severity === "error") : diagnostics;
 
 			// Print the diagnostic text based on the formatter
-			const fileDiagnosticsText = formatter.diagnosticTextForFile(file, diagnostics, config);
+			const fileDiagnosticsText = formatter.diagnosticTextForFile(file, diagnostics, cliConfig);
 			if (fileDiagnosticsText != null) {
-				printText(fileDiagnosticsText, config);
+				printText(fileDiagnosticsText, cliConfig);
 			}
 
 			// Calculate stats
@@ -110,7 +109,7 @@ export async function analyzeCommand(globs: string[], config: LitAnalyzerCliConf
 				stats.filesWithProblems += 1;
 
 				// Fail fast if "failFast" is true and the command is not successful
-				if (config.failFast && !isSuccessful(stats, config)) {
+				if (cliConfig.failFast && !isSuccessful(stats, cliConfig)) {
 					return false;
 				}
 			}
@@ -118,13 +117,13 @@ export async function analyzeCommand(globs: string[], config: LitAnalyzerCliConf
 	});
 
 	// Print summary text
-	const statsText = formatter.report(stats, config);
+	const statsText = formatter.report(stats, cliConfig);
 	if (statsText != null) {
-		printText(statsText, config);
+		printText(statsText, cliConfig);
 	}
 
 	// Return if this command was successful or not
-	return isSuccessful(stats, config);
+	return isSuccessful(stats, cliConfig);
 }
 
 function getFormatter(format: FormatterFormat): DiagnosticFormatter {
@@ -158,4 +157,22 @@ function isSuccessful(stats: AnalysisStats, config: LitAnalyzerCliConfig): boole
 	}
 
 	return true;
+}
+
+function readLitAnalyzerConfigFromCliConfig(cliConfig: LitAnalyzerCliConfig): Partial<LitAnalyzerConfig> {
+	const config: Partial<LitAnalyzerConfig> = {};
+
+	config.rules = cliConfig.rules;
+
+	// Assign "strict" setting from the CLI command (which overwrites tsconfig rules)
+	if (cliConfig.strict != null) {
+		config.strict = cliConfig.strict;
+	}
+
+	// Assign "logging" based on "debug" option from the CLI command
+	if (cliConfig.debug != null) {
+		config.logging = cliConfig.debug ? "verbose" : "off";
+	}
+
+	return config;
 }
