@@ -22,6 +22,21 @@ tsTest("Cannot use 'ifDefined' directive in event listener binding", t => {
 	hasDiagnostic(t, diagnostics, "no-invalid-directive-binding");
 });
 
+tsTest("Cannot use 'live' directive in attribute binding with non-string type", t => {
+	const { diagnostics } = getDiagnostics('type live = Function; html`<input value="${live(123)}" />`');
+	hasDiagnostic(t, diagnostics, "no-invalid-directive-binding");
+});
+
+tsTest("Can use 'live' directive in attribute binding with string type", t => {
+	const { diagnostics } = getDiagnostics("type live = Function; html`<input value=\"${live('test')}\" />`");
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Can use 'live' directive in property binding", t => {
+	const { diagnostics } = getDiagnostics('type live = Function; html`<input .maxLength="${live(123)}" />`');
+	hasNoDiagnostics(t, diagnostics);
+});
+
 tsTest("Can use 'classMap' directive on class attribute", t => {
 	const { diagnostics } = getDiagnostics('type classMap = Function; html`<input class="${classMap({foo: true})}" />`');
 	hasNoDiagnostics(t, diagnostics);
@@ -59,5 +74,17 @@ tsTest("Cannot use 'unsafeHTML' directive in attribute binding", t => {
 
 tsTest("Can use 'unsafeHTML' directive text binding", t => {
 	const { diagnostics } = getDiagnostics('type unsafeHTML = Function; html`<div>${unsafeHTML("<h1>Hello</h1>")}"</div>`');
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Can use 'unsafeSVG' directive text binding", t => {
+	const { diagnostics } = getDiagnostics('type unsafeSVG = Function; html`<svg>${unsafeSVG("<circle cx="50" cy="50" r="40" fill="red" />")}"</svg>`');
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Can use 'templateContent' directive text binding", t => {
+	const { diagnostics } = getDiagnostics(
+		'const templateEl = document.querySelector("template#myContent"); type templateContent = Function; html`<div>${templateContent(templateEl)}"</div>`'
+	);
 	hasNoDiagnostics(t, diagnostics);
 });

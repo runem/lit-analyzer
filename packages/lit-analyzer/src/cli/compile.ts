@@ -1,38 +1,45 @@
 import { existsSync, readFileSync } from "fs";
-import { join } from "path";
+import { basename } from "path";
 import {
 	CompilerOptions,
+	convertCompilerOptionsFromJson,
 	createProgram,
 	Diagnostic,
+	findConfigFile,
 	getPreEmitDiagnostics,
 	ModuleKind,
 	ModuleResolutionKind,
 	Program,
+	readConfigFile,
 	ScriptTarget,
 	SourceFile
 } from "typescript";
-import { LitAnalyzerConfig, makeConfig } from "../analyze/lit-analyzer-config";
+import { LitAnalyzerConfig } from "../analyze/lit-analyzer-config";
+
+const requiredCompilerOptions: CompilerOptions = {
+	noEmitOnError: false,
+	allowJs: true,
+	strictNullChecks: true, // Type checking will remove all "null" and "undefined" from types if "strictNullChecks" is false
+	moduleResolution: ModuleResolutionKind.NodeJs,
+	skipLibCheck: true
+};
 
 /**
  * The most general version of compiler options.
  */
-const defaultOptions: CompilerOptions = {
-	noEmitOnError: false,
-	allowJs: true,
+const defaultCompilerOptions: CompilerOptions = {
+	...requiredCompilerOptions,
 	experimentalDecorators: true,
 	target: ScriptTarget.Latest,
 	downlevelIteration: true,
 	module: ModuleKind.ESNext,
 	//module: ModuleKind.CommonJS,
 	//lib: ["esnext", "dom"],
-	strictNullChecks: true,
-	moduleResolution: ModuleResolutionKind.NodeJs,
 	esModuleInterop: true,
 	noEmit: true,
 	allowSyntheticDefaultImports: true,
 	allowUnreachableCode: true,
 	allowUnusedLabels: true,
-	skipLibCheck: true,
 	isolatedModules: true
 };
 
@@ -48,8 +55,7 @@ export interface CompileResult {
  * @param filePaths
  */
 export function compileTypescript(filePaths: string | string[]): CompileResult {
-	//const options2 = readTsConfig() || defaultOptions;
-	const options = defaultOptions;
+	const options = getCompilerOptions();
 
 	filePaths = Array.isArray(filePaths) ? filePaths : [filePaths];
 	const program = createProgram(filePaths, options);
@@ -59,30 +65,58 @@ export function compileTypescript(filePaths: string | string[]): CompileResult {
 	return { diagnostics, program, files };
 }
 
-export function readTsConfig(tsConfigPath?: string): CompilerOptions | undefined {
-	tsConfigPath = tsConfigPath || join(process.cwd(), "tsconfig.json");
+/**
+ * Returns compiler options to be used
+ */
+export function getCompilerOptions(): CompilerOptions {
+	// Get compiler options from files
+	const compilerOptions = resolveTsConfigCompilerOptions();
 
-	if (existsSync(tsConfigPath)) {
-		try {
-			const content = readFileSync(tsConfigPath, "utf8");
-			const config = JSON.parse(content) as { compilerOptions: CompilerOptions };
-			return config.compilerOptions;
-		} catch {
-			return undefined;
+	// If we found existing compiler options, merged "required compiler options" into it.
+	if (compilerOptions != null) {
+		return {
+			...requiredCompilerOptions,
+			...compilerOptions
+		};
+	}
+
+	// Return default compiler options if no compiler options were found
+	return defaultCompilerOptions;
+}
+
+/**
+ * Resolves "tsconfig.json" file and returns its CompilerOptions
+ */
+export function resolveTsConfigCompilerOptions(): CompilerOptions | undefined {
+	// Find the nearest tsconfig.json file if possible
+	const tsConfigFilePath = findConfigFile(process.cwd(), existsSync, "tsconfig.json");
+
+	if (tsConfigFilePath != null) {
+		// Read the tsconfig.json file
+		const parsedConfig = readConfigFile(tsConfigFilePath, path => readFileSync(path, "utf8"));
+
+		if (parsedConfig != null && parsedConfig.config != null) {
+			// Parse the tsconfig.json file
+			const parsedJson = convertCompilerOptionsFromJson(parsedConfig.config.compilerOptions, basename(tsConfigFilePath), "tsconfig.json");
+			return parsedJson?.options;
 		}
 	}
 
 	return undefined;
 }
 
-export function readTsLitPluginConfig(options?: CompilerOptions): LitAnalyzerConfig | undefined {
-	options = options || readTsConfig();
+/**
+ * Resolves the nearest tsconfig.json and returns the configuration seed within the plugins section for "ts-lit-plugin"
+ */
+export function readLitAnalyzerConfigFromTsConfig(): Partial<LitAnalyzerConfig> | undefined {
+	const compilerOptions = resolveTsConfigCompilerOptions();
 
-	if (options != null && "plugins" in options) {
-		const plugins = options.plugins as ({ name: string } & LitAnalyzerConfig)[];
+	// Finds the plugin section
+	if (compilerOptions != null && "plugins" in compilerOptions) {
+		const plugins = compilerOptions.plugins as ({ name: string } & Partial<LitAnalyzerConfig>)[];
 		const tsLitPluginOptions = plugins.find(plugin => plugin.name === "ts-lit-plugin");
 		if (tsLitPluginOptions != null) {
-			return makeConfig(tsLitPluginOptions);
+			return tsLitPluginOptions;
 		}
 	}
 

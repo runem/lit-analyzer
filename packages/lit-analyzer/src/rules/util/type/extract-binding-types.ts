@@ -8,11 +8,11 @@ import {
 	SimpleTypeStringLiteral,
 	toSimpleType
 } from "ts-simple-type";
-import { Type, TypeChecker, Expression } from "typescript";
-import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../analyze/types/html-node/html-node-attr-assignment-types";
-import { HtmlNodeAttrKind } from "../../../analyze/types/html-node/html-node-attr-types";
+import { Expression, Type, TypeChecker } from "typescript";
 import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
 import { getDirective } from "../directive/get-directive";
+import { HtmlNodeAttrAssignmentKind, HtmlNodeAttrAssignment } from "../../../analyze/types/html-node/html-node-attr-assignment-types";
+import { HtmlNodeAttrKind } from "../../../analyze/types/html-node/html-node-attr-types";
 
 const cache = new WeakMap<HtmlNodeAttrAssignment, { typeA: SimpleType; typeB: SimpleType }>();
 
@@ -46,8 +46,9 @@ export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, context:
 
 	// Handle directives
 	const directive = getDirective(assignment, context);
-	if (directive != null && directive.actualType != null) {
-		typeB = directive.actualType;
+	const directiveType = directive?.actualType?.();
+	if (directiveType != null) {
+		typeB = directiveType;
 	}
 
 	// Cache the result

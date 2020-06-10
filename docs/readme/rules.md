@@ -21,6 +21,7 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | [no-unknown-attribute](#-no-unknown-attribute-no-unknown-property)<br> [no-unknown-property](#-no-unknown-attribute-no-unknown-property) | You will get a warning whenever you use an unknown attribute or property within your `lit-html` template. | off | warning |
 | [no-unknown-event](#-no-unknown-event)       | When using event bindings it's checked that the event names are fired. | off | off |
 | [no-unknown-slot](#-no-unknown-slot)         | Using the "@slot" jsdoc tag on your custom element class, you can tell which slots are accepted for a particular element. | off | warning |
+| [no-legacy-attribute](#no-legacy-attribute)         | Disallows use of legacy Polymer binding syntax (e.g. `foo$=`). | off | warning |
 
 **Validating binding types**
 
@@ -193,6 +194,30 @@ html`
   <div slot="left"></div>
 </my-element>
 `
+```
+
+#### no-legacy-attribute
+
+A common mistake when dealing with Lit in particular is to use the
+legacy Polymer syntax as seen in earlier versions of Polymer (the
+predecessor of Lit).
+
+The following examples are considered warnings:
+
+<!-- prettier-ignore -->
+```js
+html`<input name$=${val} />`
+html`<input disabled?=${val} />`;
+html`<input name="{{val}}" />`;
+```
+
+The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
+```js
+html`<input name=${val} />`
+html`<input ?disabled=${val} />`;
+html`<input name=${val} />`;
 ```
 
 ### Validating binding types

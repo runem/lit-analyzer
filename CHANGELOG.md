@@ -9,6 +9,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 <!-- ### Removed -->
 <!-- ### Fixed -->
 
+## [1.1.11] - 2020-05-21
+
+### Added
+
+- New rule: `no-legacy-attribute` which is disabled as default. A common mistake when dealing with Lit in particular is to use the legacy Polymer syntax as seen in earlier versions of Polymer (the predecessor of Lit). This rule catches this mistake (see [#95](https://github.com/runem/lit-analyzer/pull/95))
+- Added closure security safe type for `<source src>` (see [#88](https://github.com/runem/lit-analyzer/pull/88))
+- Fixed typo about event type detection (see [#86](https://github.com/runem/lit-analyzer/pull/86))
+
+### Fixed
+
+- Better performance when using the `no-missing-imports` rule. `lit-analyzer` will still check imported modules in your project as usual, however, it will only follow imports 2 levels deep into any imported module from an external dependency (see [#93](https://github.com/runem/lit-analyzer/pull/93))
+- The CLI-option `maxWarnings` defaults to `-1` to avoid failing when the analysis found only warnings (see [#96](https://github.com/runem/lit-analyzer/pull/96))
+
 ## [1.1.10] - 2020-03-02
 
 ### Added

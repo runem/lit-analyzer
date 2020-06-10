@@ -1,8 +1,9 @@
+import { isAssignableToType, SimpleTypeKind } from "ts-simple-type";
 import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { RuleModule } from "../analyze/types/rule/rule-module";
-import { getDirective } from "./util/directive/get-directive";
 import { rangeFromHtmlNodeAttr } from "../analyze/util/range-util";
+import { getDirective } from "./util/directive/get-directive";
 
 /**
  * This rule validates that directives are used properly.
@@ -41,6 +42,30 @@ const rule: RuleModule = {
 
 					break;
 
+				case "live":
+					switch (htmlAttr.kind) {
+						case HtmlNodeAttrKind.ATTRIBUTE: {
+							// Make sure that only strings are passed in when using the live directive in attribute bindings
+							const typeB = directive.actualType?.();
+							if (typeB != null && !isAssignableToType({ kind: SimpleTypeKind.STRING }, typeB)) {
+								context.report({
+									location: rangeFromHtmlNodeAttr(htmlAttr),
+									message: `If you use the 'live' directive in an attribute binding, make sure that only strings are passed in, or the binding will update every render`
+								});
+							}
+
+							break;
+						}
+
+						case HtmlNodeAttrKind.EVENT_LISTENER:
+							context.report({
+								location: rangeFromHtmlNodeAttr(htmlAttr),
+								message: `The 'live' directive can only be used in attribute and property bindings`
+							});
+					}
+
+					break;
+
 				case "classMap":
 					// Report error if "classMap" is not being used on the "class" attribute.
 					if (htmlAttr.name !== "class" || htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE) {
@@ -62,8 +87,10 @@ const rule: RuleModule = {
 					break;
 
 				case "unsafeHTML":
+				case "unsafeSVG":
 				case "cache":
 				case "repeat":
+				case "templateContent":
 				case "asyncReplace":
 				case "asyncAppend":
 					// These directives can only be used within a text binding.

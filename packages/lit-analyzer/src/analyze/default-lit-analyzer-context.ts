@@ -10,9 +10,11 @@ import noIncompatibleTypeBindingRule from "../rules/no-incompatible-type-binding
 import noInvalidAttributeName from "../rules/no-invalid-attribute-name";
 import noInvalidDirectiveBindingRule from "../rules/no-invalid-directive-binding";
 import noInvalidTagName from "../rules/no-invalid-tag-name";
+import noLegacyAttribute from "../rules/no-legacy-attribute";
 import noMissingImport from "../rules/no-missing-import";
 import noNoncallableEventBindingRule from "../rules/no-noncallable-event-binding";
 import noNullableAttributeBindingRule from "../rules/no-nullable-attribute-binding";
+import noPropertyVisibilityMismatch from "../rules/no-property-visibility-mismatch";
 import noUnclosedTag from "../rules/no-unclosed-tag";
 import noUnintendedMixedBindingRule from "../rules/no-unintended-mixed-binding";
 import noUnknownAttribute from "../rules/no-unknown-attribute";
@@ -20,7 +22,6 @@ import noUnknownEvent from "../rules/no-unknown-event";
 import noUnknownProperty from "../rules/no-unknown-property";
 import noUnknownSlotRule from "../rules/no-unknown-slot";
 import noUnknownTagName from "../rules/no-unknown-tag-name";
-import noPropertyVisibilityMismatch from "../rules/no-property-visibility-mismatch";
 import { getBuiltInHtmlCollection } from "./data/get-built-in-html-collection";
 import { getUserConfigHtmlCollection } from "./data/get-user-config-html-collection";
 import { isRuleDisabled, LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config";
@@ -57,7 +58,8 @@ const ALL_RULES: RuleModule[] = [
 	noIncompatiblePropertyType,
 	noInvalidTagName,
 	noInvalidAttributeName,
-	noPropertyVisibilityMismatch
+	noPropertyVisibilityMismatch,
+	noLegacyAttribute
 ];
 
 export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
