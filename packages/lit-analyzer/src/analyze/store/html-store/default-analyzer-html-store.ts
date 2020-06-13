@@ -24,15 +24,15 @@ import { HtmlDataSourceKind, HtmlDataSourceMerged } from "./html-data-source-mer
 export class DefaultAnalyzerHtmlStore implements AnalyzerHtmlStore {
 	private dataSource = new HtmlDataSourceMerged();
 
-	absorbSubclassExtension(name: string, extension: HtmlTag) {
+	absorbSubclassExtension(name: string, extension: HtmlTag): void {
 		this.dataSource.absorbSubclassExtension(name, extension);
 	}
 
-	absorbCollection(collection: HtmlDataCollection, register: HtmlDataSourceKind) {
+	absorbCollection(collection: HtmlDataCollection, register: HtmlDataSourceKind): void {
 		this.dataSource.absorbCollection(collection, register);
 	}
 
-	forgetCollection(collection: NamedHtmlDataCollection, register: HtmlDataSourceKind) {
+	forgetCollection(collection: NamedHtmlDataCollection, register: HtmlDataSourceKind): void {
 		this.dataSource.forgetCollection(collection, register);
 	}
 

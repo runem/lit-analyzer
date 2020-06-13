@@ -1,4 +1,4 @@
-import { isAssignableToType, SimpleTypeKind } from "ts-simple-type";
+import { isAssignableToType } from "ts-simple-type";
 import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { RuleModule } from "../analyze/types/rule/rule-module";
@@ -47,7 +47,7 @@ const rule: RuleModule = {
 						case HtmlNodeAttrKind.ATTRIBUTE: {
 							// Make sure that only strings are passed in when using the live directive in attribute bindings
 							const typeB = directive.actualType?.();
-							if (typeB != null && !isAssignableToType({ kind: SimpleTypeKind.STRING }, typeB)) {
+							if (typeB != null && !isAssignableToType({ kind: "STRING" }, typeB)) {
 								context.report({
 									location: rangeFromHtmlNodeAttr(htmlAttr),
 									message: `If you use the 'live' directive in an attribute binding, make sure that only strings are passed in, or the binding will update every render`

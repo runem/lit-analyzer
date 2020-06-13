@@ -1,4 +1,4 @@
-import { SimpleType, SimpleTypeKind } from "ts-simple-type";
+import { SimpleType } from "ts-simple-type";
 
 const partTypeNames: ReadonlySet<string | undefined> = new Set([
 	"Part",
@@ -16,30 +16,32 @@ const partTypeNames: ReadonlySet<string | undefined> = new Set([
  */
 export function isLitDirective(type: SimpleType): boolean {
 	switch (type.kind) {
-		case SimpleTypeKind.ALIAS:
+		case "ALIAS":
 			return type.name === "DirectiveFn" || isLitDirective(type.target);
-		case SimpleTypeKind.FUNCTION: {
+		case "OBJECT":
+			return type.call != null && isLitDirective(type.call);
+		case "FUNCTION": {
 			// We expect a directive to be a function with at least one argument that
 			// returns void.
 			if (
-				type.kind !== SimpleTypeKind.FUNCTION ||
-				type.argTypes == null ||
-				type.argTypes.length === 0 ||
+				type.kind !== "FUNCTION" ||
+				type.parameters == null ||
+				type.parameters.length === 0 ||
 				type.returnType == null ||
-				type.returnType.kind !== SimpleTypeKind.VOID
+				type.returnType.kind !== "VOID"
 			) {
 				return false;
 			}
 			// And that one argument must all be lit Part types.
-			const firstArg = type.argTypes[0].type;
+			const firstArg = type.parameters[0].type;
 			if (firstArg.kind === "UNION") {
 				return firstArg.types.every(t => partTypeNames.has(t.name));
 			}
 			return partTypeNames.has(firstArg.name);
 		}
-		case SimpleTypeKind.GENERIC_ARGUMENTS:
+		case "GENERIC_ARGUMENTS":
 			// Test for the built in type from lit-html: Directive<NodePart>
-			return type.target.kind === SimpleTypeKind.FUNCTION && type.target.name === "Directive";
+			return type.target.kind === "FUNCTION" && type.target.name === "Directive";
 		default:
 			return false;
 	}

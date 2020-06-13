@@ -13,12 +13,9 @@
 <a href="https://github.com/runem/lit-analyzer/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/runem/lit-analyzer.svg" height="20"/></a>
 	</p>
 
-
 <p align="center">
   <img src="https://user-images.githubusercontent.com/5372940/62078476-02c1ec00-b24d-11e9-8de5-1322012cbde2.gif" alt="Lit plugin GIF"/>
 </p>
-
-
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#installation)
 
@@ -52,7 +49,6 @@ Finally, restart you Typescript Language Service, and you should start getting d
 
 - If you use Visual Studio Code you can also install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension.
 - If you would rather use a CLI, you can install the [lit-analyzer](https://github.com/runem/lit-analyzer/blob/master/packages/lit-analyzer).
-
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#configuration)
 
@@ -95,8 +91,6 @@ You can configure this plugin through your `tsconfig.json`.
 | `globalAttributes` | List of html attributes names that you expect to be present at all times. | `string[]` | |
 | `globalEvents` | List of event names that you expect to be present at all times | `string[]` | |
 | `customHtmlData` | This plugin supports the [custom vscode html data format](https://code.visualstudio.com/updates/v1_31#_html-and-css-custom-data-support) through this setting. | [Vscode Custom HTML Data Format](https://github.com/Microsoft/vscode-html-languageservice/blob/master/docs/customData.md). Supports arrays, objects and relative file paths | |
-
-
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#rules)
 
@@ -632,7 +626,6 @@ css`
 `
 ```
 
-
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#documenting-slots-events-attributes-and-properties)
 
 ## ➤ Documenting slots, events, attributes and properties
@@ -659,20 +652,16 @@ class MyElement extends HTMLElement {
 customElements.define("my-element", MyElement);
 ```
 
-
-
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#contributors)
 
 ## ➤ Contributors
-	
 
 | [<img alt="Rune Mehlsen" src="https://avatars2.githubusercontent.com/u/5372940?s=460&v=4" width="100">](https://twitter.com/runemehlsen) | [<img alt="Andreas Mehlsen" src="https://avatars1.githubusercontent.com/u/6267397?s=460&v=4" width="100">](https://twitter.com/andreasmehlsen) | [<img alt="You?" src="https://joeschmoe.io/api/v1/random" width="100">](https://github.com/runem/lit-analyzer/blob/master/CONTRIBUTING.md) |
-|:--------------------------------------------------:|:--------------------------------------------------:|:--------------------------------------------------:|
-| [Rune Mehlsen](https://twitter.com/runemehlsen)  | [Andreas Mehlsen](https://twitter.com/andreasmehlsen) | [You?](https://github.com/runem/lit-analyzer/blob/master/CONTRIBUTING.md) |
-
+| :--------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: |
+|                                             [Rune Mehlsen](https://twitter.com/runemehlsen)                                              |                                             [Andreas Mehlsen](https://twitter.com/andreasmehlsen)                                              |                                 [You?](https://github.com/runem/lit-analyzer/blob/master/CONTRIBUTING.md)                                  |
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#license)
 
 ## ➤ License
-	
+
 Licensed under [MIT](https://opensource.org/licenses/MIT).

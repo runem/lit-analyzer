@@ -1,5 +1,5 @@
-import { LitAnalyzerConfig, makeConfig, DefaultLitAnalyzerContext, LitAnalyzerContext, LitAnalyzer } from "lit-analyzer";
-import ts from "typescript";
+import { DefaultLitAnalyzerContext, LitAnalyzer, LitAnalyzerConfig, LitAnalyzerContext, makeConfig } from "lit-analyzer";
+import ts, { Diagnostic } from "typescript";
 import { translateDiagnostics } from "./ts-lit-plugin/translate/translate-diagnostics";
 
 // See https://github.com/bazelbuild/rules_typescript/blob/master/internal/tsc_wrapped/plugin_api.ts
@@ -17,6 +17,7 @@ export class Plugin implements DiagnosticPlugin {
 
 	private readonly context: LitAnalyzerContext;
 	private readonly analyzer: LitAnalyzer;
+
 	constructor(program: ts.Program, config: LitAnalyzerConfig) {
 		this.name = "lit";
 		const context = new DefaultLitAnalyzerContext({
@@ -29,7 +30,7 @@ export class Plugin implements DiagnosticPlugin {
 		this.analyzer = new LitAnalyzer(context);
 	}
 
-	getDiagnostics(sourceFile: ts.SourceFile) {
+	getDiagnostics(sourceFile: ts.SourceFile): Diagnostic[] {
 		const litDiagnostics = this.analyzer.getDiagnosticsInFile(sourceFile);
 
 		const diagnostics = translateDiagnostics(litDiagnostics, sourceFile, this.context);

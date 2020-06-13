@@ -1,4 +1,4 @@
-import { isSimpleTypeLiteral, SimpleType, SimpleTypeKind } from "ts-simple-type";
+import { isSimpleTypeLiteral, SimpleType } from "ts-simple-type";
 import { LitAnalyzerContext } from "../../../lit-analyzer-context";
 import { HtmlNodeAttrAssignmentKind } from "../../../types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types";
@@ -49,14 +49,14 @@ export function completionsForHtmlAttrValues(
 
 function getOptionsFromType(type: SimpleType): string[] {
 	switch (type.kind) {
-		case SimpleTypeKind.UNION:
+		case "UNION":
 			return type.types.filter(isSimpleTypeLiteral).map(t => t.value.toString());
-		case SimpleTypeKind.ENUM:
+		case "ENUM":
 			return type.types
 				.map(m => m.type)
 				.filter(isSimpleTypeLiteral)
 				.map(t => t.value.toString());
-		case SimpleTypeKind.ALIAS:
+		case "ALIAS":
 			return getOptionsFromType(type.target);
 	}
 

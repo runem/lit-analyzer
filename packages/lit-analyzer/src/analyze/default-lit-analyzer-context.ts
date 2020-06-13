@@ -67,7 +67,7 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 	protected hasAnalyzedSubclassExtensions = false;
 	protected _config: LitAnalyzerConfig = makeConfig({});
 
-	get ts() {
+	get ts(): typeof tsMod {
 		return this.handler.ts || tsMod;
 	}
 
@@ -112,7 +112,7 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 		this._currentFile = file;
 	}
 
-	public updateConfig(config: LitAnalyzerConfig) {
+	public updateConfig(config: LitAnalyzerConfig): void {
 		this._config = config;
 
 		this.logger.level = (() => {
@@ -194,8 +194,8 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 			config: {
 				features: ["event", "member", "slot"],
 				analyzeGlobalFeatures: true,
-				analyzeLibDom: true,
-				analyzeLib: true,
+				analyzeDefaultLib: true,
+				analyzeDependencies: true,
 				excludedDeclarationNames: ["HTMLElement"]
 			}
 		});

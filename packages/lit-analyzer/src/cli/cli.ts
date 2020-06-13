@@ -1,4 +1,4 @@
-import { LitAnalyzerRuleId, LitAnalyzerRules } from "../analyze/lit-analyzer-config";
+import { ALL_RULE_NAMES, LitAnalyzerRuleId, LitAnalyzerRules } from "../analyze/lit-analyzer-config";
 import { analyzeCommand } from "./analyze-command";
 import { LitAnalyzerCliConfig } from "./lit-analyzer-cli-config";
 import { parseCliArguments } from "./parse-cli-arguments";
@@ -21,7 +21,7 @@ const DEFAULT_CONFIG: LitAnalyzerCliConfig = {
 /**
  * The main function of the cli.
  */
-export async function cli() {
+export async function cli(): Promise<void> {
 	const { _: args, ...rest } = parseCliArguments(process.argv.slice(2));
 	const globs = args.length > 0 ? args : [DEFAULT_GLOB];
 
@@ -59,25 +59,7 @@ export async function cli() {
     --strict              Enable strict mode. This change the default ruleset.
     --rules.___ SEVERITY  Enable or disable a rule (example: --rules.no-unknown-tag-name off). 
                           Severity can be: "off" | "warn" | "error". The possible rules are:
-                          o  no-unknown-tag-name
-                          o  no-missing-import
-                          o  no-unclosed-tag
-                          o  no-unknown-attribute
-                          o  no-unknown-property
-                          o  no-unknown-event
-                          o  no-unknown-slot
-                          o  no-invalid-boolean-binding
-                          o  no-expressionless-property-binding
-                          o  no-noncallable-event-binding
-                          o  no-boolean-in-attribute-binding
-                          o  no-complex-attribute-binding
-                          o  no-nullable-attribute-binding
-                          o  no-incompatible-type-binding
-                          o  no-invalid-directive-binding
-                          o  no-incompatible-property-type
-                          o  no-invalid-attribute-name
-                          o  no-invalid-tag-name
-                          o  no-invalid-css
+                          ${ALL_RULE_NAMES.map(ruleName => `o  ${ruleName}`).join("\n                          ")}
     
   Examples
     lit-analyzer src

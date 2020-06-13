@@ -36,14 +36,14 @@
 	},
 	"dependencies": {
 		"lit-html": "https://github.com/mjbvz/vscode-lit-html.git#1.11.0",
-		"web-component-analyzer": "~1.0.3",
+		"web-component-analyzer": "~1.1.0-next.1",
 		"ts-lit-plugin": "1.1.11",
 		"vscode-styled-components": "https://github.com/styled-components/vscode-styled-components#f806f23a027e3458e9d77001851b428f1cb992d5"
 	},
 	"devDependencies": {
-		"rimraf": "^3.0.0",
-		"@types/node": "^10.12.24",
-		"typescript": "^3.6.4",
+		"rimraf": "^3.0.2",
+		"@types/node": "^14.0.13",
+		"typescript": "^3.7.5",
 		"vsce": "^1.58.0",
 		"vscode": "^1.1.29"
 	},

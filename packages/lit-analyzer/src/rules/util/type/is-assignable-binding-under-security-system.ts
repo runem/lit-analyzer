@@ -1,4 +1,4 @@
-import { SimpleType, toTypeString } from "ts-simple-type";
+import { SimpleType, typeToString } from "ts-simple-type";
 import { HtmlNodeAttr } from "../../../analyze/types/html-node/html-node-attr-types";
 import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
 import { isLitDirective } from "../directive/is-lit-directive";
@@ -81,7 +81,7 @@ function checkClosureSecurityAssignability(typeB: SimpleType, htmlAttr: HtmlNode
 
 		context.report({
 			location: rangeFromHtmlNodeAttr(htmlAttr),
-			message: `Type '${toTypeString(typeB)}' is not assignable to '${overriddenTypes.join(" | ")}'. This is due to Closure Safe Type enforcement.`
+			message: `Type '${typeToString(typeB)}' is not assignable to '${overriddenTypes.join(" | ")}'. This is due to Closure Safe Type enforcement.`
 		});
 		return false;
 	}

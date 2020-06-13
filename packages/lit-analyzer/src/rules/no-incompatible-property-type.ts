@@ -1,6 +1,6 @@
-import { isAssignableToSimpleTypeKind, isSimpleType, SimpleType, SimpleTypeKind, toSimpleType, toTypeString } from "ts-simple-type";
+import { isAssignableToSimpleTypeKind, isSimpleType, SimpleType, SimpleTypeKind, toSimpleType, typeToString } from "ts-simple-type";
 import { Node } from "typescript";
-import { LitElementPropertyConfig } from "web-component-analyzer/lib/cjs/lit-element-property-config-a6e5ad36";
+import { LitElementPropertyConfig } from "web-component-analyzer";
 import { RuleModule } from "../analyze/types/rule/rule-module";
 import { RuleModuleContext } from "../analyze/types/rule/rule-module-context";
 import { joinArray } from "../analyze/util/array-util";
@@ -16,7 +16,7 @@ const rule: RuleModule = {
 		if (member.kind !== "property" || member.meta == null) return;
 
 		// Grab the type and fallback to "any"
-		const type = member.type?.() || { kind: SimpleTypeKind.ANY };
+		const type = member.type?.() || { kind: "ANY" };
 
 		return validateLitPropertyConfig(
 			member.meta.node?.type || member.meta.node?.decorator?.expression || member.node,
@@ -36,15 +36,15 @@ const rule: RuleModule = {
  */
 function toLitPropertyTypeString(simpleTypeKind: SimpleTypeKind): string {
 	switch (simpleTypeKind) {
-		case SimpleTypeKind.STRING:
+		case "STRING":
 			return "String";
-		case SimpleTypeKind.NUMBER:
+		case "NUMBER":
 			return "Number";
-		case SimpleTypeKind.BOOLEAN:
+		case "BOOLEAN":
 			return "Boolean";
-		case SimpleTypeKind.ARRAY:
+		case "ARRAY":
 			return "Array";
-		case SimpleTypeKind.OBJECT:
+		case "OBJECT":
 			return "Object";
 		default:
 			return "";
@@ -68,20 +68,18 @@ function prepareSimpleAssignabilityTester(
 
 		const result = (() => {
 			switch (simpleTypeKind) {
-				case SimpleTypeKind.STRING:
-					return isAssignableToSimpleTypeKind(simpleType, [SimpleTypeKind.STRING, SimpleTypeKind.STRING_LITERAL], { op: "or" });
-				case SimpleTypeKind.NUMBER:
-					return isAssignableToSimpleTypeKind(simpleType, [SimpleTypeKind.NUMBER, SimpleTypeKind.NUMBER_LITERAL], { op: "or" });
-				case SimpleTypeKind.BOOLEAN:
-					return isAssignableToSimpleTypeKind(simpleType, [SimpleTypeKind.BOOLEAN, SimpleTypeKind.BOOLEAN_LITERAL], { op: "or" });
-				case SimpleTypeKind.ARRAY:
-					return isAssignableToSimpleTypeKind(simpleType, [SimpleTypeKind.ARRAY, SimpleTypeKind.TUPLE], { op: "or" });
-				case SimpleTypeKind.OBJECT:
-					return isAssignableToSimpleTypeKind(simpleType, [SimpleTypeKind.OBJECT, SimpleTypeKind.INTERFACE], {
-						op: "or"
-					});
-				case SimpleTypeKind.ANY:
-					return isAssignableToSimpleTypeKind(simpleType, SimpleTypeKind.ANY);
+				case "STRING":
+					return isAssignableToSimpleTypeKind(simpleType, ["STRING", "STRING_LITERAL"]);
+				case "NUMBER":
+					return isAssignableToSimpleTypeKind(simpleType, ["NUMBER", "NUMBER_LITERAL"]);
+				case "BOOLEAN":
+					return isAssignableToSimpleTypeKind(simpleType, ["BOOLEAN", "BOOLEAN_LITERAL"]);
+				case "ARRAY":
+					return isAssignableToSimpleTypeKind(simpleType, ["ARRAY", "TUPLE"]);
+				case "OBJECT":
+					return isAssignableToSimpleTypeKind(simpleType, ["OBJECT", "INTERFACE"]);
+				case "ANY":
+					return isAssignableToSimpleTypeKind(simpleType, "ANY");
 				default:
 					return false;
 			}
@@ -94,8 +92,8 @@ function prepareSimpleAssignabilityTester(
 
 	// Collect type kinds that can be used in as "type" in the @property decorator
 	const acceptedTypeKinds = lazy(() => {
-		return [SimpleTypeKind.STRING, SimpleTypeKind.NUMBER, SimpleTypeKind.BOOLEAN, SimpleTypeKind.ARRAY, SimpleTypeKind.OBJECT, SimpleTypeKind.ANY]
-			.filter(kind => kind !== SimpleTypeKind.ANY)
+		return (["STRING", "NUMBER", "BOOLEAN", "ARRAY", "OBJECT", "ANY"] as SimpleTypeKind[])
+			.filter(kind => kind !== "ANY")
 			.filter(kind => isAssignableTo(kind));
 	});
 
@@ -137,7 +135,7 @@ function validateLitPropertyConfig(
 	// Test the @property type against the actual type if a type has been provided
 	if (litConfig.type != null) {
 		// Report error if the @property type is not assignable to the actual type
-		if (!isAssignableTo(litConfig.type.kind) && !isAssignableTo(SimpleTypeKind.ANY)) {
+		if (!isAssignableTo(litConfig.type.kind) && !isAssignableTo("ANY")) {
 			// Suggest what to use instead
 			if (acceptedTypeKinds().length >= 1) {
 				const potentialKindText = joinArray(
@@ -154,10 +152,10 @@ function validateLitPropertyConfig(
 
 			// If no suggesting can be provided, report that they are not assignable
 			// The OBJECT @property type is an escape from this error
-			else if (litConfig.type.kind !== SimpleTypeKind.OBJECT) {
+			else if (litConfig.type.kind !== "OBJECT") {
 				context.report({
 					location: rangeFromNode(node),
-					message: `@property type '${toTypeString(litConfig.type)}' is not assignable to the actual type '${toTypeString(simplePropType)}'`
+					message: `@property type '${typeToString(litConfig.type)}' is not assignable to the actual type '${typeToString(simplePropType)}'`
 				});
 			}
 		}
@@ -166,12 +164,12 @@ function validateLitPropertyConfig(
 	// If no type has been specified, suggest what to use as the @property type
 	else if (litConfig.attribute !== false) {
 		// Don't do anything if there are multiple possibilities for a type.
-		if (isAssignableTo(SimpleTypeKind.ANY)) {
+		if (isAssignableTo("ANY")) {
 			return;
 		}
 
 		// Don't report errors because String conversion is default
-		else if (isAssignableTo(SimpleTypeKind.STRING)) {
+		else if (isAssignableTo("STRING")) {
 			return;
 		}
 
@@ -181,7 +179,7 @@ function validateLitPropertyConfig(
 			const acceptedTypeText = joinArray(
 				[
 					...acceptedTypeKinds().map(kind => `'{type: ${toLitPropertyTypeString(kind)}}'`),
-					...(isAssignableTo(SimpleTypeKind.ARRAY) || isAssignableTo(SimpleTypeKind.OBJECT) ? ["'{attribute: false}'"] : [])
+					...(isAssignableTo("ARRAY") || isAssignableTo("OBJECT") ? ["'{attribute: false}'"] : [])
 				],
 				", ",
 				"or"
@@ -194,7 +192,7 @@ function validateLitPropertyConfig(
 		} else {
 			context.report({
 				location: rangeFromNode(node),
-				message: `The built in converter doesn't handle the property type '${toTypeString(simplePropType)}'.`,
+				message: `The built in converter doesn't handle the property type '${typeToString(simplePropType)}'.`,
 				fixMessage: `Please add '{attribute: false}' on @property decorator for '${propName}'`
 			});
 		}

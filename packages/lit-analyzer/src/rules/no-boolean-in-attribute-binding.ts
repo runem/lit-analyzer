@@ -1,4 +1,4 @@
-import { isAssignableToSimpleTypeKind, SimpleTypeKind } from "ts-simple-type";
+import { isAssignableToSimpleTypeKind } from "ts-simple-type";
 import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER } from "../analyze/constants";
 import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
@@ -28,14 +28,11 @@ const rule: RuleModule = {
 		const { typeA, typeB } = extractBindingTypes(assignment, context);
 
 		// Return early if the attribute is like 'required=""' because this is assignable to boolean.
-		if (typeB.kind === SimpleTypeKind.STRING_LITERAL && typeB.value.length === 0) return;
+		if (typeB.kind === "STRING_LITERAL" && typeB.value.length === 0) return;
 
 		// Check that typeB is not of any|unknown type and typeB is assignable to boolean.
 		// Report a diagnostic if typeB is assignable to boolean type because this would result in binding the boolean coerced to string.
-		if (
-			!isAssignableToSimpleTypeKind(typeB, [SimpleTypeKind.ANY, SimpleTypeKind.UNKNOWN], { op: "or" }) &&
-			isAssignableToType({ typeA: { kind: SimpleTypeKind.BOOLEAN }, typeB }, context)
-		) {
+		if (!isAssignableToSimpleTypeKind(typeB, ["ANY", "UNKNOWN"]) && isAssignableToType({ typeA: { kind: "BOOLEAN" }, typeB }, context)) {
 			// Don't emit error if typeB is assignable to typeA with string coercion.
 			if (isAssignableToType({ typeA, typeB }, context, { isAssignable: isAssignableToTypeWithStringCoercion })) {
 				return;
@@ -66,10 +63,10 @@ const rule: RuleModule = {
 		// Report a diagnostic if typeA is assignable to boolean type because then
 		//   we should probably be using a boolean binding instead of an attribute binding.
 		else if (
-			!isAssignableToSimpleTypeKind(typeA, [SimpleTypeKind.ANY, SimpleTypeKind.UNKNOWN], { op: "or" }) &&
+			!isAssignableToSimpleTypeKind(typeA, ["ANY", "UNKNOWN"]) &&
 			isAssignableToType(
 				{
-					typeA: { kind: SimpleTypeKind.BOOLEAN },
+					typeA: { kind: "BOOLEAN" },
 					typeB: typeA
 				},
 				context

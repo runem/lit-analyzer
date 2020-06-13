@@ -1,4 +1,4 @@
-import { isAssignableToSimpleTypeKind, SimpleType, SimpleTypeKind, toTypeString } from "ts-simple-type";
+import { isAssignableToSimpleTypeKind, SimpleType, typeToString } from "ts-simple-type";
 import { ComponentDeclaration, ComponentEvent, ComponentMember, ComponentSlot } from "web-component-analyzer";
 import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../constants";
 
@@ -93,7 +93,7 @@ export function isHtmlEvent(target: HtmlAttrTarget): target is HtmlEvent {
 
 export function litAttributeModifierForTarget(target: HtmlAttrTarget): string {
 	if (isHtmlAttr(target)) {
-		if (isAssignableToSimpleTypeKind(target.getType(), SimpleTypeKind.BOOLEAN)) {
+		if (isAssignableToSimpleTypeKind(target.getType(), "BOOLEAN")) {
 			return LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER;
 		}
 		return "";
@@ -168,11 +168,11 @@ export function descriptionForTarget(target: HtmlAttrTarget, options: Descriptio
 export function targetKindAndTypeText(target: HtmlAttrTarget, options: DescriptionOptions & { modifier?: string } = {}): string {
 	const prefix = `(${targetKindText(target)}) ${options.modifier || ""}${target.name}`;
 
-	if (isAssignableToSimpleTypeKind(target.getType(), SimpleTypeKind.ANY)) {
+	if (isAssignableToSimpleTypeKind(target.getType(), "ANY")) {
 		return `${prefix}`;
 	}
 
-	return `${prefix}: ${toTypeString(target.getType())}`;
+	return `${prefix}: ${typeToString(target.getType())}`;
 }
 
 export function targetKindText(target: HtmlAttrTarget): string {

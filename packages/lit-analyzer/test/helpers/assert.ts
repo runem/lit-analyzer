@@ -2,7 +2,7 @@ import { ExecutionContext } from "ava";
 import { LitAnalyzerRuleId } from "../../src/analyze/lit-analyzer-config";
 import { LitDiagnostic } from "../../src/analyze/types/lit-diagnostic";
 
-export function hasDiagnostic(t: ExecutionContext, diagnostics: LitDiagnostic[], ruleName: LitAnalyzerRuleId) {
+export function hasDiagnostic(t: ExecutionContext, diagnostics: LitDiagnostic[], ruleName: LitAnalyzerRuleId): void {
 	if (diagnostics.length !== 1) {
 		prettyLogDiagnostics(t, diagnostics);
 	}
@@ -10,7 +10,7 @@ export function hasDiagnostic(t: ExecutionContext, diagnostics: LitDiagnostic[],
 	t.is(diagnostics[0].source, ruleName);
 }
 
-export function hasNoDiagnostics(t: ExecutionContext, diagnostics: LitDiagnostic[]) {
+export function hasNoDiagnostics(t: ExecutionContext, diagnostics: LitDiagnostic[]): void {
 	if (diagnostics.length !== 0) {
 		prettyLogDiagnostics(t, diagnostics);
 	}

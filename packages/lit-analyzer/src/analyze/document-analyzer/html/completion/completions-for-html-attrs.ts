@@ -1,4 +1,4 @@
-import { isAssignableToSimpleTypeKind, SimpleType, SimpleTypeKind } from "ts-simple-type";
+import { isAssignableToSimpleTypeKind, SimpleType } from "ts-simple-type";
 import {
 	LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER,
 	LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER,
@@ -66,8 +66,7 @@ export function completionsForHtmlAttrs(htmlNode: HtmlNode, location: DocumentPo
 }
 
 function isAssignableToBoolean(type: SimpleType, { matchAny } = { matchAny: true }): boolean {
-	return isAssignableToSimpleTypeKind(type, [SimpleTypeKind.BOOLEAN, SimpleTypeKind.BOOLEAN_LITERAL], {
-		op: "or",
+	return isAssignableToSimpleTypeKind(type, ["BOOLEAN", "BOOLEAN_LITERAL"], {
 		matchAny
 	});
 }

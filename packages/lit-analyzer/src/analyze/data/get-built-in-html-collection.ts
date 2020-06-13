@@ -1,4 +1,4 @@
-import { SimpleType, SimpleTypeKind } from "ts-simple-type";
+import { SimpleType } from "ts-simple-type";
 import { HTML5_GLOBAL_ATTRIBUTES, HTML5_VALUE_MAP } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5";
 import { ARIA_ATTRIBUTES } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Aria";
 import { HTML5_EVENTS } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Events";
@@ -58,7 +58,7 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 				name: "slotchange",
 				description:
 					"The slotchange event is fired on an HTMLSlotElement instance (<slot> element) when the node(s) contained in that slot change.\n\nNote: the slotchange event doesn't fire if the children of a slotted node change — only if you change (e.g. add or delete) the actual nodes themselves.",
-				getType: lazy(() => ({ kind: SimpleTypeKind.ANY } as SimpleType)),
+				getType: lazy(() => ({ kind: "ANY" } as SimpleType)),
 				fromTagName: "slot",
 				builtIn: true
 			}
@@ -68,14 +68,14 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 			{
 				kind: "attribute",
 				name: "name",
-				getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
+				getType: lazy(() => ({ kind: "STRING" } as SimpleType)),
 				fromTagName: "slot",
 				builtIn: true
 			},
 			{
 				kind: "attribute",
 				name: "onslotchange",
-				getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
+				getType: lazy(() => ({ kind: "STRING" } as SimpleType)),
 				fromTagName: "slot",
 				builtIn: true
 			}
@@ -89,21 +89,21 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 		{
 			kind: "attribute",
 			name: "slot",
-			getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
+			getType: lazy(() => ({ kind: "STRING" } as SimpleType)),
 			builtIn: true
 		},
 		{
 			kind: "attribute",
 			name: "part",
 			description: `This attribute specifies a "styleable" part on the element in your shadow tree.`,
-			getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
+			getType: lazy(() => ({ kind: "STRING" } as SimpleType)),
 			builtIn: true
 		},
 		{
 			kind: "attribute",
 			name: "theme",
 			description: `This attribute specifies a global "styleable" part on the element.`,
-			getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
+			getType: lazy(() => ({ kind: "STRING" } as SimpleType)),
 			builtIn: true
 		},
 		{
@@ -115,7 +115,7 @@ The value must be a comma-separated list of part mappings:
   - "some-box, some-input"
   - "some-input: foo-input"
 `,
-			getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
+			getType: lazy(() => ({ kind: "STRING" } as SimpleType)),
 			builtIn: true
 		}
 	];
@@ -130,8 +130,8 @@ The value must be a comma-separated list of part mappings:
 			getType: lazy(
 				() =>
 					({
-						kind: SimpleTypeKind.UNION,
-						types: [{ kind: SimpleTypeKind.STRING }, { kind: SimpleTypeKind.NULL }]
+						kind: "UNION",
+						types: [{ kind: "STRING" }, { kind: "NULL" }]
 					} as SimpleType)
 			)
 		});
@@ -147,17 +147,17 @@ The value must be a comma-separated list of part mappings:
 			getType: lazy(
 				() =>
 					({
-						kind: SimpleTypeKind.UNION,
+						kind: "UNION",
 						types: [
 							{
-								kind: SimpleTypeKind.STRING_LITERAL,
+								kind: "STRING_LITERAL",
 								value: "lazy"
 							},
 							{
-								kind: SimpleTypeKind.STRING_LITERAL,
+								kind: "STRING_LITERAL",
 								value: "auto"
 							},
-							{ kind: SimpleTypeKind.STRING_LITERAL, value: "eager" }
+							{ kind: "STRING_LITERAL", value: "eager" }
 						]
 					} as SimpleType)
 			)
@@ -174,8 +174,8 @@ The value must be a comma-separated list of part mappings:
 			getType: lazy(
 				() =>
 					({
-						kind: SimpleTypeKind.UNION,
-						types: [{ kind: SimpleTypeKind.STRING }, { kind: SimpleTypeKind.NULL }]
+						kind: "UNION",
+						types: [{ kind: "STRING" }, { kind: "NULL" }]
 					} as SimpleType)
 			)
 		});
@@ -190,7 +190,7 @@ The value must be a comma-separated list of part mappings:
 				fromTagName: "audio",
 				builtIn: true,
 				name: "controlslist",
-				getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType))
+				getType: lazy(() => ({ kind: "STRING" } as SimpleType))
 			} as HtmlAttr
 		];
 	}
@@ -204,14 +204,14 @@ The value must be a comma-separated list of part mappings:
 				fromTagName: "video",
 				builtIn: true,
 				name: "controlslist",
-				getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType))
+				getType: lazy(() => ({ kind: "STRING" } as SimpleType))
 			} as HtmlAttr,
 			{
 				kind: "attribute",
 				fromTagName: "video",
 				builtIn: true,
 				name: "playsinline",
-				getType: lazy(() => ({ kind: SimpleTypeKind.BOOLEAN } as SimpleType)),
+				getType: lazy(() => ({ kind: "BOOLEAN" } as SimpleType)),
 				description:
 					'The playsinline attribute is a boolean attribute. If present, it serves as a hint to the user agent that the video ought to be displayed "inline" in the document by default, constrained to the element\'s playback area, instead of being displayed fullscreen or in an independent resizable window.'
 			} as HtmlAttr
@@ -223,7 +223,7 @@ The value must be a comma-separated list of part mappings:
 		...ALL_HTML5_EVENTS.map(globalEvent => ({
 			name: globalEvent.name.replace(/^on/, ""),
 			description: globalEvent.description,
-			getType: lazy(() => ({ kind: SimpleTypeKind.ANY } as SimpleType)),
+			getType: lazy(() => ({ kind: "ANY" } as SimpleType)),
 			builtIn: true
 		}))
 	];
@@ -244,7 +244,7 @@ The value must be a comma-separated list of part mappings:
 
 function addMissingAttrTypes(attrs: HtmlAttr[]): HtmlAttr[] {
 	return attrs.map(attr => {
-		if (hasTypeForAttrName(attr.name) || attr.getType().kind === SimpleTypeKind.ANY) {
+		if (hasTypeForAttrName(attr.name) || attr.getType().kind === "ANY") {
 			const newType = html5TagAttrType(attr.name);
 			return {
 				...attr,

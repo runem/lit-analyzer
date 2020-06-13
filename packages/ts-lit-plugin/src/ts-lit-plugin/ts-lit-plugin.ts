@@ -4,6 +4,7 @@ import {
 	CompletionEntryDetails,
 	CompletionInfo,
 	DefinitionInfoAndBoundSpan,
+	Diagnostic,
 	FormatCodeOptions,
 	FormatCodeSettings,
 	GetCompletionsAtPositionOptions,
@@ -63,7 +64,7 @@ export class TsLitPlugin {
 		return (result && translateCompletions(result)) || this.prevLangService.getCompletionsAtPosition(fileName, position, options);
 	}
 
-	getSemanticDiagnostics(fileName: string) {
+	getSemanticDiagnostics(fileName: string): Diagnostic[] {
 		const file = this.program.getSourceFile(fileName)!;
 
 		const result = this.litAnalyzer.getDiagnosticsInFile(file);

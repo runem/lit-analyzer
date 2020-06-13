@@ -1,9 +1,9 @@
-import { isAssignableToType as _isAssignableToType, SimpleType, SimpleTypeComparisonOptions, SimpleTypeKind, toTypeString } from "ts-simple-type";
+import { isAssignableToType as _isAssignableToType, SimpleType, SimpleTypeComparisonOptions, typeToString } from "ts-simple-type";
 import { HtmlNodeAttrAssignmentKind } from "../../../analyze/types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttr } from "../../../analyze/types/html-node/html-node-attr-types";
 import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
-import { isLitDirective } from "../directive/is-lit-directive";
 import { rangeFromHtmlNodeAttr } from "../../../analyze/util/range-util";
+import { isLitDirective } from "../directive/is-lit-directive";
 import { isAssignableBindingUnderSecuritySystem } from "./is-assignable-binding-under-security-system";
 import { isAssignableToType } from "./is-assignable-to-type";
 
@@ -19,7 +19,7 @@ export function isAssignableInAttributeBinding(
 		if (!isAssignableToType({ typeA, typeB }, context)) {
 			context.report({
 				location: rangeFromHtmlNodeAttr(htmlAttr),
-				message: `Type '${toTypeString(typeB)}' is not assignable to '${toTypeString(typeA)}'`
+				message: `Type '${typeToString(typeB)}' is not assignable to '${typeToString(typeA)}'`
 			});
 
 			return false;
@@ -44,7 +44,7 @@ export function isAssignableInAttributeBinding(
 		if (!isAssignableToType({ typeA, typeB }, context, { isAssignable: isAssignableToTypeWithStringCoercion })) {
 			context.report({
 				location: rangeFromHtmlNodeAttr(htmlAttr),
-				message: `Type '${toTypeString(typeB)}' is not assignable to '${toTypeString(typeA)}'`
+				message: `Type '${typeToString(typeB)}' is not assignable to '${typeToString(typeA)}'`
 			});
 
 			return false;
@@ -61,42 +61,46 @@ export function isAssignableInAttributeBinding(
  * @param typeB
  * @param options
  */
-export function isAssignableToTypeWithStringCoercion(typeA: SimpleType, typeB: SimpleType, options: SimpleTypeComparisonOptions) {
+export function isAssignableToTypeWithStringCoercion(
+	typeA: SimpleType,
+	typeB: SimpleType,
+	options: SimpleTypeComparisonOptions
+): boolean | undefined {
 	const safeOptions = { ...options, isAssignable: undefined };
 
 	switch (typeB.kind) {
-		/*case SimpleTypeKind.NULL:
-		 return _isAssignableToType(typeA, { kind: SimpleTypeKind.STRING_LITERAL, value: "null" }, safeOptions);
+		/*case "NULL":
+		 return _isAssignableToType(typeA, { kind: "STRING_LITERAL", value: "null" }, safeOptions);
 
-		 case SimpleTypeKind.UNDEFINED:
-		 return _isAssignableToType(typeA, { kind: SimpleTypeKind.STRING_LITERAL, value: "undefined" }, safeOptions);
+		 case "UNDEFINED":
+		 return _isAssignableToType(typeA, { kind: "STRING_LITERAL", value: "undefined" }, safeOptions);
 		 */
-		case SimpleTypeKind.ALIAS:
-		case SimpleTypeKind.FUNCTION:
-		case SimpleTypeKind.GENERIC_ARGUMENTS:
+		case "ALIAS":
+		case "FUNCTION":
+		case "GENERIC_ARGUMENTS":
 			// Always return true if this is a lit directive
 			if (isLitDirective(typeB)) {
 				return true;
 			}
 			break;
 
-		case SimpleTypeKind.OBJECT:
-		case SimpleTypeKind.CLASS:
-		case SimpleTypeKind.INTERFACE:
+		case "OBJECT":
+		case "CLASS":
+		case "INTERFACE":
 			// This allows for types like: string | (part: Part) => void
 			return _isAssignableToType(
 				typeA,
 				{
-					kind: SimpleTypeKind.STRING_LITERAL,
+					kind: "STRING_LITERAL",
 					value: "[object Object]"
 				},
 				safeOptions
 			);
 
-		case SimpleTypeKind.STRING_LITERAL:
+		case "STRING_LITERAL":
 			// Take into account that the empty string is is equal to true
 			if (typeB.value.length === 0) {
-				if (_isAssignableToType(typeA, { kind: SimpleTypeKind.BOOLEAN_LITERAL, value: true }, safeOptions)) {
+				if (_isAssignableToType(typeA, { kind: "BOOLEAN_LITERAL", value: true }, safeOptions)) {
 					return true;
 				}
 			}
@@ -108,7 +112,7 @@ export function isAssignableToTypeWithStringCoercion(typeA: SimpleType, typeB: S
 					_isAssignableToType(
 						typeA,
 						{
-							kind: SimpleTypeKind.NUMBER_LITERAL,
+							kind: "NUMBER_LITERAL",
 							value: Number(typeB.value)
 						},
 						safeOptions
@@ -120,25 +124,25 @@ export function isAssignableToTypeWithStringCoercion(typeA: SimpleType, typeB: S
 
 			break;
 
-		case SimpleTypeKind.BOOLEAN:
+		case "BOOLEAN":
 			// Test if a boolean coerced string is possible.
 			// Example: aria-expanded="${this.open}"
 			return _isAssignableToType(
 				typeA,
 				{
-					kind: SimpleTypeKind.UNION,
+					kind: "UNION",
 					types: [
 						{
-							kind: SimpleTypeKind.STRING_LITERAL,
+							kind: "STRING_LITERAL",
 							value: "true"
 						},
-						{ kind: SimpleTypeKind.STRING_LITERAL, value: "false" }
+						{ kind: "STRING_LITERAL", value: "false" }
 					]
 				},
 				safeOptions
 			);
 
-		case SimpleTypeKind.BOOLEAN_LITERAL:
+		case "BOOLEAN_LITERAL":
 			/**
 			 * Test if a boolean literal coerced to string is possible
 			 * Example: aria-expanded="${this.open}"
@@ -146,28 +150,28 @@ export function isAssignableToTypeWithStringCoercion(typeA: SimpleType, typeB: S
 			return _isAssignableToType(
 				typeA,
 				{
-					kind: SimpleTypeKind.STRING_LITERAL,
+					kind: "STRING_LITERAL",
 					value: String(typeB.value)
 				},
 				safeOptions
 			);
 
-		case SimpleTypeKind.NUMBER:
+		case "NUMBER":
 			// Test if a number coerced to string is possible
 			// Example: value="${this.max}"
-			if (_isAssignableToType(typeA, { kind: SimpleTypeKind.STRING }, safeOptions)) {
+			if (_isAssignableToType(typeA, { kind: "STRING" }, safeOptions)) {
 				return true;
 			}
 			break;
 
-		case SimpleTypeKind.NUMBER_LITERAL:
+		case "NUMBER_LITERAL":
 			// Test if a number literal coerced to string is possible
 			// Example: value="${this.max}"
 			if (
 				_isAssignableToType(
 					typeA,
 					{
-						kind: SimpleTypeKind.STRING_LITERAL,
+						kind: "STRING_LITERAL",
 						value: String(typeB.value)
 					},
 					safeOptions

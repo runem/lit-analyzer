@@ -21,7 +21,7 @@ interface IVisitDependenciesContext {
  * @param node
  * @param context
  */
-export function visitDependencies(node: Node, context: IVisitDependenciesContext) {
+export function visitDependencies(node: Node, context: IVisitDependenciesContext): void {
 	if (node == null) return;
 
 	if (context.ts.isSourceFile(node)) {

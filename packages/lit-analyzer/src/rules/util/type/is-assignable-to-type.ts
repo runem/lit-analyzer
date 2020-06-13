@@ -7,5 +7,10 @@ export function isAssignableToType(
 	options?: SimpleTypeComparisonOptions
 ): boolean {
 	const inJsFile = context.file.fileName.endsWith(".js");
-	return _isAssignableToType(typeA, typeB, context.program, { ...(inJsFile ? { strict: false } : {}), ...(options || {}) });
+	const expandedOptions = {
+		...(inJsFile ? { strict: false } : {}),
+		options: context.ts,
+		...(options || {})
+	};
+	return _isAssignableToType(typeA, typeB, context.program, expandedOptions);
 }

@@ -113,15 +113,15 @@ function parseHtmlNodeBase(htmlNodeBase: IHtmlNodeBase): HtmlNode {
 	if (htmlNodeBase.tagName === "style") {
 		return {
 			kind: HtmlNodeKind.STYLE,
-			children: [],
-			...htmlNodeBase
+			...htmlNodeBase,
+			children: []
 		};
 	} else if (htmlNodeBase.tagName === "svg") {
 		// Ignore children of "svg" for now
 		return {
 			kind: HtmlNodeKind.SVG,
-			children: [],
-			...htmlNodeBase
+			...htmlNodeBase,
+			children: []
 		};
 	}
 

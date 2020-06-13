@@ -39,7 +39,7 @@ tsTest(testName, t => {
 });
 
 testName = "May not pass a TrustedResourceUrl to script .src with default config";
-tsTest(testName, t => {
+tsTest.only(testName, t => {
 	const { diagnostics } = getDiagnostics(preface + "html`<script .src=${trustedResourceUrl}></script>`");
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });

@@ -1,4 +1,4 @@
-import { SimpleType, SimpleTypeKind, SimpleTypeUnion } from "ts-simple-type";
+import { SimpleType, SimpleTypeUnion } from "ts-simple-type";
 import {
 	HtmlAttr,
 	HtmlDataCollection,
@@ -48,7 +48,7 @@ export class HtmlDataSourceMerged {
 		return this.combinedHtmlDataSource.globalTags;
 	}
 
-	invalidateCache(collection?: NamedHtmlDataCollection) {
+	invalidateCache(collection?: NamedHtmlDataCollection): void {
 		if (collection == null) {
 			Object.values(this.relatedForTagName).forEach(map => map.clear());
 			return;
@@ -72,7 +72,7 @@ export class HtmlDataSourceMerged {
 		}
 	}
 
-	mergeDataSourcesAndInvalidate(collection: NamedHtmlDataCollection) {
+	mergeDataSourcesAndInvalidate(collection: NamedHtmlDataCollection): void {
 		const {
 			tags,
 			global: { events, attributes, properties, slots }
@@ -136,7 +136,7 @@ export class HtmlDataSourceMerged {
 		this.invalidateCache(collection);
 	}
 
-	forgetCollection(collection: NamedHtmlDataCollection, dataSource?: HtmlDataSourceKind) {
+	forgetCollection(collection: NamedHtmlDataCollection, dataSource?: HtmlDataSourceKind): void {
 		if (dataSource == null) {
 			this.htmlDataSources.forEach(ds => ds.forgetCollection(collection));
 		} else {
@@ -147,7 +147,7 @@ export class HtmlDataSourceMerged {
 		this.mergeDataSourcesAndInvalidate(collection);
 	}
 
-	absorbCollection(collection: HtmlDataCollection, register: HtmlDataSourceKind) {
+	absorbCollection(collection: HtmlDataCollection, register: HtmlDataSourceKind): void {
 		this.htmlDataSources[register].absorbCollection(collection);
 
 		this.mergeDataSourcesAndInvalidate({
@@ -165,7 +165,7 @@ export class HtmlDataSourceMerged {
 		return this.combinedHtmlDataSource.getGlobalTag(tagName);
 	}
 
-	absorbSubclassExtension(name: string, extension: HtmlTag) {
+	absorbSubclassExtension(name: string, extension: HtmlTag): void {
 		this.subclassExtensions.set(name, extension);
 	}
 
@@ -341,14 +341,14 @@ function mergeRelatedMembers<T extends HtmlMember>(members: Iterable<T>): Readon
 function mergeRelatedTypeToUnion(typeA: SimpleType, typeB: SimpleType): SimpleType {
 	if (typeA.kind === typeB.kind) {
 		switch (typeA.kind) {
-			case SimpleTypeKind.ANY:
+			case "ANY":
 				return typeA;
 		}
 	}
 
 	switch (typeA.kind) {
-		case SimpleTypeKind.UNION:
-			if (typeB.kind === SimpleTypeKind.ANY && typeA.types.find(t => t.kind === SimpleTypeKind.ANY) != null) {
+		case "UNION":
+			if (typeB.kind === "ANY" && typeA.types.find(t => t.kind === "ANY") != null) {
 				return typeA;
 			} else {
 				return {
@@ -359,7 +359,7 @@ function mergeRelatedTypeToUnion(typeA: SimpleType, typeB: SimpleType): SimpleTy
 	}
 
 	return {
-		kind: SimpleTypeKind.UNION,
+		kind: "UNION",
 		types: [typeA, typeB]
 	} as SimpleTypeUnion;
 }

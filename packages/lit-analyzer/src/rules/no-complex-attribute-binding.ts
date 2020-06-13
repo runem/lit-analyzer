@@ -1,4 +1,4 @@
-import { isAssignableToPrimitiveType, toTypeString } from "ts-simple-type";
+import { isAssignableToPrimitiveType, typeToString } from "ts-simple-type";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { RuleModule } from "../analyze/types/rule/rule-module";
 import { rangeFromHtmlNodeAttr } from "../analyze/util/range-util";
@@ -32,7 +32,7 @@ const rule: RuleModule = {
 				return;
 			}
 
-			const message = `You are binding a non-primitive type '${toTypeString(typeB)}'. This could result in binding the string "[object Object]".`;
+			const message = `You are binding a non-primitive type '${typeToString(typeB)}'. This could result in binding the string "[object Object]".`;
 			const newModifier = ".";
 
 			context.report({
@@ -54,7 +54,7 @@ const rule: RuleModule = {
 
 		// Only primitive types should be allowed as "typeA"
 		else if (!isAssignableToPrimitiveType(typeA)) {
-			const message = `You are assigning the primitive '${toTypeString(typeB)}' to a non-primitive type '${toTypeString(typeA)}'.`;
+			const message = `You are assigning the primitive '${typeToString(typeB)}' to a non-primitive type '${typeToString(typeA)}'.`;
 			const newModifier = ".";
 
 			context.report({

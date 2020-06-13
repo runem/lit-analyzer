@@ -13,10 +13,6 @@
 <a href="https://github.com/runem/lit-analyzer/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/runem/lit-analyzer.svg" height="20"/></a>
 	</p>
 
-
-
-
-
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#installation)
 
 ## ➤ Installation
@@ -31,7 +27,6 @@ npm install lit-analyzer -g
 - If you use Visual Studio Code you can also install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension.
 - If you use Typescript you can also install [ts-lit-plugin](https://github.com/runem/lit-analyzer/blob/master/packages/ts-lit-plugin).
 
-
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#usage)
 
 ## ➤ Usage
@@ -45,7 +40,6 @@ lit-analyzer "src/**/*.{js,ts}"
 lit-analyzer my-element.js
 lit-analyzer --format markdown --outFile result.md 
 ```
-
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#configuration)
 
@@ -74,7 +68,6 @@ lit-analyzer --strict --rules.no-unknown-tag-name off --format markdown
 | `--quiet` | Report only errors and not warnings | `boolean` |  |
 | `--failFast` | Exit the process right after the first problem has been found | `boolean` | |
 | `--debug` | Enable CLI debug mode | `boolean` |  |
-
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#rules)
 
@@ -610,7 +603,6 @@ css`
 `
 ```
 
-
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#documenting-slots-events-attributes-and-properties)
 
 ## ➤ Documenting slots, events, attributes and properties
@@ -637,20 +629,16 @@ class MyElement extends HTMLElement {
 customElements.define("my-element", MyElement);
 ```
 
-
-
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#contributors)
 
 ## ➤ Contributors
-	
 
 | [<img alt="Rune Mehlsen" src="https://avatars2.githubusercontent.com/u/5372940?s=460&v=4" width="100">](https://twitter.com/runemehlsen) | [<img alt="Andreas Mehlsen" src="https://avatars1.githubusercontent.com/u/6267397?s=460&v=4" width="100">](https://twitter.com/andreasmehlsen) | [<img alt="You?" src="https://joeschmoe.io/api/v1/random" width="100">](https://github.com/runem/lit-analyzer/blob/master/CONTRIBUTING.md) |
-|:--------------------------------------------------:|:--------------------------------------------------:|:--------------------------------------------------:|
-| [Rune Mehlsen](https://twitter.com/runemehlsen)  | [Andreas Mehlsen](https://twitter.com/andreasmehlsen) | [You?](https://github.com/runem/lit-analyzer/blob/master/CONTRIBUTING.md) |
-
+| :--------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: |
+|                                             [Rune Mehlsen](https://twitter.com/runemehlsen)                                              |                                             [Andreas Mehlsen](https://twitter.com/andreasmehlsen)                                              |                                 [You?](https://github.com/runem/lit-analyzer/blob/master/CONTRIBUTING.md)                                  |
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#license)
 
 ## ➤ License
-	
+
 Licensed under [MIT](https://opensource.org/licenses/MIT).

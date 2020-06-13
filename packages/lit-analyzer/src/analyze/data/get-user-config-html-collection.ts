@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from "fs";
-import { SimpleType, SimpleTypeKind } from "ts-simple-type";
+import { SimpleType } from "ts-simple-type";
 import { LitAnalyzerConfig } from "../lit-analyzer-config";
 import { HtmlData } from "../parse/parse-html-data/html-data-tag";
 import { HtmlAttr, HtmlDataCollection, HtmlEvent, HtmlTag, mergeHtmlAttrs, mergeHtmlEvents, mergeHtmlTags } from "../parse/parse-html-data/html-tag";
@@ -46,7 +46,7 @@ export function getUserConfigHtmlCollection(config: LitAnalyzerConfig): HtmlData
 			({
 				name: attrName,
 				kind: "attribute",
-				getType: lazy(() => ({ kind: SimpleTypeKind.ANY } as SimpleType))
+				getType: lazy(() => ({ kind: "ANY" } as SimpleType))
 			} as HtmlAttr)
 	);
 
@@ -55,7 +55,7 @@ export function getUserConfigHtmlCollection(config: LitAnalyzerConfig): HtmlData
 			({
 				name: eventName,
 				kind: "event",
-				getType: lazy(() => ({ kind: SimpleTypeKind.ANY } as SimpleType))
+				getType: lazy(() => ({ kind: "ANY" } as SimpleType))
 			} as HtmlEvent)
 	);
 

@@ -1,16 +1,16 @@
-import { isAssignableToSimpleTypeKind, SimpleType, SimpleTypeKind } from "ts-simple-type";
+import { isAssignableToSimpleTypeKind, SimpleType } from "ts-simple-type";
 
 export function removeUndefinedFromType(type: SimpleType): SimpleType {
 	switch (type.kind) {
-		case SimpleTypeKind.ALIAS:
+		case "ALIAS":
 			return {
 				...type,
 				target: removeUndefinedFromType(type.target)
 			};
-		case SimpleTypeKind.UNION:
+		case "UNION":
 			return {
 				...type,
-				types: type.types.filter(t => !isAssignableToSimpleTypeKind(t, SimpleTypeKind.UNDEFINED))
+				types: type.types.filter(t => !isAssignableToSimpleTypeKind(t, "UNDEFINED"))
 			};
 	}
 

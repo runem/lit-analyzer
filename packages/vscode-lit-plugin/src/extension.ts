@@ -13,7 +13,7 @@ let defaultAnalyzeGlob = "src";
 
 const colorProvider = new ColorProvider();
 
-export async function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
 	const extension = vscode.extensions.getExtension(typeScriptExtensionId);
 	if (!extension) {
 		return;

@@ -17,7 +17,7 @@ export interface ReportedRuleDiagnostic {
 export class RuleCollection {
 	private rules: RuleModule[] = [];
 
-	push(...rule: RuleModule[]) {
+	push(...rule: RuleModule[]): void {
 		this.rules.push(...rule);
 
 		// Sort rules by most important first

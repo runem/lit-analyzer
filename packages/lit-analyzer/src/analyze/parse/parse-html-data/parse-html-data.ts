@@ -1,4 +1,4 @@
-import { SimpleType, SimpleTypeKind, SimpleTypeStringLiteral } from "ts-simple-type";
+import { SimpleType, SimpleTypeStringLiteral } from "ts-simple-type";
 import { lazy } from "../../util/general-util";
 import { HtmlData, HtmlDataAttr, HtmlDataAttrValue, HtmlDataTag, HtmlDataV1, HtmlDataValueSet } from "./html-data-tag";
 import { HtmlAttr, HtmlDataCollection, HtmlTag } from "./html-tag";
@@ -12,7 +12,7 @@ export function parseHtmlData(data: HtmlData): HtmlDataCollection {
 
 function parseDataV1(data: HtmlDataV1): HtmlDataCollection {
 	const valueSetTypeMap = valueSetsToTypeMap(data.valueSets || []);
-	valueSetTypeMap.set("v", { kind: SimpleTypeKind.BOOLEAN });
+	valueSetTypeMap.set("v", { kind: "BOOLEAN" });
 
 	return {
 		tags: (data.tags || []).map(tagData => tagDataToHtmlTag(tagData, valueSetTypeMap)),
@@ -47,7 +47,7 @@ function tagDataToHtmlTagAttr(tagDataAttr: HtmlDataAttr, typeMap: ValueSetTypeMa
 		name,
 		description,
 		fromTagName,
-		getType: lazy(() => type || { kind: SimpleTypeKind.ANY })
+		getType: lazy(() => type || { kind: "ANY" })
 	};
 }
 
@@ -61,12 +61,12 @@ function valueSetsToTypeMap(valueSets: HtmlDataValueSet[]): ValueSetTypeMap {
 
 function attrValuesToUnion(attrValues: HtmlDataAttrValue[]): SimpleType {
 	return {
-		kind: SimpleTypeKind.UNION,
+		kind: "UNION",
 		types: attrValues.map(
 			value =>
 				({
 					value: value.name,
-					kind: SimpleTypeKind.STRING_LITERAL
+					kind: "STRING_LITERAL"
 				} as SimpleTypeStringLiteral)
 		)
 	};

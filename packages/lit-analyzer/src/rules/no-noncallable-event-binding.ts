@@ -1,4 +1,4 @@
-import { isAssignableToSimpleTypeKind, SimpleType, SimpleTypeKind, toTypeString } from "ts-simple-type";
+import { isAssignableToSimpleTypeKind, SimpleType, typeToString, validateType } from "ts-simple-type";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { RuleModule } from "../analyze/types/rule/rule-module";
 import { rangeFromHtmlNodeAttr } from "../analyze/util/range-util";
@@ -24,7 +24,7 @@ const rule: RuleModule = {
 		if (!isTypeBindableToEventListener(typeB)) {
 			context.report({
 				location: rangeFromHtmlNodeAttr(htmlAttr),
-				message: `You are setting up an event listener with a non-callable type '${toTypeString(typeB)}'`
+				message: `You are setting up an event listener with a non-callable type '${typeToString(typeB)}'`
 			});
 		}
 	}
@@ -38,25 +38,25 @@ export default rule;
  */
 function isTypeBindableToEventListener(type: SimpleType): boolean {
 	// Callable types can be used in the binding
-	if (
-		isAssignableToSimpleTypeKind(type, [SimpleTypeKind.FUNCTION, SimpleTypeKind.METHOD, SimpleTypeKind.UNKNOWN], {
-			matchAny: true,
-			op: "or"
-		})
-	) {
+	if (isAssignableToSimpleTypeKind(type, ["FUNCTION", "METHOD", "UNKNOWN"], { matchAny: true })) {
 		return true;
 	}
 
-	// Object types with attributes for the setup function of the event listener can be used
-	if (type.kind === SimpleTypeKind.OBJECT || type.kind === SimpleTypeKind.INTERFACE) {
-		// The "handleEvent" property must be present
-		const handleEventFunction = type.members != null ? type.members.find(m => m.name === "handleEvent") : undefined;
+	return validateType(type, simpleType => {
+		switch (simpleType.kind) {
+			// Object types with attributes for the setup function of the event listener can be used
+			case "OBJECT":
+			case "INTERFACE": {
+				// The "handleEvent" property must be present
+				const handleEventFunction = simpleType.members != null ? simpleType.members.find(m => m.name === "handleEvent") : undefined;
 
-		// The "handleEvent" property must be callable
-		if (handleEventFunction != null) {
-			return isTypeBindableToEventListener(handleEventFunction.type);
+				// The "handleEvent" property must be callable
+				if (handleEventFunction != null) {
+					return isTypeBindableToEventListener(handleEventFunction.type);
+				}
+			}
 		}
-	}
 
-	return false;
+		return undefined;
+	});
 }

@@ -17,7 +17,7 @@ export class Logger extends DefaultLitAnalyzerLogger {
 	 * Logs if this.level >= DEBUG
 	 * @param args
 	 */
-	debug(...args: any[]) {
+	debug(...args: any[]): void {
 		this.appendLogWithLevel(LitAnalyzerLoggerLevel.DEBUG, ...args);
 	}
 
@@ -25,7 +25,7 @@ export class Logger extends DefaultLitAnalyzerLogger {
 	 * Logs if this.level >= ERROR
 	 * @param args
 	 */
-	error(...args: any[]) {
+	error(...args: any[]): void {
 		this.appendLogWithLevel(LitAnalyzerLoggerLevel.ERROR, ...args);
 	}
 
@@ -33,7 +33,7 @@ export class Logger extends DefaultLitAnalyzerLogger {
 	 * Logs if level >= WARN
 	 * @param args
 	 */
-	warn(...args: any[]) {
+	warn(...args: any[]): void {
 		this.appendLogWithLevel(LitAnalyzerLoggerLevel.WARN, ...args);
 	}
 
@@ -41,7 +41,7 @@ export class Logger extends DefaultLitAnalyzerLogger {
 	 * Logs if level >= VERBOSE
 	 * @param args
 	 */
-	verbose(...args: any[]) {
+	verbose(...args: any[]): void {
 		this.appendLogWithLevel(LitAnalyzerLoggerLevel.VERBOSE, ...args);
 	}
 
@@ -54,7 +54,7 @@ export class Logger extends DefaultLitAnalyzerLogger {
 	/**
 	 * Resets the log file.
 	 */
-	resetLogs() {
+	resetLogs(): void {
 		if (this.level > LitAnalyzerLoggerLevel.OFF) {
 			writeFileSync(this.logPath, "");
 		}

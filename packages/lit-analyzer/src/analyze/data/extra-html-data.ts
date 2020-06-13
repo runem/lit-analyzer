@@ -1,4 +1,4 @@
-import { SimpleType, SimpleTypeKind, SimpleTypeStringLiteral } from "ts-simple-type";
+import { SimpleType, SimpleTypeStringLiteral } from "ts-simple-type";
 
 const HTML_5_ATTR_TYPES: { [key: string]: string | string[] } = {
 	onafterprint: "string",
@@ -126,27 +126,27 @@ export function html5TagAttrType(attrName: string): SimpleType {
 function stringToSimpleType(typeString: string | string[], name?: string): SimpleType {
 	if (Array.isArray(typeString)) {
 		return {
-			kind: SimpleTypeKind.UNION,
-			types: typeString.map(value => ({ kind: SimpleTypeKind.STRING_LITERAL, value } as SimpleTypeStringLiteral))
+			kind: "UNION",
+			types: typeString.map(value => ({ kind: "STRING_LITERAL", value } as SimpleTypeStringLiteral))
 		};
 	}
 
 	if (typeString.includes("|")) {
 		return {
-			kind: SimpleTypeKind.UNION,
+			kind: "UNION",
 			types: typeString.split("|").map(typeStr => stringToSimpleType(typeStr))
 		};
 	}
 
 	switch (typeString) {
 		case "number":
-			return { kind: SimpleTypeKind.NUMBER, name };
+			return { kind: "NUMBER", name };
 		case "boolean":
-			return { kind: SimpleTypeKind.BOOLEAN, name };
+			return { kind: "BOOLEAN", name };
 		case "string":
-			return { kind: SimpleTypeKind.STRING, name };
+			return { kind: "STRING", name };
 		default:
-			return { kind: SimpleTypeKind.ANY, name };
+			return { kind: "ANY", name };
 	}
 }
 

@@ -53,4 +53,9 @@ async function copyPackage(linkPackageName, destPackageName) {
 	for (const mod of extraneous) {
 		await remove(`./packages/${destPackageName}/node_modules/${linkPackageName}/node_modules/${mod}`);
 	}
+
+	const missing = ["ts-simple-type"];
+	for (const mod of missing) {
+		await copy(`./node_modules/${mod}`, `./packages/${destPackageName}/node_modules/${mod}`);
+	}
 }

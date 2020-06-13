@@ -26,7 +26,7 @@ export class HtmlDataSource {
 		return this._globalSlots;
 	}
 
-	absorbCollection(collection: Partial<HtmlDataCollection>) {
+	absorbCollection(collection: Partial<HtmlDataCollection>): void {
 		if (collection.tags != null) {
 			// For now, lowercase all names because "parse5" doesn't distinguish when parsing
 			collection.tags.forEach(tag => this._globalTags.set(tag.tagName.toLowerCase(), tag));
@@ -53,7 +53,7 @@ export class HtmlDataSource {
 		}
 	}
 
-	forgetCollection({ tags, global: { events, attributes, slots, properties } }: NamedHtmlDataCollection) {
+	forgetCollection({ tags, global: { events, attributes, slots, properties } }: NamedHtmlDataCollection): void {
 		if (tags != null) tags.forEach(tagName => this._globalTags.delete(tagName));
 		if (events != null) events.forEach(eventName => this._globalEvents.delete(eventName));
 		if (attributes != null) attributes.forEach(attrName => this._globalAttributes.delete(attrName));

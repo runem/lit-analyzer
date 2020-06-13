@@ -3,7 +3,7 @@ import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert";
 import { makeElement } from "../helpers/generate-test-file";
 import { tsTest } from "../helpers/ts-test";
 
-tsTest.only("Report missing imports of custom elements", t => {
+tsTest("Report missing imports of custom elements", t => {
 	const { diagnostics } = getDiagnostics([makeElement({}), "html`<my-element></my-element>`"], { rules: { "no-missing-import": true } });
 	hasDiagnostic(t, diagnostics, "no-missing-import");
 });

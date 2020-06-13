@@ -27,7 +27,7 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 		const oldMethod = (languageService as any)[methodName];
 
 		if (newMethod !== oldMethod) {
-			(nextLanguageService as any)[methodName] = function() {
+			(nextLanguageService as any)[methodName] = function () {
 				if (plugin.context.config.disable && oldMethod != null) {
 					return oldMethod(...arguments);
 				}

@@ -6,7 +6,7 @@ export class DefaultAnalyzerDefinitionStore implements AnalyzerDefinitionStore {
 	private analysisResultForFile = new Map<string, AnalyzerResult>();
 	private definitionForTagName = new Map<string, ComponentDefinition>();
 
-	absorbAnalysisResult(sourceFile: SourceFile, result: AnalyzerResult) {
+	absorbAnalysisResult(sourceFile: SourceFile, result: AnalyzerResult): void {
 		this.analysisResultForFile.set(sourceFile.fileName, result);
 
 		result.componentDefinitions.forEach(definition => {
@@ -14,7 +14,7 @@ export class DefaultAnalyzerDefinitionStore implements AnalyzerDefinitionStore {
 		});
 	}
 
-	forgetAnalysisResultForFile(sourceFile: SourceFile) {
+	forgetAnalysisResultForFile(sourceFile: SourceFile): void {
 		const result = this.analysisResultForFile.get(sourceFile.fileName);
 		if (result == null) return;
 

@@ -1,4 +1,3 @@
-import { setTypescriptModule as setTypescriptModuleTsSimpleType } from "ts-simple-type";
 import { SourceFile } from "typescript";
 import { ComponentAnalyzer } from "./component-analyzer/component-analyzer";
 import { LitCssDocumentAnalyzer } from "./document-analyzer/css/lit-css-document-analyzer";
@@ -33,9 +32,8 @@ export class LitAnalyzer {
 
 	constructor(private context: LitAnalyzerContext) {
 		// Set the Typescript module
-		// I plan on removing these methods, so only "context.ts" is used.
+		// I plan on removing this function, so only "context.ts" is used.
 		setTypescriptModule(context.ts);
-		setTypescriptModuleTsSimpleType(context.ts);
 	}
 
 	getOutliningSpansInFile(file: SourceFile): LitOutliningSpan[] {

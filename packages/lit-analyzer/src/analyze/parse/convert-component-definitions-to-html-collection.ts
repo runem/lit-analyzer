@@ -1,4 +1,4 @@
-import { isSimpleType, SimpleType, SimpleTypeKind, toSimpleType } from "ts-simple-type";
+import { isSimpleType, SimpleType, toSimpleType } from "ts-simple-type";
 import { TypeChecker } from "typescript";
 import { AnalyzerResult, ComponentDeclaration, ComponentDefinition, ComponentFeatures } from "web-component-analyzer";
 import { lazy } from "../util/general-util";
@@ -28,11 +28,7 @@ export function convertComponentDeclarationToHtmlTag(
 ): HtmlTag {
 	const tagName = definition?.tagName;
 
-	const builtIn =
-		definition == null ||
-		iterableFirst(declaration.declarationNodes)
-			?.getSourceFile()
-			.fileName.endsWith("lib.dom.d.ts");
+	const builtIn = definition == null || iterableFirst(declaration.declarationNodes)?.getSourceFile().fileName.endsWith("lib.dom.d.ts");
 
 	const htmlTag: HtmlTag = {
 		declaration,
@@ -78,7 +74,7 @@ export function convertComponentFeaturesToHtml(
 				const type = event.type?.();
 
 				if (type == null) {
-					return { kind: SimpleTypeKind.ANY };
+					return { kind: "ANY" };
 				}
 
 				return isSimpleType(type) ? type : toSimpleType(type, checker);
@@ -91,13 +87,13 @@ export function convertComponentFeaturesToHtml(
 			kind: "attribute",
 			name: `on${event.name}`,
 			description: event.jsDoc?.description,
-			getType: lazy(() => ({ kind: SimpleTypeKind.STRING } as SimpleType)),
+			getType: lazy(() => ({ kind: "STRING" } as SimpleType)),
 			declaration: {
 				attrName: `on${event.name}`,
 				jsDoc: event.jsDoc,
 				kind: "attribute",
 				node: event.node,
-				type: () => ({ kind: SimpleTypeKind.ANY })
+				type: () => ({ kind: "ANY" })
 			},
 			builtIn,
 			fromTagName
@@ -131,7 +127,7 @@ export function convertComponentFeaturesToHtml(
 				const type = member.type?.();
 
 				if (type == null) {
-					return { kind: SimpleTypeKind.ANY };
+					return { kind: "ANY" };
 				}
 
 				return isSimpleType(type) ? type : toSimpleType(type, checker);

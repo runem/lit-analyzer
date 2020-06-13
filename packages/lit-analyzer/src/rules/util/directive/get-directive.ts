@@ -1,4 +1,4 @@
-import { SimpleType, SimpleTypeKind, toSimpleType } from "ts-simple-type";
+import { SimpleType, toSimpleType } from "ts-simple-type";
 import { Expression } from "typescript";
 import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../analyze/types/html-node/html-node-attr-assignment-types";
 import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
@@ -85,9 +85,12 @@ export function getDirective(assignment: HtmlNodeAttrAssignment, context: RuleMo
 				// The return type of the function becomes the actual type of the expression
 				const actualType = lazy(() => {
 					if (args.length >= 2) {
-						const returnFunctionType = toSimpleType(checker.getTypeAtLocation(args[1]), checker);
+						let returnFunctionType = toSimpleType(checker.getTypeAtLocation(args[1]), checker);
+						if ("call" in returnFunctionType && returnFunctionType.call != null) {
+							returnFunctionType = returnFunctionType.call;
+						}
 
-						if (returnFunctionType.kind === SimpleTypeKind.FUNCTION) {
+						if (returnFunctionType.kind === "FUNCTION") {
 							return returnFunctionType.returnType;
 						}
 					}
@@ -106,7 +109,7 @@ export function getDirective(assignment: HtmlNodeAttrAssignment, context: RuleMo
 			case "styleMap":
 				return {
 					kind: functionName,
-					actualType: () => ({ kind: SimpleTypeKind.STRING }),
+					actualType: () => ({ kind: "STRING" }),
 					args
 				};
 

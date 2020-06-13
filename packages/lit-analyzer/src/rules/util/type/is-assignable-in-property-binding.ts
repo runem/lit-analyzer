@@ -1,4 +1,4 @@
-import { SimpleType, toTypeString } from "ts-simple-type";
+import { SimpleType, typeToString } from "ts-simple-type";
 import { HtmlNodeAttr } from "../../../analyze/types/html-node/html-node-attr-types";
 import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
 import { rangeFromHtmlNodeAttr } from "../../../analyze/util/range-util";
@@ -20,7 +20,7 @@ export function isAssignableInPropertyBinding(
 	if (!isAssignableToType({ typeA, typeB }, context)) {
 		context.report({
 			location: rangeFromHtmlNodeAttr(htmlAttr),
-			message: `Type '${toTypeString(typeB)}' is not assignable to '${toTypeString(typeA)}'`
+			message: `Type '${typeToString(typeB)}' is not assignable to '${typeToString(typeA)}'`
 		});
 
 		return false;

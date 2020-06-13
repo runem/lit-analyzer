@@ -5,7 +5,7 @@ import { AnalyzerDependencyStore } from "../analyzer-dependency-store";
 export class DefaultAnalyzerDependencyStore implements AnalyzerDependencyStore {
 	importedComponentDefinitionsInFile = new Map<string, ComponentDefinition[]>();
 
-	absorbComponentDefinitionsForFile(sourceFile: SourceFile, result: ComponentDefinition[]) {
+	absorbComponentDefinitionsForFile(sourceFile: SourceFile, result: ComponentDefinition[]): void {
 		this.importedComponentDefinitionsInFile.set(sourceFile.fileName, result);
 	}
 
