@@ -1,86 +1,131 @@
 import * as tsModule from "typescript";
 import { Node, Program, SourceFile } from "typescript";
-import { ComponentDefinition } from "web-component-analyzer";
-
-const MAX_DEPTH = 2;
 
 interface IVisitDependenciesContext {
 	program: Program;
 	ts: typeof tsModule;
 	project: ts.server.Project | undefined;
-	lockedFiles: string[];
-	getDefinitionsInFile(file: SourceFile): ComponentDefinition[] | undefined;
-	getImportedDefinitionsInFile(file: SourceFile): ComponentDefinition[] | undefined;
-	addDefinitionsForFile(file: SourceFile, results: ComponentDefinition[], isCircular: boolean): void;
-	addCircularReference(fromFile: SourceFile, toFile: SourceFile): void;
+	directImportCache: WeakMap<SourceFile, Set<SourceFile>>;
+	emitIndirectImport(file: SourceFile, importedFrom?: SourceFile): boolean;
+	emitDirectImport?(file: SourceFile): void;
 	depth?: number;
+	maxExternalDepth?: number;
+	maxInternalDepth?: number;
 }
 
 /**
- * Visits dependencies recursively.
- * @param node
+ * Visits all indirect imports from a source file
+ * Emits them using "emitIndirectImport" callback
+ * @param sourceFile
  * @param context
  */
-export function visitDependencies(node: Node, context: IVisitDependenciesContext): void {
-	if (node == null) return;
+export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, context: IVisitDependenciesContext): void {
+	const currentDepth = context.depth ?? 0;
 
-	if (context.ts.isSourceFile(node)) {
-		const existingResult = context.getImportedDefinitionsInFile(node);
+	// Emit a visit. If this file has been seen already, the function will return false, and traversal will stop
+	if (!context.emitIndirectImport(sourceFile)) {
+		return;
+	}
 
-		if (existingResult != null) {
-			// It's already cached
-			context.addDefinitionsForFile(node, existingResult, false);
-		} else {
-			const result = [...(context.getDefinitionsInFile(node) || [])];
-			let isCircular = false;
+	const inExternal = context.program.isSourceFileFromExternalLibrary(sourceFile);
 
-			// Pick up all new components and add them to the scope of this file.
-			const newContext: IVisitDependenciesContext = {
-				...context,
+	// Check if we have traversed too deep
+	// Subtract 1 because depth starts at 0
+	if (inExternal && currentDepth >= (context.maxExternalDepth ?? Infinity) - 1) {
+		return;
+	} else if (!inExternal && currentDepth >= (context.maxInternalDepth ?? Infinity) - 1) {
+		return;
+	}
 
-				// Expand locked files with this file
-				lockedFiles: [...context.lockedFiles, node.fileName],
+	// Get all direct imports from the cache
+	let directImports = context.directImportCache.get(sourceFile);
 
-				addDefinitionsForFile(file: SourceFile, newResults: ComponentDefinition[], isCircular: boolean): void {
-					context.addDefinitionsForFile(file, newResults, isCircular);
-					result.push(...newResults);
-				},
-				addCircularReference() {
-					isCircular = true;
-				}
-			};
+	if (directImports == null) {
+		// If the cache didn't have all direct imports, build up using the visitor function
+		directImports = new Set<SourceFile>();
 
-			node.forEachChild(child => visitDependencies(child, newContext));
+		const newContext = {
+			...context,
+			emitDirectImport(file: SourceFile) {
+				directImports!.add(file);
+			}
+		};
 
-			// Filter out duplicates in the "components" array. Eg two files depend on the same elements.
-			const uniqueResults = Array.from(new Set(result));
+		// Emit all direct imports
+		visitDirectImports(sourceFile, newContext);
 
-			context.addDefinitionsForFile(node, uniqueResults, isCircular);
-			return;
-		}
-	} else if (context.ts.isImportDeclaration(node) || context.ts.isExportDeclaration(node)) {
-		if (
-			node.moduleSpecifier != null &&
-			context.ts.isStringLiteral(node.moduleSpecifier) &&
-			context.ts.isSourceFile(node.parent) &&
-			((context.depth ?? 0) < MAX_DEPTH || !context.program.isSourceFileFromExternalLibrary(node.parent))
-		) {
-			visitModuleWithName(node.moduleSpecifier.text, node, context);
-		}
-	} else if (context.ts.isCallExpression(node) && node.expression.kind === context.ts.SyntaxKind.ImportKeyword) {
-		const moduleSpecifier = node.arguments[0];
-		if (moduleSpecifier != null && context.ts.isStringLiteralLike(moduleSpecifier)) {
-			visitModuleWithName(moduleSpecifier.text, node, context);
-		}
-	} else {
-		node.forEachChild(child => visitDependencies(child, context));
+		// Cache the result
+		context.directImportCache.set(sourceFile, directImports);
+	}
+
+	// Call this function recursively on all direct imports from this source file
+	for (const file of directImports) {
+		const toExternal = context.program.isSourceFileFromExternalLibrary(file);
+		const fromProjectToExternal = !inExternal && toExternal;
+
+		// It's possible to only follow external dependencies from the source file of interest (depth 0)
+		/*if (fromProjectToExternal && currentDepth !== 0) {
+		 continue;
+		 }*/
+
+		// Calculate new depth. Reset depth to 0 if we go from a project module to an external module.
+		// This will make sure that we always go X modules deep into external modules
+		const newDepth = fromProjectToExternal ? 0 : currentDepth + 1;
+
+		// Visit direct imported source files recursively
+		visitIndirectImportsFromSourceFile(file, {
+			...context,
+			depth: newDepth
+		});
 	}
 }
 
-function visitModuleWithName(moduleSpecifier: string, node: Node, context: IVisitDependenciesContext) {
+/**
+ * Visits all direct imports in an AST.
+ * Emits them using "emitDirectImport"
+ * @param node
+ * @param context
+ */
+function visitDirectImports(node: Node, context: IVisitDependenciesContext): void {
+	if (node == null) return;
+
+	// Handle top level imports/exports: (import "..."), (import { ... } from "..."), (export * from "...")
+	if (context.ts.isImportDeclaration(node) || context.ts.isExportDeclaration(node)) {
+		if (node.moduleSpecifier != null && context.ts.isStringLiteral(node.moduleSpecifier) && context.ts.isSourceFile(node.parent)) {
+			// Potentially ignore all imports/exports with named imports/exports because importing an interface would not
+			//    necessarily result in the custom element being defined. An even better solution would be to ignore all
+			//    import declarations with only interface-like/type-alias imports.
+			/*if (("importClause" in node && node.importClause != null) || ("exportClause" in node && node.exportClause != null)) {
+			 return;
+			 }*/
+
+			emitDirectModuleImportWithName(node.moduleSpecifier.text, node, context);
+		}
+	}
+
+	// Handle async imports (await import(...))
+	else if (context.ts.isCallExpression(node) && node.expression.kind === context.ts.SyntaxKind.ImportKeyword) {
+		const moduleSpecifier = node.arguments[0];
+		if (moduleSpecifier != null && context.ts.isStringLiteralLike(moduleSpecifier)) {
+			emitDirectModuleImportWithName(moduleSpecifier.text, node, context);
+		}
+	}
+
+	node.forEachChild(child => visitDirectImports(child, context));
+}
+
+/**
+ * Resolves and emits a direct imported module
+ * @param moduleSpecifier
+ * @param node
+ * @param context
+ */
+function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, context: IVisitDependenciesContext) {
+	const fromSourceFile = node.getSourceFile();
+
 	// Resolve the imported string
 	const result = context.project
-		? context.project.getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, node.getSourceFile().fileName)
+		? context.project.getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, fromSourceFile.fileName)
 		: "getResolvedModuleWithFailedLookupLocationsFromCache" in context.program
 		? // eslint-disable-next-line @typescript-eslint/no-explicit-any
 		  (context.program as any)["getResolvedModuleWithFailedLookupLocationsFromCache"](moduleSpecifier, node.getSourceFile().fileName)
@@ -89,19 +134,10 @@ function visitModuleWithName(moduleSpecifier: string, node: Node, context: IVisi
 	const mod = result != null ? result.resolvedModule : undefined;
 
 	if (mod != null) {
-		const isCircularImport = context.lockedFiles.includes(mod.resolvedFileName);
 		const sourceFile = context.program.getSourceFile(mod.resolvedFileName);
 
-		if (!isCircularImport) {
-			if (sourceFile != null) {
-				// Visit dependencies in the import recursively
-				visitDependencies(sourceFile, { ...context, depth: (context.depth ?? 0) + 1 });
-			}
-		} else if (sourceFile != null) {
-			// Stop! Prevent infinite loop due to circular imports
-			context.addCircularReference(node.getSourceFile(), sourceFile);
+		if (sourceFile != null) {
+			context.emitDirectImport?.(sourceFile);
 		}
-	} else {
-		//logger.error("Couldn't find module for ", moduleSpecifier, "from", node.getSourceFile().fileName);
 	}
 }
