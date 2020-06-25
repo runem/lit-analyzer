@@ -1,4 +1,4 @@
-import { basename, dirname, relative } from "path";
+import { basename, dirname, posix } from "path";
 import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
 import { LitHtmlDiagnostic, LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
 import { RuleModule } from "../analyze/types/rule-module";
@@ -64,7 +64,7 @@ export default rule;
  * @param toFileName
  */
 function getRelativePathForImport(fromFileName: string, toFileName: string): string {
-	const path = relative(dirname(fromFileName), dirname(toFileName));
+	const path = posix.relative(dirname(fromFileName), dirname(toFileName));
 	const filenameWithoutExt = basename(toFileName).replace(/\.[^/.]+$/, "");
 	const importPath = `./${path ? `${path}/` : ""}${filenameWithoutExt}`;
 	return importPath
