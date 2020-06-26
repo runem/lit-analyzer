@@ -195,10 +195,16 @@ export class LitAnalyzer {
 
 		const diagnostics: LitDiagnostic[] = [];
 
-		// Get diagnostics for components in this file
+		// Get diagnostics for components definitions in this file
 		const definitions = this.context.definitionStore.getDefinitionsWithDeclarationInFile(file);
 		for (const definition of definitions) {
 			diagnostics.push(...this.componentAnalyzer.getDiagnostics(definition, this.context));
+		}
+
+		// Get diagnostics for components in this file
+		const declarations = this.context.definitionStore.getComponentDeclarationsInFile(file);
+		for (const declaration of declarations) {
+			diagnostics.push(...this.componentAnalyzer.getDiagnostics(declaration, this.context));
 		}
 
 		// Get diagnostics for documents in this file
@@ -230,7 +236,18 @@ export class LitAnalyzer {
 		else {
 			const definitions = this.context.definitionStore.getDefinitionsWithDeclarationInFile(file);
 			for (const definition of definitions) {
-				return this.componentAnalyzer.getCodeFixesAtOffsetRange(definition, makeSourceFileRange(sourceFileRange), this.context);
+				const result = this.componentAnalyzer.getCodeFixesAtOffsetRange(definition, makeSourceFileRange(sourceFileRange), this.context);
+				if (result != null) {
+					return result;
+				}
+			}
+
+			const components = this.context.definitionStore.getComponentDeclarationsInFile(file);
+			for (const component of components) {
+				const result = this.componentAnalyzer.getCodeFixesAtOffsetRange(component, makeSourceFileRange(sourceFileRange), this.context);
+				if (result != null) {
+					return result;
+				}
 			}
 		}
 

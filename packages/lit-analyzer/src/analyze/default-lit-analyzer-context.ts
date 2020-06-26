@@ -37,7 +37,6 @@ import { DefaultAnalyzerHtmlStore } from "./store/html-store/default-analyzer-ht
 import { HtmlDataSourceKind } from "./store/html-store/html-data-source-merged";
 import { RuleModule } from "./types/rule/rule-module";
 import { changedSourceFileIterator } from "./util/changed-source-file-iterator";
-import { iterableFirst } from "./util/iterable-util";
 
 const ALL_RULES: RuleModule[] = [
 	noExpressionlessPropertyBindingRule,
@@ -165,12 +164,9 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 			seenFiles.add(sourceFile);
 
 			this.definitionStore.getDefinitionsWithDeclarationInFile(sourceFile).forEach(definition => {
-				const node = iterableFirst(definition.identifierNodes);
-				if (node != null) {
-					const sf = this.program.getSourceFile(node.getSourceFile().fileName);
-					if (sf != null) {
-						invalidatedFiles.add(sf);
-					}
+				const sf = this.program.getSourceFile(definition.sourceFile.fileName);
+				if (sf != null) {
+					invalidatedFiles.add(sf);
 				}
 			});
 
@@ -196,6 +192,7 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 				analyzeGlobalFeatures: true,
 				analyzeDefaultLib: true,
 				analyzeDependencies: true,
+				analyzeAllDeclarations: false,
 				excludedDeclarationNames: ["HTMLElement"]
 			}
 		});

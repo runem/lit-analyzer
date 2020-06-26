@@ -21,7 +21,7 @@ const rule: RuleModule = {
 			attrNameNode = member.meta.node?.attribute || member.node;
 		}
 
-		if (attrName != null && attrNameNode != null && !isValidAttributeName(attrName)) {
+		if (attrName != null && attrNameNode != null && attrNameNode.getSourceFile() === context.file && !isValidAttributeName(attrName)) {
 			context.report({
 				location: rangeFromNode(attrNameNode),
 				message: `'${attrName}' is not a valid attribute name.`

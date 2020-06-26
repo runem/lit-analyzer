@@ -2,7 +2,6 @@ import { isSimpleType, SimpleType, toSimpleType } from "ts-simple-type";
 import { TypeChecker } from "typescript";
 import { AnalyzerResult, ComponentDeclaration, ComponentDefinition, ComponentFeatures } from "web-component-analyzer";
 import { lazy } from "../util/general-util";
-import { iterableFirst } from "../util/iterable-util";
 import { HtmlDataCollection, HtmlDataFeatures, HtmlMemberBase, HtmlTag } from "./parse-html-data/html-tag";
 
 export interface AnalyzeResultConversionOptions {
@@ -28,7 +27,7 @@ export function convertComponentDeclarationToHtmlTag(
 ): HtmlTag {
 	const tagName = definition?.tagName;
 
-	const builtIn = definition == null || iterableFirst(declaration.declarationNodes)?.getSourceFile().fileName.endsWith("lib.dom.d.ts");
+	const builtIn = definition == null || declaration.sourceFile.fileName.endsWith("lib.dom.d.ts");
 
 	const htmlTag: HtmlTag = {
 		declaration,
@@ -40,13 +39,11 @@ export function convertComponentDeclarationToHtmlTag(
 
 	if (addDeclarationPropertiesAsAttributes && !builtIn) {
 		for (const htmlProp of htmlTag.properties) {
-			if (htmlProp.declaration != null && !("attrName" in htmlProp.declaration)) {
-				if (htmlProp.declaration.node.getSourceFile().isDeclarationFile) {
-					htmlTag.attributes.push({
-						...htmlProp,
-						kind: "attribute"
-					});
-				}
+			if (htmlProp.declaration != null && htmlProp.declaration.attrName == null && htmlProp.declaration.node.getSourceFile().isDeclarationFile) {
+				htmlTag.attributes.push({
+					...htmlProp,
+					kind: "attribute"
+				});
 			}
 		}
 	}

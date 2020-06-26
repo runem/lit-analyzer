@@ -1,16 +1,27 @@
 import { SourceFile } from "typescript";
-import { AnalyzerResult, ComponentDefinition } from "web-component-analyzer";
+import { AnalyzerResult, ComponentDeclaration, ComponentDefinition, visitAllHeritageClauses } from "web-component-analyzer";
+import { getDeclarationsInFile } from "../../util/component-util";
 import { AnalyzerDefinitionStore } from "../analyzer-definition-store";
 
 export class DefaultAnalyzerDefinitionStore implements AnalyzerDefinitionStore {
 	private analysisResultForFile = new Map<string, AnalyzerResult>();
 	private definitionForTagName = new Map<string, ComponentDefinition>();
 
+	private intersectingDefinitionsForFile = new Map<string, Set<ComponentDefinition>>();
+
 	absorbAnalysisResult(sourceFile: SourceFile, result: AnalyzerResult): void {
 		this.analysisResultForFile.set(sourceFile.fileName, result);
 
 		result.componentDefinitions.forEach(definition => {
 			this.definitionForTagName.set(definition.tagName, definition);
+
+			addToSetInMap(this.intersectingDefinitionsForFile, sourceFile.fileName, definition);
+
+			visitAllHeritageClauses(definition.declaration(), clause => {
+				if (clause.declaration != null) {
+					addToSetInMap(this.intersectingDefinitionsForFile, clause.declaration.sourceFile.fileName, definition);
+				}
+			});
 		});
 	}
 
@@ -19,6 +30,12 @@ export class DefaultAnalyzerDefinitionStore implements AnalyzerDefinitionStore {
 		if (result == null) return;
 
 		result.componentDefinitions.forEach(definition => {
+			visitAllHeritageClauses(definition.declaration(), clause => {
+				if (clause.declaration != null) {
+					this.intersectingDefinitionsForFile.get(clause.declaration.sourceFile.fileName)?.delete(definition);
+				}
+			});
+
 			this.definitionForTagName.delete(definition.tagName);
 		});
 
@@ -30,9 +47,19 @@ export class DefaultAnalyzerDefinitionStore implements AnalyzerDefinitionStore {
 	}
 
 	getDefinitionsWithDeclarationInFile(sourceFile: SourceFile): ComponentDefinition[] {
-		return Array.from(this.definitionForTagName.values()).filter(d =>
-			[...d.declaration().declarationNodes].map(n => n.getSourceFile()).find(sf => sf.fileName === sourceFile.fileName)
-		);
+		return Array.from(this.intersectingDefinitionsForFile.get(sourceFile.fileName) || []);
+	}
+
+	getComponentDeclarationsInFile(sourceFile: SourceFile): ComponentDeclaration[] {
+		const declarations = new Set<ComponentDeclaration>();
+
+		for (const definition of this.intersectingDefinitionsForFile.get(sourceFile.fileName) || []) {
+			for (const declaration of getDeclarationsInFile(definition, sourceFile)) {
+				declarations.add(declaration);
+			}
+		}
+
+		return Array.from(declarations);
 	}
 
 	getDefinitionForTagName(tagName: string): ComponentDefinition | undefined {
@@ -43,4 +70,10 @@ export class DefaultAnalyzerDefinitionStore implements AnalyzerDefinitionStore {
 		const result = this.analysisResultForFile.get(sourceFile.fileName);
 		return (result != null && result.componentDefinitions) || [];
 	}
+}
+
+function addToSetInMap<K, V>(map: Map<K, Set<V>>, key: K, value: V) {
+	const set = map.get(key) || new Set();
+	set.add(value);
+	map.set(key, set);
 }

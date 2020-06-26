@@ -10,11 +10,12 @@ export function isAssignableInBooleanBinding(
 	context: RuleModuleContext
 ): boolean | undefined {
 	// Test if the user is trying to use ? modifier on a non-boolean type.
-	if (!isAssignableToType({ typeA: { kind: "BOOLEAN" }, typeB }, context)) {
+	if (!isAssignableToType({ typeA: { kind: "UNION", types: [{ kind: "BOOLEAN" }, { kind: "UNDEFINED" }, { kind: "NULL" }] }, typeB }, context)) {
 		context.report({
 			location: rangeFromHtmlNodeAttr(htmlAttr),
 			message: `Type '${typeToString(typeB)}' is not assignable to 'boolean'`
 		});
+
 		return false;
 	}
 

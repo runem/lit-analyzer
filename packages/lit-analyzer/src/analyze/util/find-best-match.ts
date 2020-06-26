@@ -13,28 +13,26 @@ export interface FindBestMatchOptions<T> {
  * @param elements
  * @param options
  */
-export function findBestMatch<T extends string | object>(find: string, elements: T[], options: FindBestMatchOptions<T>): T | undefined;
 export function findBestMatch<T extends string | object>(find: string, elements: T[], options: FindBestMatchOptions<T>): T | undefined {
 	options.caseSensitive = "caseSensitive" in options ? options.caseSensitive : false;
 	options.threshold = "threshold" in options ? options.threshold : 0.5;
 
-	return (didYouMean(find, elements, {
-		caseSensitive: options.caseSensitive,
-		threshold: options.threshold,
-		matchPath: [options.matchKey] as [string],
-		returnType: dym.ReturnTypeEnums.FIRST_CLOSEST_MATCH,
-		trimSpaces: false
-	}) as unknown) as T | undefined;
+	return (
+		didYouMean(find, elements as never[], {
+			caseSensitive: options.caseSensitive,
+			threshold: options.threshold,
+			matchPath: [options.matchKey] as [string],
+			returnType: dym.ReturnTypeEnums.FIRST_CLOSEST_MATCH,
+			trimSpaces: false
+		}) || undefined
+	);
 }
 
 export function findBestStringMatch(
 	find: string,
 	elements: string[],
-	options: Omit<FindBestMatchOptions<string>, "matchKey"> = {
-		caseSensitive: true,
-		threshold: 0.5
-	}
+	{ caseSensitive = true, threshold = 0.5 }: Omit<FindBestMatchOptions<string>, "matchKey"> = {}
 ): string | undefined {
-	const matches = didYouMean(find, elements, options);
+	const matches = didYouMean(find, elements, { caseSensitive, threshold });
 	return typeof matches === "string" ? matches : Array.isArray(matches) ? matches[0] : undefined;
 }

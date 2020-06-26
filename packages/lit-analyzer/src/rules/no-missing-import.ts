@@ -1,7 +1,6 @@
 import { basename, dirname, relative } from "path";
 import { RuleModule } from "../analyze/types/rule/rule-module";
 import { isCustomElementTagName } from "../analyze/util/is-valid-name";
-import { iterableFirst } from "../analyze/util/iterable-util";
 import { rangeFromHtmlNode } from "../analyze/util/range-util";
 
 /**
@@ -38,10 +37,10 @@ const rule: RuleModule = {
 				message: `Missing import for <${htmlNode.tagName}>`,
 				suggestion: config.dontSuggestConfigChanges ? undefined : `You can disable this check by disabling the 'no-missing-import' rule.`,
 				fix: () => {
-					const importPath = getRelativePathForImport(file.fileName, iterableFirst(definition.tagNameNodes)!.getSourceFile().fileName);
+					const importPath = getRelativePathForImport(file.fileName, definition.sourceFile.fileName);
 
 					return {
-						message: `Import "${iterableFirst(definition.identifierNodes)?.getText() || "component"}" from module "${importPath}"`,
+						message: `Import <${definition.tagName}> from module "${importPath}"`,
 						actions: [
 							{
 								kind: "import",

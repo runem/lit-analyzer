@@ -14,10 +14,13 @@ export interface LitAnalyzerContext {
 	readonly program: Program;
 	readonly project: tsServer.server.Project | undefined;
 	readonly config: LitAnalyzerConfig;
+
+	// Stores
 	readonly htmlStore: AnalyzerHtmlStore;
 	readonly dependencyStore: AnalyzerDependencyStore;
 	readonly documentStore: AnalyzerDocumentStore;
 	readonly definitionStore: AnalyzerDefinitionStore;
+
 	readonly logger: LitAnalyzerLogger;
 	readonly rules: RuleCollection;
 	readonly currentFile: SourceFile;

@@ -37,7 +37,7 @@ const rule: RuleModule = {
 
 		// Get the decorator of the property if any
 		const decoratorIdentifier = getDecoratorIdentifier(member, context);
-		if (decoratorIdentifier == null) {
+		if (decoratorIdentifier == null || decoratorIdentifier.getSourceFile() !== context.file) {
 			return;
 		}
 

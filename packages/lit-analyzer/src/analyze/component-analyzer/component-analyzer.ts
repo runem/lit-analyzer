@@ -1,5 +1,6 @@
-import { ComponentDefinition } from "web-component-analyzer";
+import { ComponentDeclaration, ComponentDefinition } from "web-component-analyzer";
 import { LitAnalyzerContext } from "../lit-analyzer-context";
+import { ReportedRuleDiagnostic } from "../rule-collection";
 import { LitCodeFix } from "../types/lit-code-fix";
 import { LitDiagnostic } from "../types/lit-diagnostic";
 import { SourceFileRange } from "../types/range";
@@ -9,18 +10,32 @@ import { convertRuleDiagnosticToLitDiagnostic } from "../util/rule-diagnostic-ut
 import { converRuleFixToLitCodeFix } from "../util/rule-fix-util";
 
 export class ComponentAnalyzer {
-	getDiagnostics(definition: ComponentDefinition, context: LitAnalyzerContext): LitDiagnostic[] {
-		return context.rules.getDiagnosticsFromDefinition(definition, context).map(d => convertRuleDiagnosticToLitDiagnostic(d, context));
+	getDiagnostics(definitionOrDeclaration: ComponentDefinition | ComponentDeclaration, context: LitAnalyzerContext): LitDiagnostic[] {
+		return this.getRuleDiagnostics(definitionOrDeclaration, context).map(d => convertRuleDiagnosticToLitDiagnostic(d, context));
 	}
 
-	getCodeFixesAtOffsetRange(definition: ComponentDefinition, range: SourceFileRange, context: LitAnalyzerContext): LitCodeFix[] {
+	getCodeFixesAtOffsetRange(
+		definitionOrDeclaration: ComponentDefinition | ComponentDeclaration,
+		range: SourceFileRange,
+		context: LitAnalyzerContext
+	): LitCodeFix[] {
 		return arrayFlat(
 			arrayDefined(
-				context.rules
-					.getDiagnosticsFromDefinition(definition, context)
+				this.getRuleDiagnostics(definitionOrDeclaration, context)
 					.filter(({ diagnostic }) => intersects(range, diagnostic.location))
 					.map(({ diagnostic }) => diagnostic.fix?.())
 			)
 		).map(ruleFix => converRuleFixToLitCodeFix(ruleFix));
+	}
+
+	private getRuleDiagnostics(
+		definitionOrDeclaration: ComponentDefinition | ComponentDeclaration,
+		context: LitAnalyzerContext
+	): ReportedRuleDiagnostic[] {
+		if ("tagName" in definitionOrDeclaration) {
+			return context.rules.getDiagnosticsFromDefinition(definitionOrDeclaration, context);
+		} else {
+			return context.rules.getDiagnosticsFromDeclaration(definitionOrDeclaration, context);
+		}
 	}
 }

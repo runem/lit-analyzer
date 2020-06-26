@@ -1,4 +1,4 @@
-import { ComponentDefinition } from "web-component-analyzer";
+import { ComponentDeclaration, ComponentDefinition } from "web-component-analyzer";
 import { isRuleEnabled, LitAnalyzerRuleId } from "./lit-analyzer-config";
 import { LitAnalyzerContext } from "./lit-analyzer-context";
 import { HtmlDocument } from "./parse/document/text-document/html-document/html-document";
@@ -7,7 +7,6 @@ import { HtmlNode, HtmlNodeKind } from "./types/html-node/html-node-types";
 import { RuleDiagnostic } from "./types/rule/rule-diagnostic";
 import { RuleModule, RuleModuleImplementation } from "./types/rule/rule-module";
 import { RuleModuleContext } from "./types/rule/rule-module-context";
-import { iterableFirst } from "./util/iterable-util";
 
 export interface ReportedRuleDiagnostic {
 	source: LitAnalyzerRuleId;
@@ -74,22 +73,29 @@ export class RuleCollection {
 		}
 	}
 
-	getDiagnosticsFromDefinition(definition: ComponentDefinition, baseContext: LitAnalyzerContext): ReportedRuleDiagnostic[] {
+	getDiagnosticsFromDeclaration(declaration: ComponentDeclaration, baseContext: LitAnalyzerContext): ReportedRuleDiagnostic[] {
 		const file = baseContext.currentFile;
 
 		const diagnostics: ReportedRuleDiagnostic[] = [];
 
-		if (iterableFirst(definition.tagNameNodes)?.getSourceFile() === file) {
-			this.invokeRule("visitComponentDefinition", definition, d => diagnostics.push(d), baseContext);
-		}
-
-		const declaration = definition.declaration();
 		this.invokeRule("visitComponentDeclaration", declaration, d => diagnostics.push(d), baseContext);
 
 		for (const member of declaration.members) {
 			if (member.node.getSourceFile() === file) {
 				this.invokeRule("visitComponentMember", member, d => diagnostics.push(d), baseContext);
 			}
+		}
+
+		return diagnostics;
+	}
+
+	getDiagnosticsFromDefinition(definition: ComponentDefinition, baseContext: LitAnalyzerContext): ReportedRuleDiagnostic[] {
+		const file = baseContext.currentFile;
+
+		const diagnostics: ReportedRuleDiagnostic[] = [];
+
+		if (definition.sourceFile === file) {
+			this.invokeRule("visitComponentDefinition", definition, d => diagnostics.push(d), baseContext);
 		}
 
 		return diagnostics;

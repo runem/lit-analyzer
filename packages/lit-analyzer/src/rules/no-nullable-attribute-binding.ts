@@ -27,7 +27,7 @@ const rule: RuleModule = {
 		if (isAssignableToSimpleTypeKind(typeB, "NULL")) {
 			context.report({
 				location: rangeFromHtmlNodeAttr(htmlAttr),
-				message: `This attribute binds the type '${typeToString(typeB)}' which can be 'null'.`,
+				message: `This attribute binds the type '${typeToString(typeB)}' which can end up binding the string 'null'.`,
 				fixMessage: "Use the 'ifDefined' directive and strict null check?",
 				fix: () => {
 					const newValue = `ifDefined(${assignment.expression.getText()} === null ? undefined : ${assignment.expression.getText()})`;
@@ -44,7 +44,7 @@ const rule: RuleModule = {
 		else if (isAssignableToSimpleTypeKind(typeB, "UNDEFINED")) {
 			context.report({
 				location: rangeFromHtmlNodeAttr(htmlAttr),
-				message: `This attribute binds the type '${typeToString(typeB)}' which can be 'undefined'.`,
+				message: `This attribute binds the type '${typeToString(typeB)}' which can end up binding the string 'undefined'.`,
 				fixMessage: "Use the 'ifDefined' directive?",
 				fix: () => ({
 					message: `Use the 'ifDefined' directive.`,
