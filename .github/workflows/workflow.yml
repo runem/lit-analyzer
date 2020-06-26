@@ -29,18 +29,15 @@ jobs:
         run: npm run lint
 
       - name: Prettier
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest' && matrix.node == 12
         run: npm run prettier:check
-
-      - name: Build
-        run: npm run bootstrap
 
       - name: Test
         run: npm run test:all
 
       - name: Package vscode plugin
         if: matrix.os == 'ubuntu-latest' && matrix.node == 12
-        run: npm run copylink && npx lerna run package --scope lit-plugin && mkdir vscode-lit-plugin && mv packages/vscode-lit-plugin/lit-plugin-*.vsix vscode-lit-plugin
+        run: npx lerna run package --scope lit-plugin && mkdir vscode-lit-plugin && mv packages/vscode-lit-plugin/lit-plugin-*.vsix vscode-lit-plugin
 
       - name: Upload artifacts
         uses: actions/upload-artifact@master
