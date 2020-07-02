@@ -105,7 +105,7 @@ function ruleFixActionConverter(action: RuleFixAction): LitCodeFixAction[] {
 				{
 					range: makeSourceFileRange({
 						start: lastImportIndex,
-						end: 0
+						end: lastImportIndex
 					}),
 					newText: `\nimport "${action.path}";`
 				}
@@ -142,7 +142,7 @@ function getLastImportIndex(sourceFile: SourceFile): number {
 	let lastImportIndex = 0;
 
 	for (const statement of sourceFile.statements) {
-		if (tsModule.ts.isImportDeclaration(statement)) {
+		if (tsModule.ts.isImportDeclaration(statement) || tsModule.ts.isImportEqualsDeclaration(statement)) {
 			lastImportIndex = statement.getEnd();
 		}
 	}
