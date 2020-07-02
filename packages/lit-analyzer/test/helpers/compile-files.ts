@@ -79,7 +79,7 @@ export function compileFiles(inputFiles: TestFile[] | TestFile = []): { program:
 		},
 
 		getCurrentDirectory() {
-			return ".";
+			return "./";
 		},
 
 		getDirectories(directoryName: string) {
