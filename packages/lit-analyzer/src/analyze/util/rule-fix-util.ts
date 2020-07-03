@@ -142,7 +142,7 @@ function getLastImportIndex(sourceFile: SourceFile): number {
 	let lastImportIndex = 0;
 
 	for (const statement of sourceFile.statements) {
-		if (tsModule.ts.isImportDeclaration(statement) || tsModule.ts.isImportEqualsDeclaration(statement)) {
+		if (tsModule.ts.isImportDeclaration(statement)) {
 			lastImportIndex = statement.getEnd();
 		}
 	}
