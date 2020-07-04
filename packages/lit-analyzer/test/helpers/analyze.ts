@@ -6,6 +6,8 @@ import { LitAnalyzerContext } from "../../src/analyze/lit-analyzer-context";
 import { LitDiagnostic } from "../../src/analyze/types/lit-diagnostic";
 import { compileFiles, TestFile } from "./compile-files";
 import { getCurrentTsModule } from "./ts-test";
+import { Range } from "../../src/analyze/types/range";
+import { LitCodeFix } from "../../src/analyze/types/lit-code-fix";
 
 /**
  * Prepares both the Typescript program and the LitAnalyzer
@@ -50,6 +52,25 @@ export function getDiagnostics(
 
 	return {
 		diagnostics: analyzer.getDiagnosticsInFile(sourceFile),
+		program,
+		sourceFile
+	};
+}
+
+/**
+ * Returns code fixes in 'virtual' files using the LitAnalyzer
+ * @param inputFiles
+ * @param config
+ */
+export function getCodeFixesAtRange(
+	inputFiles: TestFile[] | TestFile,
+	range: Range,
+	config: Partial<LitAnalyzerConfig> = {}
+): { codeFixes: LitCodeFix[]; program: Program; sourceFile: SourceFile } {
+	const { analyzer, sourceFile, program } = prepareAnalyzer(inputFiles, config);
+
+	return {
+		codeFixes: analyzer.getCodeFixesAtPositionRange(sourceFile, range),
 		program,
 		sourceFile
 	};

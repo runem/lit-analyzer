@@ -7,7 +7,7 @@ export function makeElement({ properties, slots }: { properties?: string[]; slot
 		/**
 ${(slots || []).map(slot => `        * @slot ${slot}`)}
 		 */
-		class MyElement extends HTMElement {
+		class MyElement extends HTMLElement {
 			${(properties || []).map(prop => `@property() ${prop}`).join("\n")}
 		};
 		customElements.define("my-element", MyElement);	
