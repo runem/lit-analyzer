@@ -103,6 +103,6 @@ function getSuggestionText({
 		: tagIsFromLibrary
 		? `If you are not the author of this component please consider disabling the 'no-unknown-property' rule.`
 		: tagHasDeclaration
-		? `This plugin can't automatically find all properties yet. Please consider adding a '@prop' tag to jsdoc on the component class or disabling the 'no-unknown-property' rule.`
+		? `Please consider adding a '@prop' tag to jsdoc on the component class or disabling the 'no-unknown-property' rule.`
 		: `Please consider disabling the 'no-unknown-property' rule.`;
 }

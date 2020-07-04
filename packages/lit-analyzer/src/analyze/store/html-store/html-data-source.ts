@@ -54,30 +54,30 @@ export class HtmlDataSource {
 	}
 
 	forgetCollection({ tags, global: { events, attributes, slots, properties } }: NamedHtmlDataCollection): void {
-		if (tags != null) tags.forEach(tagName => this._globalTags.delete(tagName));
-		if (events != null) events.forEach(eventName => this._globalEvents.delete(eventName));
-		if (attributes != null) attributes.forEach(attrName => this._globalAttributes.delete(attrName));
-		if (properties != null) properties.forEach(propName => this._globalProperties.delete(propName));
-		if (slots != null) slots.forEach(slotName => this._globalSlots.delete(slotName));
+		if (tags != null) tags.forEach(tagName => this._globalTags.delete(tagName.toLowerCase()));
+		if (events != null) events.forEach(eventName => this._globalEvents.delete(eventName.toLowerCase()));
+		if (attributes != null) attributes.forEach(attrName => this._globalAttributes.delete(attrName.toLowerCase()));
+		if (properties != null) properties.forEach(propName => this._globalProperties.delete(propName.toLowerCase()));
+		if (slots != null) slots.forEach(slotName => this._globalSlots.delete(slotName.toLowerCase()));
 	}
 
 	getGlobalTag(tagName: string): HtmlTag | undefined {
-		return this._globalTags.get(tagName);
+		return this._globalTags.get(tagName.toLowerCase());
 	}
 
 	getGlobalAttribute(attrName: string): HtmlAttr | undefined {
-		return this._globalAttributes.get(attrName);
+		return this._globalAttributes.get(attrName.toLowerCase());
 	}
 
 	getGlobalEvent(eventName: string): HtmlEvent | undefined {
-		return this._globalEvents.get(eventName);
+		return this._globalEvents.get(eventName.toLowerCase());
 	}
 
 	getGlobalProperty(propName: string): HtmlProp | undefined {
-		return this._globalProperties.get(propName);
+		return this._globalProperties.get(propName.toLowerCase());
 	}
 
 	getGlobalSlot(slotName: string): HtmlSlot | undefined {
-		return this._globalSlots.get(slotName);
+		return this._globalSlots.get(slotName.toLowerCase());
 	}
 }
