@@ -198,17 +198,29 @@ export class LitAnalyzer {
 		// Get diagnostics for components definitions in this file
 		const definitions = this.context.definitionStore.getDefinitionsWithDeclarationInFile(file);
 		for (const definition of definitions) {
+			if (this.context.isCancellationRequested) {
+				break;
+			}
+
 			diagnostics.push(...this.componentAnalyzer.getDiagnostics(definition, this.context));
 		}
 
 		// Get diagnostics for components in this file
 		const declarations = this.context.definitionStore.getComponentDeclarationsInFile(file);
 		for (const declaration of declarations) {
+			if (this.context.isCancellationRequested) {
+				break;
+			}
+
 			diagnostics.push(...this.componentAnalyzer.getDiagnostics(declaration, this.context));
 		}
 
 		// Get diagnostics for documents in this file
 		for (const document of documents) {
+			if (this.context.isCancellationRequested) {
+				break;
+			}
+
 			if (document instanceof CssDocument) {
 				diagnostics.push(...this.litCssDocumentAnalyzer.getDiagnostics(document, this.context));
 			} else if (document instanceof HtmlDocument) {

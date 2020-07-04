@@ -23,7 +23,7 @@ export class RuleCollection {
 		this.rules.sort((ruleA, ruleB) => (getPriorityValue(ruleA) > getPriorityValue(ruleB) ? -1 : 1));
 	}
 
-	private invokeRule<VisitFunctionName extends keyof RuleModuleImplementation>(
+	private invokeRules<VisitFunctionName extends keyof RuleModuleImplementation>(
 		functionName: VisitFunctionName,
 		parameter: Parameters<NonNullable<RuleModuleImplementation[VisitFunctionName]>>[0],
 		report: (diagnostic: ReportedRuleDiagnostic) => void,
@@ -78,11 +78,11 @@ export class RuleCollection {
 
 		const diagnostics: ReportedRuleDiagnostic[] = [];
 
-		this.invokeRule("visitComponentDeclaration", declaration, d => diagnostics.push(d), baseContext);
+		this.invokeRules("visitComponentDeclaration", declaration, d => diagnostics.push(d), baseContext);
 
 		for (const member of declaration.members) {
 			if (member.node.getSourceFile() === file) {
-				this.invokeRule("visitComponentMember", member, d => diagnostics.push(d), baseContext);
+				this.invokeRules("visitComponentMember", member, d => diagnostics.push(d), baseContext);
 			}
 		}
 
@@ -95,7 +95,7 @@ export class RuleCollection {
 		const diagnostics: ReportedRuleDiagnostic[] = [];
 
 		if (definition.sourceFile === file) {
-			this.invokeRule("visitComponentDefinition", definition, d => diagnostics.push(d), baseContext);
+			this.invokeRules("visitComponentDefinition", definition, d => diagnostics.push(d), baseContext);
 		}
 
 		return diagnostics;
@@ -111,14 +111,14 @@ export class RuleCollection {
 					continue;
 				}
 
-				this.invokeRule("visitHtmlNode", childNode, d => diagnostics.push(d), baseContext);
+				this.invokeRules("visitHtmlNode", childNode, d => diagnostics.push(d), baseContext);
 
 				const iterateAttrs = (attrs: HtmlNodeAttr[]) => {
 					for (const attr of attrs) {
-						this.invokeRule("visitHtmlAttribute", attr, d => diagnostics.push(d), baseContext);
+						this.invokeRules("visitHtmlAttribute", attr, d => diagnostics.push(d), baseContext);
 
 						if (attr.assignment != null) {
-							this.invokeRule("visitHtmlAssignment", attr.assignment, d => diagnostics.push(d), baseContext);
+							this.invokeRules("visitHtmlAssignment", attr.assignment, d => diagnostics.push(d), baseContext);
 						}
 					}
 				};

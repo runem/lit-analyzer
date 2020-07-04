@@ -1,5 +1,5 @@
 import * as tsMod from "typescript";
-import { Program, SourceFile, TypeChecker } from "typescript";
+import { HostCancellationToken, Program, SourceFile, TypeChecker } from "typescript";
 import * as tsServer from "typescript/lib/tsserverlibrary";
 import { analyzeHTMLElement, analyzeSourceFile } from "web-component-analyzer";
 import noBooleanInAttributeBindingRule from "../rules/no-boolean-in-attribute-binding";
@@ -22,6 +22,7 @@ import noUnknownEvent from "../rules/no-unknown-event";
 import noUnknownProperty from "../rules/no-unknown-property";
 import noUnknownSlotRule from "../rules/no-unknown-slot";
 import noUnknownTagName from "../rules/no-unknown-tag-name";
+import { MAX_RUNNING_TIME_PER_OPERATION } from "./constants";
 import { getBuiltInHtmlCollection } from "./data/get-built-in-html-collection";
 import { getUserConfigHtmlCollection } from "./data/get-user-config-html-collection";
 import { isRuleDisabled, LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config";
@@ -82,6 +83,45 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 		return this._config;
 	}
 
+	private _currentStartTime = Date.now();
+	get currentRunningTime(): number {
+		return Date.now() - this._currentStartTime;
+	}
+
+	private _currentCancellationToken: HostCancellationToken | undefined = undefined;
+	private _hasRequestedCancellation = false;
+	get isCancellationRequested(): boolean {
+		if (this._hasRequestedCancellation) {
+			return true;
+		}
+
+		if (this._currentCancellationToken == null) {
+			// Never cancel if "cancellation token" is not present
+			// This means that we are in a CLI context, and are willing to wait for the operation to finish for correctness reasons
+			return false;
+		}
+
+		if (this._currentCancellationToken?.isCancellationRequested()) {
+			if (!this._hasRequestedCancellation) {
+				this.logger.error("Cancelling current operation because project host has requested cancellation");
+			}
+
+			return (this._hasRequestedCancellation = true);
+		}
+
+		if (this.currentRunningTime > MAX_RUNNING_TIME_PER_OPERATION) {
+			if (!this._hasRequestedCancellation) {
+				this.logger.error(
+					`Cancelling current operation because it has been running for more than ${MAX_RUNNING_TIME_PER_OPERATION}ms (${this.currentRunningTime}ms)`
+				);
+			}
+
+			return (this._hasRequestedCancellation = true);
+		}
+
+		return false;
+	}
+
 	private _currentFile: SourceFile | undefined;
 	get currentFile(): SourceFile {
 		if (this._currentFile == null) {
@@ -107,11 +147,14 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 		return this._rules;
 	}
 
-	public setCurrentFile(file: SourceFile | undefined): void {
+	setCurrentFile(file: SourceFile | undefined): void {
 		this._currentFile = file;
+		this._currentStartTime = Date.now();
+		this._currentCancellationToken = this.project?.getCancellationToken();
+		this._hasRequestedCancellation = false;
 	}
 
-	public updateConfig(config: LitAnalyzerConfig): void {
+	updateConfig(config: LitAnalyzerConfig): void {
 		this._config = config;
 
 		this.logger.level = (() => {
@@ -156,13 +199,24 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 	}
 
 	private findInvalidatedComponents() {
+		const startTime = Date.now();
+
 		const seenFiles = new Set<SourceFile>();
 		const invalidatedFiles = new Set<SourceFile>();
 
+		const getRunningTime = () => {
+			return Date.now() - startTime;
+		};
+
 		// Find components in all changed files
 		for (const sourceFile of this.componentSourceFileIterator(this.program.getSourceFiles())) {
+			if (this.isCancellationRequested) {
+				break;
+			}
+
 			seenFiles.add(sourceFile);
 
+			// All components definitions that use this file must be invidalited
 			this.definitionStore.getDefinitionsWithDeclarationInFile(sourceFile).forEach(definition => {
 				const sf = this.program.getSourceFile(definition.sourceFile.fileName);
 				if (sf != null) {
@@ -170,17 +224,24 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 				}
 			});
 
+			this.logger.debug(`Analyzing components in ${sourceFile.fileName} (changed) (${getRunningTime()}ms total)`);
 			this.findComponentsInFile(sourceFile);
 		}
 
 		for (const sourceFile of invalidatedFiles) {
+			if (this.isCancellationRequested) {
+				break;
+			}
+
 			if (!seenFiles.has(sourceFile)) {
 				seenFiles.add(sourceFile);
+
+				this.logger.debug(`Analyzing components in ${sourceFile.fileName} (invalidated) (${getRunningTime()}ms total)`);
 				this.findComponentsInFile(sourceFile);
 			}
 		}
 
-		this.logger.verbose(`Analyzed ${seenFiles.size} files (${invalidatedFiles.size} invalidated)`);
+		this.logger.verbose(`Analyzed ${seenFiles.size} files (${invalidatedFiles.size} invalidated) in ${getRunningTime()}ms`);
 	}
 
 	private findComponentsInFile(sourceFile: SourceFile) {

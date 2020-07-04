@@ -112,6 +112,11 @@ export function convertComponentFeaturesToHtml(
 			continue;
 		}
 
+		// Only add non-static members
+		if (member.modifiers?.has("static")) {
+			continue;
+		}
+
 		// Only add writable members
 		if (member.modifiers?.has("readonly")) {
 			continue;

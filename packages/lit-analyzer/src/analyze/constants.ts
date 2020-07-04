@@ -17,3 +17,5 @@ export const DIAGNOSTIC_SOURCE = "lit-plugin";
 export const TS_IGNORE_FLAG = "@ts-ignore";
 
 export const VERSION = "<@VERSION@>";
+
+export const MAX_RUNNING_TIME_PER_OPERATION = 3000;

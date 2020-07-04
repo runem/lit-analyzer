@@ -15,8 +15,7 @@ export class DefaultAnalyzerDefinitionStore implements AnalyzerDefinitionStore {
 		result.componentDefinitions.forEach(definition => {
 			this.definitionForTagName.set(definition.tagName, definition);
 
-			addToSetInMap(this.intersectingDefinitionsForFile, sourceFile.fileName, definition);
-
+			addToSetInMap(this.intersectingDefinitionsForFile, definition.sourceFile.fileName, definition);
 			visitAllHeritageClauses(definition.declaration(), clause => {
 				if (clause.declaration != null) {
 					addToSetInMap(this.intersectingDefinitionsForFile, clause.declaration.sourceFile.fileName, definition);
@@ -30,13 +29,14 @@ export class DefaultAnalyzerDefinitionStore implements AnalyzerDefinitionStore {
 		if (result == null) return;
 
 		result.componentDefinitions.forEach(definition => {
+			this.definitionForTagName.delete(definition.tagName);
+
+			this.intersectingDefinitionsForFile.get(definition.sourceFile.fileName)?.delete(definition);
 			visitAllHeritageClauses(definition.declaration(), clause => {
 				if (clause.declaration != null) {
 					this.intersectingDefinitionsForFile.get(clause.declaration.sourceFile.fileName)?.delete(definition);
 				}
 			});
-
-			this.definitionForTagName.delete(definition.tagName);
 		});
 
 		this.analysisResultForFile.delete(sourceFile.fileName);

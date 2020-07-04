@@ -10,7 +10,7 @@ const rule: RuleModule = {
 	},
 	visitComponentDefinition(definition, context) {
 		// Check if the tag name is invalid
-		if (!isValidCustomElementName(definition.tagName)) {
+		if (!isValidCustomElementName(definition.tagName) && definition.tagName !== "") {
 			const node = iterableFirst(definition.tagNameNodes) || iterableFirst(definition.identifierNodes);
 
 			// Only report diagnostic if the tag is not built in,

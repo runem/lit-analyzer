@@ -23,7 +23,10 @@ export interface LitAnalyzerContext {
 
 	readonly logger: LitAnalyzerLogger;
 	readonly rules: RuleCollection;
+
 	readonly currentFile: SourceFile;
+	readonly currentRunningTime: number;
+	readonly isCancellationRequested: boolean;
 
 	updateConfig(config: LitAnalyzerConfig): void;
 	updateDependencies(file: SourceFile): void;

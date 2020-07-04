@@ -50,7 +50,7 @@ export const ALL_RULE_NAMES: LitAnalyzerRuleId[] = [
 	"no-legacy-attribute"
 ];
 
-export type LitAnalyzerRuleSeverity = "off" | "warn" | "warning" | "error" | 0 | 1 | 2 | true | false;
+export type LitAnalyzerRuleSeverity = "on" | "off" | "warn" | "warning" | "error" | 0 | 1 | 2 | true | false;
 
 export type LitAnalyzerRules = Partial<Record<LitAnalyzerRuleId, LitAnalyzerRuleSeverity | [LitAnalyzerRuleSeverity]>>;
 
@@ -129,6 +129,7 @@ export function litDiagnosticRuleSeverity(config: LitAnalyzerConfig, ruleId: Lit
 		case "warn":
 		case "warning":
 		case true:
+		case "on":
 		case 1:
 			return "warning";
 

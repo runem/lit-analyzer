@@ -13,9 +13,9 @@ const rule: RuleModule = {
 		priority: "medium"
 	},
 	visitComponentMember(member, context) {
-		if (member.kind !== "property" || member.meta == null) return;
+		if (member.kind !== "property" || member.modifiers?.has("static") || member.meta == null) return;
 
-		if (member.meta.node?.type?.getSourceFile() !== context.file) return;
+		if ((member.meta.node?.type ?? member.node)?.getSourceFile() !== context.file) return;
 
 		// Grab the type and fallback to "any"
 		const type = member.type?.() || { kind: "ANY" };
