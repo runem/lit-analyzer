@@ -40,6 +40,7 @@ const HTML_5_ATTR_TYPES: { [key: string]: string | string[] } = {
 	"aria-valuenow": "",
 	"aria-valuetext": "",
 	accesskey: "string",
+	autocapitalize: ["off", "none", "on", "sentences", "words", "characters"],
 	class: "string",
 	contextmenu: "string",
 	dropzone: ["copy", "move", "link"],
