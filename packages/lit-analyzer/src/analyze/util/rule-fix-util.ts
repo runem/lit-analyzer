@@ -105,7 +105,7 @@ function ruleFixActionConverter(action: RuleFixAction): LitCodeFixAction[] {
 				{
 					range: makeSourceFileRange({
 						start: lastImportIndex,
-						end: 0
+						end: lastImportIndex
 					}),
 					newText: `\nimport "${action.path}";`
 				}
