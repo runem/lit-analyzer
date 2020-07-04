@@ -1,232 +1,200 @@
 import { SimpleType } from "ts-simple-type";
-import { HTML5_GLOBAL_ATTRIBUTES, HTML5_VALUE_MAP } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5";
-import { ARIA_ATTRIBUTES } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Aria";
-import { HTML5_EVENTS } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Events";
-import { HTML5_TAGS } from "vscode-html-languageservice/lib/umd/languageFacts/data/html5Tags";
+import { HTMLDataV1 } from "vscode-html-languageservice";
+import htmlDataJson from "vscode-web-custom-data/data/browsers.html-data.json";
 import { HtmlAttr, HtmlDataCollection } from "../parse/parse-html-data/html-tag";
-import { parseHtmlData } from "../parse/parse-html-data/parse-html-data";
+import { parseVscodeHtmlData } from "../parse/parse-html-data/parse-vscode-html-data";
 import { lazy } from "../util/general-util";
 import { EXTRA_HTML5_EVENTS, hasTypeForAttrName, html5TagAttrType } from "./extra-html-data";
 
 export function getBuiltInHtmlCollection(): HtmlDataCollection {
-	// Combine data with extra html5 events because vscode-html-language-service hasn't included all events yet.
-	const ALL_HTML5_EVENTS: typeof HTML5_EVENTS = [
-		...HTML5_EVENTS,
-		...EXTRA_HTML5_EVENTS.filter(evt => HTML5_EVENTS.find(existingEvt => existingEvt.name === evt.name) == null)
-	];
+	const vscodeHtmlData = htmlDataJson as HTMLDataV1;
 
-	// It seems like the autocompletion value map for <select>, <textarea> and <input> needs "on" and "off" values
-	const EXTENDED_HTML5_VALUE_MAP = HTML5_VALUE_MAP.map(VALUE_MAP => {
-		switch (VALUE_MAP.name) {
-			case "inputautocomplete":
-				return {
-					...VALUE_MAP,
-					values: [{ name: "on" }, { name: "off" }, ...VALUE_MAP.values]
-				};
-			default:
-				return VALUE_MAP;
+	const version = vscodeHtmlData.version;
+	const globalAttributes = [...vscodeHtmlData.globalAttributes];
+
+	// Modify valueSets
+	const valueSets = (vscodeHtmlData.valueSets || []).map(valueSet => {
+		// It seems like the autocompletion value map for <select>, <textarea> and <input> needs "on" and "off" values
+		if (valueSet.name === "inputautocomplete") {
+			return {
+				...valueSet,
+				values: [{ name: "on" }, { name: "off" }, ...valueSet.values]
+			};
 		}
+
+		return valueSet;
 	});
 
-	const result = parseHtmlData({
-		version: 1,
-		tags: HTML5_TAGS,
-		globalAttributes: [...HTML5_GLOBAL_ATTRIBUTES, ...ALL_HTML5_EVENTS, ...ARIA_ATTRIBUTES],
-		valueSets: EXTENDED_HTML5_VALUE_MAP
+	// Modify tags
+	const tags = (vscodeHtmlData.tags || []).map(tag => {
+		switch (tag.name) {
+			case "audio":
+				return {
+					...tag,
+					attributes: [
+						...tag.attributes,
+						{
+							name: "controlslist",
+							description: ""
+						}
+					]
+				};
+
+			case "video":
+				return {
+					...tag,
+					attributes: [
+						...tag.attributes,
+						{
+							name: "controlslist",
+							description: ""
+						},
+						{
+							name: "disablepictureinpicture",
+							valueSet: "v" // "v" is the undocumented boolean type
+						},
+						{
+							name: "playsinline",
+							description:
+								'The playsinline attribute is a boolean attribute. If present, it serves as a hint to the user agent that the video ought to be displayed "inline" in the document by default, constrained to the element\'s playback area, instead of being displayed fullscreen or in an independent resizable window.',
+							valueSet: "v" // "v" is the undocumented boolean type
+						}
+					]
+				};
+		}
+
+		return tag;
 	});
 
-	// Force all tags to be built in
-	for (const tag of result.tags) {
-		tag.builtIn = true;
-	}
-
-	result.tags.push({
-		attributes: [],
-		properties: [],
-		events: [],
-		slots: [],
-		tagName: "svg",
-		description: "",
-		builtIn: true
-	});
-
-	result.tags.push({
-		builtIn: true,
-		properties: [],
-		events: [
-			{
-				name: "slotchange",
-				description:
-					"The slotchange event is fired on an HTMLSlotElement instance (<slot> element) when the node(s) contained in that slot change.\n\nNote: the slotchange event doesn't fire if the children of a slotted node change — only if you change (e.g. add or delete) the actual nodes themselves.",
-				getType: lazy(() => ({ kind: "ANY" } as SimpleType)),
-				fromTagName: "slot",
-				builtIn: true
-			}
-		],
-		slots: [],
-		attributes: [
-			{
-				kind: "attribute",
-				name: "name",
-				getType: lazy(() => ({ kind: "STRING" } as SimpleType)),
-				fromTagName: "slot",
-				builtIn: true
-			},
-			{
-				kind: "attribute",
-				name: "onslotchange",
-				getType: lazy(() => ({ kind: "STRING" } as SimpleType)),
-				fromTagName: "slot",
-				builtIn: true
-			}
-		],
-		tagName: "slot",
-		description: ""
-	});
-
-	result.global.attributes = [
-		...(result.global.attributes || []),
+	// Add missing html tags
+	tags.push(
 		{
-			kind: "attribute",
+			name: "svg",
+			attributes: []
+		},
+		{
 			name: "slot",
-			getType: lazy(() => ({ kind: "STRING" } as SimpleType)),
-			builtIn: true
+			description: "",
+			attributes: [
+				{
+					name: "name",
+					description: ""
+				},
+				{
+					name: "onslotchange",
+					description:
+						"The slotchange event is fired on an HTMLSlotElement instance (<slot> element) when the node(s) contained in that slot change.\n\nNote: the slotchange event doesn't fire if the children of a slotted node change — only if you change (e.g. add or delete) the actual nodes themselves."
+				}
+			]
+		}
+	);
+
+	// Add missing global attributes
+	globalAttributes.push(
+		// Combine data with extra html5 events because vscode-html-language-service hasn't included all events yet.
+		...EXTRA_HTML5_EVENTS.filter(evt => globalAttributes.some(existingEvt => existingEvt.name === evt.name)),
+		{
+			name: "tabindex",
+			description: ""
 		},
 		{
-			kind: "attribute",
+			name: "slot",
+			description: ""
+		},
+		{
 			name: "part",
-			description: `This attribute specifies a "styleable" part on the element in your shadow tree.`,
-			getType: lazy(() => ({ kind: "STRING" } as SimpleType)),
-			builtIn: true
+			description: `This attribute specifies a "styleable" part on the element in your shadow tree.`
 		},
 		{
-			kind: "attribute",
 			name: "theme",
-			description: `This attribute specifies a global "styleable" part on the element.`,
-			getType: lazy(() => ({ kind: "STRING" } as SimpleType)),
-			builtIn: true
+			description: `This attribute specifies a global "styleable" part on the element.`
 		},
 		{
-			kind: "attribute",
 			name: "exportparts",
 			description: `This attribute is used to explicitly forward a child’s part to be styleable outside of the parent’s shadow tree.
 
 The value must be a comma-separated list of part mappings:
   - "some-box, some-input"
   - "some-input: foo-input"
-`,
-			getType: lazy(() => ({ kind: "STRING" } as SimpleType)),
+`
+		}
+	);
+
+	// Parse vscode html data
+	const result = parseVscodeHtmlData(
+		{
+			version,
+			globalAttributes,
+			tags,
+			valueSets
+		},
+		{
 			builtIn: true
 		}
-	];
+	);
 
-	const textareaElement = result.tags.find(t => t.tagName === "textarea");
-	if (textareaElement != null) {
-		textareaElement.properties.push({
-			kind: "property",
-			name: "value",
-			builtIn: true,
-			fromTagName: "textarea",
-			getType: lazy(
-				() =>
-					({
-						kind: "UNION",
-						types: [{ kind: "STRING" }, { kind: "NULL" }]
-					} as SimpleType)
-			)
-		});
+	// Add missing properties to the result, because they are not included in vscode html data
+	for (const tag of result.tags) {
+		switch (tag.tagName) {
+			case "textarea":
+				tag.properties.push({
+					kind: "property",
+					name: "value",
+					builtIn: true,
+					fromTagName: "textarea",
+					getType: lazy(
+						() =>
+							({
+								kind: "UNION",
+								types: [{ kind: "STRING" }, { kind: "NULL" }]
+							} as SimpleType)
+					)
+				});
+				break;
+
+			case "img":
+				tag.attributes.push({
+					kind: "attribute",
+					name: "loading",
+					builtIn: true,
+					fromTagName: "img",
+					getType: lazy(
+						() =>
+							({
+								kind: "UNION",
+								types: [
+									{
+										kind: "STRING_LITERAL",
+										value: "lazy"
+									},
+									{
+										kind: "STRING_LITERAL",
+										value: "auto"
+									},
+									{ kind: "STRING_LITERAL", value: "eager" }
+								]
+							} as SimpleType)
+					)
+				});
+				break;
+
+			case "input":
+				tag.properties.push({
+					kind: "property",
+					name: "value",
+					builtIn: true,
+					fromTagName: "input",
+					getType: lazy(
+						() =>
+							({
+								kind: "UNION",
+								types: [{ kind: "STRING" }, { kind: "NULL" }]
+							} as SimpleType)
+					)
+				});
+				break;
+		}
 	}
-
-	const imageElement = result.tags.find(t => t.tagName === "img");
-	if (imageElement != null) {
-		imageElement.attributes.push({
-			kind: "attribute",
-			name: "loading",
-			builtIn: true,
-			fromTagName: "img",
-			getType: lazy(
-				() =>
-					({
-						kind: "UNION",
-						types: [
-							{
-								kind: "STRING_LITERAL",
-								value: "lazy"
-							},
-							{
-								kind: "STRING_LITERAL",
-								value: "auto"
-							},
-							{ kind: "STRING_LITERAL", value: "eager" }
-						]
-					} as SimpleType)
-			)
-		});
-	}
-
-	const inputElement = result.tags.find(t => t.tagName === "input");
-	if (inputElement != null) {
-		inputElement.properties.push({
-			kind: "property",
-			name: "value",
-			builtIn: true,
-			fromTagName: "input",
-			getType: lazy(
-				() =>
-					({
-						kind: "UNION",
-						types: [{ kind: "STRING" }, { kind: "NULL" }]
-					} as SimpleType)
-			)
-		});
-	}
-
-	const audioElement = result.tags.find(t => t.tagName === "audio");
-	if (audioElement != null) {
-		audioElement.attributes = [
-			...audioElement.attributes,
-			{
-				kind: "attribute",
-				fromTagName: "audio",
-				builtIn: true,
-				name: "controlslist",
-				getType: lazy(() => ({ kind: "STRING" } as SimpleType))
-			} as HtmlAttr
-		];
-	}
-
-	const videoElement = result.tags.find(t => t.tagName === "video");
-	if (videoElement != null) {
-		videoElement.attributes = [
-			...videoElement.attributes,
-			{
-				kind: "attribute",
-				fromTagName: "video",
-				builtIn: true,
-				name: "controlslist",
-				getType: lazy(() => ({ kind: "STRING" } as SimpleType))
-			} as HtmlAttr,
-			{
-				kind: "attribute",
-				fromTagName: "video",
-				builtIn: true,
-				name: "playsinline",
-				getType: lazy(() => ({ kind: "BOOLEAN" } as SimpleType)),
-				description:
-					'The playsinline attribute is a boolean attribute. If present, it serves as a hint to the user agent that the video ought to be displayed "inline" in the document by default, constrained to the element\'s playback area, instead of being displayed fullscreen or in an independent resizable window.'
-			} as HtmlAttr
-		];
-	}
-
-	result.global.events = [
-		...(result.global.events || []),
-		...ALL_HTML5_EVENTS.map(globalEvent => ({
-			name: globalEvent.name.replace(/^on/, ""),
-			description: globalEvent.description,
-			getType: lazy(() => ({ kind: "ANY" } as SimpleType)),
-			builtIn: true
-		}))
-	];
 
 	return {
 		...result,

@@ -1,9 +1,9 @@
 import { existsSync, readFileSync } from "fs";
 import { SimpleType } from "ts-simple-type";
+import { HTMLDataV1 } from "vscode-html-languageservice";
 import { LitAnalyzerConfig } from "../lit-analyzer-config";
-import { HtmlData } from "../parse/parse-html-data/html-data-tag";
 import { HtmlAttr, HtmlDataCollection, HtmlEvent, HtmlTag, mergeHtmlAttrs, mergeHtmlEvents, mergeHtmlTags } from "../parse/parse-html-data/html-tag";
-import { parseHtmlData } from "../parse/parse-html-data/parse-html-data";
+import { parseVscodeHtmlData } from "../parse/parse-html-data/parse-vscode-html-data";
 import { lazy } from "../util/general-util";
 
 export function getUserConfigHtmlCollection(config: LitAnalyzerConfig): HtmlDataCollection {
@@ -11,11 +11,11 @@ export function getUserConfigHtmlCollection(config: LitAnalyzerConfig): HtmlData
 		let collection: HtmlDataCollection = { tags: [], global: {} };
 		for (const customHtmlData of Array.isArray(config.customHtmlData) ? config.customHtmlData : [config.customHtmlData]) {
 			try {
-				const data: HtmlData =
+				const data: HTMLDataV1 =
 					typeof customHtmlData === "string" && existsSync(customHtmlData)
 						? JSON.parse(readFileSync(customHtmlData, "utf8").toString())
 						: customHtmlData;
-				const parsedCollection = parseHtmlData(data);
+				const parsedCollection = parseVscodeHtmlData(data);
 				collection = {
 					tags: mergeHtmlTags([...collection.tags, ...parsedCollection.tags]),
 					global: {

@@ -1,4 +1,4 @@
-import { HtmlData } from "./parse/parse-html-data/html-data-tag";
+import { HTMLDataV1 } from "vscode-html-languageservice";
 import { LitDiagnosticSeverity } from "./types/lit-diagnostic";
 
 export type LitAnalyzerRuleId =
@@ -162,7 +162,7 @@ export interface LitAnalyzerConfig {
 	globalTags: string[];
 	globalAttributes: string[];
 	globalEvents: string[];
-	customHtmlData: (string | HtmlData)[] | string | HtmlData;
+	customHtmlData: (string | HTMLDataV1)[] | string | HTMLDataV1;
 }
 
 function expectNever(never: never) {
