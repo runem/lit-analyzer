@@ -104,20 +104,16 @@ export class HtmlDocument extends TextDocument {
 		return items;
 	}
 
-	private mapFindOne<T>(map: (node: HtmlNode) => T | undefined): T | undefined {
-		function innerTest(node: HtmlNode): T | undefined {
-			const res = map(node);
-			if (res) return res;
-
-			for (const childNode of node.children || []) {
-				const found = innerTest(childNode);
-				if (found != null) return found;
-			}
-			return;
+	*nodes(roots = this.rootNodes): IterableIterator<HtmlNode> {
+		for (const root of roots) {
+			yield root;
+			yield* this.nodes(root.children);
 		}
+	}
 
-		for (const rootNode of this.rootNodes || []) {
-			const found = innerTest(rootNode);
+	private mapFindOne<T>(map: (node: HtmlNode) => T | undefined): T | undefined {
+		for (const node of this.nodes()) {
+			const found = map(node);
 			if (found != null) {
 				return found;
 			}

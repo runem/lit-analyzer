@@ -2,13 +2,13 @@ import { FormatCodeSettings } from "typescript";
 import { Range } from "../../types/range";
 import { LitAnalyzerRequest } from "../../lit-analyzer-context";
 import { HtmlDocument } from "../../parse/document/text-document/html-document/html-document";
-import { isHTMLAttr } from "../../types/html-node/html-node-attr-types";
-import { isHTMLNode } from "../../types/html-node/html-node-types";
+import { isHTMLAttr, HtmlNodeAttr } from "../../types/html-node/html-node-attr-types";
+import { isHTMLNode, HtmlNode } from "../../types/html-node/html-node-types";
 import { LitClosingTagInfo } from "../../types/lit-closing-tag-info";
 import { LitCodeFix } from "../../types/lit-code-fix";
 import { LitCompletion } from "../../types/lit-completion";
 import { LitCompletionDetails } from "../../types/lit-completion-details";
-import { LitDefinition } from "../../types/lit-definition";
+import { DefinitionComponent, LitDefinition } from "../../types/lit-definition";
 import { LitHtmlDiagnostic } from "../../types/lit-diagnostic";
 import { LitFormatEdit } from "../../types/lit-format-edit";
 import { LitOutliningSpan, LitOutliningSpanKind } from "../../types/lit-outlining-span";
@@ -144,4 +144,34 @@ export class LitHtmlDocumentAnalyzer {
 	getFormatEdits(document: HtmlDocument, settings: FormatCodeSettings): LitFormatEdit[] {
 		return this.vscodeHtmlService.format(document, settings);
 	}
+
+	*indexFile(document: HtmlDocument, request: LitAnalyzerRequest): IterableIterator<LitIndexEntry> {
+		for (const node of document.nodes()) {
+			const definition = definitionForHtmlNode(node, request);
+			if (definition != null && definition.kind === "COMPONENT") {
+				yield { kind: "ELEMENT-REFERENCE", element: node, document, definition };
+			}
+			for (const attribute of node.attributes) {
+				const definition = definitionForHtmlAttr(attribute, request);
+				if (definition != null) {
+					yield { kind: "ATTRIBUTE-REFERENCE", attribute, document, definition };
+				}
+			}
+		}
+		document.virtualDocument.offsetToSCPosition;
+	}
+}
+
+export type LitIndexEntry = HtmlElementIndexEntry | HtmlAttributeIndexEntry;
+interface HtmlElementIndexEntry {
+	kind: "ELEMENT-REFERENCE";
+	element: HtmlNode;
+	document: HtmlDocument;
+	definition: DefinitionComponent;
+}
+interface HtmlAttributeIndexEntry {
+	kind: "ATTRIBUTE-REFERENCE";
+	attribute: HtmlNodeAttr;
+	document: HtmlDocument;
+	definition: LitDefinition;
 }
