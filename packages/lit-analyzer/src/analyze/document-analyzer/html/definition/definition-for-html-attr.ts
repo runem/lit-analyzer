@@ -1,7 +1,7 @@
+import { LitAnalyzerContext } from "../../../lit-analyzer-context";
 import { isHtmlEvent, isHtmlMember } from "../../../parse/parse-html-data/html-tag";
 import { HtmlNodeAttr } from "../../../types/html-node/html-node-attr-types";
-import { LitAnalyzerContext } from "../../../lit-analyzer-context";
-import { DefinitionKind, LitDefinition } from "../../../types/lit-definition";
+import { LitDefinition } from "../../../types/lit-definition";
 import { rangeFromHtmlNodeAttr } from "../../../util/range-util";
 
 export function definitionForHtmlAttr(htmlAttr: HtmlNodeAttr, { htmlStore }: LitAnalyzerContext): LitDefinition | undefined {
@@ -10,15 +10,19 @@ export function definitionForHtmlAttr(htmlAttr: HtmlNodeAttr, { htmlStore }: Lit
 
 	if (isHtmlMember(target) && target.declaration != null) {
 		return {
-			kind: DefinitionKind.MEMBER,
 			fromRange: rangeFromHtmlNodeAttr(htmlAttr),
-			target: target.declaration
+			target: {
+				kind: "node",
+				node: target.declaration.node
+			}
 		};
 	} else if (isHtmlEvent(target) && target.declaration != null) {
 		return {
-			kind: DefinitionKind.EVENT,
 			fromRange: rangeFromHtmlNodeAttr(htmlAttr),
-			target: target.declaration
+			target: {
+				kind: "node",
+				node: target.declaration.node
+			}
 		};
 	}
 	return;

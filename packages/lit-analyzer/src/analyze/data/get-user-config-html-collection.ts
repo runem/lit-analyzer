@@ -37,7 +37,9 @@ export function getUserConfigHtmlCollection(config: LitAnalyzerConfig): HtmlData
 				properties: [],
 				attributes: [],
 				events: [],
-				slots: []
+				slots: [],
+				cssParts: [],
+				cssProperties: []
 			} as HtmlTag)
 	);
 

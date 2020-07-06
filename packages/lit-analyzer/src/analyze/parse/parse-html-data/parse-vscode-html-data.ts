@@ -60,7 +60,9 @@ function tagDataToHtmlTag(tagData: ITagData, config: ParseVscodeHtmlDataConfig):
 		events,
 		properties: [],
 		slots: [],
-		builtIn: config.builtIn
+		builtIn: config.builtIn,
+		cssParts: [],
+		cssProperties: []
 	};
 }
 

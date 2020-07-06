@@ -1,4 +1,14 @@
-import { HtmlAttr, HtmlDataCollection, HtmlEvent, HtmlProp, HtmlSlot, HtmlTag, NamedHtmlDataCollection } from "../../parse/parse-html-data/html-tag";
+import {
+	HtmlAttr,
+	HtmlCssPart,
+	HtmlCssProperty,
+	HtmlDataCollection,
+	HtmlEvent,
+	HtmlProp,
+	HtmlSlot,
+	HtmlTag,
+	NamedHtmlDataCollection
+} from "../../parse/parse-html-data/html-tag";
 
 export class HtmlDataSource {
 	private _globalTags = new Map<string, HtmlTag>();
@@ -26,6 +36,16 @@ export class HtmlDataSource {
 		return this._globalSlots;
 	}
 
+	private _globalCssParts = new Map<string, HtmlCssPart>();
+	get globalCssParts(): ReadonlyMap<string, HtmlCssPart> {
+		return this._globalCssParts;
+	}
+
+	private _globalCssProperties = new Map<string, HtmlCssProperty>();
+	get globalCssProperties(): ReadonlyMap<string, HtmlCssProperty> {
+		return this._globalCssProperties;
+	}
+
 	absorbCollection(collection: Partial<HtmlDataCollection>): void {
 		if (collection.tags != null) {
 			// For now, lowercase all names because "parse5" doesn't distinguish when parsing
@@ -51,14 +71,26 @@ export class HtmlDataSource {
 			// For now, lowercase all names because "parse5" doesn't distinguish when parsing
 			collection.global.slots.forEach(slot => this._globalSlots.set(slot.name.toLowerCase(), slot));
 		}
+
+		if (collection.global?.cssParts != null) {
+			// For now, lowercase all names because "parse5" doesn't distinguish when parsing
+			collection.global.cssParts.forEach(cssPart => this._globalCssParts.set(cssPart.name.toLowerCase(), cssPart));
+		}
+
+		if (collection.global?.cssProperties != null) {
+			// For now, lowercase all names because "parse5" doesn't distinguish when parsing
+			collection.global.cssProperties.forEach(cssProperty => this._globalCssProperties.set(cssProperty.name.toLowerCase(), cssProperty));
+		}
 	}
 
-	forgetCollection({ tags, global: { events, attributes, slots, properties } }: NamedHtmlDataCollection): void {
+	forgetCollection({ tags, global: { events, attributes, slots, properties, cssParts, cssProperties } }: NamedHtmlDataCollection): void {
 		if (tags != null) tags.forEach(tagName => this._globalTags.delete(tagName.toLowerCase()));
 		if (events != null) events.forEach(eventName => this._globalEvents.delete(eventName.toLowerCase()));
 		if (attributes != null) attributes.forEach(attrName => this._globalAttributes.delete(attrName.toLowerCase()));
 		if (properties != null) properties.forEach(propName => this._globalProperties.delete(propName.toLowerCase()));
 		if (slots != null) slots.forEach(slotName => this._globalSlots.delete(slotName.toLowerCase()));
+		if (cssParts != null) cssParts.forEach(partName => this._globalCssParts.delete(partName.toLowerCase()));
+		if (cssProperties != null) cssProperties.forEach(cssPropName => this._globalCssProperties.delete(cssPropName.toLowerCase()));
 	}
 
 	getGlobalTag(tagName: string): HtmlTag | undefined {
@@ -79,5 +111,13 @@ export class HtmlDataSource {
 
 	getGlobalSlot(slotName: string): HtmlSlot | undefined {
 		return this._globalSlots.get(slotName.toLowerCase());
+	}
+
+	getGlobalCssPart(partName: string): HtmlCssPart | undefined {
+		return this._globalCssParts.get(partName.toLowerCase());
+	}
+
+	getGlobalCssProperty(propName: string): HtmlCssProperty | undefined {
+		return this._globalCssProperties.get(propName.toLowerCase());
 	}
 }

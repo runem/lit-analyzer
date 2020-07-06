@@ -1,6 +1,7 @@
 import {
 	HtmlAttr,
 	HtmlAttrTarget,
+	HtmlCssPart,
 	HtmlDataCollection,
 	HtmlEvent,
 	HtmlMember,
@@ -58,6 +59,14 @@ export class DefaultAnalyzerHtmlStore implements AnalyzerHtmlStore {
 
 	getAllSlotsForTag(htmlNode: HtmlNode | string): Iterable<HtmlSlot> {
 		return this.dataSource.getAllSlotForTag(typeof htmlNode === "string" ? htmlNode : htmlNode.tagName).values();
+	}
+
+	getAllCssPartsForTag(htmlNode: HtmlNode | string): Iterable<HtmlCssPart> {
+		return this.dataSource.getAllCssPartsForTag(typeof htmlNode === "string" ? htmlNode : htmlNode.tagName).values();
+	}
+
+	getAllCssPropertiesForTag(htmlNode: HtmlNode | string): Iterable<HtmlCssPart> {
+		return this.dataSource.getAllCssPropertiesForTag(typeof htmlNode === "string" ? htmlNode : htmlNode.tagName).values();
 	}
 
 	getHtmlAttrTarget(htmlNodeAttr: IHtmlNodeAttrProp): HtmlProp | undefined;

@@ -195,7 +195,7 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 	constructor(private handler: LitPluginContextHandler) {
 		// Add all HTML5 tags and attributes
 		const builtInCollection = getBuiltInHtmlCollection();
-		this.htmlStore.absorbCollection(builtInCollection, HtmlDataSourceKind.BUILD_IN);
+		this.htmlStore.absorbCollection(builtInCollection, HtmlDataSourceKind.BUILT_IN);
 	}
 
 	private findInvalidatedComponents() {
@@ -249,7 +249,7 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 			program: this.program,
 			ts: this.ts,
 			config: {
-				features: ["event", "member", "slot"],
+				features: ["event", "member", "slot", "csspart", "cssproperty"],
 				analyzeGlobalFeatures: !sourceFile.fileName.includes("lib.dom.d.ts"), // Don't analyze global features in lib.dom.d.ts
 				analyzeDefaultLib: true,
 				analyzeDependencies: true,
@@ -267,6 +267,8 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 					global: {
 						events: existingResult.globalFeatures?.events.map(e => e.name),
 						slots: existingResult.globalFeatures?.slots.map(s => s.name || ""),
+						cssParts: existingResult.globalFeatures?.cssParts.map(s => s.name || ""),
+						cssProperties: existingResult.globalFeatures?.cssProperties.map(s => s.name || ""),
 						attributes: existingResult.globalFeatures?.members.filter(m => m.kind === "attribute").map(m => m.attrName || ""),
 						properties: existingResult.globalFeatures?.members.filter(m => m.kind === "property").map(m => m.propName || "")
 					}
@@ -278,12 +280,10 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 
 		// Absorb
 		this.definitionStore.absorbAnalysisResult(sourceFile, analyzeResult);
-		this.logger.debug(`FOUND PROPS ${analyzeResult.globalFeatures?.members.map(m => m.propName)}`);
 		const htmlCollection = convertAnalyzeResultToHtmlCollection(analyzeResult, {
 			checker: this.checker,
 			addDeclarationPropertiesAsAttributes: true
 		});
-		this.logger.debug(`HAS PROPS ${htmlCollection.global?.properties?.map(m => m.name)}`);
 		this.htmlStore.absorbCollection(htmlCollection, HtmlDataSourceKind.DECLARED);
 	}
 

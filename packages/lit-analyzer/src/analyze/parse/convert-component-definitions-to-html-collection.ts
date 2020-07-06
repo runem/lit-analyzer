@@ -59,7 +59,9 @@ export function convertComponentFeaturesToHtml(
 		attributes: [],
 		events: [],
 		properties: [],
-		slots: []
+		slots: [],
+		cssParts: [],
+		cssProperties: []
 	};
 
 	for (const event of features.events) {
@@ -93,6 +95,25 @@ export function convertComponentFeaturesToHtml(
 				type: () => ({ kind: "ANY" })
 			},
 			builtIn,
+			fromTagName
+		});
+	}
+
+	for (const cssPart of features.cssParts) {
+		result.cssParts.push({
+			declaration: cssPart,
+			description: cssPart.jsDoc?.description,
+			name: cssPart.name || "",
+			fromTagName
+		});
+	}
+
+	for (const cssProp of features.cssProperties) {
+		result.cssProperties.push({
+			declaration: cssProp,
+			description: cssProp.jsDoc?.description,
+			name: cssProp.name || "",
+			typeHint: cssProp.typeHint,
 			fromTagName
 		});
 	}

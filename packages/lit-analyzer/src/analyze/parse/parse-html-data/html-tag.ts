@@ -1,12 +1,15 @@
 import { isAssignableToSimpleTypeKind, SimpleType, typeToString } from "ts-simple-type";
-import { ComponentDeclaration, ComponentEvent, ComponentMember, ComponentSlot } from "web-component-analyzer";
+import { ComponentCssPart, ComponentCssProperty, ComponentDeclaration, ComponentEvent, ComponentMember, ComponentSlot } from "web-component-analyzer";
 import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../constants";
+import { iterableDefined } from "../../util/iterable-util";
 
 export interface HtmlDataFeatures {
 	attributes: HtmlAttr[];
 	properties: HtmlProp[];
 	events: HtmlEvent[];
 	slots: HtmlSlot[];
+	cssParts: HtmlCssPart[];
+	cssProperties: HtmlCssProperty[];
 }
 
 export interface HtmlDataCollection {
@@ -71,6 +74,24 @@ export interface HtmlSlot {
 	fromTagName?: string;
 	description?: string;
 	declaration?: ComponentSlot;
+	related?: HtmlCssPart[];
+}
+
+export interface HtmlCssPart {
+	name: string;
+	fromTagName?: string;
+	description?: string;
+	declaration?: ComponentCssPart;
+	related?: HtmlCssPart[];
+}
+
+export interface HtmlCssProperty {
+	name: string;
+	fromTagName?: string;
+	description?: string;
+	typeHint?: string;
+	declaration?: ComponentCssProperty;
+	related?: HtmlCssProperty[];
 }
 
 export type HtmlAttrTarget = HtmlEvent | HtmlMember;
@@ -119,6 +140,34 @@ function descriptionListItem(item: string, { markdown }: DescriptionOptions) {
 function descriptionList<T>(title: string, items: T[], toString: (item: T) => string, options: DescriptionOptions) {
 	const itemsDesc = items.map(item => descriptionListItem(toString(item), options)).join("\n");
 	return `${descriptionHeader(`${title}:`, 0, options)}\n${itemsDesc}`;
+}
+
+export function documentationForCssPart(cssPart: HtmlCssPart, options: DescriptionOptions = {}): string | undefined {
+	const relatedText = (() => {
+		if ((cssPart.related?.length || 0) > 0) {
+			return `From multiple elements: ${cssPart.related!.map(p => `<${p.fromTagName}>`).join(", ")}`;
+		} else if (cssPart.fromTagName != null) {
+			return `From: <${cssPart.fromTagName}>`;
+		}
+
+		return undefined;
+	})();
+
+	return iterableDefined([cssPart.description, relatedText]).join("\n\n");
+}
+
+export function documentationForCssProperty(cssProperty: HtmlCssProperty, options: DescriptionOptions = {}): string | undefined {
+	const relatedText = (() => {
+		if ((cssProperty.related?.length || 0) > 0) {
+			return `From multiple elements: ${cssProperty.related!.map(p => `<${p.fromTagName}>`).join(", ")}`;
+		} else if (cssProperty.fromTagName != null) {
+			return `From: <${cssProperty.fromTagName}>`;
+		}
+
+		return undefined;
+	})();
+
+	return iterableDefined([cssProperty.description, cssProperty.typeHint, relatedText]).join("\n\n");
 }
 
 export function documentationForHtmlTag(htmlTag: HtmlTag, options: DescriptionOptions = {}): string | undefined {
@@ -212,6 +261,14 @@ export function mergeHtmlEvents(events: HtmlEvent[]): HtmlEvent[] {
 
 export function mergeHtmlSlots(slots: HtmlSlot[]): HtmlSlot[] {
 	return mergeFirstUnique(slots, event => event.name);
+}
+
+export function mergeCssParts(cssParts: HtmlCssPart[]): HtmlCssPart[] {
+	return mergeFirstUnique(cssParts, cssPart => cssPart.name);
+}
+
+export function mergeCssProperties(cssProperties: HtmlCssProperty[]): HtmlCssProperty[] {
+	return mergeFirstUnique(cssProperties, cssProp => cssProp.name);
 }
 
 export function mergeHtmlTags(tags: HtmlTag[]): HtmlTag[] {
