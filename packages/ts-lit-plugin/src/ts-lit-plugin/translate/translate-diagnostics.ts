@@ -18,7 +18,7 @@ function translateDiagnostic(diagnostic: LitDiagnostic, file: SourceFile, contex
 	const span = translateRange(diagnostic.location);
 
 	const category = diagnostic.severity === "error" ? context.ts.DiagnosticCategory.Error : context.ts.DiagnosticCategory.Warning;
-	const code = 2322;
+	const code = 0;
 	const messageText: string | DiagnosticMessageChain =
 		!context.config.dontShowSuggestions && diagnostic.suggestion
 			? {
@@ -28,7 +28,7 @@ function translateDiagnostic(diagnostic: LitDiagnostic, file: SourceFile, contex
 					next: [
 						{
 							messageText: diagnostic.suggestion,
-							code: 0,
+							code,
 							category: context.ts.DiagnosticCategory.Suggestion
 						}
 					]
@@ -50,6 +50,6 @@ function translateDiagnostic(diagnostic: LitDiagnostic, file: SourceFile, contex
 		messageText,
 		category,
 		code,
-		source: diagnostic.source == null ? undefined : diagnostic.source
+		source: diagnostic.source == null ? undefined : `lit-plugin(${diagnostic.source})`
 	};
 }
