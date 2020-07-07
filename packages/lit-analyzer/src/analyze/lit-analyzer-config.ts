@@ -25,69 +25,50 @@ export type LitAnalyzerRuleId =
 	| "no-invalid-tag-name"
 	| "no-invalid-css"
 	| "no-property-visibility-mismatch"
-	| "no-legacy-attribute";
+	| "no-legacy-attribute"
+	| "no-missing-element-type-definition";
 
 export type LitAnalyzerRules = Partial<Record<LitAnalyzerRuleId, LitAnalyzerRuleSeverity | [LitAnalyzerRuleSeverity]>>;
 
-const DEFAULT_RULES_NOSTRICT: Required<LitAnalyzerRules> = {
-	"no-unknown-tag-name": "off",
-	"no-missing-import": "off",
-	"no-unclosed-tag": "warn",
-	"no-unknown-attribute": "off",
-	"no-unknown-property": "off",
-	"no-unknown-event": "off",
-	"no-unknown-slot": "off",
-	"no-unintended-mixed-binding": "warn",
-	"no-invalid-boolean-binding": "error",
-	"no-expressionless-property-binding": "error",
-	"no-noncallable-event-binding": "error",
-	"no-boolean-in-attribute-binding": "error",
-	"no-complex-attribute-binding": "error",
-	"no-nullable-attribute-binding": "error",
-	"no-incompatible-type-binding": "error",
-	"no-invalid-directive-binding": "error",
-	"no-incompatible-property-type": "warn",
-	"no-invalid-attribute-name": "error",
-	"no-invalid-tag-name": "error",
-	"no-invalid-css": "warn",
-	"no-property-visibility-mismatch": "off",
-	"no-legacy-attribute": "off"
-};
-
-const DEFAULT_RULES_STRICT: Required<LitAnalyzerRules> = {
-	"no-unknown-tag-name": "warn",
-	"no-missing-import": "warn",
-	"no-unclosed-tag": "error",
-	"no-unknown-attribute": "warn",
-	"no-unknown-property": "warn",
-	"no-unknown-event": "off",
-	"no-unknown-slot": "warn",
-	"no-unintended-mixed-binding": "warn",
-	"no-invalid-boolean-binding": "error",
-	"no-expressionless-property-binding": "error",
-	"no-noncallable-event-binding": "error",
-	"no-boolean-in-attribute-binding": "error",
-	"no-complex-attribute-binding": "error",
-	"no-nullable-attribute-binding": "error",
-	"no-incompatible-type-binding": "error",
-	"no-invalid-directive-binding": "error",
-	"no-incompatible-property-type": "warn",
-	"no-invalid-attribute-name": "error",
-	"no-invalid-tag-name": "error",
-	"no-invalid-css": "error",
-	"no-property-visibility-mismatch": "error",
-	"no-legacy-attribute": "off"
+/**
+ * The values of this map are tuples where 1st element is
+ * non-strict severity and 2nd element is "strict" severity
+ */
+const DEFAULT_RULES_SEVERITY: Record<LitAnalyzerRuleId, [LitAnalyzerRuleSeverity, LitAnalyzerRuleSeverity]> = {
+	"no-unknown-tag-name": ["off", "warn"],
+	"no-missing-import": ["off", "warn"],
+	"no-unclosed-tag": ["warn", "error"],
+	"no-unknown-attribute": ["off", "warn"],
+	"no-unknown-property": ["off", "warn"],
+	"no-unknown-event": ["off", "off"],
+	"no-unknown-slot": ["off", "warn"],
+	"no-unintended-mixed-binding": ["warn", "warn"],
+	"no-invalid-boolean-binding": ["error", "error"],
+	"no-expressionless-property-binding": ["error", "error"],
+	"no-noncallable-event-binding": ["error", "error"],
+	"no-boolean-in-attribute-binding": ["error", "error"],
+	"no-complex-attribute-binding": ["error", "error"],
+	"no-nullable-attribute-binding": ["error", "error"],
+	"no-incompatible-type-binding": ["error", "error"],
+	"no-invalid-directive-binding": ["error", "error"],
+	"no-incompatible-property-type": ["warn", "warn"],
+	"no-invalid-attribute-name": ["error", "error"],
+	"no-invalid-tag-name": ["error", "error"],
+	"no-invalid-css": ["warn", "error"],
+	"no-property-visibility-mismatch": ["off", "error"],
+	"no-legacy-attribute": ["off", "off"],
+	"no-missing-element-type-definition": ["off", "off"]
 };
 
 // All rule names order alphabetically
-export const ALL_RULE_NAMES = Object.keys(DEFAULT_RULES_STRICT).sort() as LitAnalyzerRuleId[];
+export const ALL_RULE_IDS = Object.keys(DEFAULT_RULES_SEVERITY).sort() as LitAnalyzerRuleId[];
 
 // This map is based on alphabetic order, so it assumed that
 //   these rule codes are changed when new rules are added and
 //   should not be depended on by the user.
 // The user should always use the "rule id" string.
 // Consider if this map should be manually maintained in the future.
-export const RULE_ID_CODE_MAP = ALL_RULE_NAMES.reduce((acc, ruleId, i) => {
+export const RULE_ID_CODE_MAP = ALL_RULE_IDS.reduce((acc, ruleId, i) => {
 	acc[ruleId] = i + 1;
 	return acc;
 }, {} as Record<LitAnalyzerRuleId, number>);
@@ -223,11 +204,11 @@ function getUserRules(userOptions: Partial<LitAnalyzerConfig>): LitAnalyzerRules
 function getDefaultRules(userOptions: Partial<LitAnalyzerConfig>): LitAnalyzerRules {
 	const isStrict = userOptions.strict || false;
 
-	if (isStrict) {
-		return DEFAULT_RULES_STRICT;
-	} else {
-		return DEFAULT_RULES_NOSTRICT;
-	}
+	return ALL_RULE_IDS.reduce((acc, ruleId) => {
+		const severities = DEFAULT_RULES_SEVERITY[ruleId];
+		acc[ruleId] = isStrict ? severities[1] : severities[0];
+		return acc;
+	}, ({} as unknown) as LitAnalyzerRules);
 }
 
 function getDeprecatedMappedRules(userOptions: Partial<LitAnalyzerConfig>): LitAnalyzerRules {

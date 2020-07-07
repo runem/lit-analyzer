@@ -73,7 +73,7 @@ export interface RuleFixActionChangeRange extends RuleFixActionBase {
 export interface RuleFixActionExtendGlobalDeclaration extends RuleFixActionBase {
 	kind: "extendGlobalDeclaration";
 	name: string;
-	newMembers: Record<string, string>;
+	newMembers: string[];
 }
 
 export type RuleFixAction =

@@ -10,8 +10,9 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | Rule    | Description | Severity normal | Severity strict |
 | :------ | ----------- | --------------- | --------------- |
 | [no-unknown-tag-name](#-no-unknown-tag-name) | The existence of tag names are checked. Be aware that not all custom elements from libraries will be found out of the box. | off | warning |
-| [no-missing-import](#-no-missing-import)    | When using custom elements in HTML it is checked if the element has been imported and is available in the current context. | off | warning |
+| [no-missing-import](#-no-missing-import)     | When using custom elements in HTML it is checked if the element has been imported and is available in the current context. | off | warning |
 | [no-unclosed-tag](#-no-unclosed-tag)         | Unclosed tags, and invalid self closing tags like custom elements tags, are checked. | warning | error |
+| [no-missing-element-type-definition](#no-missing-element-type-definition) | This rule will ensure that custom elements are registered on the `HTMLElementTagNameMap` Typescript interface. | off | off |
 
 **Validating binding names**
 
@@ -36,7 +37,7 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | [no-nullable-attribute-binding](#-no-nullable-attribute-binding) | Disallow attribute bindings with nullable types such as "null" or "undefined".  | error | error |
 | [no-incompatible-type-binding](#-no-incompatible-type-binding)   | Disallow incompatible type in bindings.  | error | error |
 | [no-invalid-directive-binding](#-no-invalid-directive-binding)   | Disallow using built-in directives in unsupported bindings. | error | error |
-| [no-unintended-mixed-binding](#-no-unintended-mixed-binding)   | Disallow mixed value bindings where a character `'`, `"`, `}` or `/` is unintentionally included in the binding. | warn | warn |
+| [no-unintended-mixed-binding](#-no-unintended-mixed-binding)   | Disallow mixed value bindings where a character `'`, `"`, `}` or `/` is unintentionally included in the binding. | warning | warning |
 
 **Validating LitElement**
 
@@ -46,6 +47,7 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | [no-incompatible-property-type](#-no-incompatible-property-type) | When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type | error | error |
 | [no-invalid-attribute-name](#-no-invalid-attribute-name)         | When using the property option `attribute`, the value is checked to make sure it's a valid attribute name. | error | error |
 | [no-invalid-tag-name](#-no-invalid-tag-name)                     | When defining a custom element the tag name is checked to make sure it's valid. | error | error |
+| [no-property-visibility-mismatch](#no-property-visibility-mismatch) | This rule will ensure public properties use `@property` and non-public properties use `@internalProperty`. | off | error |
 
 **Validating CSS**
 
@@ -114,6 +116,40 @@ html`<div></div>`
 html`<custom-element></custom-element>`
 html`<video></video>`
 html`<input />`
+```
+
+#### no-missing-element-type-definition
+
+This rule is only applicable to Typescript files.
+
+When sharing custom elements it's a good practice to add custom elements to the global interface `HTMLElementTagNameMap`. This rule will ensure that custom elements are registered on this interface.
+
+The following example is considered a warning:
+
+<!-- prettier-ignore -->
+```ts
+export class MyElement extends HTMLElement {
+
+} 
+
+customElements.define("my-element", MyElement)
+```
+
+The following example is not considered a warning:
+
+<!-- prettier-ignore -->
+```ts
+export class MyElement extends HTMLElement {
+
+} 
+
+customElements.define("my-element", MyElement)
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "my-element": MyElement
+  }
+}
 ```
 
 ### Validating binding names

@@ -1,4 +1,4 @@
-<h1 align="center">lit-analyzer</h1>
+<!-- ⚠️ This README has been generated from the file(s) "readme.blueprint.md" ⚠️--><h1 align="center">lit-analyzer</h1>
 <p align="center">
   <b>Monorepo for tools that analyze lit-html templates</b></br>
   <sub><sub>

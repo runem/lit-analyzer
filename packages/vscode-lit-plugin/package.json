@@ -188,6 +188,17 @@
 							"error"
 						]
 					},
+					"lit-plugin.rules.no-missing-element-type-definition": {
+						"type": "string",
+						"description": "This rule will ensure that custom elements are registered on the HTMLElementTagNameMap Typescript interface.",
+						"default": "default",
+						"enum": [
+							"default",
+							"off",
+							"warning",
+							"error"
+						]
+					},
 					"lit-plugin.rules.no-unclosed-tag": {
 						"type": "string",
 						"description": "Check that all tags are properly closed.",

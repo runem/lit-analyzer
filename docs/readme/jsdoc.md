@@ -15,6 +15,8 @@ Code is analyzed using [web-component-analyzer](https://github.com/runem/web-com
  * @slot - This is a comment for the unnamed slot
  * @slot right - Right content
  * @slot left
+ * @cssprop {Color} --border-color
+ * @csspart header
  */
 class MyElement extends HTMLElement { 
 }

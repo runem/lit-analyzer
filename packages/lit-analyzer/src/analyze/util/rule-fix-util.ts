@@ -1,4 +1,4 @@
-import { SourceFile } from "typescript";
+import { InterfaceDeclaration, ModuleDeclaration, SourceFile } from "typescript";
 import { tsModule } from "../../../../ts-lit-plugin/src/ts-module";
 import { LitCodeFix } from "../types/lit-code-fix";
 import { LitCodeFixAction } from "../types/lit-code-fix-action";
@@ -126,6 +126,67 @@ function ruleFixActionConverter(action: RuleFixAction): LitCodeFixAction[] {
 				{
 					range: action.range,
 					newText: action.newText
+				}
+			];
+		}
+
+		case "extendGlobalDeclaration": {
+			if (action.file == null) {
+				break;
+			}
+
+			const MEMBER_PART = `\n\t\t${action.newMembers.join("\t\t")}`;
+			const DECLARATION_PART = `\n\tinterface ${action.name} {${MEMBER_PART}\n\t}`;
+			const MODULE_PART = `\n\ndeclare global {${DECLARATION_PART}\n}`;
+
+			const existingModuleDeclaration = action.file.statements?.find(
+				(statement): statement is ModuleDeclaration => tsModule.ts.isModuleDeclaration(statement) && statement.name.text === "global"
+			);
+
+			const existingModuleBody = existingModuleDeclaration?.body;
+
+			// If there is no existing "global" module declaration, add an entire global module declaration
+			if (existingModuleDeclaration == null) {
+				return [
+					{
+						range: {
+							start: action.file.getEnd(),
+							end: action.file.getEnd()
+						},
+						newText: MODULE_PART
+					}
+				];
+			}
+
+			if (existingModuleBody == null || !tsModule.ts.isModuleBlock(existingModuleBody)) {
+				return [];
+			}
+
+			const existingDeclaration = existingModuleBody.statements?.find(
+				(statement): statement is InterfaceDeclaration => tsModule.ts.isInterfaceDeclaration(statement) && statement.name.text === action.name
+			);
+
+			// If there is no existing declaration with "action.name", add a new declaration inside the module block
+			if (existingDeclaration == null) {
+				return [
+					{
+						range: {
+							start: existingModuleBody.getStart() + 1,
+							end: existingModuleBody.getStart() + 1
+						},
+						newText: DECLARATION_PART
+					}
+				];
+			}
+
+			// If there is an existing declaration with "action.name", add members to it
+			return [
+				{
+					range: {
+						start: existingDeclaration.name.getEnd() + 2,
+						end: existingDeclaration.name.getEnd() + 2
+					},
+					newText: MEMBER_PART
 				}
 			];
 		}

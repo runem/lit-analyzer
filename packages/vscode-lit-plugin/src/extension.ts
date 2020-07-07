@@ -1,4 +1,4 @@
-import { ALL_RULE_NAMES, LitAnalyzerConfig } from "lit-analyzer";
+import { ALL_RULE_IDS, LitAnalyzerConfig } from "lit-analyzer";
 import { join } from "path";
 import { ColorProvider } from "./color-provider";
 import * as vscode from "vscode";
@@ -145,7 +145,7 @@ function getConfig(): Partial<LitAnalyzerConfig> {
 	// Apply rules
 	const rules = outConfig.rules || {};
 
-	ALL_RULE_NAMES.forEach(ruleName => {
+	ALL_RULE_IDS.forEach(ruleName => {
 		withConfigValue(config, `rules.${ruleName}`, value => {
 			rules[ruleName] = value;
 		});

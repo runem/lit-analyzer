@@ -8,6 +8,7 @@ import noInvalidAttributeName from "./no-invalid-attribute-name";
 import noInvalidDirectiveBindingRule from "./no-invalid-directive-binding";
 import noInvalidTagName from "./no-invalid-tag-name";
 import noLegacyAttribute from "./no-legacy-attribute";
+import noMissingElementTypeDefinition from "./no-missing-element-type-definition";
 import noMissingImport from "./no-missing-import";
 import noNoncallableEventBindingRule from "./no-noncallable-event-binding";
 import noNullableAttributeBindingRule from "./no-nullable-attribute-binding";
@@ -40,5 +41,6 @@ export const ALL_RULES: RuleModule[] = [
 	noInvalidTagName,
 	noInvalidAttributeName,
 	noPropertyVisibilityMismatch,
-	noLegacyAttribute
+	noLegacyAttribute,
+	noMissingElementTypeDefinition
 ];
