@@ -4,19 +4,19 @@ import { makeElement } from "../helpers/generate-test-file";
 import { tsTest } from "../helpers/ts-test";
 import { TestFile } from "../helpers/compile-files";
 
-tsTest.skip("Report missing imports of custom elements", t => {
+tsTest("Report missing imports of custom elements", t => {
 	const { diagnostics } = getDiagnostics([makeElement({}), "html`<my-element></my-element>`"], { rules: { "no-missing-import": true } });
 	hasDiagnostic(t, diagnostics, "no-missing-import");
 });
 
-tsTest.skip("Don't report missing imports when the custom element has been imported 1", t => {
+tsTest("Don't report missing imports when the custom element has been imported 1", t => {
 	const { diagnostics } = getDiagnostics([makeElement({}), "import './my-element'; html`<my-element></my-element>`"], {
 		rules: { "no-missing-import": true }
 	});
 	hasNoDiagnostics(t, diagnostics);
 });
 
-tsTest.skip("Don't report missing imports when the custom element has been imported 2", t => {
+tsTest("Don't report missing imports when the custom element has been imported 2", t => {
 	const { diagnostics } = getDiagnostics(
 		[
 			makeElement({}),
@@ -31,7 +31,7 @@ tsTest.skip("Don't report missing imports when the custom element has been impor
 	hasNoDiagnostics(t, diagnostics);
 });
 
-tsTest.skip("Suggest adding correct import statement", t => {
+tsTest("Suggest adding correct import statement", t => {
 	const fileContentWithMissingImport = "html`<my-element></my-element>`";
 	const elementTagWithoutImport = "my-element";
 
@@ -55,7 +55,7 @@ tsTest.skip("Suggest adding correct import statement", t => {
 	t.true(correctCodeFixCreated);
 });
 
-tsTest.skip("Suggest adding correct import statement for element in nested folder", t => {
+tsTest("Suggest adding correct import statement for element in nested folder", t => {
 	const fileContentWithMissingImport = "html`<my-element></my-element>`";
 	const elementTagWithoutImport = "my-element";
 
