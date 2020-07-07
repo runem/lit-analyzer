@@ -2,26 +2,7 @@ import * as tsMod from "typescript";
 import { HostCancellationToken, Program, SourceFile, TypeChecker } from "typescript";
 import * as tsServer from "typescript/lib/tsserverlibrary";
 import { analyzeHTMLElement, analyzeSourceFile } from "web-component-analyzer";
-import noBooleanInAttributeBindingRule from "../rules/no-boolean-in-attribute-binding";
-import noComplexAttributeBindingRule from "../rules/no-complex-attribute-binding";
-import noExpressionlessPropertyBindingRule from "../rules/no-expressionless-property-binding";
-import noIncompatiblePropertyType from "../rules/no-incompatible-property-type";
-import noIncompatibleTypeBindingRule from "../rules/no-incompatible-type-binding";
-import noInvalidAttributeName from "../rules/no-invalid-attribute-name";
-import noInvalidDirectiveBindingRule from "../rules/no-invalid-directive-binding";
-import noInvalidTagName from "../rules/no-invalid-tag-name";
-import noLegacyAttribute from "../rules/no-legacy-attribute";
-import noMissingImport from "../rules/no-missing-import";
-import noNoncallableEventBindingRule from "../rules/no-noncallable-event-binding";
-import noNullableAttributeBindingRule from "../rules/no-nullable-attribute-binding";
-import noPropertyVisibilityMismatch from "../rules/no-property-visibility-mismatch";
-import noUnclosedTag from "../rules/no-unclosed-tag";
-import noUnintendedMixedBindingRule from "../rules/no-unintended-mixed-binding";
-import noUnknownAttribute from "../rules/no-unknown-attribute";
-import noUnknownEvent from "../rules/no-unknown-event";
-import noUnknownProperty from "../rules/no-unknown-property";
-import noUnknownSlotRule from "../rules/no-unknown-slot";
-import noUnknownTagName from "../rules/no-unknown-tag-name";
+import { ALL_RULES } from "../rules/all-rules";
 import { MAX_RUNNING_TIME_PER_OPERATION } from "./constants";
 import { getBuiltInHtmlCollection } from "./data/get-built-in-html-collection";
 import { getUserConfigHtmlCollection } from "./data/get-user-config-html-collection";
@@ -36,31 +17,7 @@ import { DefaultAnalyzerDependencyStore } from "./store/dependency-store/default
 import { DefaultAnalyzerDocumentStore } from "./store/document-store/default-analyzer-document-store";
 import { DefaultAnalyzerHtmlStore } from "./store/html-store/default-analyzer-html-store";
 import { HtmlDataSourceKind } from "./store/html-store/html-data-source-merged";
-import { RuleModule } from "./types/rule/rule-module";
 import { changedSourceFileIterator } from "./util/changed-source-file-iterator";
-
-const ALL_RULES: RuleModule[] = [
-	noExpressionlessPropertyBindingRule,
-	noUnintendedMixedBindingRule,
-	noUnknownSlotRule,
-	noNoncallableEventBindingRule,
-	noNullableAttributeBindingRule,
-	noComplexAttributeBindingRule,
-	noBooleanInAttributeBindingRule,
-	noInvalidDirectiveBindingRule,
-	noIncompatibleTypeBindingRule,
-	noMissingImport,
-	noUnclosedTag,
-	noUnknownTagName,
-	noUnknownAttribute,
-	noUnknownProperty,
-	noUnknownEvent,
-	noIncompatiblePropertyType,
-	noInvalidTagName,
-	noInvalidAttributeName,
-	noPropertyVisibilityMismatch,
-	noLegacyAttribute
-];
 
 export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 	protected componentSourceFileIterator = changedSourceFileIterator();

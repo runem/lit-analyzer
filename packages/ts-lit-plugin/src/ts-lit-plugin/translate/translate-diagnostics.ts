@@ -18,7 +18,7 @@ function translateDiagnostic(diagnostic: LitDiagnostic, file: SourceFile, contex
 	const span = translateRange(diagnostic.location);
 
 	const category = diagnostic.severity === "error" ? context.ts.DiagnosticCategory.Error : context.ts.DiagnosticCategory.Warning;
-	const code = 0;
+	const code = diagnostic.code ?? 0;
 	const messageText: string | DiagnosticMessageChain =
 		!context.config.dontShowSuggestions && diagnostic.suggestion
 			? {
@@ -28,7 +28,7 @@ function translateDiagnostic(diagnostic: LitDiagnostic, file: SourceFile, contex
 					next: [
 						{
 							messageText: diagnostic.suggestion,
-							code,
+							code: 0,
 							category: context.ts.DiagnosticCategory.Suggestion
 						}
 					]

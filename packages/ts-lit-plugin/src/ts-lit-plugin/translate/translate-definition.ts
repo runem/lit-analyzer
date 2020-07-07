@@ -1,7 +1,6 @@
 import { LitDefinition, LitDefinitionTarget } from "lit-analyzer";
 import { DefinitionInfo, DefinitionInfoAndBoundSpan } from "typescript";
 import { tsModule } from "../../ts-module";
-import { getNodeIdentifier } from "../../util/ast-util";
 import { translateRange } from "./translate-range";
 
 export function translateDefinition(definition: LitDefinition): DefinitionInfoAndBoundSpan {
@@ -26,7 +25,7 @@ function translateDefinitionInfo(target: LitDefinitionTarget): DefinitionInfo {
 			break;
 
 		case "node": {
-			const node = getNodeIdentifier(target.node) || target.node;
+			const node = target.node;
 			targetStart = node.getStart();
 			targetEnd = node.getEnd();
 			targetFileName = node.getSourceFile().fileName;

@@ -42,6 +42,10 @@ export class TsLitPlugin {
 
 	constructor(private prevLangService: LanguageService, public readonly context: LitPluginContext) {}
 
+	getSupportedCodeFixes(): string[] {
+		return this.litAnalyzer.getSupportedCodeFixes();
+	}
+
 	getCompletionEntryDetails(
 		fileName: string,
 		position: number,

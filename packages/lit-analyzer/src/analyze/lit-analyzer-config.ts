@@ -1,6 +1,8 @@
 import { HTMLDataV1 } from "vscode-html-languageservice";
 import { LitDiagnosticSeverity } from "./types/lit-diagnostic";
 
+export type LitAnalyzerRuleSeverity = "on" | "off" | "warn" | "warning" | "error" | 0 | 1 | 2 | true | false;
+
 export type LitAnalyzerRuleId =
 	| "no-unknown-tag-name"
 	| "no-missing-import"
@@ -24,33 +26,6 @@ export type LitAnalyzerRuleId =
 	| "no-invalid-css"
 	| "no-property-visibility-mismatch"
 	| "no-legacy-attribute";
-
-export const ALL_RULE_NAMES: LitAnalyzerRuleId[] = [
-	"no-unknown-tag-name",
-	"no-missing-import",
-	"no-unclosed-tag",
-	"no-unknown-attribute",
-	"no-unknown-property",
-	"no-unknown-event",
-	"no-unknown-slot",
-	"no-unintended-mixed-binding",
-	"no-invalid-boolean-binding",
-	"no-expressionless-property-binding",
-	"no-noncallable-event-binding",
-	"no-boolean-in-attribute-binding",
-	"no-complex-attribute-binding",
-	"no-nullable-attribute-binding",
-	"no-incompatible-type-binding",
-	"no-invalid-directive-binding",
-	"no-incompatible-property-type",
-	"no-invalid-attribute-name",
-	"no-invalid-tag-name",
-	"no-invalid-css",
-	"no-property-visibility-mismatch",
-	"no-legacy-attribute"
-];
-
-export type LitAnalyzerRuleSeverity = "on" | "off" | "warn" | "warning" | "error" | 0 | 1 | 2 | true | false;
 
 export type LitAnalyzerRules = Partial<Record<LitAnalyzerRuleId, LitAnalyzerRuleSeverity | [LitAnalyzerRuleSeverity]>>;
 
@@ -103,6 +78,23 @@ const DEFAULT_RULES_STRICT: Required<LitAnalyzerRules> = {
 	"no-property-visibility-mismatch": "error",
 	"no-legacy-attribute": "off"
 };
+
+// All rule names order alphabetically
+export const ALL_RULE_NAMES = Object.keys(DEFAULT_RULES_STRICT).sort() as LitAnalyzerRuleId[];
+
+// This map is based on alphabetic order, so it assumed that
+//   these rule codes are changed when new rules are added and
+//   should not be depended on by the user.
+// The user should always use the "rule id" string.
+// Consider if this map should be manually maintained in the future.
+export const RULE_ID_CODE_MAP = ALL_RULE_NAMES.reduce((acc, ruleId, i) => {
+	acc[ruleId] = i + 1;
+	return acc;
+}, {} as Record<LitAnalyzerRuleId, number>);
+
+export function ruleIdCode(ruleId: LitAnalyzerRuleId): number {
+	return RULE_ID_CODE_MAP[ruleId];
+}
 
 export function ruleSeverity(rules: LitAnalyzerConfig | LitAnalyzerRules, ruleId: LitAnalyzerRuleId): LitAnalyzerRuleSeverity {
 	if ("rules" in rules) return ruleSeverity(rules.rules, ruleId);

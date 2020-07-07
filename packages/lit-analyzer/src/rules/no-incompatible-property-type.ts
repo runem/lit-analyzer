@@ -10,7 +10,7 @@ import { rangeFromNode } from "../analyze/util/range-util";
 const rule: RuleModule = {
 	id: "no-incompatible-property-type",
 	meta: {
-		priority: "medium"
+		priority: "low"
 	},
 	visitComponentMember(member, context) {
 		if (member.kind !== "property" || member.modifiers?.has("static") || member.meta == null) return;

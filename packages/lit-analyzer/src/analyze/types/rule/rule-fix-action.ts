@@ -11,6 +11,7 @@ export type RuleFixActionKind =
 	| "changeAttributeModifier"
 	| "changeAssignment"
 	| "import"
+	| "extendGlobalDeclaration"
 	| "changeRange"
 	| "changeIdentifier";
 
@@ -69,6 +70,12 @@ export interface RuleFixActionChangeRange extends RuleFixActionBase {
 	newText: string;
 }
 
+export interface RuleFixActionExtendGlobalDeclaration extends RuleFixActionBase {
+	kind: "extendGlobalDeclaration";
+	name: string;
+	newMembers: Record<string, string>;
+}
+
 export type RuleFixAction =
 	| RuleFixActionChangeTagName
 	| RuleFixActionAddAttribute
@@ -77,4 +84,5 @@ export type RuleFixAction =
 	| RuleFixActionChangeAttributeModifier
 	| RuleFixActionChangeAssignment
 	| RuleFixActionChangeIdentifier
+	| RuleFixActionExtendGlobalDeclaration
 	| RuleFixActionChangeRange;

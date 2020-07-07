@@ -6,6 +6,7 @@ import { LitDefinition } from "../../types/lit-definition";
 import { LitDiagnostic } from "../../types/lit-diagnostic";
 import { LitQuickInfo } from "../../types/lit-quick-info";
 import { DocumentOffset } from "../../types/range";
+import { getNodeIdentifier } from "../../util/ast-util";
 import { getPositionContextInDocument } from "../../util/get-position-context-in-document";
 import { iterableDefined } from "../../util/iterable-util";
 import { documentRangeToSFRange } from "../../util/range-util";
@@ -68,7 +69,7 @@ export class LitCssDocumentAnalyzer {
 						fromRange: documentRangeToSFRange(document, { start, end }),
 						target: nodes.map(node => ({
 							kind: "node",
-							node
+							node: getNodeIdentifier(node, context.ts) || node
 						}))
 					};
 				}
@@ -80,11 +81,13 @@ export class LitCssDocumentAnalyzer {
 			const definition = context.definitionStore.getDefinitionForTagName(word);
 
 			if (definition != null) {
+				const node = definition.declaration().node;
+
 				return {
 					fromRange: documentRangeToSFRange(document, { start, end }),
 					target: {
 						kind: "node",
-						node: definition.declaration().node
+						node: getNodeIdentifier(node, context.ts) || node
 					}
 				};
 			}

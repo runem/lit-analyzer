@@ -1,4 +1,4 @@
-import { litDiagnosticRuleSeverity } from "../lit-analyzer-config";
+import { litDiagnosticRuleSeverity, ruleIdCode } from "../lit-analyzer-config";
 import { LitAnalyzerContext } from "../lit-analyzer-context";
 import { ReportedRuleDiagnostic } from "../rule-collection";
 import { LitDiagnostic } from "../types/lit-diagnostic";
@@ -14,6 +14,7 @@ export function convertRuleDiagnosticToLitDiagnostic(reported: ReportedRuleDiagn
 		message,
 		source,
 		file: context.currentFile,
-		severity: litDiagnosticRuleSeverity(context.config, source)
+		severity: litDiagnosticRuleSeverity(context.config, source),
+		code: ruleIdCode(source)
 	};
 }

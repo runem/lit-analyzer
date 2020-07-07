@@ -1,8 +1,9 @@
-import { Identifier } from "typescript";
+import { Identifier, ObjectLiteralExpression } from "typescript";
 import { ComponentMember } from "web-component-analyzer";
-import { RuleFixActionChangeRange } from "../analyze/types/rule/rule-fix-action";
+import { RuleFixAction, RuleFixActionChangeRange } from "../analyze/types/rule/rule-fix-action";
 import { RuleModule } from "../analyze/types/rule/rule-module";
 import { RuleModuleContext } from "../analyze/types/rule/rule-module-context";
+import { findChild, getNodeIdentifier } from "../analyze/util/ast-util";
 import { makeSourceFileRange, rangeFromNode } from "../analyze/util/range-util";
 
 /**
@@ -13,11 +14,11 @@ import { makeSourceFileRange, rangeFromNode } from "../analyze/util/range-util";
 const getDecoratorIdentifier = (member: ComponentMember, context: RuleModuleContext): Identifier | undefined => {
 	const decorator = member.meta?.node?.decorator;
 
-	if (decorator !== undefined && context.ts.isCallExpression(decorator) && context.ts.isIdentifier(decorator.expression)) {
-		return decorator.expression;
+	if (decorator == null) {
+		return undefined;
 	}
 
-	return undefined;
+	return getNodeIdentifier(decorator, context.ts);
 };
 
 /**
@@ -27,7 +28,7 @@ const getDecoratorIdentifier = (member: ComponentMember, context: RuleModuleCont
 const rule: RuleModule = {
 	id: "no-property-visibility-mismatch",
 	meta: {
-		priority: "low"
+		priority: "medium"
 	},
 	visitComponentMember(member, context) {
 		// Only run this rule on members of "property" kind
@@ -63,6 +64,7 @@ const rule: RuleModule = {
 							fix: () => {
 								// Make sure we operate on a property declaration
 								const propertyDeclaration = member.node;
+
 								if (!context.ts.isPropertyDeclaration(propertyDeclaration)) {
 									return [];
 								}
@@ -97,8 +99,8 @@ const rule: RuleModule = {
 											{
 												kind: "changeRange",
 												range: makeSourceFileRange({
-													start: propertyIdentifier.getStart() - 1,
-													end: propertyIdentifier.getStart() - 1
+													start: propertyIdentifier.getStart(),
+													end: propertyIdentifier.getStart()
 												}),
 												newText: `${keyword} `
 											} as RuleFixActionChangeRange
@@ -122,15 +124,35 @@ const rule: RuleModule = {
 					// Return a code action that can replace the identifier of the decorator
 					const newText = `internalProperty`;
 
+					// Change identifier to "internal property"
+					const actions: RuleFixAction[] = [
+						{
+							kind: "changeIdentifier",
+							identifier: decoratorIdentifier,
+							newText
+						}
+					];
+
+					// Find the object literal node (the config of the "@property" decorator)
+					const objectLiteralNode = findChild<ObjectLiteralExpression>(decoratorIdentifier.parent, node =>
+						context.ts.isObjectLiteralExpression(node)
+					);
+
+					if (objectLiteralNode != null) {
+						// Remove the configuration if the config doesn't have any shared properties with the "internalProperty" config
+						const internalPropertyConfigProperties = ["hasChanged"];
+						if (!objectLiteralNode.properties?.some(propertyNode => internalPropertyConfigProperties.includes(propertyNode.name?.getText() || ""))) {
+							actions.push({
+								kind: "changeRange",
+								range: rangeFromNode(objectLiteralNode),
+								newText: ""
+							});
+						}
+					}
+
 					return {
 						message: `Change to '${newText}'`,
-						actions: [
-							{
-								kind: "changeIdentifier",
-								identifier: decoratorIdentifier,
-								newText
-							}
-						]
+						actions
 					};
 				}
 			});

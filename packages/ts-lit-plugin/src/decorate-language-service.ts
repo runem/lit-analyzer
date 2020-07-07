@@ -2,10 +2,10 @@
 import { LanguageService } from "typescript";
 import { logger } from "./logger";
 import { TsLitPlugin } from "./ts-lit-plugin/ts-lit-plugin";
+import { tsModule } from "./ts-module";
 
 export function decorateLanguageService(languageService: LanguageService, plugin: TsLitPlugin): LanguageService {
-	const nextLanguageService: LanguageService = {
-		...languageService,
+	const languageServiceExtension: Partial<LanguageService> = {
 		getCompletionsAtPosition: plugin.getCompletionsAtPosition.bind(plugin),
 		getCompletionEntryDetails: plugin.getCompletionEntryDetails.bind(plugin),
 		getSemanticDiagnostics: plugin.getSemanticDiagnostics.bind(plugin),
@@ -16,36 +16,47 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 		getRenameInfo: plugin.getRenameInfo.bind(plugin),
 		findRenameLocations: plugin.findRenameLocations.bind(plugin),
 		getSignatureHelpItems: plugin.getSignatureHelpItems.bind(plugin)
-
 		//getOutliningSpans: plugin.getOutliningSpans.bind(plugin)
 		//getFormattingEditsForRange: plugin.getFormattingEditsForRange.bind(plugin)
 	};
 
+	const decoratedLanguageService: LanguageService = {
+		...languageService,
+		...languageServiceExtension
+	};
+
+	// Decorate "getSupportedCodeFixes"
+	// Read more here: https://github.com/microsoft/TypeScript/issues/29051
+	const getSupportedCodeFixes = tsModule.ts.getSupportedCodeFixes.bind(tsModule.ts);
+	tsModule.ts.getSupportedCodeFixes = () => {
+		return [...getSupportedCodeFixes(), ...plugin.getSupportedCodeFixes()];
+	};
+
 	// Make sure to call the old service if config.disable === true
-	for (const methodName of Object.getOwnPropertyNames(nextLanguageService)) {
-		const newMethod = (nextLanguageService as any)[methodName];
-		const oldMethod = (languageService as any)[methodName];
+	for (const methodName of Object.getOwnPropertyNames(languageServiceExtension) as (keyof LanguageService)[]) {
+		const newMethod: Function | undefined = decoratedLanguageService[methodName]!;
+		const oldMethod: Function | undefined = languageService[methodName];
 
-		if (newMethod !== oldMethod) {
-			(nextLanguageService as any)[methodName] = function () {
-				if (plugin.context.config.disable && oldMethod != null) {
-					return oldMethod(...arguments);
-				}
+		decoratedLanguageService[methodName] = function (): any {
+			if (plugin.context.config.disable && oldMethod != null) {
+				return oldMethod(...arguments);
+			}
 
-				return wrapTryCatch(newMethod, oldMethod, methodName)(...arguments);
-			};
-		}
+			return wrapTryCatch(newMethod, oldMethod, methodName)(...arguments);
+		};
 	}
 
-	// Wrap all method called to the service in logging and performance measuring
-	for (const methodName of Object.getOwnPropertyNames(nextLanguageService)) {
-		const isDecorated = (nextLanguageService as any)[methodName] != null;
+	// Wrap all method calls to the service in logging and performance measuring
+	for (const methodName of Object.getOwnPropertyNames(decoratedLanguageService) as (keyof LanguageService)[]) {
+		//const isDecorated = languageServiceExtension[methodName] != null;
+		const isDecorated = decoratedLanguageService[methodName] != null;
+
 		if (isDecorated) {
-			const method = (nextLanguageService as any)[methodName];
-			(nextLanguageService as any)[methodName] = wrapLog(methodName, method, plugin);
+			const method = (decoratedLanguageService as any)[methodName];
+			(decoratedLanguageService as any)[methodName] = wrapLog(methodName, method, plugin);
 		}
 	}
-	return nextLanguageService;
+	return decoratedLanguageService;
 }
 
 /**
@@ -55,7 +66,7 @@ export function decorateLanguageService(languageService: LanguageService, plugin
  * @param oldMethod
  * @param methodName
  */
-function wrapTryCatch<T extends Function>(newMethod: T, oldMethod: T, methodName: string): T {
+function wrapTryCatch<T extends Function>(newMethod: T, oldMethod: T | undefined, methodName: string): T {
 	return (((...args: unknown[]) => {
 		try {
 			return newMethod(...args);
@@ -64,7 +75,7 @@ function wrapTryCatch<T extends Function>(newMethod: T, oldMethod: T, methodName
 
 			// Always return the old method if anything fails
 			// Don't crash everything :-)
-			return oldMethod(...args);
+			return oldMethod?.(...args);
 		}
 	}) as unknown) as T;
 }
