@@ -28,16 +28,15 @@
 		"vscode:prepublish": "npm run compile",
 		"compile": "npm run clean & tsc -p ./",
 		"watch": "tsc -watch -p ./",
-		"postinstall": "node ./node_modules/vscode/bin/install",
 		"publish": "vsce publish",
 		"package": "vsce package",
 		"install:safe": "npm install --ignore-scripts --no-package-lock && npm i --no-package-lock",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json"
 	},
 	"dependencies": {
-		"lit-html": "https://github.com/mjbvz/vscode-lit-html.git#1.11.0",
+		"lit-html": "https://github.com/mjbvz/vscode-lit-html.git#1.11.1",
 		"ts-lit-plugin": "1.2.0-next.2",
-		"vscode-styled-components": "https://github.com/styled-components/vscode-styled-components#f806f23a027e3458e9d77001851b428f1cb992d5",
+		"vscode-styled-components": "https://github.com/styled-components/vscode-styled-components#4320c223666ea835e8c63c85573c2704f550b7df",
 		"web-component-analyzer": "~1.1.0-next.2"
 	},
 	"devDependencies": {
@@ -45,7 +44,7 @@
 		"rimraf": "^3.0.2",
 		"typescript": "^3.7.5",
 		"vsce": "^1.58.0",
-		"vscode": "^1.1.29"
+		"@types/vscode": "^1.30.0"
 	},
 	"activationEvents": [
 		"onCommand:lit-plugin.analyze",
