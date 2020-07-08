@@ -149,10 +149,10 @@ function ruleFixActionConverter(action: RuleFixAction): LitCodeFixAction[] {
 			if (existingModuleDeclaration == null) {
 				return [
 					{
-						range: {
+						range: makeSourceFileRange({
 							start: action.file.getEnd(),
 							end: action.file.getEnd()
-						},
+						}),
 						newText: MODULE_PART
 					}
 				];
@@ -170,10 +170,10 @@ function ruleFixActionConverter(action: RuleFixAction): LitCodeFixAction[] {
 			if (existingDeclaration == null) {
 				return [
 					{
-						range: {
+						range: makeSourceFileRange({
 							start: existingModuleBody.getStart() + 1,
 							end: existingModuleBody.getStart() + 1
-						},
+						}),
 						newText: DECLARATION_PART
 					}
 				];
@@ -182,10 +182,10 @@ function ruleFixActionConverter(action: RuleFixAction): LitCodeFixAction[] {
 			// If there is an existing declaration with "action.name", add members to it
 			return [
 				{
-					range: {
+					range: makeSourceFileRange({
 						start: existingDeclaration.name.getEnd() + 2,
 						end: existingDeclaration.name.getEnd() + 2
-					},
+					}),
 					newText: MEMBER_PART
 				}
 			];

@@ -187,3 +187,17 @@ html\`<input step="\${ifExists(10)}" />\`
 	`);
 	hasNoDiagnostics(t, diagnostics);
 });
+
+tsTest("Attribute binding: the role attribute is correctly type checked when given valid items", t => {
+	const { diagnostics } = getDiagnostics(`html\`<div role="button listitem"></div>\`
+	`);
+
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Attribute binding: the role attribute is correctly type checked when given invalid items", t => {
+	const { diagnostics } = getDiagnostics(`html\`<div role="button foo"></div>\`
+	`);
+
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});

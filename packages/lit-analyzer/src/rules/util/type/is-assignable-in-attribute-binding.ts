@@ -1,8 +1,9 @@
 import { isAssignableToType as _isAssignableToType, SimpleType, SimpleTypeComparisonOptions, typeToString } from "ts-simple-type";
-import { HtmlNodeAttrAssignmentKind } from "../../../analyze/types/html-node/html-node-attr-assignment-types";
+import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../analyze/types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttr } from "../../../analyze/types/html-node/html-node-attr-types";
 import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
-import { rangeFromHtmlNodeAttr } from "../../../analyze/util/range-util";
+import { documentRangeToSFRange, rangeFromHtmlNodeAttr } from "../../../analyze/util/range-util";
+import { isPrimitiveArrayType } from "../../../analyze/util/type-util";
 import { isLitDirective } from "../directive/is-lit-directive";
 import { isAssignableBindingUnderSecuritySystem } from "./is-assignable-binding-under-security-system";
 import { isAssignableToType } from "./is-assignable-to-type";
@@ -39,6 +40,11 @@ export function isAssignableInAttributeBinding(
 				// and we should not do any more checking.
 				return securitySystemResult;
 			}
+		}
+
+		const primitiveArrayTypeResult = isAssignableInPrimitiveArray(assignment, { typeA, typeB }, context);
+		if (primitiveArrayTypeResult !== undefined) {
+			return primitiveArrayTypeResult;
 		}
 
 		if (!isAssignableToType({ typeA, typeB }, context, { isAssignable: isAssignableToTypeWithStringCoercion })) {
@@ -98,6 +104,9 @@ export function isAssignableToTypeWithStringCoercion(
 			);
 
 		case "STRING_LITERAL":
+			/*if (typeA.kind === "ARRAY" && typeA.type.kind === "STRING_LITERAL") {
+			}*/
+
 			// Take into account that the empty string is is equal to true
 			if (typeB.value.length === 0) {
 				if (_isAssignableToType(typeA, { kind: "BOOLEAN_LITERAL", value: true }, safeOptions)) {
@@ -180,6 +189,75 @@ export function isAssignableToTypeWithStringCoercion(
 				return true;
 			}
 			break;
+	}
+
+	return undefined;
+}
+
+/**
+ * Certain attributes like "role" are string literals, but should be type checked
+ *   by comparing each item in the white-space-separated array against typeA
+ * @param assignment
+ * @param typeA
+ * @param typeB
+ * @param context
+ */
+export function isAssignableInPrimitiveArray(
+	assignment: HtmlNodeAttrAssignment,
+	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },
+	context: RuleModuleContext
+): boolean | undefined {
+	// Only check "STRING" and "EXPRESSION" for now
+	if (assignment.kind !== HtmlNodeAttrAssignmentKind.STRING && assignment.kind !== HtmlNodeAttrAssignmentKind.EXPRESSION) {
+		return undefined;
+	}
+
+	// Check if typeA is marked as a "primitive array type"
+	if (isPrimitiveArrayType(typeA) && typeB.kind === "STRING_LITERAL") {
+		// Split a value like: "button listitem" into ["button", " ", "listitem"]
+		const valuesAndWhitespace = typeB.value.split(/(\s+)/g);
+		const valuesNotAssignable: string[] = [];
+
+		const startOffset = assignment.location.start;
+		let offset = 0;
+
+		for (const value of valuesAndWhitespace) {
+			// Check all non-whitespace values
+			if (value.match(/\s+/) == null && value !== "") {
+				// Make sure that the the value is assignable to the union
+				if (
+					!isAssignableToType({ typeA, typeB: { kind: "STRING_LITERAL", value } }, context, { isAssignable: isAssignableToTypeWithStringCoercion })
+				) {
+					valuesNotAssignable.push(value);
+
+					// If the assignment kind is "STRING" we can report diagnostics directly on the value in the HTML
+					if (assignment.kind === "STRING") {
+						context.report({
+							location: documentRangeToSFRange(assignment.htmlAttr.document, {
+								start: startOffset + offset,
+								end: startOffset + offset + value.length
+							}),
+							message: `The value '${value}' is not assignable to '${typeToString(typeA)}'`
+						});
+					}
+				}
+			}
+
+			offset += value.length;
+		}
+
+		// If the assignment kind as "EXPRESSION" report a single diagnostic on the attribute name
+		if (assignment.kind === "EXPRESSION" && valuesNotAssignable.length > 0) {
+			const multiple = valuesNotAssignable.length > 1;
+			context.report({
+				location: rangeFromHtmlNodeAttr(assignment.htmlAttr),
+				message: `The value${multiple ? "s" : ""} ${valuesNotAssignable.map(v => `'${v}'`).join(", ")} ${
+					multiple ? "are" : "is"
+				} not assignable to '${typeToString(typeA)}'`
+			});
+		}
+
+		return valuesNotAssignable.length === 0;
 	}
 
 	return undefined;

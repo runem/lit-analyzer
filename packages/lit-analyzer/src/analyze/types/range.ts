@@ -21,6 +21,6 @@ export function makeDocumentPosition(position: number): SourceFilePosition {
 }*/
 
 // Ranges
-export type DocumentRange = { start: DocumentOffset; end: DocumentOffset } & { _brand?: "document" };
+export type DocumentRange = { start: DocumentOffset; end: DocumentOffset } & { _brand: "document" };
 
-export type SourceFileRange = { start: SourceFilePosition; end: SourceFilePosition } & { _brand?: "sourcefile" };
+export type SourceFileRange = { start: SourceFilePosition; end: SourceFilePosition } & { _brand: "sourcefile" };
