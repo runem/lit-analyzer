@@ -156,7 +156,7 @@ function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, con
  * @param SourceFile
  * @param TsModule
  */
-function isFacadeModule(SourceFile: SourceFile, TsModule: typeof tsModule): boolean {
+export function isFacadeModule(SourceFile: SourceFile, TsModule: typeof tsModule): boolean {
 	const statements = SourceFile.statements;
 	const isFacade = statements.every(statement => {
 		return TsModule.isImportDeclaration(statement) || TsModule.isExportDeclaration(statement);
