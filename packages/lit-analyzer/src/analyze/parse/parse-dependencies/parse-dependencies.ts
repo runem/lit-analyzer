@@ -4,7 +4,7 @@ import { LitAnalyzerContext } from "../../lit-analyzer-context";
 import { visitIndirectImportsFromSourceFile } from "./visit-dependencies";
 
 // Depth constants
-const MAX_EXTERNAL_DEPTH = 2;
+const MAX_EXTERNAL_DEPTH = 1;
 
 const MAX_INTERNAL_DEPTH = Infinity;
 
