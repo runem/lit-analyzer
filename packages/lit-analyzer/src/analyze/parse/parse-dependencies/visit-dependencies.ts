@@ -153,13 +153,13 @@ function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, con
 /**
  * Returns whether a SourceFile is a Facade Module.
  * A Facade Module only consists of import and export declarations.
- * @param SourceFile
- * @param TsModule
+ * @param sourceFile
+ * @param ts
  */
-export function isFacadeModule(SourceFile: SourceFile, TsModule: typeof tsModule): boolean {
-	const statements = SourceFile.statements;
+export function isFacadeModule(sourceFile: SourceFile, ts: typeof tsModule): boolean {
+	const statements = sourceFile.statements;
 	const isFacade = statements.every(statement => {
-		return TsModule.isImportDeclaration(statement) || TsModule.isExportDeclaration(statement);
+		return ts.isImportDeclaration(statement) || ts.isExportDeclaration(statement);
 	});
 	return isFacade;
 }
