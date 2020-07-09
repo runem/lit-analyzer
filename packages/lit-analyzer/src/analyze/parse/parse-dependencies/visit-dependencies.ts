@@ -68,16 +68,18 @@ export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, conte
 		 continue;
 		 }*/
 
-		// Calculate new depth. Reset depth to 0 if we go from a project module to an external module.
+		// Calculate new depth. Reset depth to 1 if we go from a project module to an external module.
 		// This will make sure that we always go X modules deep into external modules
 		let newDepth;
 		if (fromProjectToExternal) {
-			newDepth = 0;
-		} else if (isFacadeModule(file, context.ts)) {
-			// Facade modules are ignored when calculating depth
-			newDepth = currentDepth;
+			newDepth = 1;
 		} else {
 			newDepth = currentDepth + 1;
+		}
+
+		if (isFacadeModule(file, context.ts)) {
+			// Facade modules are ignored when calculating depth
+			newDepth--;
 		}
 
 		// Visit direct imported source files recursively
