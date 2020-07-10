@@ -112,18 +112,10 @@ function getConfig(): Partial<LitAnalyzerConfig> {
 		outConfig.securitySystem = value;
 	});
 	withConfigValue(config, "moduleTraversalDepthInternal", value => {
-		const castedValue = Number(value);
-		if (!(isNaN(castedValue) || castedValue === 0)) {
-			// cast successful.
-			outConfig.moduleTraversalDepthExternal = castedValue;
-		}
+		outConfig.moduleTraversalDepthInternal = value;
 	});
 	withConfigValue(config, "moduleTraversalDepthExternal", value => {
-		const castedValue = Number(value);
-		if (!(isNaN(castedValue) || castedValue === 0)) {
-			// cast successful.
-			outConfig.moduleTraversalDepthExternal = castedValue;
-		}
+		outConfig.moduleTraversalDepthExternal = value;
 	});
 	// Template tags
 	withConfigValue(config, "htmlTemplateTags", value => {

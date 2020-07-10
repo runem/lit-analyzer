@@ -173,8 +173,8 @@ export function makeConfig(userOptions: Partial<LitAnalyzerConfig> = {}): LitAna
 		},
 		dontSuggestConfigChanges: userOptions.dontSuggestConfigChanges || false,
 		dontShowSuggestions: userOptions.dontShowSuggestions || getDeprecatedOption(userOptions, "skipSuggestions") || false,
-		moduleTraversalDepthInternal: userOptions.moduleTraversalDepthInternal || Infinity,
-		moduleTraversalDepthExternal: userOptions.moduleTraversalDepthExternal || 1,
+		moduleTraversalDepthInternal: parseModuleTraversalDepth(userOptions.moduleTraversalDepthInternal, Infinity),
+		moduleTraversalDepthExternal: parseModuleTraversalDepth(userOptions.moduleTraversalDepthExternal, 1),
 
 		// Template tags
 		htmlTemplateTags: userOptions.htmlTemplateTags || ["html", "raw"],
@@ -258,4 +258,19 @@ function getDeprecatedMappedRules(userOptions: Partial<LitAnalyzerConfig>): LitA
 	}
 
 	return mappedDeprecatedRules;
+}
+
+/**
+ * Parses dependency traversal depth from configuration.
+ * The string "Infinity" gets parsed to the number Infinity.
+ * @param value
+ * @param defaultValue
+ */
+function parseModuleTraversalDepth(value: string | number | undefined, defaultValue: number): number {
+	const castedValue = Number(value);
+	if (!(isNaN(castedValue) || castedValue <= 0)) {
+		// cast successful.
+		return castedValue;
+	}
+	return defaultValue;
 }
