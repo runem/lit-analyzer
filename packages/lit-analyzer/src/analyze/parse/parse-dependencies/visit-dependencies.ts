@@ -31,9 +31,9 @@ export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, conte
 
 	// Check if we have traversed too deep
 	// Subtract 1 because depth starts at 0
-	if (inExternal && currentDepth >= (context.maxExternalDepth ?? Infinity) - 1) {
+	if (inExternal && currentDepth > (context.maxExternalDepth ?? Infinity) - 1) {
 		return;
-	} else if (!inExternal && currentDepth >= (context.maxInternalDepth ?? Infinity) - 1) {
+	} else if (!inExternal && currentDepth > (context.maxInternalDepth ?? Infinity) - 1) {
 		return;
 	}
 
@@ -70,7 +70,15 @@ export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, conte
 
 		// Calculate new depth. Reset depth to 0 if we go from a project module to an external module.
 		// This will make sure that we always go X modules deep into external modules
-		const newDepth = fromProjectToExternal ? 0 : currentDepth + 1;
+		let newDepth;
+		if (fromProjectToExternal) {
+			newDepth = 0;
+		} else if (isFacadeModule(file, context.ts)) {
+			// Facade modules are ignored when calculating depth
+			newDepth = currentDepth;
+		} else {
+			newDepth = currentDepth + 1;
+		}
 
 		// Visit direct imported source files recursively
 		visitIndirectImportsFromSourceFile(file, {
@@ -140,4 +148,18 @@ function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, con
 			context.emitDirectImport?.(sourceFile);
 		}
 	}
+}
+
+/**
+ * Returns whether a SourceFile is a Facade Module.
+ * A Facade Module only consists of import and export declarations.
+ * @param sourceFile
+ * @param ts
+ */
+export function isFacadeModule(sourceFile: SourceFile, ts: typeof tsModule): boolean {
+	const statements = sourceFile.statements;
+	const isFacade = statements.every(statement => {
+		return ts.isImportDeclaration(statement) || ts.isExportDeclaration(statement);
+	});
+	return isFacade;
 }

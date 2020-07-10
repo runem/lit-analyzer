@@ -71,7 +71,7 @@ tsTest("Suggest adding correct import statement for element in nested folder", t
 		text: `
 		class MyElement extends HTMLElement {
 		};
-		customElements.define("my-element", MyElement);	
+		customElements.define("my-element", MyElement);
 		`
 	};
 	const { codeFixes } = getCodeFixesAtRange([nestedElement, fileContentWithMissingImport], { start, end }, { rules: { "no-missing-import": true } });
