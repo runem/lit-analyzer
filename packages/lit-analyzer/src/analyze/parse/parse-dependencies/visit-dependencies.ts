@@ -68,16 +68,18 @@ export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, conte
 		 continue;
 		 }*/
 
-		// Calculate new depth. Reset depth to 0 if we go from a project module to an external module.
+		// Calculate new depth. Reset depth to 1 if we go from a project module to an external module.
 		// This will make sure that we always go X modules deep into external modules
 		let newDepth;
 		if (fromProjectToExternal) {
-			newDepth = 0;
-		} else if (isFacadeModule(file, context.ts)) {
-			// Facade modules are ignored when calculating depth
-			newDepth = currentDepth;
+			newDepth = 1;
 		} else {
 			newDepth = currentDepth + 1;
+		}
+
+		if (isFacadeModule(file, context.ts)) {
+			// Facade modules are ignored when calculating depth
+			newDepth--;
 		}
 
 		// Visit direct imported source files recursively
@@ -136,14 +138,12 @@ function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, con
 		? context.project.getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, fromSourceFile.fileName)
 		: "getResolvedModuleWithFailedLookupLocationsFromCache" in context.program
 		? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-		  (context.program as any)["getResolvedModuleWithFailedLookupLocationsFromCache"](moduleSpecifier, node.getSourceFile().fileName)
+		  (context.program as any)["getResolvedModuleWithFailedLookupLocationsFromCache"](moduleSpecifier, fromSourceFile.fileName)
 		: undefined;
 
-	const mod = result != null ? result.resolvedModule : undefined;
-
-	if (mod != null) {
-		const sourceFile = context.program.getSourceFile(mod.resolvedFileName);
-
+	if (result?.resolvedModule?.resolvedFileName != null) {
+		const resolvedModule = result.resolvedModule;
+		const sourceFile = context.program.getSourceFile(resolvedModule.resolvedFileName);
 		if (sourceFile != null) {
 			context.emitDirectImport?.(sourceFile);
 		}
