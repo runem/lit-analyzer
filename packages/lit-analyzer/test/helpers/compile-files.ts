@@ -114,7 +114,7 @@ export function compileFiles(inputFiles: TestFile[] | TestFile = []): { program:
 	// We need to overwrite this so the traversal of external modules can be tested.
 	program.isSourceFileFromExternalLibrary = (sourceFile: SourceFile): boolean => {
 		const filename = sourceFile.fileName;
-		return filename.includes("node_modules") ? true : false;
+		return filename.includes("node_modules");
 	};
 
 	const entrySourceFile = entryFile.fileName != null ? program.getSourceFile(entryFile.fileName)! : program.getSourceFiles()[0];
