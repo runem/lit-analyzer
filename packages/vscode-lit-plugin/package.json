@@ -92,6 +92,16 @@
 						"description": "Enable strict mode.",
 						"default": false
 					},
+					"lit-plugin.moduleTraversalDepthInternal": {
+						"type": "string",
+						"description": "Determines how many modules deep dependencies are followed to determine whether a custom element is available in the current file.",
+						"default": "Infinity"
+					},
+					"lit-plugin.moduleTraversalDepthExternal": {
+						"type": "string",
+						"description": "Determines how many modules deep dependencies in npm packages are followed to determine whether a custom element is available in the current file.",
+						"default": 1
+					},
 					"lit-plugin.securitySystem": {
 						"type": "string",
 						"description": "The lit-html security sanitization strategy to assume.",

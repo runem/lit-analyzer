@@ -125,12 +125,13 @@ export interface LitAnalyzerConfig {
 	logging: LitAnalyzerLogging;
 	cwd: string;
 	format: { disable: boolean };
+	dontShowSuggestions: boolean;
+	dontSuggestConfigChanges: boolean;
+	moduleTraversalDepthInternal: number;
+	moduleTraversalDepthExternal: number;
 
 	htmlTemplateTags: string[];
 	cssTemplateTags: string[];
-
-	dontShowSuggestions: boolean;
-	dontSuggestConfigChanges: boolean;
 
 	globalTags: string[];
 	globalAttributes: string[];
@@ -172,6 +173,8 @@ export function makeConfig(userOptions: Partial<LitAnalyzerConfig> = {}): LitAna
 		},
 		dontSuggestConfigChanges: userOptions.dontSuggestConfigChanges || false,
 		dontShowSuggestions: userOptions.dontShowSuggestions || getDeprecatedOption(userOptions, "skipSuggestions") || false,
+		moduleTraversalDepthInternal: userOptions.moduleTraversalDepthInternal || Infinity,
+		moduleTraversalDepthExternal: userOptions.moduleTraversalDepthExternal || 1,
 
 		// Template tags
 		htmlTemplateTags: userOptions.htmlTemplateTags || ["html", "raw"],

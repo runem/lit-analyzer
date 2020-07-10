@@ -13,4 +13,6 @@ export interface LitAnalyzerCliConfig {
 	strict?: boolean;
 	format?: FormatterFormat;
 	rules?: LitAnalyzerRules;
+	moduleTraversalDepthInternal?: number;
+	moduleTraversalDepthExternal?: number;
 }

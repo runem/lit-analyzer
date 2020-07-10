@@ -193,5 +193,15 @@ function readLitAnalyzerConfigFromCliConfig(cliConfig: LitAnalyzerCliConfig): Pa
 		config.logging = cliConfig.debug ? "verbose" : "off";
 	}
 
+	// Assign "moduleTraversalDepthInternal" setting from the CLI command (which overwrites tsconfig rules)
+	if (cliConfig.moduleTraversalDepthInternal != null) {
+		config.moduleTraversalDepthInternal = cliConfig.moduleTraversalDepthInternal;
+	}
+
+	// Assign "moduleTraversalDepthExternal" setting from the CLI command (which overwrites tsconfig rules)
+	if (cliConfig.moduleTraversalDepthExternal != null) {
+		config.moduleTraversalDepthExternal = cliConfig.moduleTraversalDepthExternal;
+	}
+
 	return config;
 }

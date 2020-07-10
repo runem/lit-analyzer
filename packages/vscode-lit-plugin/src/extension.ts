@@ -111,7 +111,20 @@ function getConfig(): Partial<LitAnalyzerConfig> {
 	withConfigValue(config, "securitySystem", value => {
 		outConfig.securitySystem = value;
 	});
-
+	withConfigValue(config, "moduleTraversalDepthInternal", value => {
+		const castedValue = Number(value);
+		if (!(isNaN(castedValue) || castedValue === 0)) {
+			// cast successful.
+			outConfig.moduleTraversalDepthExternal = castedValue;
+		}
+	});
+	withConfigValue(config, "moduleTraversalDepthExternal", value => {
+		const castedValue = Number(value);
+		if (!(isNaN(castedValue) || castedValue === 0)) {
+			// cast successful.
+			outConfig.moduleTraversalDepthExternal = castedValue;
+		}
+	});
 	// Template tags
 	withConfigValue(config, "htmlTemplateTags", value => {
 		outConfig.htmlTemplateTags = value;

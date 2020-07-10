@@ -3,11 +3,6 @@ import { ComponentDefinition } from "web-component-analyzer";
 import { LitAnalyzerContext } from "../../lit-analyzer-context";
 import { visitIndirectImportsFromSourceFile } from "./visit-dependencies";
 
-// Depth constants
-const MAX_EXTERNAL_DEPTH = 1;
-
-const MAX_INTERNAL_DEPTH = Infinity;
-
 // A cache used to prevent traversing through entire source files multiple times to find direct imports
 const DIRECT_IMPORT_CACHE = new WeakMap<SourceFile, Set<SourceFile>>();
 
@@ -79,8 +74,8 @@ export function parseAllIndirectImports(
 		program: context.program,
 		ts: context.ts,
 		directImportCache: DIRECT_IMPORT_CACHE,
-		maxExternalDepth: maxExternalDepth ?? MAX_EXTERNAL_DEPTH,
-		maxInternalDepth: maxInternalDepth ?? MAX_INTERNAL_DEPTH,
+		maxExternalDepth: maxExternalDepth ?? context.config.moduleTraversalDepthExternal,
+		maxInternalDepth: maxInternalDepth ?? context.config.moduleTraversalDepthInternal,
 		emitIndirectImport(file: SourceFile): boolean {
 			if (importedSourceFiles.has(file)) {
 				return false;
