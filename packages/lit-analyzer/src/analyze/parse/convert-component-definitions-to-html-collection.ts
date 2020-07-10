@@ -10,7 +10,7 @@ export interface AnalyzeResultConversionOptions {
 }
 
 export function convertAnalyzeResultToHtmlCollection(result: AnalyzerResult, options: AnalyzeResultConversionOptions): HtmlDataCollection {
-	const tags = result.componentDefinitions.map(definition => convertComponentDeclarationToHtmlTag(definition.declaration(), definition, options));
+	const tags = result.componentDefinitions.map(definition => convertComponentDeclarationToHtmlTag(definition.declaration, definition, options));
 
 	const global = result.globalFeatures == null ? {} : convertComponentFeaturesToHtml(result.globalFeatures, { checker: options.checker });
 
@@ -21,17 +21,30 @@ export function convertAnalyzeResultToHtmlCollection(result: AnalyzerResult, opt
 }
 
 export function convertComponentDeclarationToHtmlTag(
-	declaration: ComponentDeclaration,
+	declaration: ComponentDeclaration | undefined,
 	definition: ComponentDefinition | undefined,
 	{ checker, addDeclarationPropertiesAsAttributes }: AnalyzeResultConversionOptions
 ): HtmlTag {
-	const tagName = definition?.tagName;
+	const tagName = definition?.tagName ?? "";
 
-	const builtIn = definition == null || declaration.sourceFile.fileName.endsWith("lib.dom.d.ts");
+	const builtIn = definition == null || (declaration?.sourceFile || definition.sourceFile).fileName.endsWith("lib.dom.d.ts");
+
+	if (declaration == null) {
+		return {
+			tagName,
+			builtIn,
+			attributes: [],
+			events: [],
+			properties: [],
+			slots: [],
+			cssParts: [],
+			cssProperties: []
+		};
+	}
 
 	const htmlTag: HtmlTag = {
 		declaration,
-		tagName: tagName ?? "",
+		tagName,
 		builtIn,
 		description: declaration.jsDoc?.description,
 		...convertComponentFeaturesToHtml(declaration, { checker, builtIn, fromTagName: tagName })

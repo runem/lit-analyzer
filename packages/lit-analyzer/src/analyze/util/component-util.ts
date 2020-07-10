@@ -8,7 +8,11 @@ export function getDeclarationsInFile(definition: ComponentDefinition, sourceFil
 }
 
 function emitDeclarationsInFile(definition: ComponentDefinition, sourceFile: SourceFile, emit: (decl: ComponentDeclaration) => unknown): void {
-	const declaration = definition.declaration();
+	const declaration = definition.declaration;
+
+	if (declaration == null) {
+		return;
+	}
 
 	if (declaration.sourceFile.fileName === sourceFile.fileName) {
 		if (emit(declaration) === false) {

@@ -4,9 +4,7 @@ import {
 	CompilerOptions,
 	convertCompilerOptionsFromJson,
 	createProgram,
-	Diagnostic,
 	findConfigFile,
-	getPreEmitDiagnostics,
 	ModuleKind,
 	ModuleResolutionKind,
 	Program,
@@ -18,6 +16,7 @@ import { LitAnalyzerConfig } from "../analyze/lit-analyzer-config";
 
 const requiredCompilerOptions: CompilerOptions = {
 	noEmitOnError: false,
+	noEmit: true,
 	allowJs: true,
 	strictNullChecks: true, // Type checking will remove all "null" and "undefined" from types if "strictNullChecks" is false
 	moduleResolution: ModuleResolutionKind.NodeJs,
@@ -36,7 +35,6 @@ const defaultCompilerOptions: CompilerOptions = {
 	//module: ModuleKind.CommonJS,
 	//lib: ["esnext", "dom"],
 	esModuleInterop: true,
-	noEmit: true,
 	allowSyntheticDefaultImports: true,
 	allowUnreachableCode: true,
 	allowUnusedLabels: true,
@@ -44,7 +42,6 @@ const defaultCompilerOptions: CompilerOptions = {
 };
 
 export interface CompileResult {
-	diagnostics: readonly Diagnostic[];
 	program: Program;
 	files: SourceFile[];
 	pluginOptions?: LitAnalyzerConfig;
@@ -59,10 +56,9 @@ export function compileTypescript(filePaths: string | string[]): CompileResult {
 
 	filePaths = Array.isArray(filePaths) ? filePaths : [filePaths];
 	const program = createProgram(filePaths, options);
-	const diagnostics = getPreEmitDiagnostics(program);
 	const files = program.getSourceFiles().filter(sf => filePaths.includes(sf.fileName));
 
-	return { diagnostics, program, files };
+	return { program, files };
 }
 
 /**

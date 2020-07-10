@@ -33,7 +33,7 @@ const rule: RuleModule = {
 		}
 
 		// Find the identifier node
-		const declarationIdentifier = getNodeIdentifier(definition.declaration().node, context.ts);
+		const declarationIdentifier = definition.declaration != null ? getNodeIdentifier(definition.declaration.node, context.ts) : undefined;
 		if (declarationIdentifier == null) {
 			return;
 		}

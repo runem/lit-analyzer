@@ -20,6 +20,10 @@ const rule: RuleModule = {
 	visitHtmlAssignment(assignment, context) {
 		const { htmlAttr } = assignment;
 
+		if (context.htmlStore.getHtmlAttrTarget(assignment.htmlAttr) == null) {
+			return;
+		}
+
 		const { typeA, typeB } = extractBindingTypes(assignment, context);
 
 		// Validate types based on the binding in which they appear

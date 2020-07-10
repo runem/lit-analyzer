@@ -67,6 +67,8 @@ export async function analyzeCommand(globs: string[], cliConfig: LitAnalyzerCliC
 
 	const formatter = getFormatter(cliConfig.format || "code");
 
+	const timeMap = new Map<string, number>();
+
 	await analyzeGlobs(globs, cliConfig, {
 		didExpandGlobs(filePaths: string[]): void {
 			if (filePaths.length === 0) {
@@ -86,8 +88,18 @@ export async function analyzeCommand(globs: string[], cliConfig: LitAnalyzerCliC
 		analyzeSourceFile(file: SourceFile, options: { program: Program }): void | boolean {
 			program = options.program;
 
+			if (cliConfig.debug) {
+				// eslint-disable-next-line no-console
+				console.log(`Analyzing ${file.fileName}...`);
+			}
+
+			const timeStart = Date.now();
+
 			// Get all diagnostics in the source file (errors and warnings)
 			let diagnostics = analyzer.getDiagnosticsInFile(file);
+
+			const time = Date.now() - timeStart;
+			timeMap.set(file.fileName, time);
 
 			// Filter all diagnostics by "error" if "quiet" option is active
 			diagnostics = cliConfig.quiet ? diagnostics.filter(d => d.severity === "error") : diagnostics;
@@ -120,6 +132,13 @@ export async function analyzeCommand(globs: string[], cliConfig: LitAnalyzerCliC
 	const statsText = formatter.report(stats, cliConfig);
 	if (statsText != null) {
 		printText(statsText, cliConfig);
+	}
+
+	// Print debugging
+	if (cliConfig.debug) {
+		const sortedTimeArray = Array.from(timeMap.entries()).sort(([, timeA], [, timeB]) => (timeA > timeB ? 1 : -1));
+		// eslint-disable-next-line no-console
+		console.log(sortedTimeArray.map(([fileName, time]) => `${fileName}: ${time}ms`).join("\n"));
 	}
 
 	// Return if this command was successful or not

@@ -80,8 +80,8 @@ export class LitCssDocumentAnalyzer {
 		else {
 			const definition = context.definitionStore.getDefinitionForTagName(word);
 
-			if (definition != null) {
-				const node = definition.declaration().node;
+			if (definition != null && definition.declaration != null) {
+				const node = definition.declaration.node;
 
 				return {
 					fromRange: documentRangeToSFRange(document, { start, end }),
