@@ -19,7 +19,7 @@ const rule: RuleModule = {
 			if (node != null && tag != null && !tag.builtIn) {
 				context.report({
 					location: rangeFromNode(node),
-					message: `'${definition.tagName}' is not a valid custom element name.`
+					message: `The tag name '${definition.tagName}' is not a valid custom element name. Remember that a hyphen (-) is required.`
 				});
 			}
 		}
