@@ -225,21 +225,30 @@ html\`<input step="\${myDirective("foo")}" /> \`
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
-test("Event binding: event handler is assignable to valid event", t => {
-	const { diagnostics } = getDiagnostics([makeElement({ events: ["foo-event"] }), 'html`<my-element @foo-event=${(ev) => {}}></my-element>`']);
+tsTest("Event binding: event handler is assignable to valid event", t => {
+	const { diagnostics } = getDiagnostics([makeElement({ events: ["foo-event"] }), "html`<my-element @foo-event=${(ev) => {}}></my-element>`"]);
 	hasNoDiagnostics(t, diagnostics);
 });
 
-test("Event binding: event handler is assignable to valid typed event", t => {
-	const { diagnostics } = getDiagnostics([makeElement({ events: ["{MouseEvent} foo-event"] }), 'html`<my-element @foo-event=${(ev: MouseEvent) => {}}></my-element>`']);
+tsTest("Event binding: event handler is assignable to valid typed event", t => {
+	const { diagnostics } = getDiagnostics([
+		makeElement({ events: ["{MouseEvent} foo-event"] }),
+		"html`<my-element @foo-event=${(ev: MouseEvent) => {}}></my-element>`"
+	]);
 	hasNoDiagnostics(t, diagnostics);
 });
 
-test("Event binding: invalid event handler is not assignable to typed event", t => {
-	const { diagnostics } = getDiagnostics([makeElement({ events: ["{MouseEvent} foo-event"] }), 'html`<my-element @foo-event=${(ev: KeyboardEvent) => {}}></my-element>`']);
+tsTest("Event binding: invalid event handler is not assignable to typed event", t => {
+	const { diagnostics } = getDiagnostics([
+		makeElement({ events: ["{MouseEvent} foo-event"] }),
+		"html`<my-element @foo-event=${(ev: KeyboardEvent) => {}}></my-element>`"
+	]);
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
-test("Event binding: invalid event handler is not assignable to event", t => {
-	const { diagnostics } = getDiagnostics([makeElement({ events: ["foo-event"] }), 'html`<my-element @foo-event=${(arg: boolean) => {}}></my-element>`']);
+tsTest("Event binding: invalid event handler is not assignable to event", t => {
+	const { diagnostics } = getDiagnostics([
+		makeElement({ events: ["foo-event"] }),
+		"html`<my-element @foo-event=${(arg: boolean) => {}}></my-element>`"
+	]);
 });

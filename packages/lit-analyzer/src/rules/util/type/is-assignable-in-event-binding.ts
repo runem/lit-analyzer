@@ -1,4 +1,4 @@
-import { SimpleType, SimpleTypeKind, toTypeString } from "ts-simple-type";
+import { SimpleType, typeToString } from "ts-simple-type";
 import { HtmlNodeAttr } from "../../../analyze/types/html-node/html-node-attr-types";
 import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
 import { rangeFromHtmlNodeAttr } from "../../../analyze/util/range-util";
@@ -10,14 +10,14 @@ export function isAssignableInEventBinding(
 	context: RuleModuleContext
 ): boolean | undefined {
 	const expectedType: SimpleType = {
-		kind: SimpleTypeKind.FUNCTION,
-		returnType: { kind: SimpleTypeKind.VOID },
-		argTypes: [
+		kind: "FUNCTION",
+		returnType: { kind: "VOID" },
+		parameters: [
 			{
-				name: 'event',
+				name: "event",
 				type: typeA,
 				optional: false,
-				spread: false,
+				rest: false,
 				initializer: false
 			}
 		]
@@ -26,7 +26,7 @@ export function isAssignableInEventBinding(
 	if (!isAssignableToType({ typeA: expectedType, typeB }, context)) {
 		context.report({
 			location: rangeFromHtmlNodeAttr(htmlAttr),
-			message: `Type '${toTypeString(typeB)}' is not assignable to '${toTypeString(expectedType)}'`
+			message: `Type '${typeToString(typeB)}' is not assignable to '${typeToString(expectedType)}'`
 		});
 
 		return false;
