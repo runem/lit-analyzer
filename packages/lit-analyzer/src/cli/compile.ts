@@ -56,7 +56,10 @@ export function compileTypescript(filePaths: string | string[]): CompileResult {
 
 	filePaths = Array.isArray(filePaths) ? filePaths : [filePaths];
 	const program = createProgram(filePaths, options);
-	const files = program.getSourceFiles().filter(sf => filePaths.includes(sf.fileName));
+	const files = program
+		.getSourceFiles()
+		.filter(sf => filePaths.includes(sf.fileName))
+		.sort((sfA, sfB) => (sfA.fileName > sfB.fileName ? 1 : -1));
 
 	return { program, files };
 }
