@@ -3,8 +3,8 @@
 	"version": "1.0.0",
 	"description": "",
 	"dependencies": {
-		"lit-element": "^2.2.1",
-		"lit-html": "^1.1.1",
+		"lit-element": "^2.3.1",
+		"lit-html": "^1.2.1",
 		"ts-lit-plugin": "file:../packages/ts-lit-plugin"
 	},
 	"devDependencies": {

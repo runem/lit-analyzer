@@ -1,4 +1,4 @@
-import { customElement, html, LitElement, property } from "lit-element";
+import { customElement, html, LitElement, property, internalProperty } from "lit-element";
 import "./my-element-2";
 
 @customElement("my-element")
