@@ -111,11 +111,11 @@ function getConfig(): Partial<LitAnalyzerConfig> {
 	withConfigValue(config, "securitySystem", value => {
 		outConfig.securitySystem = value;
 	});
-	withConfigValue(config, "moduleTraversalDepthInternal", value => {
-		outConfig.moduleTraversalDepthInternal = value;
+	withConfigValue(config, "maxProjectImportDepth", value => {
+		outConfig.maxProjectImportDepth = value;
 	});
-	withConfigValue(config, "moduleTraversalDepthExternal", value => {
-		outConfig.moduleTraversalDepthExternal = value;
+	withConfigValue(config, "maxNodeModuleImportDepth", value => {
+		outConfig.maxNodeModuleImportDepth = value;
 	});
 	// Template tags
 	withConfigValue(config, "htmlTemplateTags", value => {

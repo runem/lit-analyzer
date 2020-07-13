@@ -193,14 +193,14 @@ function readLitAnalyzerConfigFromCliConfig(cliConfig: LitAnalyzerCliConfig): Pa
 		config.logging = cliConfig.debug ? "verbose" : "off";
 	}
 
-	// Assign "moduleTraversalDepthInternal" setting from the CLI command (which overwrites tsconfig rules)
-	if (cliConfig.moduleTraversalDepthInternal != null) {
-		config.moduleTraversalDepthInternal = cliConfig.moduleTraversalDepthInternal;
+	// Assign "maxProjectImportDepth" setting from the CLI command (which overwrites tsconfig rules)
+	if (cliConfig.maxProjectImportDepth != null) {
+		config.maxProjectImportDepth = cliConfig.maxProjectImportDepth;
 	}
 
-	// Assign "moduleTraversalDepthExternal" setting from the CLI command (which overwrites tsconfig rules)
-	if (cliConfig.moduleTraversalDepthExternal != null) {
-		config.moduleTraversalDepthExternal = cliConfig.moduleTraversalDepthExternal;
+	// Assign "maxNodeModuleImportDepth" setting from the CLI command (which overwrites tsconfig rules)
+	if (cliConfig.maxNodeModuleImportDepth != null) {
+		config.maxNodeModuleImportDepth = cliConfig.maxNodeModuleImportDepth;
 	}
 
 	return config;

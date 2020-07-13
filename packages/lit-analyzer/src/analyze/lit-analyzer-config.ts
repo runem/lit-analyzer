@@ -127,8 +127,8 @@ export interface LitAnalyzerConfig {
 	format: { disable: boolean };
 	dontShowSuggestions: boolean;
 	dontSuggestConfigChanges: boolean;
-	moduleTraversalDepthInternal: number;
-	moduleTraversalDepthExternal: number;
+	maxNodeModuleImportDepth: number;
+	maxProjectImportDepth: number;
 
 	htmlTemplateTags: string[];
 	cssTemplateTags: string[];
@@ -173,8 +173,8 @@ export function makeConfig(userOptions: Partial<LitAnalyzerConfig> = {}): LitAna
 		},
 		dontSuggestConfigChanges: userOptions.dontSuggestConfigChanges || false,
 		dontShowSuggestions: userOptions.dontShowSuggestions || getDeprecatedOption(userOptions, "skipSuggestions") || false,
-		moduleTraversalDepthInternal: parseModuleTraversalDepth(userOptions.moduleTraversalDepthInternal, Infinity),
-		moduleTraversalDepthExternal: parseModuleTraversalDepth(userOptions.moduleTraversalDepthExternal, 1),
+		maxProjectImportDepth: parseModuleTraversalDepth(userOptions.maxProjectImportDepth, Infinity),
+		maxNodeModuleImportDepth: parseModuleTraversalDepth(userOptions.maxNodeModuleImportDepth, 1),
 
 		// Template tags
 		htmlTemplateTags: userOptions.htmlTemplateTags || ["html", "raw"],

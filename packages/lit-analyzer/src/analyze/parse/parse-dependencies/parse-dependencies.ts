@@ -74,8 +74,8 @@ export function parseAllIndirectImports(
 		program: context.program,
 		ts: context.ts,
 		directImportCache: DIRECT_IMPORT_CACHE,
-		maxExternalDepth: maxExternalDepth ?? context.config.moduleTraversalDepthExternal,
-		maxInternalDepth: maxInternalDepth ?? context.config.moduleTraversalDepthInternal,
+		maxExternalDepth: maxExternalDepth ?? context.config.maxNodeModuleImportDepth,
+		maxInternalDepth: maxInternalDepth ?? context.config.maxProjectImportDepth,
 		emitIndirectImport(file: SourceFile): boolean {
 			if (importedSourceFiles.has(file)) {
 				return false;
