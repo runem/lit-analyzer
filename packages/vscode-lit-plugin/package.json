@@ -92,13 +92,13 @@
 						"description": "Enable strict mode.",
 						"default": false
 					},
-					"lit-plugin.moduleTraversalDepthInternal": {
-						"type": "string",
+					"lit-plugin.maxProjectImportDepth": {
+						"type": "integer",
 						"description": "Determines how many modules deep dependencies are followed to determine whether a custom element is available in the current file.",
-						"default": "Infinity"
+						"default": -1
 					},
-					"lit-plugin.moduleTraversalDepthExternal": {
-						"type": "string",
+					"lit-plugin.maxNodeModuleImportDepth": {
+						"type": "integer",
 						"description": "Determines how many modules deep dependencies in npm packages are followed to determine whether a custom element is available in the current file.",
 						"default": 1
 					},

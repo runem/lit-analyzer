@@ -173,8 +173,8 @@ export function makeConfig(userOptions: Partial<LitAnalyzerConfig> = {}): LitAna
 		},
 		dontSuggestConfigChanges: userOptions.dontSuggestConfigChanges || false,
 		dontShowSuggestions: userOptions.dontShowSuggestions || getDeprecatedOption(userOptions, "skipSuggestions") || false,
-		maxProjectImportDepth: parseModuleTraversalDepth(userOptions.maxProjectImportDepth, Infinity),
-		maxNodeModuleImportDepth: parseModuleTraversalDepth(userOptions.maxNodeModuleImportDepth, 1),
+		maxProjectImportDepth: parseImportDepth(userOptions.maxProjectImportDepth, Infinity),
+		maxNodeModuleImportDepth: parseImportDepth(userOptions.maxNodeModuleImportDepth, 1),
 
 		// Template tags
 		htmlTemplateTags: userOptions.htmlTemplateTags || ["html", "raw"],
@@ -262,15 +262,14 @@ function getDeprecatedMappedRules(userOptions: Partial<LitAnalyzerConfig>): LitA
 
 /**
  * Parses dependency traversal depth from configuration.
- * The string "Infinity" gets parsed to the number Infinity.
+ * The number -1 (as well as any other negative number) gets parsed into the number Infinity.
  * @param value
  * @param defaultValue
  */
-function parseModuleTraversalDepth(value: string | number | undefined, defaultValue: number): number {
-	const castedValue = Number(value);
-	if (!(isNaN(castedValue) || castedValue <= 0)) {
-		// cast successful.
-		return castedValue;
+function parseImportDepth(value: number | undefined, defaultValue: number): number {
+	if (value != null) {
+		return value < 0 ? Infinity : value;
+	} else {
+		return defaultValue;
 	}
-	return defaultValue;
 }

@@ -29,13 +29,13 @@
 									"description": "Enable strict mode.",
 									"default": false
 								},
-								"moduleTraversalDepthInternal": {
-									"type": "string",
+								"maxProjectImportDepth": {
+									"type": "integer",
 									"description": "Determines how many modules deep dependencies are followed to determine whether a custom element is available in the current file.",
-									"default": "Infinity"
+									"default": -1
 								},
-								"moduleTraversalDepthExternal": {
-									"type": "string",
+								"maxNodeModuleImportDepth": {
+									"type": "integer",
 									"description": "Determines how many modules deep dependencies in npm packages are followed to determine whether a custom element is available in the current file.",
 									"default": 1
 								},
