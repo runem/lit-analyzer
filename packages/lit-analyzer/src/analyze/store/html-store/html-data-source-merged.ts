@@ -25,7 +25,8 @@ import { HtmlDataSource } from "./html-data-source";
 export enum HtmlDataSourceKind {
 	DECLARED = 0,
 	USER = 1,
-	BUILT_IN = 2
+	BUILT_IN = 2,
+	BUILT_IN_DECLARED = 3
 }
 
 export class HtmlDataSourceMerged {
@@ -34,6 +35,7 @@ export class HtmlDataSourceMerged {
 	private htmlDataSources: HtmlDataSource[] = (() => {
 		const array: HtmlDataSource[] = [];
 		array[HtmlDataSourceKind.BUILT_IN] = new HtmlDataSource();
+		array[HtmlDataSourceKind.BUILT_IN_DECLARED] = new HtmlDataSource();
 		array[HtmlDataSourceKind.USER] = new HtmlDataSource();
 		array[HtmlDataSourceKind.DECLARED] = new HtmlDataSource();
 		return array;

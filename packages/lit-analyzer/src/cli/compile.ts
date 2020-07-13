@@ -20,7 +20,8 @@ const requiredCompilerOptions: CompilerOptions = {
 	allowJs: true,
 	strictNullChecks: true, // Type checking will remove all "null" and "undefined" from types if "strictNullChecks" is false
 	moduleResolution: ModuleResolutionKind.NodeJs,
-	skipLibCheck: true
+	skipLibCheck: true,
+	lib: ["lib.esnext.d.ts", "lib.dom.d.ts"]
 };
 
 /**
@@ -33,7 +34,6 @@ const defaultCompilerOptions: CompilerOptions = {
 	downlevelIteration: true,
 	module: ModuleKind.ESNext,
 	//module: ModuleKind.CommonJS,
-	//lib: ["esnext", "dom"],
 	esModuleInterop: true,
 	allowSyntheticDefaultImports: true,
 	allowUnreachableCode: true,
@@ -74,8 +74,8 @@ export function getCompilerOptions(): CompilerOptions {
 	// If we found existing compiler options, merged "required compiler options" into it.
 	if (compilerOptions != null) {
 		return {
-			...requiredCompilerOptions,
-			...compilerOptions
+			...compilerOptions,
+			...requiredCompilerOptions
 		};
 	}
 

@@ -202,18 +202,22 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 	}
 
 	private findComponentsInFile(sourceFile: SourceFile) {
+		const isDefaultLibrary = this.program.isSourceFileDefaultLibrary(sourceFile);
+
 		const analyzeResult = analyzeSourceFile(sourceFile, {
 			program: this.program,
 			ts: this.ts,
 			config: {
 				features: ["event", "member", "slot", "csspart", "cssproperty"],
-				analyzeGlobalFeatures: !sourceFile.fileName.includes("lib.dom.d.ts"), // Don't analyze global features in lib.dom.d.ts
+				analyzeGlobalFeatures: !isDefaultLibrary, // Don't analyze global features in lib.dom.d.ts
 				analyzeDefaultLib: true,
 				analyzeDependencies: true,
 				analyzeAllDeclarations: false,
 				excludedDeclarationNames: ["HTMLElement"]
 			}
 		});
+
+		const reg = isDefaultLibrary ? HtmlDataSourceKind.BUILT_IN_DECLARED : HtmlDataSourceKind.DECLARED;
 
 		// Forget
 		const existingResult = this.definitionStore.getAnalysisResultForFile(sourceFile);
@@ -230,7 +234,7 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 						properties: existingResult.globalFeatures?.members.filter(m => m.kind === "property").map(m => m.propName || "")
 					}
 				},
-				HtmlDataSourceKind.DECLARED
+				reg
 			);
 			this.definitionStore.forgetAnalysisResultForFile(sourceFile);
 		}
@@ -239,9 +243,9 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 		this.definitionStore.absorbAnalysisResult(sourceFile, analyzeResult);
 		const htmlCollection = convertAnalyzeResultToHtmlCollection(analyzeResult, {
 			checker: this.checker,
-			addDeclarationPropertiesAsAttributes: true
+			addDeclarationPropertiesAsAttributes: this.program.isSourceFileFromExternalLibrary(sourceFile)
 		});
-		this.htmlStore.absorbCollection(htmlCollection, HtmlDataSourceKind.DECLARED);
+		this.htmlStore.absorbCollection(htmlCollection, reg);
 	}
 
 	private analyzeSubclassExtensions() {
