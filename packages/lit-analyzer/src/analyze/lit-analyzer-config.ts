@@ -125,12 +125,13 @@ export interface LitAnalyzerConfig {
 	logging: LitAnalyzerLogging;
 	cwd: string;
 	format: { disable: boolean };
+	dontShowSuggestions: boolean;
+	dontSuggestConfigChanges: boolean;
+	maxNodeModuleImportDepth: number;
+	maxProjectImportDepth: number;
 
 	htmlTemplateTags: string[];
 	cssTemplateTags: string[];
-
-	dontShowSuggestions: boolean;
-	dontSuggestConfigChanges: boolean;
 
 	globalTags: string[];
 	globalAttributes: string[];
@@ -172,6 +173,8 @@ export function makeConfig(userOptions: Partial<LitAnalyzerConfig> = {}): LitAna
 		},
 		dontSuggestConfigChanges: userOptions.dontSuggestConfigChanges || false,
 		dontShowSuggestions: userOptions.dontShowSuggestions || getDeprecatedOption(userOptions, "skipSuggestions") || false,
+		maxProjectImportDepth: parseImportDepth(userOptions.maxProjectImportDepth, Infinity),
+		maxNodeModuleImportDepth: parseImportDepth(userOptions.maxNodeModuleImportDepth, 1),
 
 		// Template tags
 		htmlTemplateTags: userOptions.htmlTemplateTags || ["html", "raw"],
@@ -255,4 +258,18 @@ function getDeprecatedMappedRules(userOptions: Partial<LitAnalyzerConfig>): LitA
 	}
 
 	return mappedDeprecatedRules;
+}
+
+/**
+ * Parses dependency traversal depth from configuration.
+ * The number -1 (as well as any other negative number) gets parsed into the number Infinity.
+ * @param value
+ * @param defaultValue
+ */
+function parseImportDepth(value: number | undefined, defaultValue: number): number {
+	if (value != null) {
+		return value < 0 ? Infinity : value;
+	} else {
+		return defaultValue;
+	}
 }
