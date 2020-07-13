@@ -66,7 +66,8 @@ export default rule;
 function getRelativePathForImport(fromFileName: string, toFileName: string): string {
 	const path = posix.relative(dirname(fromFileName), dirname(toFileName));
 	const filenameWithoutExt = basename(toFileName).replace(/\.[^/.]+$/, "");
-	const importPath = `./${path ? `${path}/` : ""}${filenameWithoutExt}`;
+	const prefix = path.startsWith("../") ? "" : "./";
+	const importPath = `${prefix}${path ? `${path}/` : ""}${filenameWithoutExt}`;
 	return importPath
 		.replace(/^.*node_modules\//, "")
 		.replace(/\.d$/, "")
