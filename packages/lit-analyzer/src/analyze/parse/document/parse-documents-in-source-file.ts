@@ -102,7 +102,7 @@ function styleHtmlNodeToCssDocument(htmlDocument: HtmlDocument, styleNode: IHtml
 
 	const cssDocumentParts = htmlDocument.virtualDocument.getPartsAtDocumentRange(
 		makeDocumentRange({
-			start: styleNode.location.startTag.end,
+			start: styleNode.location.startTag.start,
 			end: styleNode.location.endTag.start
 		})
 	);
