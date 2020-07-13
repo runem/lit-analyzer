@@ -51,11 +51,11 @@ const DEFAULT_RULES_SEVERITY: Record<LitAnalyzerRuleId, [LitAnalyzerRuleSeverity
 	"no-nullable-attribute-binding": ["error", "error"],
 	"no-incompatible-type-binding": ["error", "error"],
 	"no-invalid-directive-binding": ["error", "error"],
-	"no-incompatible-property-type": ["warn", "warn"],
+	"no-incompatible-property-type": ["warn", "error"],
 	"no-invalid-attribute-name": ["error", "error"],
 	"no-invalid-tag-name": ["error", "error"],
 	"no-invalid-css": ["warn", "error"],
-	"no-property-visibility-mismatch": ["off", "error"],
+	"no-property-visibility-mismatch": ["off", "warning"],
 	"no-legacy-attribute": ["off", "off"],
 	"no-missing-element-type-definition": ["off", "off"]
 };
