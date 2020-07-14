@@ -53,12 +53,12 @@ const rule: RuleModule = {
 							message: `Change attribute to 'data-${htmlAttr.name}'`,
 							actions: [
 								{
-									kind: "CHANGE_ATTRIBUTE_NAME",
+									kind: "changeAttributeName",
 									newName: `data-${htmlAttr.name}`,
 									htmlAttr
 								}
 							]
-						},
+						} as RuleFix,
 						...(suggestedMemberName == null
 							? []
 							: [
@@ -66,17 +66,17 @@ const rule: RuleModule = {
 										message: `Change attribute to '${suggestedModifier}${suggestedMemberName}'`,
 										actions: [
 											{
-												kind: "CHANGE_ATTRIBUTE_NAME",
+												kind: "changeAttributeName",
 												newName: suggestedMemberName,
 												htmlAttr
 											},
 											{
-												kind: "CHANGE_ATTRIBUTE_MODIFIER",
+												kind: "changeAttributeModifier",
 												newModifier: suggestedModifier,
 												htmlAttr
 											}
 										]
-									}
+									} as RuleFix
 							  ])
 					] as RuleFix[]
 			});
