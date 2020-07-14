@@ -1,13 +1,8 @@
-import { SourceFile } from "typescript";
 import { ComponentDefinition } from "web-component-analyzer";
 import { AnalyzerDependencyStore } from "../analyzer-dependency-store";
 
 export class DefaultAnalyzerDependencyStore implements AnalyzerDependencyStore {
 	importedComponentDefinitionsInFile = new Map<string, ComponentDefinition[]>();
-
-	absorbComponentDefinitionsForFile(sourceFile: SourceFile, result: ComponentDefinition[]): void {
-		this.importedComponentDefinitionsInFile.set(sourceFile.fileName, result);
-	}
 
 	/**
 	 * Returns if a component for a specific file has been imported.
@@ -23,4 +18,8 @@ export class DefaultAnalyzerDependencyStore implements AnalyzerDependencyStore {
 
 		return false;
 	}
+
+	// TODO: write function "hasImportBeenUsed(fileName: string, range: Range): boolean"
+	// that loops over all ComponentDefinitions of a file and searches for a Definition with the given range.
+	// Somehow we need to track wheter the tagName associated with the importRange is used within the SourceFile
 }

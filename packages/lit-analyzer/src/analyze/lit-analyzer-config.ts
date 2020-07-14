@@ -6,6 +6,7 @@ export type LitAnalyzerRuleSeverity = "on" | "off" | "warn" | "warning" | "error
 export type LitAnalyzerRuleId =
 	| "no-unknown-tag-name"
 	| "no-missing-import"
+	| "no-unused-import"
 	| "no-unclosed-tag"
 	| "no-unknown-attribute"
 	| "no-unknown-property"
@@ -37,6 +38,7 @@ export type LitAnalyzerRules = Partial<Record<LitAnalyzerRuleId, LitAnalyzerRule
 const DEFAULT_RULES_SEVERITY: Record<LitAnalyzerRuleId, [LitAnalyzerRuleSeverity, LitAnalyzerRuleSeverity]> = {
 	"no-unknown-tag-name": ["off", "warn"],
 	"no-missing-import": ["off", "warn"],
+	"no-unused-import": ["off", "warn"],
 	"no-unclosed-tag": ["warn", "error"],
 	"no-unknown-attribute": ["off", "warn"],
 	"no-unknown-property": ["off", "warn"],

@@ -1,16 +1,18 @@
 import * as tsModule from "typescript";
 import { Node, Program, SourceFile } from "typescript";
+import { Range } from "../../types/range";
 
 interface IVisitDependenciesContext {
 	program: Program;
 	ts: typeof tsModule;
 	project: ts.server.Project | undefined;
 	directImportCache: WeakMap<SourceFile, Set<SourceFile>>;
-	emitIndirectImport(file: SourceFile, importedFrom?: SourceFile): boolean;
-	emitDirectImport?(file: SourceFile): void;
+	emitIndirectImport(file: SourceFile, range?: Range): boolean;
+	emitDirectImport?(file: SourceFile, range: Range): void;
 	depth?: number;
 	maxExternalDepth?: number;
 	maxInternalDepth?: number;
+	directImportRange?: Range;
 }
 
 /**
@@ -23,7 +25,7 @@ export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, conte
 	const currentDepth = context.depth ?? 0;
 
 	// Emit a visit. If this file has been seen already, the function will return false, and traversal will stop
-	if (!context.emitIndirectImport(sourceFile)) {
+	if (!context.emitIndirectImport(sourceFile, context.directImportRange)) {
 		return;
 	}
 
@@ -38,15 +40,17 @@ export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, conte
 
 	// Get all direct imports from the cache
 	let directImports = context.directImportCache.get(sourceFile);
+	const rangesOfDirectImports = new Map<SourceFile, Range>();
 
-	if (directImports == null) {
+	if (directImports == null || context.directImportRange == null) {
 		// If the cache didn't have all direct imports, build up using the visitor function
 		directImports = new Set<SourceFile>();
 
 		const newContext = {
 			...context,
-			emitDirectImport(file: SourceFile) {
+			emitDirectImport(file: SourceFile, range: Range) {
 				directImports!.add(file);
+				rangesOfDirectImports.set(file, range);
 			}
 		};
 
@@ -91,9 +95,12 @@ export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, conte
 			newDepth--;
 		}
 
+		const directImportRange = context.directImportRange ?? rangesOfDirectImports.get(file);
+
 		// Visit direct imported source files recursively
 		visitIndirectImportsFromSourceFile(file, {
 			...context,
+			directImportRange,
 			depth: newDepth
 		});
 	}
@@ -154,7 +161,8 @@ function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, con
 		const resolvedModule = result.resolvedModule;
 		const sourceFile = context.program.getSourceFile(resolvedModule.resolvedFileName);
 		if (sourceFile != null) {
-			context.emitDirectImport?.(sourceFile);
+			const range = { start: node.pos, end: node.end };
+			context.emitDirectImport?.(sourceFile, range);
 		}
 	}
 }
