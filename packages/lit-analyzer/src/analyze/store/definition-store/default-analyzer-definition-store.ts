@@ -21,6 +21,8 @@ export class DefaultAnalyzerDefinitionStore implements AnalyzerDefinitionStore {
 				return;
 			}
 
+			addToSetInMap(this.intersectingDefinitionsForFile, definition.declaration?.sourceFile.fileName, definition);
+
 			visitAllHeritageClauses(definition.declaration, clause => {
 				if (clause.declaration != null) {
 					addToSetInMap(this.intersectingDefinitionsForFile, clause.declaration.sourceFile.fileName, definition);
@@ -41,6 +43,8 @@ export class DefaultAnalyzerDefinitionStore implements AnalyzerDefinitionStore {
 			if (definition.declaration == null) {
 				return;
 			}
+
+			this.intersectingDefinitionsForFile.get(definition.declaration?.sourceFile.fileName)?.delete(definition);
 
 			visitAllHeritageClauses(definition.declaration, clause => {
 				if (clause.declaration != null) {
