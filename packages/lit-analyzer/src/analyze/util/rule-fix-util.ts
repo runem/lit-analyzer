@@ -19,7 +19,7 @@ function ruleFixActionConverter(action: RuleFixAction): LitCodeFixAction[] {
 	switch (action.kind) {
 		case "changeTagName": {
 			const document = action.htmlNode.document;
-			const startLocation = action.htmlNode.location.startTag;
+			const startLocation = action.htmlNode.location.name;
 			const endLocation = action.htmlNode.location.endTag;
 
 			return [
