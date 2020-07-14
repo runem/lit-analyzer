@@ -201,3 +201,26 @@ tsTest("Attribute binding: the role attribute is correctly type checked when giv
 
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
+
+function makeCustomDirective(name = "myDirective") {
+	return `
+type DirectiveFn<_T = unknown> = (part: Part) => void;
+const ${name} = {} as (<T>(arg: T) => DirectiveFn<T>);
+`;
+}
+
+tsTest("Attribute binding: correctly infers type of generic directive function", t => {
+	const { diagnostics } = getDiagnostics(`${makeCustomDirective("myDirective")}
+html\`<input step="\${myDirective(10)}" /> \`
+	`);
+
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Attribute binding: correctly infers type of generic directive function and fails type checking", t => {
+	const { diagnostics } = getDiagnostics(`${makeCustomDirective("myDirective")}
+html\`<input step="\${myDirective("foo")}" /> \`
+	`);
+
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});

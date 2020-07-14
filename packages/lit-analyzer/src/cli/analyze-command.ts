@@ -76,7 +76,7 @@ export async function analyzeCommand(globs: string[], cliConfig: LitAnalyzerCliC
 				console.log(`\n${chalk.red("  ✖ Couldn't find any files to analyze")}`);
 			} else {
 				// eslint-disable-next-line no-console
-				console.log(`Analyzing ${filePaths.length} files...`);
+				console.log(`Analyzing ${filePaths.length} file${filePaths.length === 1 ? "" : "s"}...`);
 			}
 		},
 		willAnalyzeFiles(filePaths: string[]): void {

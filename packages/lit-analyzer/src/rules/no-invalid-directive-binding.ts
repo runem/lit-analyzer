@@ -103,7 +103,10 @@ const rule: RuleModule = {
 		} else {
 			// Now we have an unknown (user defined) directive.
 			// This needs no further type checking, so break the chain
-			context.break();
+			// Don't break if the "actualType" was found. Then we can do further type checking.
+			if (directive.actualType == null) {
+				context.break();
+			}
 		}
 	}
 };

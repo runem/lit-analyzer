@@ -41,7 +41,7 @@ export function isLitDirective(type: SimpleType): boolean {
 		}
 		case "GENERIC_ARGUMENTS":
 			// Test for the built in type from lit-html: Directive<NodePart>
-			return type.target.kind === "FUNCTION" && type.target.name === "Directive";
+			return (type.target.kind === "FUNCTION" && type.target.name === "Directive") || isLitDirective(type.target);
 		default:
 			return false;
 	}
