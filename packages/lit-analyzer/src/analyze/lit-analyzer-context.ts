@@ -32,7 +32,12 @@ export interface LitAnalyzerContext {
 	updateDependencies(file: SourceFile): void;
 	updateComponents(file: SourceFile): void;
 
-	setCurrentFile(file: SourceFile | undefined): void;
+	setContextBase(contextBase: LitAnalyzerContextBaseOptions): void;
+}
+
+export interface LitAnalyzerContextBaseOptions {
+	file: SourceFile | undefined;
+	timeout?: number;
 }
 
 export interface LitPluginContextHandler {

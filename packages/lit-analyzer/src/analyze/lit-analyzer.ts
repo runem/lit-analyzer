@@ -42,7 +42,7 @@ export class LitAnalyzer {
 	}
 
 	getOutliningSpansInFile(file: SourceFile): LitOutliningSpan[] {
-		this.context.setCurrentFile(file);
+		this.context.setContextBase({ file });
 
 		const documents = this.getDocumentsInFile(file);
 
@@ -62,7 +62,7 @@ export class LitAnalyzer {
 	}
 
 	getDefinitionAtPosition(file: SourceFile, position: SourceFilePosition): LitDefinition | undefined {
-		this.context.setCurrentFile(file);
+		this.context.setContextBase({ file });
 
 		const { document, offset } = this.getDocumentAndOffsetAtPosition(file, position);
 		if (document == null) return undefined;
@@ -78,7 +78,7 @@ export class LitAnalyzer {
 	}
 
 	getQuickInfoAtPosition(file: SourceFile, position: SourceFilePosition): LitQuickInfo | undefined {
-		this.context.setCurrentFile(file);
+		this.context.setContextBase({ file });
 
 		const { document, offset } = this.getDocumentAndOffsetAtPosition(file, position);
 		if (document == null) return undefined;
@@ -94,7 +94,7 @@ export class LitAnalyzer {
 	}
 
 	getRenameInfoAtPosition(file: SourceFile, position: SourceFilePosition): LitRenameInfo | undefined {
-		this.context.setCurrentFile(file);
+		this.context.setContextBase({ file });
 
 		const { document, offset } = this.getDocumentAndOffsetAtPosition(file, position);
 		if (document != null) {
@@ -126,7 +126,7 @@ export class LitAnalyzer {
 	}
 
 	getRenameLocationsAtPosition(file: SourceFile, position: SourceFilePosition): LitRenameLocation[] {
-		this.context.setCurrentFile(file);
+		this.context.setContextBase({ file });
 
 		const renameInfo = this.getRenameInfoAtPosition(file, position);
 		if (renameInfo == null) return [];
@@ -146,7 +146,7 @@ export class LitAnalyzer {
 	}
 
 	getClosingTagAtPosition(file: SourceFile, position: SourceFilePosition): LitClosingTagInfo | undefined {
-		this.context.setCurrentFile(file);
+		this.context.setContextBase({ file });
 
 		const { document, offset } = this.getDocumentAndOffsetAtPosition(file, position);
 		if (document == null) return undefined;
@@ -160,7 +160,7 @@ export class LitAnalyzer {
 	}
 
 	getCompletionDetailsAtPosition(file: SourceFile, position: SourceFilePosition, name: string): LitCompletionDetails | undefined {
-		this.context.setCurrentFile(file);
+		this.context.setContextBase({ file });
 
 		const { document, offset } = this.getDocumentAndOffsetAtPosition(file, position);
 		if (document == null) return undefined;
@@ -174,7 +174,7 @@ export class LitAnalyzer {
 	}
 
 	getCompletionsAtPosition(file: SourceFile, position: SourceFilePosition): LitCompletion[] | undefined {
-		this.context.setCurrentFile(file);
+		this.context.setContextBase({ file });
 
 		const { document, offset } = this.getDocumentAndOffsetAtPosition(file, position);
 
@@ -191,7 +191,7 @@ export class LitAnalyzer {
 	}
 
 	getDiagnosticsInFile(file: SourceFile): LitDiagnostic[] {
-		this.context.setCurrentFile(file);
+		this.context.setContextBase({ file, timeout: 7000 });
 
 		this.context.updateComponents(file);
 		this.context.updateDependencies(file);
@@ -237,7 +237,7 @@ export class LitAnalyzer {
 	}
 
 	getCodeFixesAtPositionRange(file: SourceFile, sourceFileRange: Range): LitCodeFix[] {
-		this.context.setCurrentFile(file);
+		this.context.setContextBase({ file });
 
 		const { document } = this.getDocumentAndOffsetAtPosition(file, sourceFileRange.start);
 
@@ -272,7 +272,7 @@ export class LitAnalyzer {
 	}
 
 	getFormatEditsInFile(file: SourceFile, settings: ts.FormatCodeSettings): LitFormatEdit[] {
-		this.context.setCurrentFile(file);
+		this.context.setContextBase({ file });
 
 		const documents = this.getDocumentsInFile(file);
 

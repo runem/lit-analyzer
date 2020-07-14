@@ -7,7 +7,7 @@ import { MAX_RUNNING_TIME_PER_OPERATION } from "./constants";
 import { getBuiltInHtmlCollection } from "./data/get-built-in-html-collection";
 import { getUserConfigHtmlCollection } from "./data/get-user-config-html-collection";
 import { isRuleDisabled, LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config";
-import { LitAnalyzerContext, LitPluginContextHandler } from "./lit-analyzer-context";
+import { LitAnalyzerContext, LitAnalyzerContextBaseOptions, LitPluginContextHandler } from "./lit-analyzer-context";
 import { DefaultLitAnalyzerLogger, LitAnalyzerLoggerLevel } from "./lit-analyzer-logger";
 import { convertAnalyzeResultToHtmlCollection, convertComponentDeclarationToHtmlTag } from "./parse/convert-component-definitions-to-html-collection";
 import { parseDependencies } from "./parse/parse-dependencies/parse-dependencies";
@@ -41,6 +41,7 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 	}
 
 	private _currentStartTime = Date.now();
+	private _currentTimeout = MAX_RUNNING_TIME_PER_OPERATION;
 	get currentRunningTime(): number {
 		return Date.now() - this._currentStartTime;
 	}
@@ -66,10 +67,10 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 			return (this._hasRequestedCancellation = true);
 		}
 
-		if (this.currentRunningTime > MAX_RUNNING_TIME_PER_OPERATION) {
+		if (this.currentRunningTime > this._currentTimeout) {
 			if (!this._hasRequestedCancellation) {
 				this.logger.error(
-					`Cancelling current operation because it has been running for more than ${MAX_RUNNING_TIME_PER_OPERATION}ms (${this.currentRunningTime}ms)`
+					`Cancelling current operation because it has been running for more than ${this._currentTimeout}ms (${this.currentRunningTime}ms)`
 				);
 			}
 
@@ -104,9 +105,10 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 		return this._rules;
 	}
 
-	setCurrentFile(file: SourceFile | undefined): void {
+	setContextBase({ file, timeout }: LitAnalyzerContextBaseOptions): void {
 		this._currentFile = file;
 		this._currentStartTime = Date.now();
+		this._currentTimeout = timeout ?? MAX_RUNNING_TIME_PER_OPERATION;
 		this._currentCancellationToken = this.project?.getCancellationToken();
 		this._hasRequestedCancellation = false;
 	}
