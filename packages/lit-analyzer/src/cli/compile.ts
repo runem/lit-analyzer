@@ -18,6 +18,7 @@ const requiredCompilerOptions: CompilerOptions = {
 	noEmitOnError: false,
 	noEmit: true,
 	allowJs: true,
+	//maxNodeModuleJsDepth: 3,
 	strictNullChecks: true, // Type checking will remove all "null" and "undefined" from types if "strictNullChecks" is false
 	moduleResolution: ModuleResolutionKind.NodeJs,
 	skipLibCheck: true,
@@ -37,8 +38,7 @@ const defaultCompilerOptions: CompilerOptions = {
 	esModuleInterop: true,
 	allowSyntheticDefaultImports: true,
 	allowUnreachableCode: true,
-	allowUnusedLabels: true,
-	isolatedModules: true
+	allowUnusedLabels: true
 };
 
 export interface CompileResult {

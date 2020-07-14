@@ -196,6 +196,18 @@ The value must be a comma-separated list of part mappings:
 		}
 	}
 
+	// Add missing global properties to the result
+	result.global.properties = [
+		...(result.global.properties || []),
+		{
+			builtIn: true,
+			description: `This attribute specifies a "styleable" part on the element in your shadow tree.`,
+			getType: () => ({ kind: "STRING" }),
+			kind: "property",
+			name: "part"
+		}
+	];
+
 	return {
 		...result,
 		tags: result.tags.map(tag => ({
@@ -204,6 +216,7 @@ The value must be a comma-separated list of part mappings:
 			attributes: addMissingAttrTypes(tag.attributes.map(attr => ({ ...attr, builtIn: true })))
 		})),
 		global: {
+			...result.global,
 			attributes: addMissingAttrTypes(result.global.attributes?.map(attr => ({ ...attr, builtIn: true })) || []),
 			events: result.global.events?.map(event => ({ ...event, builtIn: true }))
 		}
