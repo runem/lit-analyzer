@@ -8,7 +8,7 @@ import { Range } from "../../types/range";
 const DIRECT_IMPORT_CACHE = new WeakMap<SourceFile, Set<SourceFile>>();
 
 // Two caches used to return the result of of a known source file right away
-const RESULT_CACHE = new WeakMap<SourceFile, ComponentDefinition[]>();
+const RESULT_CACHE = new WeakMap<SourceFile, { def: ComponentDefinition; range: Range }[]>();
 const IMPORTED_SOURCE_FILES_CACHE = new WeakMap<SourceFile, Map<SourceFile, Range>>();
 
 /**
@@ -16,7 +16,7 @@ const IMPORTED_SOURCE_FILES_CACHE = new WeakMap<SourceFile, Map<SourceFile, Rang
  * @param sourceFile
  * @param context
  */
-export function parseDependencies(sourceFile: SourceFile, context: LitAnalyzerContext): ComponentDefinition[] {
+export function parseDependencies(sourceFile: SourceFile, context: LitAnalyzerContext): { def: ComponentDefinition; range: Range }[] {
 	if (RESULT_CACHE.has(sourceFile)) {
 		let invalidate = false;
 
@@ -43,11 +43,11 @@ export function parseDependencies(sourceFile: SourceFile, context: LitAnalyzerCo
 	IMPORTED_SOURCE_FILES_CACHE.set(sourceFile, importedSourceFiles);
 
 	// Get component definitions from all these source files
-	const definitions = new Set<ComponentDefinition>();
+	const definitions = new Set<{ def: ComponentDefinition; range: Range }>();
 	for (const imports of importedSourceFiles) {
-		const [file] = imports;
+		const [file, range] = imports;
 		for (const def of context.definitionStore.getDefinitionsInFile(file)) {
-			definitions.add(def);
+			definitions.add({ def, range });
 		}
 	}
 

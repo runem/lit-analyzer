@@ -7,6 +7,9 @@ import { HtmlNode, HtmlNodeKind } from "./types/html-node/html-node-types";
 import { RuleDiagnostic } from "./types/rule/rule-diagnostic";
 import { RuleModule, RuleModuleImplementation } from "./types/rule/rule-module";
 import { RuleModuleContext } from "./types/rule/rule-module-context";
+import { Statement } from "typescript";
+import { convertRuleDiagnosticToLitDiagnostic } from "./util/rule-diagnostic-util";
+import { LitDiagnostic } from "./types/lit-diagnostic";
 
 export interface ReportedRuleDiagnostic {
 	source: LitAnalyzerRuleId;
@@ -132,6 +135,13 @@ export class RuleCollection {
 		iterateNodes(htmlDocument.rootNodes);
 
 		return diagnostics;
+	}
+
+	getDiagnosticsFromImportStatement(importStatement: Statement, htmlDocuments: HtmlDocument[], baseContext: LitAnalyzerContext): LitDiagnostic[] {
+		const diagnostics: ReportedRuleDiagnostic[] = [];
+		this.invokeRules("visitImportStatement", { importStatement, htmlDocuments }, d => diagnostics.push(d), baseContext);
+		const convertedDiagnostics = diagnostics.map(diagnostic => convertRuleDiagnosticToLitDiagnostic(diagnostic, baseContext));
+		return convertedDiagnostics;
 	}
 }
 

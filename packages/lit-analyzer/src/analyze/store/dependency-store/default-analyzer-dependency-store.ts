@@ -1,8 +1,10 @@
 import { ComponentDefinition } from "web-component-analyzer";
 import { AnalyzerDependencyStore } from "../analyzer-dependency-store";
+import { Range } from "../../types/range";
+import { SourceFile } from "typescript";
 
 export class DefaultAnalyzerDependencyStore implements AnalyzerDependencyStore {
-	importedComponentDefinitionsInFile = new Map<string, ComponentDefinition[]>();
+	importedComponentDefinitionsInFile = new Map<string, { def: ComponentDefinition; range: Range }[]>();
 
 	/**
 	 * Returns if a component for a specific file has been imported.
@@ -10,8 +12,8 @@ export class DefaultAnalyzerDependencyStore implements AnalyzerDependencyStore {
 	 * @param tagName
 	 */
 	hasTagNameBeenImported(fileName: string, tagName: string): boolean {
-		for (const file of this.importedComponentDefinitionsInFile.get(fileName) || []) {
-			if (file.tagName === tagName) {
+		for (const importedDef of this.importedComponentDefinitionsInFile.get(fileName) || []) {
+			if (importedDef.def.tagName === tagName) {
 				return true;
 			}
 		}
@@ -19,7 +21,13 @@ export class DefaultAnalyzerDependencyStore implements AnalyzerDependencyStore {
 		return false;
 	}
 
-	// TODO: write function "hasImportBeenUsed(fileName: string, range: Range): boolean"
-	// that loops over all ComponentDefinitions of a file and searches for a Definition with the given range.
-	// Somehow we need to track wheter the tagName associated with the importRange is used within the SourceFile
+	getImportedDefinitionByRangeOfImportStatement(sourceFile: SourceFile, range: Range): ComponentDefinition[] {
+		const definitionsOfThisImport: ComponentDefinition[] = [];
+		for (const importedDef of this.importedComponentDefinitionsInFile.get(sourceFile.fileName) || []) {
+			if (importedDef.range.start === range.start && importedDef.range.end === range.end) {
+				definitionsOfThisImport.push(importedDef.def);
+			}
+		}
+		return definitionsOfThisImport;
+	}
 }

@@ -1,4 +1,5 @@
-import { SourceFile } from "typescript";
+import { SourceFile, Statement } from "typescript";
+import * as tsModule from "typescript";
 import { ComponentAnalyzer } from "./component-analyzer/component-analyzer";
 import { LitCssDocumentAnalyzer } from "./document-analyzer/css/lit-css-document-analyzer";
 import { LitHtmlDocumentAnalyzer } from "./document-analyzer/html/lit-html-document-analyzer";
@@ -233,6 +234,13 @@ export class LitAnalyzer {
 			}
 		}
 
+		// Get diagnostics for import statements in this file
+		const importStatements = this.getImportStatementsInFile(file, this.context.ts);
+		const htmlDocuments = documents.filter((document: TextDocument) => document instanceof HtmlDocument);
+		for (const importStatement of importStatements) {
+			diagnostics.push(...this.context.rules.getDiagnosticsFromImportStatement(importStatement, htmlDocuments as HtmlDocument[], this.context));
+		}
+
 		return diagnostics;
 	}
 
@@ -303,5 +311,11 @@ export class LitAnalyzer {
 
 	private getDocumentsInFile(sourceFile: SourceFile): TextDocument[] {
 		return this.context.documentStore.getDocumentsInFile(sourceFile, this.context.config);
+	}
+
+	private getImportStatementsInFile(soureFile: SourceFile, ts: typeof tsModule): Statement[] {
+		const statements = soureFile.statements;
+		const importStatements = statements.filter((statement: Statement) => ts.isImportDeclaration(statement));
+		return importStatements;
 	}
 }
