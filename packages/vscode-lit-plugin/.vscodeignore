@@ -8,3 +8,6 @@ src/**
 **/tslint.json
 **/*.map
 **/*.ts
+*.log
+readme.blueprint.md
+*.vsix
