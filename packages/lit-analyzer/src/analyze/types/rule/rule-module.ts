@@ -4,7 +4,7 @@ import { HtmlNodeAttrAssignment } from "../html-node/html-node-attr-assignment-t
 import { HtmlNodeAttr } from "../html-node/html-node-attr-types";
 import { HtmlNode } from "../html-node/html-node-types";
 import { RuleModuleContext } from "./rule-module-context";
-import { Statement } from "typescript";
+import { ImportDeclaration } from "typescript";
 import { HtmlDocument } from "../../parse/document/text-document/html-document/html-document";
 
 export type RuleModulePriority = "low" | "medium" | "high";
@@ -21,7 +21,10 @@ export interface RuleModuleImplementation {
 	visitComponentDefinition?(definition: ComponentDefinition, context: RuleModuleContext): void;
 	visitComponentDeclaration?(declaration: ComponentDeclaration, context: RuleModuleContext): void;
 	visitComponentMember?(declaration: ComponentMember, context: RuleModuleContext): void;
-	visitImportStatement?(importAndDocuments: { importStatement: Statement; htmlDocuments: HtmlDocument[] }, context: RuleModuleContext): void;
+	visitImportStatement?(
+		importAndDocuments: { importDeclaration: ImportDeclaration; htmlDocuments: HtmlDocument[] },
+		context: RuleModuleContext
+	): void;
 }
 
 export interface RuleModule extends RuleModuleImplementation {

@@ -1,4 +1,4 @@
-import { SourceFile, Statement } from "typescript";
+import { SourceFile, Statement, ImportDeclaration } from "typescript";
 import * as tsModule from "typescript";
 import { ComponentAnalyzer } from "./component-analyzer/component-analyzer";
 import { LitCssDocumentAnalyzer } from "./document-analyzer/css/lit-css-document-analyzer";
@@ -26,11 +26,13 @@ import { arrayFlat } from "./util/array-util";
 import { getNodeAtPosition, nodeIntersects } from "./util/ast-util";
 import { iterableFirst } from "./util/iterable-util";
 import { makeSourceFileRange, sfRangeToDocumentRange } from "./util/range-util";
+import { ImportAnalyzer } from "./import-analyzer/import-analyzer";
 
 export class LitAnalyzer {
 	private litHtmlDocumentAnalyzer = new LitHtmlDocumentAnalyzer();
 	private litCssDocumentAnalyzer = new LitCssDocumentAnalyzer();
 	private componentAnalyzer = new ComponentAnalyzer();
+	private importAnalyzer = new ImportAnalyzer();
 
 	constructor(private context: LitAnalyzerContext) {
 		// Set the Typescript module
@@ -235,10 +237,10 @@ export class LitAnalyzer {
 		}
 
 		// Get diagnostics for import statements in this file
-		const importStatements = this.getImportStatementsInFile(file, this.context.ts);
-		const htmlDocuments = documents.filter((document: TextDocument) => document instanceof HtmlDocument);
-		for (const importStatement of importStatements) {
-			diagnostics.push(...this.context.rules.getDiagnosticsFromImportStatement(importStatement, htmlDocuments as HtmlDocument[], this.context));
+		const importDeclarations = this.getImportStatementsInFile(file, this.context.ts);
+		const htmlDocuments = documents.filter((document: TextDocument) => document instanceof HtmlDocument) as HtmlDocument[];
+		for (const importDeclaration of importDeclarations) {
+			diagnostics.push(...this.importAnalyzer.getDiagnostics({ importDeclaration, htmlDocuments }, this.context));
 		}
 
 		return diagnostics;
@@ -313,9 +315,14 @@ export class LitAnalyzer {
 		return this.context.documentStore.getDocumentsInFile(sourceFile, this.context.config);
 	}
 
-	private getImportStatementsInFile(soureFile: SourceFile, ts: typeof tsModule): Statement[] {
+	private getImportStatementsInFile(soureFile: SourceFile, ts: typeof tsModule): ImportDeclaration[] {
 		const statements = soureFile.statements;
-		const importStatements = statements.filter((statement: Statement) => ts.isImportDeclaration(statement));
-		return importStatements;
+		const importStatements = statements.filter((statement: Statement) => {
+			// Until now we only want to evaluate side effect only imports
+			// e. g.: "import './my-module';"
+			// Therefore we search for importDeclarations without ImportClauses.
+			return ts.isImportDeclaration(statement) && statement.importClause == null;
+		});
+		return importStatements as ImportDeclaration[];
 	}
 }
