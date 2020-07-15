@@ -37,6 +37,11 @@ export default rule;
  * @param type
  */
 function isTypeBindableToEventListener(type: SimpleType): boolean {
+	// Return "true" if the type has a call signature
+	if ("call" in type && type.call != null) {
+		return true;
+	}
+
 	// Callable types can be used in the binding
 	if (isAssignableToSimpleTypeKind(type, ["FUNCTION", "METHOD", "UNKNOWN"], { matchAny: true })) {
 		return true;
