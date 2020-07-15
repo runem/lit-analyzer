@@ -192,6 +192,10 @@ function getDeprecatedOption<T>(userOptions: Partial<LitAnalyzerConfig>, name: s
 	return (userOptions as Record<string, T>)[name];
 }
 
+/*function getDeprecatedRule(userOptions: Partial<LitAnalyzerConfig>, name: string): LitAnalyzerRuleSeverity | undefined {
+	return userOptions.rules?.[name as never];
+}*/
+
 export function makeRules(userOptions: Partial<LitAnalyzerConfig>): LitAnalyzerRules {
 	const mappedDeprecatedRules = getDeprecatedMappedRules(userOptions);
 	const defaultRules = getDefaultRules(userOptions);

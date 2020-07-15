@@ -212,6 +212,15 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 
 	private findComponentsInFile(sourceFile: SourceFile) {
 		const isDefaultLibrary = this.program.isSourceFileDefaultLibrary(sourceFile);
+		const isExternalLibrary = this.program.isSourceFileFromExternalLibrary(sourceFile);
+
+		// Only analyzing specific default libs of interest can save us up to 500ms in startup time
+		if (
+			(isDefaultLibrary && sourceFile.fileName.match(/(lib\.dom\.d\.ts)/) == null) ||
+			(isExternalLibrary && sourceFile.fileName.match(/(@types\/node)/) != null)
+		) {
+			return;
+		}
 
 		const analyzeResult = analyzeSourceFile(sourceFile, {
 			program: this.program,

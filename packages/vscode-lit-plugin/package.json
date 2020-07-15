@@ -94,12 +94,12 @@
 					},
 					"lit-plugin.maxProjectImportDepth": {
 						"type": "integer",
-						"description": "Determines how many modules deep dependencies are followed to determine whether a custom element is available in the current file.",
+						"description": "Determines how many modules deep dependencies are followed to determine whether a custom element is available in the current file. When `-1` is used, dependencies will be followed infinitely deep.",
 						"default": -1
 					},
 					"lit-plugin.maxNodeModuleImportDepth": {
 						"type": "integer",
-						"description": "Determines how many modules deep dependencies in npm packages are followed to determine whether a custom element is available in the current file.",
+						"description": "Determines how many modules deep dependencies in npm packages are followed to determine whether a custom element is available in the current file. When `-1` is used, dependencies will be followed infinitely deep.",
 						"default": 1
 					},
 					"lit-plugin.securitySystem": {
