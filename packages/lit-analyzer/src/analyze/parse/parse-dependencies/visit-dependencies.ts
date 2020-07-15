@@ -30,10 +30,9 @@ export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, conte
 	const inExternal = context.program.isSourceFileFromExternalLibrary(sourceFile);
 
 	// Check if we have traversed too deep
-	// Subtract 1 because depth starts at 0
-	if (inExternal && currentDepth > (context.maxExternalDepth ?? Infinity) - 1) {
+	if (inExternal && currentDepth >= (context.maxExternalDepth ?? Infinity)) {
 		return;
-	} else if (!inExternal && currentDepth > (context.maxInternalDepth ?? Infinity) - 1) {
+	} else if (!inExternal && currentDepth >= (context.maxInternalDepth ?? Infinity)) {
 		return;
 	}
 
@@ -56,6 +55,16 @@ export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, conte
 
 		// Cache the result
 		context.directImportCache.set(sourceFile, directImports);
+	} else {
+		// Updated references to newest source files
+		const updatedImports = new Set<SourceFile>();
+		for (const sf of directImports) {
+			const updatedSf = context.program.getSourceFile(sf.fileName);
+			if (updatedSf != null) {
+				updatedImports.add(updatedSf);
+			}
+		}
+		directImports = updatedImports;
 	}
 
 	// Call this function recursively on all direct imports from this source file

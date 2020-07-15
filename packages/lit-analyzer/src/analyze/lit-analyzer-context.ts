@@ -38,6 +38,7 @@ export interface LitAnalyzerContext {
 export interface LitAnalyzerContextBaseOptions {
 	file: SourceFile | undefined;
 	timeout?: number;
+	throwOnCancellation?: boolean;
 }
 
 export interface LitPluginContextHandler {

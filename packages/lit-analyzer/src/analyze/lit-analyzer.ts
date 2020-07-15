@@ -191,7 +191,7 @@ export class LitAnalyzer {
 	}
 
 	getDiagnosticsInFile(file: SourceFile): LitDiagnostic[] {
-		this.context.setContextBase({ file, timeout: 7000 });
+		this.context.setContextBase({ file, timeout: 7000, throwOnCancellation: true });
 
 		this.context.updateComponents(file);
 		this.context.updateDependencies(file);

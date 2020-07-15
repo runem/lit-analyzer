@@ -48,6 +48,7 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 
 	private _currentCancellationToken: HostCancellationToken | undefined = undefined;
 	private _hasRequestedCancellation = false;
+	private _throwOnRequestedCancellation = false;
 	get isCancellationRequested(): boolean {
 		if (this._hasRequestedCancellation) {
 			return true;
@@ -64,7 +65,7 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 				this.logger.error("Cancelling current operation because project host has requested cancellation");
 			}
 
-			return (this._hasRequestedCancellation = true);
+			this._hasRequestedCancellation = true;
 		}
 
 		if (this.currentRunningTime > this._currentTimeout) {
@@ -74,10 +75,15 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 				);
 			}
 
-			return (this._hasRequestedCancellation = true);
+			this._hasRequestedCancellation = true;
 		}
 
-		return false;
+		// Throw if necessary
+		if (this._hasRequestedCancellation && this._throwOnRequestedCancellation) {
+			throw new this.ts.OperationCanceledException();
+		}
+
+		return this._hasRequestedCancellation;
 	}
 
 	private _currentFile: SourceFile | undefined;
@@ -105,11 +111,12 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 		return this._rules;
 	}
 
-	setContextBase({ file, timeout }: LitAnalyzerContextBaseOptions): void {
+	setContextBase({ file, timeout, throwOnCancellation }: LitAnalyzerContextBaseOptions): void {
 		this._currentFile = file;
 		this._currentStartTime = Date.now();
 		this._currentTimeout = timeout ?? MAX_RUNNING_TIME_PER_OPERATION;
 		this._currentCancellationToken = this.project?.getCancellationToken();
+		this._throwOnRequestedCancellation = throwOnCancellation ?? false;
 		this._hasRequestedCancellation = false;
 	}
 
