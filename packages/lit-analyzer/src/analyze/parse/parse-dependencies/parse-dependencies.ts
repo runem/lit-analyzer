@@ -71,8 +71,7 @@ export function parseAllIndirectImports(
 	context: LitAnalyzerContext,
 	{ maxExternalDepth, maxInternalDepth }: { maxExternalDepth?: number; maxInternalDepth?: number } = {}
 ): Map<SourceFile, ImportDeclaration> {
-	// The Range destribes the location of the direct import statement.
-	const importedSourceFiles = new Map<SourceFile, ImportDeclaration>();
+	const importedSourceFiles = new Map<SourceFile, { importDeclaration: ImportDeclaration; depth: number }>();
 
 	visitIndirectImportsFromSourceFile(sourceFile, {
 		project: context.project,
@@ -81,40 +80,28 @@ export function parseAllIndirectImports(
 		directImportCache: DIRECT_IMPORT_CACHE,
 		maxExternalDepth: maxExternalDepth ?? context.config.maxNodeModuleImportDepth,
 		maxInternalDepth: maxInternalDepth ?? context.config.maxProjectImportDepth,
-		emitIndirectImport(file: SourceFile, importDeclaration: ImportDeclaration): boolean {
+		emitIndirectImport(file: SourceFile, depthOfFile: number, importDeclaration: ImportDeclaration): boolean {
+			const newImport = { importDeclaration, depth: depthOfFile };
 			if (importedSourceFiles.has(file)) {
-				const oldImport = importedSourceFiles.get(file);
-				const newImport = importDeclaration;
-				const oldFile = importedSourceFiles.get(file)?.getSourceFile();
-				const newFile = importDeclaration.getSourceFile();
-				// does .getSourceFile() return the Sourcefile where the importDeclaration is located as expected?
-				if (oldImport !== newImport) {
-					// Two importDeclarations load the same file
-					// How do we determine which one to keep?
-					// non-ideal solution: indirect imports > direct imports.
-					// replace existing import if it directly imports the file and if the new import indirectly imports the file.
-					const oldFileDirectlyImported = isDirectlyImported(sourceFile, oldFile);
-					const newFileDirectlyImported = isDirectlyImported(sourceFile, newFile);
+				const oldImport = importedSourceFiles.get(file)!;
 
-					if (oldFileDirectlyImported && !newFileDirectlyImported) {
-						importedSourceFiles.delete(file);
-						importedSourceFiles.set(file, importDeclaration);
-						return false;
-					}
+				if (newImport.depth > oldImport.depth) {
+					// Two importDeclarations load the same file.
+					// If the new import has more depth, the old one will be replaced.
+					importedSourceFiles.delete(file);
+					importedSourceFiles.set(file, newImport);
 				}
 				return false;
 			}
 
-			importedSourceFiles.set(file, importDeclaration);
+			importedSourceFiles.set(file, newImport);
 			return true;
 		}
 	});
 
-	return importedSourceFiles;
-}
-
-function isDirectlyImported(parentFile: SourceFile, childFile: SourceFile | undefined): boolean {
-	if (childFile == null) return false;
-	const referencedFiles = parentFile.referencedFiles;
-	return referencedFiles.some(file => file.fileName === childFile.fileName);
+	const importedSourceFilesWithoutDepth = new Map<SourceFile, ImportDeclaration>();
+	importedSourceFiles.forEach((value, key) => {
+		importedSourceFilesWithoutDepth.set(key, value.importDeclaration);
+	});
+	return importedSourceFilesWithoutDepth;
 }

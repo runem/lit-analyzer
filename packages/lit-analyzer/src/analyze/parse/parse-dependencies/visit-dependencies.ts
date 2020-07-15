@@ -6,7 +6,7 @@ interface IVisitDependenciesContext {
 	ts: typeof tsModule;
 	project: ts.server.Project | undefined;
 	directImportCache: WeakMap<SourceFile, Set<SourceFile>>;
-	emitIndirectImport(file: SourceFile, importDeclaration?: ImportDeclaration): boolean;
+	emitIndirectImport(file: SourceFile, depthOfFile: number, importDeclaration?: ImportDeclaration): boolean;
 	emitDirectImport?(file: SourceFile, importDeclaration: ImportDeclaration): void;
 	depth?: number;
 	maxExternalDepth?: number;
@@ -24,7 +24,7 @@ export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, conte
 	const currentDepth = context.depth ?? 0;
 
 	// Emit a visit. If this file has been seen already, the function will return false, and traversal will stop
-	if (!context.emitIndirectImport(sourceFile, context.importDeclaration)) {
+	if (!context.emitIndirectImport(sourceFile, currentDepth, context.importDeclaration)) {
 		return;
 	}
 
