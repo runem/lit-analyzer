@@ -1,13 +1,13 @@
 import { Expression } from "typescript";
-import { Range } from "../../../types/range";
+import { DocumentOffset, DocumentRange, Range, SourceFilePosition, SourceFileRange } from "../../../types/range";
 
 export interface VirtualDocument {
 	fileName: string;
-	location: Range;
+	location: SourceFileRange;
 	text: string;
-	getPartsAtOffsetRange(range?: Range): (Expression | string)[];
-	scPositionToOffset(position: number): number;
-	offsetToSCPosition(offset: number): number;
+	getPartsAtDocumentRange(range?: DocumentRange): (Expression | string)[];
+	sfPositionToDocumentOffset(position: SourceFilePosition): DocumentOffset;
+	documentOffsetToSFPosition(offset: DocumentOffset): SourceFilePosition;
 }
 
 export function textPartsToRanges(parts: (Expression | string)[]): Range[] {

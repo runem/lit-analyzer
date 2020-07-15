@@ -1,7 +1,7 @@
-import { Node } from "typescript";
+import { Identifier, Node } from "typescript";
 import { tsModule } from "../ts-module";
 import { Range } from "../types/range";
-import { intersects } from "./general-util";
+import { intersects } from "./range-util";
 
 /**
  * Tests nodes recursively walking up the tree using parent nodes.
@@ -65,4 +65,30 @@ export function leadingCommentsIncludes(text: string, pos: number, needle: strin
 		}
 	}
 	return false;
+}
+
+/**
+ * Returns the declaration name of a given node if possible.
+ * @param node
+ * @param ts
+ */
+export function getNodeIdentifier(node: Node, ts: typeof tsModule.ts): Identifier | undefined {
+	if (ts.isIdentifier(node)) {
+		return node;
+	} else if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)) {
+		return node.expression;
+	} else if (
+		(ts.isClassLike(node) ||
+			ts.isInterfaceDeclaration(node) ||
+			ts.isVariableDeclaration(node) ||
+			ts.isMethodDeclaration(node) ||
+			ts.isPropertyDeclaration(node) ||
+			ts.isFunctionDeclaration(node)) &&
+		node.name != null &&
+		ts.isIdentifier(node.name)
+	) {
+		return node.name;
+	}
+
+	return undefined;
 }

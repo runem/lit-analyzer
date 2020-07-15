@@ -1,7 +1,8 @@
 import { LitHtmlAttributeModifier } from "../../constants";
+import { HtmlDocument } from "../../parse/document/text-document/html-document/html-document";
+import { Range } from "../range";
 import { HtmlNodeAttrAssignment } from "./html-node-attr-assignment-types";
 import { HtmlNode } from "./html-node-types";
-import { Range } from "../range";
 
 export enum HtmlNodeAttrKind {
 	EVENT_LISTENER = "EVENT_LISTENER",
@@ -20,6 +21,7 @@ export interface IHtmlNodeAttrBase {
 	location: IHtmlNodeAttrSourceCodeLocation;
 	assignment?: HtmlNodeAttrAssignment;
 	htmlNode: HtmlNode;
+	document: HtmlDocument;
 }
 
 export interface IHtmlNodeAttrEventListener extends IHtmlNodeAttrBase {
@@ -44,7 +46,6 @@ export interface IHtmlNodeAttr extends IHtmlNodeAttrBase {
 
 export type HtmlNodeAttr = IHtmlNodeAttrEventListener | IHtmlNodeAttrProp | IHtmlNodeAttr | IHtmlNodeBooleanAttribute;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function isHTMLAttr(obj: any): obj is IHtmlNodeAttrBase {
+export function isHTMLAttr(obj: object): obj is IHtmlNodeAttrBase {
 	return "name" in obj && "location" in obj && "htmlNode" in obj;
 }

@@ -47,6 +47,7 @@ export function parseHtmlNodeAttr(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, conte
 
 	const htmlAttrBase: IHtmlNodeAttrBase = {
 		name: name.toLowerCase(), // Parse5 lowercases all attributes names. Therefore ".myAttr" becomes ".myattr"
+		document: context.document,
 		modifier,
 		htmlNode,
 		location

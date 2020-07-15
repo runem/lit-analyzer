@@ -1,15 +1,20 @@
 import * as vscode from "vscode-css-languageservice";
 import { IAtDirectiveData, ICSSDataProvider, IPropertyData, IPseudoClassData, IPseudoElementData } from "vscode-css-languageservice";
 import { isRuleDisabled } from "../../lit-analyzer-config";
-import { LitAnalyzerRequest } from "../../lit-analyzer-context";
+import { LitAnalyzerContext } from "../../lit-analyzer-context";
 import { CssDocument } from "../../parse/document/text-document/css-document/css-document";
+import { documentationForCssPart, documentationForCssProperty, documentationForHtmlTag } from "../../parse/parse-html-data/html-tag";
 import { AnalyzerHtmlStore } from "../../store/analyzer-html-store";
 import { LitCompletion } from "../../types/lit-completion";
-import { LitCssDiagnostic } from "../../types/lit-diagnostic";
+import { LitDiagnostic } from "../../types/lit-diagnostic";
 import { LitQuickInfo } from "../../types/lit-quick-info";
 import { LitTargetKind } from "../../types/lit-target-kind";
+import { DocumentOffset } from "../../types/range";
 import { lazy } from "../../util/general-util";
+import { getPositionContextInDocument, grabWordInDirection } from "../../util/get-position-context-in-document";
 import { iterableFilter, iterableMap } from "../../util/iterable-util";
+import { documentRangeToSFRange } from "../../util/range-util";
+import { replacePrefix } from "../../util/str-util";
 
 function makeVscTextDocument(cssDocument: CssDocument): vscode.TextDocument {
 	return vscode.TextDocument.create("untitled://embedded.css", "css", 1, cssDocument.virtualDocument.text);
@@ -26,7 +31,11 @@ export class LitCssVscodeService {
 		return vscode.getSCSSLanguageService({ customDataProviders: [this.dataProvider.provider] });
 	}
 
-	getDiagnostics(document: CssDocument, context: LitAnalyzerRequest): LitCssDiagnostic[] {
+	getDiagnostics(document: CssDocument, context: LitAnalyzerContext): LitDiagnostic[] {
+		if (isRuleDisabled(context.config, "no-invalid-css")) {
+			return [];
+		}
+
 		this.dataProvider.update(context.htmlStore);
 
 		const vscTextDocument = makeVscTextDocument(document);
@@ -40,27 +49,24 @@ export class LitCssVscodeService {
 		const vscStylesheet = this.makeVscStylesheet(vscTextDocument);
 		const diagnostics = this.scssService.doValidation(vscTextDocument, vscStylesheet);
 
-		if (isRuleDisabled(context.config, "no-invalid-css")) {
-			return [];
-		}
-
 		return diagnostics
 			.filter(diagnostic => diagnostic.range.start.line !== 0 && diagnostic.range.start.line < vscTextDocument.lineCount - 1)
 			.map(
 				diagnostic =>
 					({
 						severity: diagnostic.severity === vscode.DiagnosticSeverity.Error ? "error" : "warning",
-						location: {
-							document,
+						source: "no-invalid-css",
+						location: documentRangeToSFRange(document, {
 							start: vscTextDocument.offsetAt(diagnostic.range.start),
 							end: vscTextDocument.offsetAt(diagnostic.range.end)
-						},
-						message: diagnostic.message
-					} as LitCssDiagnostic)
+						}),
+						message: diagnostic.message,
+						file: context.currentFile
+					} as LitDiagnostic)
 			);
 	}
 
-	getQuickInfo(document: CssDocument, offset: number, context: LitAnalyzerRequest): LitQuickInfo | undefined {
+	getQuickInfo(document: CssDocument, offset: DocumentOffset, context: LitAnalyzerContext): LitQuickInfo | undefined {
 		this.dataProvider.update(context.htmlStore);
 
 		const vscTextDocument = makeVscTextDocument(document);
@@ -88,33 +94,85 @@ export class LitCssVscodeService {
 		return {
 			primaryInfo: primaryInfo || "",
 			secondaryInfo,
-			range: {
-				document,
-				start: vscTextDocument.offsetAt(hover.range.start),
-				end: vscTextDocument.offsetAt(hover.range.end)
-			}
+			range: documentRangeToSFRange(document, { start: vscTextDocument.offsetAt(hover.range.start), end: vscTextDocument.offsetAt(hover.range.end) })
 		};
 	}
 
-	getCompletions(document: CssDocument, offset: number, request: LitAnalyzerRequest): LitCompletion[] {
-		this.dataProvider.update(request.htmlStore);
+	getCompletions(document: CssDocument, offset: DocumentOffset, context: LitAnalyzerContext): LitCompletion[] {
+		this.dataProvider.update(context.htmlStore);
+
+		const positionContext = getPositionContextInDocument(document, offset);
+
+		// If there is ":" before the word, treat them like it's a part of the "leftWord", because ":" is a part of the name, but also a separator
+		if (positionContext.beforeWord === ":") {
+			positionContext.leftWord =
+				":" +
+				grabWordInDirection({
+					startOffset: offset - positionContext.leftWord.length - 1,
+					stopChar: /[^:]/,
+					direction: "left",
+					text: document.virtualDocument.text
+				}) +
+				positionContext.leftWord;
+		}
 
 		const vscTextDocument = makeVscTextDocument(document);
 		const vscStylesheet = this.makeVscStylesheet(vscTextDocument);
 		const vscPosition = vscTextDocument.positionAt(offset);
 		const items = this.cssService.doComplete(vscTextDocument, vscPosition, vscStylesheet);
 
-		return items.items.map(
+		// Get all completions from vscode html language service
+		const completions = items.items.map(
 			i =>
 				({
 					kind: i.kind == null ? "unknown" : translateCompletionItemKind(i.kind),
-					insert: i.label,
 					name: i.label,
+					insert: replacePrefix(i.label, positionContext.leftWord),
 					kindModifiers: i.kind === vscode.CompletionItemKind.Color ? "color" : undefined,
-					importance: i.label.startsWith("@") || i.label.startsWith("-") ? "low" : i.label.startsWith(":") ? "medium" : "high",
+					importance: i.label.startsWith("@") || i.label.startsWith("-") || i.label.startsWith(":") ? "low" : "medium",
 					documentation: lazy(() => (typeof i.documentation === "string" || i.documentation == null ? i.documentation : i.documentation.value))
 				} as LitCompletion)
 		);
+
+		// Add completions for css custom properties
+		for (const cssProp of context.htmlStore.getAllCssPropertiesForTag("")) {
+			if (completions.some(c => c.name === cssProp.name)) {
+				continue;
+			}
+
+			completions.push({
+				kind: "variableElement",
+				name: cssProp.name,
+				insert: replacePrefix(cssProp.name, positionContext.leftWord),
+				importance: positionContext.leftWord.startsWith("-") ? "high" : "medium",
+				documentation: lazy(() => documentationForCssProperty(cssProp))
+			});
+		}
+
+		if (positionContext.beforeWord === "(") {
+			// Get the name of the pseudo element
+			const pseudoElementName = grabWordInDirection({
+				startOffset: offset - positionContext.leftWord.length - 1,
+				stopChar: /[^-A-Za-z]/,
+				direction: "left",
+				text: document.virtualDocument.text
+			});
+
+			// Add completions for css shadow parts
+			if (pseudoElementName === "part") {
+				for (const cssPart of context.htmlStore.getAllCssPartsForTag("")) {
+					completions.push({
+						kind: "variableElement",
+						name: cssPart.name,
+						insert: replacePrefix(cssPart.name, positionContext.leftWord),
+						importance: "high",
+						documentation: lazy(() => documentationForCssPart(cssPart))
+					});
+				}
+			}
+		}
+
+		return completions;
 	}
 
 	private makeVscStylesheet(vscTextDocument: vscode.TextDocument) {
@@ -166,28 +224,23 @@ class LitVscodeCSSDataProvider {
 
 	private customDataProvider: ICSSDataProvider = (() => {
 		const provider = this;
+
 		return {
 			providePseudoElements(): IPseudoElementData[] {
-				return provider.pseudoElementData;
+				return [
+					{
+						browsers: [],
+						description: `Unlike ::part, ::theme matches elements parts with that theme name, anywhere in the document.`,
+						name: "::theme",
+						status: "nonstandard"
+					}
+				];
 			},
 			provideAtDirectives(): IAtDirectiveData[] {
 				return [];
 			},
 			providePseudoClasses(): IPseudoClassData[] {
-				return [
-					{
-						browsers: [],
-						description: "Allows you to select elements that have been exposed via a part attribute.",
-						name: "part",
-						status: "standard"
-					},
-					{
-						browsers: [],
-						description: `Unlike ::part, ::theme matches elements parts with that theme name, anywhere in the document.`,
-						name: "theme",
-						status: "nonstandard"
-					}
-				];
+				return provider.pseudoElementData;
 			},
 			provideProperties(): IPropertyData[] {
 				return [];
@@ -206,7 +259,7 @@ class LitVscodeCSSDataProvider {
 				tag =>
 					({
 						browsers: [],
-						description: tag.description,
+						description: documentationForHtmlTag(tag),
 						name: tag.tagName,
 						status: "standard"
 					} as IPseudoElementData)

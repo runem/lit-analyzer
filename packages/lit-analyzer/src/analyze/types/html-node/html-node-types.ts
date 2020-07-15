@@ -1,5 +1,6 @@
-import { HtmlNodeAttr } from "./html-node-attr-types";
+import { HtmlDocument } from "../../parse/document/text-document/html-document/html-document";
 import { Range } from "../range";
+import { HtmlNodeAttr } from "./html-node-attr-types";
 
 export interface IHtmlNodeSourceCodeLocation extends Range {
 	name: Range;
@@ -20,6 +21,7 @@ export interface IHtmlNodeBase {
 	parent?: HtmlNode;
 	children: HtmlNode[];
 	selfClosed: boolean;
+	document: HtmlDocument;
 }
 
 export interface IHtmlNode extends IHtmlNodeBase {
@@ -36,7 +38,6 @@ export interface IHtmlNodeSvgTag extends IHtmlNodeBase {
 
 export type HtmlNode = IHtmlNode | IHtmlNodeStyleTag | IHtmlNodeSvgTag;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function isHTMLNode(obj: any): obj is IHtmlNodeBase {
+export function isHTMLNode(obj: object): obj is IHtmlNodeBase {
 	return "tagName" in obj && "location" in obj && "attributes" in obj;
 }

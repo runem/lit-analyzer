@@ -23,7 +23,7 @@ export class DefaultLitAnalyzerLogger implements LitAnalyzerLogger {
 	 * Logs if this.level >= DEBUG
 	 * @param args
 	 */
-	debug(...args: any[]) {
+	debug(...args: any[]): void {
 		this.log(LitAnalyzerLoggerLevel.DEBUG, ...args);
 	}
 
@@ -31,7 +31,7 @@ export class DefaultLitAnalyzerLogger implements LitAnalyzerLogger {
 	 * Logs if this.level >= ERROR
 	 * @param args
 	 */
-	error(...args: any[]) {
+	error(...args: any[]): void {
 		this.log(LitAnalyzerLoggerLevel.ERROR, ...args);
 	}
 
@@ -39,7 +39,7 @@ export class DefaultLitAnalyzerLogger implements LitAnalyzerLogger {
 	 * Logs if level >= WARN
 	 * @param args
 	 */
-	warn(...args: any[]) {
+	warn(...args: any[]): void {
 		this.log(LitAnalyzerLoggerLevel.WARN, ...args);
 	}
 
@@ -47,11 +47,11 @@ export class DefaultLitAnalyzerLogger implements LitAnalyzerLogger {
 	 * Logs if level >= VERBOSE
 	 * @param args
 	 */
-	verbose(...args: any[]) {
+	verbose(...args: any[]): void {
 		this.log(LitAnalyzerLoggerLevel.VERBOSE, ...args);
 	}
 
-	private log(level: LitAnalyzerLoggerLevel, ...args: any[]) {
+	private log(level: LitAnalyzerLoggerLevel, ...args: any[]): void {
 		// Only log for the set level
 		if (level > this.level) {
 			return;

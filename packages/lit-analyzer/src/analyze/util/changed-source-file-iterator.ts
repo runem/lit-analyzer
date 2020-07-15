@@ -10,7 +10,7 @@ export type ChangedSourceFileIterator = ((sourceFiles: readonly SourceFile[]) =>
 export function changedSourceFileIterator(): ChangedSourceFileIterator {
 	const sourceFileCache = new WeakSet<SourceFile>();
 
-	const iterator = function*(sourceFiles: readonly SourceFile[]): Iterable<SourceFile> {
+	const iterator = function* (sourceFiles: readonly SourceFile[]): Iterable<SourceFile> {
 		for (const sourceFile of sourceFiles) {
 			if (!sourceFileCache.has(sourceFile)) {
 				yield sourceFile;

@@ -1,5 +1,5 @@
-import { isSimpleTypeLiteral, SimpleType, SimpleTypeKind } from "ts-simple-type";
-import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
+import { isSimpleTypeLiteral, SimpleType } from "ts-simple-type";
+import { LitAnalyzerContext } from "../../../lit-analyzer-context";
 import { HtmlNodeAttrAssignmentKind } from "../../../types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types";
 import { LitCompletion } from "../../../types/lit-completion";
@@ -8,7 +8,7 @@ import { DocumentPositionContext } from "../../../util/get-position-context-in-d
 export function completionsForHtmlAttrValues(
 	htmlNodeAttr: HtmlNodeAttr,
 	location: DocumentPositionContext,
-	{ htmlStore }: LitAnalyzerRequest
+	{ htmlStore }: LitAnalyzerContext
 ): LitCompletion[] {
 	// There is not point in showing completions for event listener bindings
 	if (htmlNodeAttr.kind === HtmlNodeAttrKind.EVENT_LISTENER) return [];
@@ -49,14 +49,14 @@ export function completionsForHtmlAttrValues(
 
 function getOptionsFromType(type: SimpleType): string[] {
 	switch (type.kind) {
-		case SimpleTypeKind.UNION:
+		case "UNION":
 			return type.types.filter(isSimpleTypeLiteral).map(t => t.value.toString());
-		case SimpleTypeKind.ENUM:
+		case "ENUM":
 			return type.types
 				.map(m => m.type)
 				.filter(isSimpleTypeLiteral)
 				.map(t => t.value.toString());
-		case SimpleTypeKind.ALIAS:
+		case "ALIAS":
 			return getOptionsFromType(type.target);
 	}
 

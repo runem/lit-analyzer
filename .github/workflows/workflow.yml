@@ -1,21 +1,30 @@
 name: Main Workflow
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - master
 
 jobs:
   run:
     name: Run
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        node: [10, 12]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@master
 
-      - name: Set Node.js 10.x
+      - name: Setup Node
         uses: actions/setup-node@master
         with:
-          node-version: 10.x
+          node-version: ${{ matrix.node }}
 
       - name: Install
         run: npm ci
@@ -23,17 +32,20 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Build
-        run: npm run bootstrap
+      - name: Prettier
+        if: matrix.os == 'ubuntu-latest' && matrix.node == 12
+        run: npm run prettier:check
 
       - name: Test
-        run: npm test
+        run: npm run test:all
 
       - name: Package vscode plugin
-        run: npm run copylink && npx lerna run package --scope lit-plugin && mkdir vscode-lit-plugin && mv packages/vscode-lit-plugin/lit-plugin-*.vsix vscode-lit-plugin
+        if: matrix.os == 'ubuntu-latest' && matrix.node == 12
+        run: npx lerna run package --scope lit-plugin && mkdir vscode-lit-plugin && mv packages/vscode-lit-plugin/lit-plugin-*.vsix vscode-lit-plugin
 
       - name: Upload artifacts
         uses: actions/upload-artifact@master
+        if: matrix.os == 'ubuntu-latest' && matrix.node == 12
         with:
           name: vscode-lit-plugin
           path: vscode-lit-plugin

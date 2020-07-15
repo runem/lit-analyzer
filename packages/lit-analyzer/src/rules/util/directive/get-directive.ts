@@ -1,8 +1,8 @@
-import { SimpleType, SimpleTypeKind, toSimpleType } from "ts-simple-type";
+import { SimpleType, toSimpleType } from "ts-simple-type";
 import { Expression } from "typescript";
-import { LitAnalyzerRequest } from "../../lit-analyzer-context";
-import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../types/html-node/html-node-attr-assignment-types";
-import { lazy } from "../general-util";
+import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../analyze/types/html-node/html-node-attr-assignment-types";
+import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
+import { lazy } from "../../../analyze/util/general-util";
 import { removeUndefinedFromType } from "../type/remove-undefined-from-type";
 import { isLitDirective } from "./is-lit-directive";
 
@@ -30,8 +30,8 @@ interface Directive {
 	args: Expression[];
 }
 
-export function getDirective(assignment: HtmlNodeAttrAssignment, request: LitAnalyzerRequest): Directive | undefined {
-	const { ts, program } = request;
+export function getDirective(assignment: HtmlNodeAttrAssignment, context: RuleModuleContext): Directive | undefined {
+	const { ts, program } = context;
 	const checker = program.getTypeChecker();
 
 	if (assignment.kind !== HtmlNodeAttrAssignmentKind.EXPRESSION) return;
@@ -85,9 +85,12 @@ export function getDirective(assignment: HtmlNodeAttrAssignment, request: LitAna
 				// The return type of the function becomes the actual type of the expression
 				const actualType = lazy(() => {
 					if (args.length >= 2) {
-						const returnFunctionType = toSimpleType(checker.getTypeAtLocation(args[1]), checker);
+						let returnFunctionType = toSimpleType(checker.getTypeAtLocation(args[1]), checker);
+						if ("call" in returnFunctionType && returnFunctionType.call != null) {
+							returnFunctionType = returnFunctionType.call;
+						}
 
-						if (returnFunctionType.kind === SimpleTypeKind.FUNCTION) {
+						if (returnFunctionType.kind === "FUNCTION") {
 							return returnFunctionType.returnType;
 						}
 					}
@@ -106,7 +109,7 @@ export function getDirective(assignment: HtmlNodeAttrAssignment, request: LitAna
 			case "styleMap":
 				return {
 					kind: functionName,
-					actualType: () => ({ kind: SimpleTypeKind.STRING }),
+					actualType: () => ({ kind: "STRING" }),
 					args
 				};
 
@@ -128,12 +131,21 @@ export function getDirective(assignment: HtmlNodeAttrAssignment, request: LitAna
 					const typeB = toSimpleType(checker.getTypeAtLocation(assignment.expression), checker);
 
 					if (isLitDirective(typeB)) {
+						// Factories can mark which parameters might be assigned to the property with the generic type in DirectiveFn<T>
+						// Here we get the actual type of the directive if the it is a generic directive with type. Example: DirectiveFn<string>
+						// Read more: https://github.com/Polymer/lit-html/pull/1151
+						const actualType =
+							typeB.kind === "GENERIC_ARGUMENTS" && typeB.target.name === "DirectiveFn" && typeB.typeArguments.length > 0 // && typeB.typeArguments[0].kind !== "UNKNOWN"
+								? () => typeB.typeArguments[0]
+								: undefined;
+
 						// Now we have an unknown (user defined) directive.
 						return {
 							kind: {
 								name: functionName
 							},
-							args
+							args,
+							actualType
 						};
 					}
 				}

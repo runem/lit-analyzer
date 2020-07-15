@@ -4,6 +4,7 @@ import {
 	CompletionEntryDetails,
 	CompletionInfo,
 	DefinitionInfoAndBoundSpan,
+	Diagnostic,
 	FormatCodeOptions,
 	FormatCodeSettings,
 	GetCompletionsAtPositionOptions,
@@ -15,10 +16,10 @@ import {
 	RenameInfo,
 	RenameInfoOptions,
 	RenameLocation,
-	TextChange,
-	UserPreferences,
+	SignatureHelpItems,
 	SignatureHelpItemsOptions,
-	SignatureHelpItems
+	TextChange,
+	UserPreferences
 } from "typescript";
 import { LitPluginContext } from "./lit-plugin-context";
 import { translateCodeFixes } from "./translate/translate-code-fixes";
@@ -40,6 +41,10 @@ export class TsLitPlugin {
 	}
 
 	constructor(private prevLangService: LanguageService, public readonly context: LitPluginContext) {}
+
+	getSupportedCodeFixes(): string[] {
+		return this.litAnalyzer.getSupportedCodeFixes();
+	}
 
 	getCompletionEntryDetails(
 		fileName: string,
@@ -63,7 +68,7 @@ export class TsLitPlugin {
 		return (result && translateCompletions(result)) || this.prevLangService.getCompletionsAtPosition(fileName, position, options);
 	}
 
-	getSemanticDiagnostics(fileName: string) {
+	getSemanticDiagnostics(fileName: string): Diagnostic[] {
 		const file = this.program.getSourceFile(fileName)!;
 
 		const result = this.litAnalyzer.getDiagnosticsInFile(file);
@@ -119,7 +124,7 @@ export class TsLitPlugin {
 		const result = this.prevLangService.getSignatureHelpItems(fileName, position, options);
 
 		// Test if the signature is "html" or "css
-		// Don't return a signature if trying to show signature fo the html/css tagged template literal
+		// Don't return a signature if trying to show signature for the html/css tagged template literal
 		if (result != null && result.items.length === 1) {
 			const displayPart = result.items[0].prefixDisplayParts[0];
 			if (displayPart.kind === "aliasName" && (displayPart.text === "html" || displayPart.text === "css")) {

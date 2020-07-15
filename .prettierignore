@@ -1,11 +1,10 @@
-/.vsCode
+.vscode
 .idea
 .editorconfig
 node_modules
 *.txt
 *.tgz
 *.log
-todo.md
 .DS_Store
 lib
 dist

@@ -1,8 +1,18 @@
-import { LitElement, html, customElement } from "lit-element";
+import { customElement, html, LitElement, property, internalProperty } from "lit-element";
 import "./my-element-2";
 
 @customElement("my-element")
 export class MyElement extends LitElement {
+	@property({ attribute: "hell>o" }) test: number | undefined;
+
+	@property({ type: Date }) test2: number | undefined;
+
+	@internalProperty() internal: number | undefined;
+
+	static get observedAttributes() {
+		return ["this is a test", "testing"];
+	}
+
 	render() {
 		return html`
 			<my-tsconfig-element size="large"></my-tsconfig-element>
@@ -12,6 +22,7 @@ export class MyElement extends LitElement {
 				<div slot=""></div>
 				<div slot="right"></div>
 			</my-element2>
+			<my-element></my-element>
 			<input @hehehehe="${() => {}}" />
 			<my-element></my-element>
 			<my-element></my-element>

@@ -3,7 +3,7 @@
 	"private": true,
 	"displayName": "lit-plugin",
 	"description": "Syntax highlighting, type checking and code completion for lit-html",
-	"version": "1.1.11",
+	"version": "1.2.0-next.4",
 	"publisher": "runem",
 	"icon": "docs/assets/lit-plugin@256w.png",
 	"license": "MIT",
@@ -24,26 +24,27 @@
 	},
 	"main": "./out/extension",
 	"scripts": {
+		"clean": "rimraf out",
 		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
+		"compile": "npm run clean & tsc -p ./",
 		"watch": "tsc -watch -p ./",
-		"postinstall": "node ./node_modules/vscode/bin/install",
 		"publish": "vsce publish",
 		"package": "vsce package",
-		"install:safe": "npm install --ignore-scripts --no-package-lock && npm i --no-package-lock # use this script in order to install directly from the github repositories",
+		"install:safe": "npm install --ignore-scripts --no-package-lock && npm i --no-package-lock",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json"
 	},
 	"dependencies": {
-		"lit-html": "https://github.com/mjbvz/vscode-lit-html.git#1.11.0",
-		"ts-lit-plugin": "1.1.11",
-		"vscode-styled-components": "https://github.com/styled-components/vscode-styled-components#f806f23a027e3458e9d77001851b428f1cb992d5"
+		"lit-html": "https://github.com/mjbvz/vscode-lit-html.git#1.11.1",
+		"ts-lit-plugin": "1.2.0-next.4",
+		"vscode-styled-components": "https://github.com/styled-components/vscode-styled-components#4320c223666ea835e8c63c85573c2704f550b7df",
+		"web-component-analyzer": "~1.1.1"
 	},
 	"devDependencies": {
-		"@appnest/readme": "^1.2.4",
-		"@types/node": "^10.12.24",
-		"typescript": "^3.6.4",
-		"vsce": "^1.58.0",
-		"vscode": "^1.1.29"
+		"@types/node": "^14.0.13",
+		"@types/vscode": "^1.30.0",
+		"rimraf": "^3.0.2",
+		"typescript": "^3.7.5",
+		"vsce": "^1.58.0"
 	},
 	"activationEvents": [
 		"onCommand:lit-plugin.analyze",
@@ -90,6 +91,16 @@
 						"type": "boolean",
 						"description": "Enable strict mode.",
 						"default": false
+					},
+					"lit-plugin.maxProjectImportDepth": {
+						"type": "integer",
+						"description": "Determines how many modules deep dependencies are followed to determine whether a custom element is available in the current file. When `-1` is used, dependencies will be followed infinitely deep.",
+						"default": -1
+					},
+					"lit-plugin.maxNodeModuleImportDepth": {
+						"type": "integer",
+						"description": "Determines how many modules deep dependencies in npm packages are followed to determine whether a custom element is available in the current file. When `-1` is used, dependencies will be followed infinitely deep.",
+						"default": 1
 					},
 					"lit-plugin.securitySystem": {
 						"type": "string",
@@ -178,6 +189,17 @@
 					"lit-plugin.rules.no-missing-import": {
 						"type": "string",
 						"description": "Check that custom elements used are imported.",
+						"default": "default",
+						"enum": [
+							"default",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-missing-element-type-definition": {
+						"type": "string",
+						"description": "This rule will ensure that custom elements are registered on the HTMLElementTagNameMap Typescript interface.",
 						"default": "default",
 						"enum": [
 							"default",
@@ -332,17 +354,6 @@
 					"lit-plugin.rules.no-incompatible-property-type": {
 						"type": "string",
 						"description": "Check the 'type' key of the @property decorator against the actual property type.",
-						"default": "default",
-						"enum": [
-							"default",
-							"off",
-							"warning",
-							"error"
-						]
-					},
-					"lit-plugin.rules.no-unknown-property-converter": {
-						"type": "string",
-						"description": "Check that the converter of @property decorators exists.",
 						"default": "default",
 						"enum": [
 							"default",

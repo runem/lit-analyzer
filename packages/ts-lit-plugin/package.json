@@ -1,6 +1,6 @@
 {
 	"name": "ts-lit-plugin",
-	"version": "1.1.11",
+	"version": "1.2.0-next.4",
 	"description": "Typescript plugin that adds type checking and code completion to lit-html",
 	"author": "runem",
 	"license": "MIT",
@@ -21,9 +21,10 @@
 		"template"
 	],
 	"scripts": {
+		"clean": "rimraf lib",
 		"prepare": "npm run build",
 		"watch": "tsc --watch",
-		"build": "rm -rf lib && tsc",
+		"build": "npm run clean & tsc",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json"
 	},
 	"main": "lib/index.js",
@@ -32,11 +33,12 @@
 		"/html-documentation/"
 	],
 	"dependencies": {
-		"lit-analyzer": "1.1.11"
+		"lit-analyzer": "1.2.0-next.4"
 	},
 	"devDependencies": {
-		"@types/node": "^12.12.17",
-		"typescript": "^3.6.4"
+		"@types/node": "^14.0.13",
+		"rimraf": "^3.0.2",
+		"typescript": "^3.7.5"
 	},
 	"contributors": [
 		{

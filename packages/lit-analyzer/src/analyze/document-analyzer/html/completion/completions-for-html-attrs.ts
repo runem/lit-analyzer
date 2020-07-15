@@ -1,4 +1,4 @@
-import { isAssignableToSimpleTypeKind, SimpleType, SimpleTypeKind } from "ts-simple-type";
+import { isAssignableToSimpleTypeKind, SimpleType } from "ts-simple-type";
 import {
 	LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER,
 	LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER,
@@ -9,10 +9,10 @@ import { HtmlNode } from "../../../types/html-node/html-node-types";
 import { DocumentPositionContext } from "../../../util/get-position-context-in-document";
 import { iterableFilter, iterableMap } from "../../../util/iterable-util";
 import { lazy } from "../../../util/general-util";
-import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
+import { LitAnalyzerContext } from "../../../lit-analyzer-context";
 import { LitCompletion } from "../../../types/lit-completion";
 
-export function completionsForHtmlAttrs(htmlNode: HtmlNode, location: DocumentPositionContext, { htmlStore }: LitAnalyzerRequest): LitCompletion[] {
+export function completionsForHtmlAttrs(htmlNode: HtmlNode, location: DocumentPositionContext, { htmlStore }: LitAnalyzerContext): LitCompletion[] {
 	const onTagName = htmlNode.tagName;
 
 	// Code completions for ".[...]";
@@ -66,8 +66,7 @@ export function completionsForHtmlAttrs(htmlNode: HtmlNode, location: DocumentPo
 }
 
 function isAssignableToBoolean(type: SimpleType, { matchAny } = { matchAny: true }): boolean {
-	return isAssignableToSimpleTypeKind(type, [SimpleTypeKind.BOOLEAN, SimpleTypeKind.BOOLEAN_LITERAL], {
-		op: "or",
+	return isAssignableToSimpleTypeKind(type, ["BOOLEAN", "BOOLEAN_LITERAL"], {
 		matchAny
 	});
 }

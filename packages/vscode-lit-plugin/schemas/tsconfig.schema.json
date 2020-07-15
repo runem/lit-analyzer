@@ -29,6 +29,16 @@
 									"description": "Enable strict mode.",
 									"default": false
 								},
+								"maxProjectImportDepth": {
+									"type": "integer",
+									"description": "Determines how many modules deep dependencies are followed to determine whether a custom element is available in the current file.",
+									"default": -1
+								},
+								"maxNodeModuleImportDepth": {
+									"type": "integer",
+									"description": "Determines how many modules deep dependencies in npm packages are followed to determine whether a custom element is available in the current file.",
+									"default": 1
+								},
 								"securitySystem": {
 									"type": "string",
 									"description": "The lit-html security sanitization strategy to assume.",
@@ -171,11 +181,6 @@
 										"no-incompatible-property-type": {
 											"type": "string",
 											"description": "Check the 'type' key of the @property decorator against the actual property type.",
-											"enum": ["off", "warning", "error"]
-										},
-										"no-unknown-property-converter": {
-											"type": "string",
-											"description": "Check that the converter of @property decorators exists.",
 											"enum": ["off", "warning", "error"]
 										},
 										"no-invalid-attribute-name": {

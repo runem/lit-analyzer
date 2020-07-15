@@ -1,6 +1,5 @@
 {
-	"html.experimental.customData": ["./html.json"],
-	"typescript.tsserver.log": "verbose",
-	"typescript.tsserver.trace": "verbose",
+	"typescript.tsserver.log": "normal",
+	"typescript.tsserver.trace": "messages",
 	"typescript.tsdk": "node_modules/typescript/lib"
 }

@@ -1,6 +1,7 @@
+import json from "@rollup/plugin-json";
+import resolve from "@rollup/plugin-node-resolve";
+import replace from "@rollup/plugin-replace";
 import ts from "@wessberg/rollup-plugin-ts";
-import resolve from "rollup-plugin-node-resolve";
-import replace from "rollup-plugin-replace";
 
 const pkg = require("./package.json");
 const watch = { include: "src/**" };
@@ -19,11 +20,7 @@ const external = [
 	"ts-simple-type",
 	"chalk",
 	"vscode-html-languageservice",
-	"vscode-css-languageservice",
-	"vscode-html-languageservice/lib/umd/languageFacts/data/html5Events",
-	"vscode-html-languageservice/lib/umd/languageFacts/data/html5Tags",
-	"vscode-html-languageservice/lib/umd/languageFacts/data/html5Aria",
-	"vscode-html-languageservice/lib/umd/languageFacts/data/html5"
+	"vscode-css-languageservice"
 ];
 const plugins = [
 	replace({
@@ -32,6 +29,9 @@ const plugins = [
 	}),
 	resolve({
 		preferBuiltins: true
+	}),
+	json({
+		compact: true
 	}),
 	ts()
 ];

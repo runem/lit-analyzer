@@ -1,18 +1,24 @@
-import { LitAnalyzerConfig, litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
+import { LitAnalyzerConfig } from "../analyze/lit-analyzer-config";
 import { HtmlTag, litAttributeModifierForTarget } from "../analyze/parse/parse-html-data/html-tag";
 import { AnalyzerDefinitionStore } from "../analyze/store/analyzer-definition-store";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { HtmlNodeKind } from "../analyze/types/html-node/html-node-types";
-import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
-import { RuleModule } from "../analyze/types/rule-module";
+import { RuleFix } from "../analyze/types/rule/rule-fix";
+import { RuleModule } from "../analyze/types/rule/rule-module";
 import { suggestTargetForHtmlAttr } from "../analyze/util/attribute-util";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/range-util";
 
 /**
  * This rule validates that only known attributes are used in attribute bindings.
  */
 const rule: RuleModule = {
-	name: "no-unknown-attribute",
-	visitHtmlAttribute(htmlAttr, { htmlStore, config, definitionStore, document }) {
+	id: "no-unknown-attribute",
+	meta: {
+		priority: "low"
+	},
+	visitHtmlAttribute(htmlAttr, context) {
+		const { htmlStore, config, definitionStore } = context;
+
 		// Ignore "style" and "svg" attrs because I don't yet have all data for them.
 		if (htmlAttr.htmlNode.kind !== HtmlNodeKind.NODE) return;
 
@@ -31,23 +37,49 @@ const rule: RuleModule = {
 
 			// Get suggested target
 			const suggestedTarget = suggestTargetForHtmlAttr(htmlAttr, htmlStore);
-			const suggestedMemberName = (suggestedTarget && `${litAttributeModifierForTarget(suggestedTarget)}${suggestedTarget.name}`) || undefined;
+			const suggestedModifier = suggestedTarget == null ? undefined : litAttributeModifierForTarget(suggestedTarget);
+			const suggestedMemberName = suggestedTarget == null ? undefined : suggestedTarget.name;
 
 			const suggestion = getSuggestionText({ config, htmlTag, definitionStore });
 
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.UNKNOWN_TARGET,
-					message: `Unknown attribute '${htmlAttr.name}'.`,
-					fix: suggestedMemberName == null ? undefined : `Did you mean '${suggestedMemberName}'?`,
-					location: { document, ...htmlAttr.location.name },
-					source: "no-unknown-attribute",
-					severity: litDiagnosticRuleSeverity(config, "no-unknown-attribute"),
-					suggestion,
-					htmlAttr,
-					suggestedTarget
-				}
-			];
+			context.report({
+				location: rangeFromHtmlNodeAttr(htmlAttr),
+				message: `Unknown attribute '${htmlAttr.name}'.`,
+				fixMessage: suggestedMemberName == null ? undefined : `Did you mean '${suggestedModifier}${suggestedMemberName}'?`,
+				suggestion,
+				fix: () =>
+					[
+						{
+							message: `Change attribute to 'data-${htmlAttr.name}'`,
+							actions: [
+								{
+									kind: "changeAttributeName",
+									newName: `data-${htmlAttr.name}`,
+									htmlAttr
+								}
+							]
+						} as RuleFix,
+						...(suggestedMemberName == null
+							? []
+							: [
+									{
+										message: `Change attribute to '${suggestedModifier}${suggestedMemberName}'`,
+										actions: [
+											{
+												kind: "changeAttributeName",
+												newName: suggestedMemberName,
+												htmlAttr
+											},
+											{
+												kind: "changeAttributeModifier",
+												newModifier: suggestedModifier,
+												htmlAttr
+											}
+										]
+									} as RuleFix
+							  ])
+					] as RuleFix[]
+			});
 		}
 
 		return;
@@ -75,10 +107,9 @@ function getSuggestionText({
 		return `Please consider using a data-* attribute.`;
 	}
 
-	const definition = definitionStore.getDefinitionForTagName(htmlTag.tagName);
 	const tagHasDeclaration = htmlTag.declaration != null;
 	const tagIsBuiltIn = htmlTag.builtIn || false;
-	const tagIsFromLibrary = definition != null && definition.declaration.node.getSourceFile().isDeclarationFile;
+	const tagIsFromLibrary = definitionStore.getDefinitionForTagName(htmlTag.tagName)?.sourceFile?.isDeclarationFile || false;
 
 	return tagIsBuiltIn
 		? `This is a built in tag. Please consider using a 'data-*' attribute, adding the attribute to 'globalAttributes' or disabling the 'no-unknown-attribute' rule.`

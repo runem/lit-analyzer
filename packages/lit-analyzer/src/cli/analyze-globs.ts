@@ -1,8 +1,8 @@
 import { async } from "fast-glob";
 import { existsSync, lstatSync } from "fs";
 import { join } from "path";
-import { Diagnostic, flattenDiagnosticMessageText, Program, SourceFile } from "typescript";
-import { flatten } from "../analyze/util/general-util";
+import { Diagnostic, Program, SourceFile } from "typescript";
+import { arrayFlat } from "../analyze/util/array-util";
 import { CompileResult, compileTypescript } from "./compile";
 import { LitAnalyzerCliConfig } from "./lit-analyzer-cli-config";
 
@@ -37,16 +37,7 @@ export async function analyzeGlobs(globs: string[], config: LitAnalyzerCliConfig
 	if (context.willAnalyzeFiles != null) context.willAnalyzeFiles(filePaths);
 
 	// Parse all the files with typescript
-	const { program, files, diagnostics } = compileTypescript(filePaths);
-
-	if (diagnostics.length > 0) {
-		if (config.debug) {
-			// eslint-disable-next-line no-console
-			console.dir(diagnostics.map(d => `${(d.file && d.file.fileName) || "unknown"}: ${flattenDiagnosticMessageText(d.messageText, "\n")}`));
-		}
-
-		if (context.didFindTypescriptDiagnostics != null) context.didFindTypescriptDiagnostics(diagnostics, { program });
-	}
+	const { program, files } = compileTypescript(filePaths);
 
 	// Analyze each file
 	for (const file of files) {
@@ -57,7 +48,7 @@ export async function analyzeGlobs(globs: string[], config: LitAnalyzerCliConfig
 		}
 	}
 
-	return { program, diagnostics, files };
+	return { program, files };
 }
 
 /**
@@ -67,7 +58,7 @@ export async function analyzeGlobs(globs: string[], config: LitAnalyzerCliConfig
 async function expandGlobs(globs: string | string[]): Promise<string[]> {
 	globs = Array.isArray(globs) ? globs : [globs];
 
-	return flatten(
+	return arrayFlat(
 		await Promise.all(
 			globs.map(g => {
 				try {

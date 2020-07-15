@@ -10,18 +10,30 @@ export function suggestTargetForHtmlAttr(htmlNodeAttr: HtmlNodeAttr, htmlStore: 
 
 	switch (htmlNodeAttr.kind) {
 		case HtmlNodeAttrKind.EVENT_LISTENER:
-			return findSuggestedTarget(htmlNodeAttr.name, events);
+			return findSuggestedTarget(htmlNodeAttr.name, [events]);
 		case HtmlNodeAttrKind.PROPERTY:
-			return findSuggestedTarget(htmlNodeAttr.name, properties, attributes);
+			return findSuggestedTarget(htmlNodeAttr.name, [properties, attributes]);
 		case HtmlNodeAttrKind.ATTRIBUTE:
 		case HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE:
-			return findSuggestedTarget(htmlNodeAttr.name, attributes, properties);
+			return findSuggestedTarget(htmlNodeAttr.name, [attributes, properties]);
 	}
 }
 
-function findSuggestedTarget(name: string, ...tests: Iterable<HtmlAttrTarget>[]): HtmlAttrTarget | undefined {
+function findSuggestedTarget(name: string, tests: Iterable<HtmlAttrTarget>[]): HtmlAttrTarget | undefined {
 	for (const test of tests) {
-		const match = findBestMatch(name, [...test], { matchKey: "name", caseSensitive: false });
+		let items = [...test];
+
+		// If the search string starts with "on"/"aria", only check members starting with "on"/"aria"
+		// If not, remove members starting with "on"/"aria" from the list of items
+		if (name.startsWith("on")) {
+			items = items.filter(item => item.name.startsWith("on"));
+		} else if (name.startsWith("aria")) {
+			items = items.filter(item => item.name.startsWith("aria"));
+		} else {
+			items = items.filter(item => !item.name.startsWith("on") && !item.name.startsWith("aria"));
+		}
+
+		const match = findBestMatch(name, items, { matchKey: "name", caseSensitive: false });
 		if (match != null) {
 			return match;
 		}

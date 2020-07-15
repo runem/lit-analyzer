@@ -2,7 +2,7 @@ import chalk from "chalk";
 import { SourceFile } from "typescript";
 import { LitDiagnostic } from "../../analyze/types/lit-diagnostic";
 import { AnalysisStats, DiagnosticFormatter } from "./diagnostic-formatter";
-import { generalReport, markText, relativeFileName, translateRange } from "./util";
+import { generalReport, markText, relativeFileName } from "./util";
 
 export class CodeDiagnosticFormatter implements DiagnosticFormatter {
 	report(stats: AnalysisStats): string | undefined {
@@ -21,28 +21,26 @@ ${diagnosticText}`;
 }
 
 function diagnosticTextForFile(file: SourceFile, diagnostic: LitDiagnostic) {
-	const textSpan = translateRange(diagnostic.location);
-
 	const MAX_LINE_WIDTH = 50;
 	const MIN_MESSAGE_PADDING = 10;
 
 	// Get line and character of start position
-	const lineContext = file.getLineAndCharacterOfPosition(textSpan.start);
+	const lineContext = file.getLineAndCharacterOfPosition(diagnostic.location.start);
 
 	// Get start and end position of the line
 	let linePositionRange = {
 		start: file.getPositionOfLineAndCharacter(lineContext.line, 0),
-		end: file.getLineEndOfPosition(textSpan.start)
+		end: file.getLineEndOfPosition(diagnostic.location.start)
 	};
 
 	// Modify the line position range if the width of the line exceeds MAX_LINE_WIDTH
 	if (linePositionRange.end - linePositionRange.start > MAX_LINE_WIDTH) {
 		// Calculate even padding to both sides
-		const padding = Math.max(MIN_MESSAGE_PADDING, Math.round((MAX_LINE_WIDTH - textSpan.length) / 2));
+		const padding = Math.max(MIN_MESSAGE_PADDING, Math.round((MAX_LINE_WIDTH - (diagnostic.location.end - diagnostic.location.start)) / 2));
 
 		// Calculate new start and end position without exceeding the line position range
-		const start = Math.max(linePositionRange.start, textSpan.start - padding);
-		const end = Math.min(linePositionRange.end, textSpan.start + textSpan.length + padding);
+		const start = Math.max(linePositionRange.start, diagnostic.location.start - padding);
+		const end = Math.min(linePositionRange.end, diagnostic.location.end + padding);
 
 		linePositionRange = { start, end };
 	}
@@ -57,14 +55,14 @@ function diagnosticTextForFile(file: SourceFile, diagnostic: LitDiagnostic) {
 	const markedLine = markText(
 		lineText,
 		{
-			start: textSpan.start - linePositionRange.start,
-			length: textSpan.length
+			start: diagnostic.location.start - linePositionRange.start,
+			length: diagnostic.location.end - diagnostic.location.start
 		},
 		highlightingColorFunction
 	).replace(/^\s*/, " ");
 
 	const block = [
-		chalk.bold(diagnostic.message),
+		chalk.bold(`${diagnostic.message}${diagnostic.fixMessage ? ` ${diagnostic.fixMessage}` : ""}`),
 		`${chalk.gray(`${lineContext.line + 1}:`)} ${markedLine}`,
 		diagnostic.source == null ? undefined : chalk.gray(`${diagnostic.source}`)
 	]

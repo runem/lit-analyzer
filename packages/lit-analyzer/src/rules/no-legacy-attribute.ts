@@ -1,10 +1,8 @@
-import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
-import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node-attr-assignment-types";
+import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { HtmlNodeKind } from "../analyze/types/html-node/html-node-types";
-import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
-import { RuleModule } from "../analyze/types/rule-module";
-import { suggestTargetForHtmlAttr } from "../analyze/util/attribute-util";
+import { RuleModule } from "../analyze/types/rule/rule-module";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/range-util";
 
 const LEGACY_ASSIGNMENT = /^(\[\[[^\]]+\]\]|{{[^}]+}})/;
 
@@ -12,8 +10,11 @@ const LEGACY_ASSIGNMENT = /^(\[\[[^\]]+\]\]|{{[^}]+}})/;
  * This rule validates that legacy Polymer attribute bindings are not used.
  */
 const rule: RuleModule = {
-	name: "no-legacy-attribute",
-	visitHtmlAttribute(htmlAttr, { htmlStore, config, definitionStore, document }) {
+	id: "no-legacy-attribute",
+	meta: {
+		priority: "medium"
+	},
+	visitHtmlAttribute(htmlAttr, context) {
 		if (htmlAttr.htmlNode.kind !== HtmlNodeKind.NODE) {
 			return;
 		}
@@ -22,27 +23,23 @@ const rule: RuleModule = {
 			return;
 		}
 
-		const suggestedTarget = suggestTargetForHtmlAttr(htmlAttr, htmlStore);
+		//const suggestedTarget = suggestTargetForHtmlAttr(htmlAttr, htmlStore);
 		const suggestedName = getSuggestedName(htmlAttr.name);
 
 		if (suggestedName !== htmlAttr.name) {
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.LEGACY_SYNTAX,
-					message: `Legacy Polymer binding syntax in attribute '${htmlAttr.name}'.`,
-					fix: `Did you mean '${suggestedName}'?`,
-					location: { document, ...htmlAttr.location.name },
-					source: "no-legacy-attribute",
-					severity: litDiagnosticRuleSeverity(config, "no-legacy-attribute"),
-					suggestion: 'Legacy Polymer binding syntax is not supported in Lit.',
-					suggestedTarget
-				}
-			];
+			context.report({
+				location: rangeFromHtmlNodeAttr(htmlAttr),
+				message: `Legacy Polymer binding syntax in attribute '${htmlAttr.name}'.`,
+				fixMessage: `Did you mean '${suggestedName}'?`,
+				suggestion: "Legacy Polymer binding syntax is not supported in Lit."
+				/*fix: () => ({
+					message: `Change to '${suggestedName}'`,
+					actions: [{ kind: "changeAttributeName", htmlAttr, newName: suggestedName }]
+				})*/
+			});
 		}
-
-		return;
 	},
-	visitHtmlAssignment(assignment, { htmlStore, config, definitionStore, document }) {
+	visitHtmlAssignment(assignment, context) {
 		if (assignment.kind !== HtmlNodeAttrAssignmentKind.STRING) {
 			return;
 		}
@@ -50,23 +47,15 @@ const rule: RuleModule = {
 		const htmlAttr = assignment.htmlAttr;
 
 		if (LEGACY_ASSIGNMENT.test(assignment.value)) {
-			const suggestedTarget = suggestTargetForHtmlAttr(htmlAttr, htmlStore);
+			//const suggestedTarget = suggestTargetForHtmlAttr(htmlAttr, htmlStore);
 
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.LEGACY_SYNTAX,
-					message: `Legacy Polymer binding syntax in attribute '${htmlAttr.name}'.`,
-					location: { document, ...htmlAttr.location.name },
-					source: "no-legacy-attribute",
-					severity: litDiagnosticRuleSeverity(config, "no-legacy-attribute"),
-					suggestion: 'Legacy Polymer binding syntax is not supported in Lit.' +
-						' Instead you should use JavaScript interpolation, e.g. "attr=${foo}".',
-					suggestedTarget
-				}
-			];
+			context.report({
+				location: rangeFromHtmlNodeAttr(htmlAttr),
+				message: `Legacy Polymer binding syntax in attribute '${htmlAttr.name}'.`,
+				suggestion: "Legacy Polymer binding syntax is not supported in Lit." + ' Instead you should use JavaScript interpolation, e.g. "attr=${foo}".'
+				//suggestedTarget
+			});
 		}
-
-		return;
 	}
 };
 
@@ -77,10 +66,10 @@ export default rule;
  * @param name legacy name
  */
 function getSuggestedName(name: string): string {
-	if (name.endsWith('?')) {
+	if (name.endsWith("?")) {
 		return `?${name.slice(0, -1)}`;
 	}
-	if (name.endsWith('$')) {
+	if (name.endsWith("$")) {
 		return `${name.slice(0, -1)}`;
 	}
 	return name;

@@ -4,9 +4,7 @@ import {
 	CompilerOptions,
 	convertCompilerOptionsFromJson,
 	createProgram,
-	Diagnostic,
 	findConfigFile,
-	getPreEmitDiagnostics,
 	ModuleKind,
 	ModuleResolutionKind,
 	Program,
@@ -18,10 +16,13 @@ import { LitAnalyzerConfig } from "../analyze/lit-analyzer-config";
 
 const requiredCompilerOptions: CompilerOptions = {
 	noEmitOnError: false,
+	noEmit: true,
 	allowJs: true,
+	//maxNodeModuleJsDepth: 3,
 	strictNullChecks: true, // Type checking will remove all "null" and "undefined" from types if "strictNullChecks" is false
 	moduleResolution: ModuleResolutionKind.NodeJs,
-	skipLibCheck: true
+	skipLibCheck: true,
+	lib: ["lib.esnext.d.ts", "lib.dom.d.ts"]
 };
 
 /**
@@ -34,17 +35,13 @@ const defaultCompilerOptions: CompilerOptions = {
 	downlevelIteration: true,
 	module: ModuleKind.ESNext,
 	//module: ModuleKind.CommonJS,
-	//lib: ["esnext", "dom"],
 	esModuleInterop: true,
-	noEmit: true,
 	allowSyntheticDefaultImports: true,
 	allowUnreachableCode: true,
-	allowUnusedLabels: true,
-	isolatedModules: true
+	allowUnusedLabels: true
 };
 
 export interface CompileResult {
-	diagnostics: readonly Diagnostic[];
 	program: Program;
 	files: SourceFile[];
 	pluginOptions?: LitAnalyzerConfig;
@@ -59,10 +56,12 @@ export function compileTypescript(filePaths: string | string[]): CompileResult {
 
 	filePaths = Array.isArray(filePaths) ? filePaths : [filePaths];
 	const program = createProgram(filePaths, options);
-	const diagnostics = getPreEmitDiagnostics(program);
-	const files = program.getSourceFiles().filter(sf => filePaths.includes(sf.fileName));
+	const files = program
+		.getSourceFiles()
+		.filter(sf => filePaths.includes(sf.fileName))
+		.sort((sfA, sfB) => (sfA.fileName > sfB.fileName ? 1 : -1));
 
-	return { diagnostics, program, files };
+	return { program, files };
 }
 
 /**
@@ -75,8 +74,8 @@ export function getCompilerOptions(): CompilerOptions {
 	// If we found existing compiler options, merged "required compiler options" into it.
 	if (compilerOptions != null) {
 		return {
-			...requiredCompilerOptions,
-			...compilerOptions
+			...compilerOptions,
+			...requiredCompilerOptions
 		};
 	}
 

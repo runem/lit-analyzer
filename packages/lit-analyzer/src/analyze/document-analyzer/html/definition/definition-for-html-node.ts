@@ -1,14 +1,20 @@
+import { LitAnalyzerContext } from "../../../lit-analyzer-context";
 import { HtmlNode } from "../../../types/html-node/html-node-types";
-import { LitAnalyzerRequest } from "../../../lit-analyzer-context";
-import { DefinitionKind, LitDefinition } from "../../../types/lit-definition";
+import { LitDefinition } from "../../../types/lit-definition";
+import { getNodeIdentifier } from "../../../util/ast-util";
+import { rangeFromHtmlNode } from "../../../util/range-util";
 
-export function definitionForHtmlNode(htmlNode: HtmlNode, { document, htmlStore }: LitAnalyzerRequest): LitDefinition | undefined {
+export function definitionForHtmlNode(htmlNode: HtmlNode, { htmlStore, ts }: LitAnalyzerContext): LitDefinition | undefined {
 	const tag = htmlStore.getHtmlTag(htmlNode);
 	if (tag == null || tag.declaration == null) return undefined;
 
+	const node = tag.declaration.node;
+
 	return {
-		kind: DefinitionKind.COMPONENT,
-		fromRange: { document, ...htmlNode.location.name },
-		target: tag.declaration
+		fromRange: rangeFromHtmlNode(htmlNode),
+		target: {
+			kind: "node",
+			node: getNodeIdentifier(node, ts) || node
+		}
 	};
 }

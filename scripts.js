@@ -1,4 +1,5 @@
-const { copy } = require("fs-extra");
+/* eslint-disable no-console */
+const { copy, remove } = require("fs-extra");
 
 /**
  * Run custom node commands
@@ -35,4 +36,26 @@ async function copyPackage(linkPackageName, destPackageName) {
 	console.log(`Copying ${linkPackageName} to ${destPackageName}/node_modules`);
 	await copy(`./packages/${linkPackageName}/lib`, `./packages/${destPackageName}/node_modules/${linkPackageName}/lib`);
 	await copy(`./packages/${linkPackageName}/package.json`, `./packages/${destPackageName}/node_modules/${linkPackageName}/package.json`);
+
+	// Get rid of any "extraneous" according to "npm list --production --parseable --depth=99999" in nested node_modules
+	// The reason this script needs to run is because vscode extension development doesn't yet support symlinked node_modules.
+	const extraneous = [
+		"web-component-analyzer",
+		"fast-glob",
+		"glob-parent",
+		"micromatch",
+		"@nodelib/fs.stat",
+		"braces",
+		"fill-range",
+		"to-regex-range",
+		"is-number"
+	];
+	for (const mod of extraneous) {
+		await remove(`./packages/${destPackageName}/node_modules/${linkPackageName}/node_modules/${mod}`);
+	}
+
+	const missing = ["ts-simple-type"];
+	for (const mod of missing) {
+		await copy(`./node_modules/${mod}`, `./packages/${destPackageName}/node_modules/${mod}`);
+	}
 }

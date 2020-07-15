@@ -1,4 +1,4 @@
-<h1 align="center">ts-lit-plugin</h1>
+<!-- ⚠️ This README has been generated from the file(s) "readme.blueprint.md" ⚠️--><h1 align="center">ts-lit-plugin</h1>
 <p align="center">
   <b>Typescript plugin that adds type checking and code completion to lit-html</b></br>
   <sub><sub>
@@ -91,6 +91,8 @@ You can configure this plugin through your `tsconfig.json`.
 | `globalAttributes` | List of html attributes names that you expect to be present at all times. | `string[]` | |
 | `globalEvents` | List of event names that you expect to be present at all times | `string[]` | |
 | `customHtmlData` | This plugin supports the [custom vscode html data format](https://code.visualstudio.com/updates/v1_31#_html-and-css-custom-data-support) through this setting. | [Vscode Custom HTML Data Format](https://github.com/Microsoft/vscode-html-languageservice/blob/master/docs/customData.md). Supports arrays, objects and relative file paths | |
+| `maxProjectImportDepth` | Determines how many modules deep dependencies are followed to determine whether a custom element is available in the current file. When `-1` is used, dependencies will be followed infinitely deep. | `number` | `-1` |
+| `maxNodeModuleImportDepth` | Determines how many modules deep dependencies in __npm packages__ are followed to determine whether a custom element is available in the current file. When `-1` is used, dependencies in __npm packages__ will be followed infinitely deep.| `number` | `1` |
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#rules)
 
@@ -106,8 +108,9 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | Rule    | Description | Severity normal | Severity strict |
 | :------ | ----------- | --------------- | --------------- |
 | [no-unknown-tag-name](#-no-unknown-tag-name) | The existence of tag names are checked. Be aware that not all custom elements from libraries will be found out of the box. | off | warning |
-| [no-missing-import](#-no-missing-import)    | When using custom elements in HTML it is checked if the element has been imported and is available in the current context. | off | warning |
+| [no-missing-import](#-no-missing-import)     | When using custom elements in HTML it is checked if the element has been imported and is available in the current context. | off | warning |
 | [no-unclosed-tag](#-no-unclosed-tag)         | Unclosed tags, and invalid self closing tags like custom elements tags, are checked. | warning | error |
+| [no-missing-element-type-definition](#no-missing-element-type-definition) | This rule will ensure that custom elements are registered on the `HTMLElementTagNameMap` Typescript interface. | off | off |
 
 **Validating binding names**
 
@@ -117,6 +120,7 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | [no-unknown-attribute](#-no-unknown-attribute-no-unknown-property)<br> [no-unknown-property](#-no-unknown-attribute-no-unknown-property) | You will get a warning whenever you use an unknown attribute or property within your `lit-html` template. | off | warning |
 | [no-unknown-event](#-no-unknown-event)       | When using event bindings it's checked that the event names are fired. | off | off |
 | [no-unknown-slot](#-no-unknown-slot)         | Using the "@slot" jsdoc tag on your custom element class, you can tell which slots are accepted for a particular element. | off | warning |
+| [no-legacy-attribute](#no-legacy-attribute)         | Disallows use of legacy Polymer binding syntax (e.g. `foo$=`). | off | warning |
 
 **Validating binding types**
 
@@ -131,17 +135,17 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | [no-nullable-attribute-binding](#-no-nullable-attribute-binding) | Disallow attribute bindings with nullable types such as "null" or "undefined".  | error | error |
 | [no-incompatible-type-binding](#-no-incompatible-type-binding)   | Disallow incompatible type in bindings.  | error | error |
 | [no-invalid-directive-binding](#-no-invalid-directive-binding)   | Disallow using built-in directives in unsupported bindings. | error | error |
-| [no-unintended-mixed-binding](#-no-unintended-mixed-binding)   | Disallow mixed value bindings where a character `'`, `"`, `}` or `/` is unintentionally included in the binding. | warn | warn |
+| [no-unintended-mixed-binding](#-no-unintended-mixed-binding)   | Disallow mixed value bindings where a character `'`, `"`, `}` or `/` is unintentionally included in the binding. | warning | warning |
 
 **Validating LitElement**
 
 <!-- prettier-ignore -->
 | Rule    | Description | Severity normal | Severity strict |
 | :------ | ----------- | --------------- | --------------- |
-| [no-incompatible-property-type](#-no-incompatible-property-type) | When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type | error | error |
-| [no-unknown-property-converter](#-no-unknown-property-converter) | LitElement provides default converters. For example 'Function' is not a valid default converter type for a LitElement-managed property. | error | error |
+| [no-incompatible-property-type](#-no-incompatible-property-type) | When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type | warn | error |
 | [no-invalid-attribute-name](#-no-invalid-attribute-name)         | When using the property option `attribute`, the value is checked to make sure it's a valid attribute name. | error | error |
 | [no-invalid-tag-name](#-no-invalid-tag-name)                     | When defining a custom element the tag name is checked to make sure it's valid. | error | error |
+| [no-property-visibility-mismatch](#no-property-visibility-mismatch) | This rule will ensure public properties use `@property` and non-public properties use `@internalProperty`. | off | warn |
 
 **Validating CSS**
 
@@ -210,6 +214,40 @@ html`<div></div>`
 html`<custom-element></custom-element>`
 html`<video></video>`
 html`<input />`
+```
+
+#### no-missing-element-type-definition
+
+This rule is only applicable to Typescript files.
+
+When sharing custom elements it's a good practice to add custom elements to the global interface `HTMLElementTagNameMap`. This rule will ensure that custom elements are registered on this interface.
+
+The following example is considered a warning:
+
+<!-- prettier-ignore -->
+```ts
+export class MyElement extends HTMLElement {
+
+} 
+
+customElements.define("my-element", MyElement)
+```
+
+The following example is not considered a warning:
+
+<!-- prettier-ignore -->
+```ts
+export class MyElement extends HTMLElement {
+
+} 
+
+customElements.define("my-element", MyElement)
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "my-element": MyElement
+  }
+}
 ```
 
 ### Validating binding names
@@ -290,6 +328,30 @@ html`
   <div slot="left"></div>
 </my-element>
 `
+```
+
+#### no-legacy-attribute
+
+A common mistake when dealing with Lit in particular is to use the
+legacy Polymer syntax as seen in earlier versions of Polymer (the
+predecessor of Lit).
+
+The following examples are considered warnings:
+
+<!-- prettier-ignore -->
+```js
+html`<input name$=${val} />`
+html`<input disabled?=${val} />`;
+html`<input name="val" />`;
+```
+
+The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
+```js
+html`<input name=${val} />`
+html`<input ?disabled=${val} />`;
+html`<input name=${val} />`;
 ```
 
 ### Validating binding types
@@ -494,7 +556,15 @@ html`<input @input="${console.log}" />`
 
 #### 💞 no-incompatible-property-type
 
-When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type.
+This rule checks that LitElement-controlled properties are correctly configured in accordance with the default value converter.
+
+The following is a summary of what this rule does:
+
+1. The `type` given to the LitElement property configuration is checked against the actual Typescript type of the property.
+2. The default converter only accepts the types `String`, `Boolean`, `Number`, `Array` and `Object`, so all other values for `type` are considered warnings.
+3. The absence of a `type` is only considered a warning if the property is not assignable to the `string` type.
+
+This rule will not check for a given LitElement-controlled property if the property has custom converter configured.
 
 The following examples are considered warnings:
 
@@ -505,30 +575,7 @@ class MyElement extends LitElement {
   @property({type: Boolean}) count: number;
   @property({type: String}) disabled: boolean;
   @property({type: Object}) list: ListItem[];
-}
-```
 
-The following examples are not considered warnings:
-
-<!-- prettier-ignore -->
-```js
-class MyElement extends LitElement {
-  @property({type: String}) text: string;
-  @property({type: Number}) count: number;
-  @property({type: Boolean}) disabled: boolean;
-  @property({type: Array}) list: ListItem[];
-}
-```
-
-#### 👎 no-unknown-property-converter
-
-The default converter in LitElement only accepts `String`, `Boolean`, `Number`, `Array` and `Object`, so all other values for `type` are considered warnings. This check doesn't run if a custom converter is used.
-
-The following example is considered a warning:
-
-<!-- prettier-ignore -->
-```js
-class MyElement extends LitElement {
   static get properties () {
     return {
       callback: {
@@ -542,11 +589,16 @@ class MyElement extends LitElement {
 }
 ```
 
-The following example is not considered a warning:
+The following examples are not considered warnings:
 
 <!-- prettier-ignore -->
 ```js
 class MyElement extends LitElement {
+  @property({type: String}) text: string;
+  @property({type: Number}) count: number;
+  @property({type: Boolean}) disabled: boolean;
+  @property({type: Array}) list: ListItem[];
+
   static get properties () {
     return {
       callback: {
@@ -558,6 +610,7 @@ class MyElement extends LitElement {
       }
     }
   }
+
 }
 ```
 
@@ -604,6 +657,25 @@ class MyElement extends LitElement {
 }
 
 customElements.define("correct-element-name", MyElement);
+```
+
+#### no-property-visibility-mismatch
+
+When using the `@property` decorator, your property should be publicly visible,
+expected to be exposed to consumers of the element. Private and protected
+properties however, should make use of the `@internalProperty` decorator
+instead.
+
+This rule will ensure public properties use `@property` and non-public
+properties use `@internalProperty`.
+
+The following example is considered a warning:
+
+<!-- prettier-ignore -->
+```ts
+class MyElement extends LitElement {
+	@property() private myProperty: string;
+}
 ```
 
 ### Validating CSS
@@ -655,6 +727,8 @@ Code is analyzed using [web-component-analyzer](https://github.com/runem/web-com
  * @slot - This is a comment for the unnamed slot
  * @slot right - Right content
  * @slot left
+ * @cssprop {Color} --border-color
+ * @csspart header
  */
 class MyElement extends HTMLElement { 
 }

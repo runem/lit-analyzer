@@ -1,8 +1,7 @@
-import { litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
 import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
-import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
-import { RuleModule } from "../analyze/types/rule-module";
+import { RuleModule } from "../analyze/types/rule/rule-module";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/range-util";
 
 const CONTROL_CHARACTERS = ["'", '"', "}", "/"];
 
@@ -15,9 +14,12 @@ const CONTROL_CHARACTERS = ["'", '"', "}", "/"];
  *   <input value=${val}} />
  */
 const rule: RuleModule = {
-	name: "no-unintended-mixed-binding",
-	visitHtmlAssignment(assignment, request) {
-		// Check mixed bindings
+	id: "no-unintended-mixed-binding",
+	meta: {
+		priority: "high"
+	},
+	visitHtmlAssignment(assignment, context) {
+		// Check only mixed bindings
 		if (assignment.kind !== HtmlNodeAttrAssignmentKind.MIXED) {
 			return;
 		}
@@ -52,15 +54,10 @@ const rule: RuleModule = {
 				}
 			})();
 
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.INVALID_MIXED_BINDING,
-					severity: litDiagnosticRuleSeverity(request.config, "no-unintended-mixed-binding"),
-					source: "no-unintended-mixed-binding",
-					message,
-					location: { document: request.document, ...assignment.htmlAttr.location.name }
-				}
-			];
+			context.report({
+				location: rangeFromHtmlNodeAttr(assignment.htmlAttr),
+				message
+			});
 		}
 
 		return;

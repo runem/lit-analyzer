@@ -40,14 +40,18 @@ export function* iterableUnique<T, U>(iterable: Iterable<T>, on: (item: T) => U)
 	}
 }
 
-export function iterableFirst<T>(iterable: Iterable<T>): T | undefined {
-	// noinspection LoopStatementThatDoesntLoopJS
-	for (const item of iterable) {
-		return item;
-	}
-	return;
-}
-
 export function iterableDefined<T>(iterable: (T | undefined | null)[]): T[] {
 	return iterable.filter((i): i is T => i != null);
+}
+
+export function iterableFirst<T>(iterable: Iterator<T> | Set<T> | Map<unknown, T> | undefined): T | undefined {
+	if (iterable == null) {
+		return iterable;
+	}
+
+	if (iterable instanceof Map || iterable instanceof Set) {
+		return iterableFirst(iterable.values());
+	}
+
+	return iterable.next().value;
 }

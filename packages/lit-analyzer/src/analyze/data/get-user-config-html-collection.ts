@@ -1,25 +1,27 @@
 import { existsSync, readFileSync } from "fs";
-import { SimpleType, SimpleTypeKind } from "ts-simple-type";
+import { SimpleType } from "ts-simple-type";
+import { HTMLDataV1 } from "vscode-html-languageservice";
 import { LitAnalyzerConfig } from "../lit-analyzer-config";
-import { HtmlData } from "../parse/parse-html-data/html-data-tag";
 import { HtmlAttr, HtmlDataCollection, HtmlEvent, HtmlTag, mergeHtmlAttrs, mergeHtmlEvents, mergeHtmlTags } from "../parse/parse-html-data/html-tag";
-import { parseHtmlData } from "../parse/parse-html-data/parse-html-data";
+import { parseVscodeHtmlData } from "../parse/parse-html-data/parse-vscode-html-data";
 import { lazy } from "../util/general-util";
 
 export function getUserConfigHtmlCollection(config: LitAnalyzerConfig): HtmlDataCollection {
 	const collection = (() => {
-		let collection: HtmlDataCollection = { tags: [], events: [], attrs: [] };
+		let collection: HtmlDataCollection = { tags: [], global: {} };
 		for (const customHtmlData of Array.isArray(config.customHtmlData) ? config.customHtmlData : [config.customHtmlData]) {
 			try {
-				const data: HtmlData =
+				const data: HTMLDataV1 =
 					typeof customHtmlData === "string" && existsSync(customHtmlData)
 						? JSON.parse(readFileSync(customHtmlData, "utf8").toString())
 						: customHtmlData;
-				const parsedCollection = parseHtmlData(data);
+				const parsedCollection = parseVscodeHtmlData(data);
 				collection = {
 					tags: mergeHtmlTags([...collection.tags, ...parsedCollection.tags]),
-					attrs: mergeHtmlAttrs([...collection.attrs, ...parsedCollection.attrs]),
-					events: mergeHtmlEvents([...collection.events, ...parsedCollection.events])
+					global: {
+						attributes: mergeHtmlAttrs([...(collection.global.attributes || []), ...(parsedCollection.global.attributes || [])]),
+						events: mergeHtmlEvents([...(collection.global.events || []), ...(parsedCollection.global.events || [])])
+					}
 				};
 			} catch (e) {
 				//logger.error("Error parsing user configuration 'customHtmlData'", e, customHtmlData);
@@ -35,7 +37,9 @@ export function getUserConfigHtmlCollection(config: LitAnalyzerConfig): HtmlData
 				properties: [],
 				attributes: [],
 				events: [],
-				slots: []
+				slots: [],
+				cssParts: [],
+				cssProperties: []
 			} as HtmlTag)
 	);
 
@@ -44,7 +48,7 @@ export function getUserConfigHtmlCollection(config: LitAnalyzerConfig): HtmlData
 			({
 				name: attrName,
 				kind: "attribute",
-				getType: lazy(() => ({ kind: SimpleTypeKind.ANY } as SimpleType))
+				getType: lazy(() => ({ kind: "ANY" } as SimpleType))
 			} as HtmlAttr)
 	);
 
@@ -53,13 +57,15 @@ export function getUserConfigHtmlCollection(config: LitAnalyzerConfig): HtmlData
 			({
 				name: eventName,
 				kind: "event",
-				getType: lazy(() => ({ kind: SimpleTypeKind.ANY } as SimpleType))
+				getType: lazy(() => ({ kind: "ANY" } as SimpleType))
 			} as HtmlEvent)
 	);
 
 	return {
 		tags: [...tags, ...collection.tags],
-		attrs: [...attrs, ...collection.attrs],
-		events: [...events, ...collection.events]
+		global: {
+			attributes: [...attrs, ...(collection.global.attributes || [])],
+			events: [...events, ...(collection.global.events || [])]
+		}
 	};
 }

@@ -47,7 +47,7 @@ export interface TaggedTemplateVisitContext {
 	shouldCheckTemplateTag(templateTag: string): boolean;
 }
 
-export function visitTaggedTemplateNodes(astNode: Node, context: TaggedTemplateVisitContext) {
+export function visitTaggedTemplateNodes(astNode: Node, context: TaggedTemplateVisitContext): void {
 	const newContext = { ...context };
 	if (tsModule.ts.isTaggedTemplateExpression(astNode) && context.shouldCheckTemplateTag(astNode.tag.getText())) {
 		// Only visit the template expression if the leading comments does not include the ts-ignore flag.

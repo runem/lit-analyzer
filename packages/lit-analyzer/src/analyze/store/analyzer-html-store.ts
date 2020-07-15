@@ -1,4 +1,14 @@
-import { HtmlAttr, HtmlAttrTarget, HtmlEvent, HtmlMember, HtmlProp, HtmlSlot, HtmlTag } from "../parse/parse-html-data/html-tag";
+import {
+	HtmlAttr,
+	HtmlAttrTarget,
+	HtmlCssPart,
+	HtmlCssProperty,
+	HtmlEvent,
+	HtmlMember,
+	HtmlProp,
+	HtmlSlot,
+	HtmlTag
+} from "../parse/parse-html-data/html-tag";
 import {
 	HtmlNodeAttr,
 	IHtmlNodeAttr,
@@ -25,6 +35,8 @@ export interface AnalyzerHtmlStore {
 	getAllPropertiesForTag(htmlNode: HtmlNode | string): Iterable<HtmlProp>;
 	getAllEventsForTag(htmlNode: HtmlNode | string): Iterable<HtmlEvent>;
 	getAllSlotsForTag(htmlNode: HtmlNode | string): Iterable<HtmlSlot>;
+	getAllCssPartsForTag(htmlNode: HtmlNode | string): Iterable<HtmlCssPart>;
+	getAllCssPropertiesForTag(htmlNode: HtmlNode | string): Iterable<HtmlCssProperty>;
 
 	getHtmlAttrTarget(htmlNodeAttr: IHtmlNodeAttrProp): HtmlProp | undefined;
 	getHtmlAttrTarget(htmlNodeAttr: IHtmlNodeAttr | IHtmlNodeBooleanAttribute): HtmlAttr | undefined;

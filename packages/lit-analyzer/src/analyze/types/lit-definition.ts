@@ -1,29 +1,28 @@
-import { ComponentDeclaration, ComponentMember, EventDeclaration } from "web-component-analyzer";
-import { DocumentRange } from "./lit-range";
+import { Node, SourceFile } from "typescript";
+import { SourceFileRange } from "./range";
 
-export enum DefinitionKind {
-	COMPONENT = "COMPONENT",
-	MEMBER = "MEMBER",
-	EVENT = "EVENT"
+export type LitDefinitionTargetKind = "node" | "range";
+
+export interface LitDefinitionTargetBase {
+	kind: LitDefinitionTargetKind;
 }
 
-export interface DefinitionBase {
-	fromRange: DocumentRange;
+export interface LitDefinitionTargetNode extends LitDefinitionTargetBase {
+	kind: "node";
+	node: Node;
+	name?: string;
 }
 
-export interface DefinitionComponent extends DefinitionBase {
-	kind: DefinitionKind.COMPONENT;
-	target: ComponentDeclaration;
+export interface LitDefinitionTargetRange {
+	kind: "range";
+	sourceFile: SourceFile;
+	range: SourceFileRange;
+	name?: string;
 }
 
-export interface DefinitionMember extends DefinitionBase {
-	kind: DefinitionKind.MEMBER;
-	target: ComponentMember;
-}
+export type LitDefinitionTarget = LitDefinitionTargetNode | LitDefinitionTargetRange;
 
-export interface DefinitionEvent extends DefinitionBase {
-	kind: DefinitionKind.EVENT;
-	target: EventDeclaration;
+export interface LitDefinition {
+	fromRange: SourceFileRange;
+	target: LitDefinitionTarget[] | LitDefinitionTarget;
 }
-
-export type LitDefinition = DefinitionComponent | DefinitionMember | DefinitionEvent;

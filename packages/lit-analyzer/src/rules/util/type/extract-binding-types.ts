@@ -3,25 +3,24 @@ import {
 	SimpleType,
 	SimpleTypeBooleanLiteral,
 	SimpleTypeEnumMember,
-	SimpleTypeKind,
 	SimpleTypeString,
 	SimpleTypeStringLiteral,
 	toSimpleType
 } from "ts-simple-type";
 import { Expression, Type, TypeChecker } from "typescript";
-import { LitAnalyzerRequest } from "../../lit-analyzer-context";
-import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../types/html-node/html-node-attr-assignment-types";
-import { HtmlNodeAttrKind } from "../../types/html-node/html-node-attr-types";
+import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../analyze/types/html-node/html-node-attr-assignment-types";
+import { HtmlNodeAttrKind } from "../../../analyze/types/html-node/html-node-attr-types";
+import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
 import { getDirective } from "../directive/get-directive";
 
 const cache = new WeakMap<HtmlNodeAttrAssignment, { typeA: SimpleType; typeB: SimpleType }>();
 
-export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, request: LitAnalyzerRequest): { typeA: SimpleType; typeB: SimpleType } {
+export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, context: RuleModuleContext): { typeA: SimpleType; typeB: SimpleType } {
 	if (cache.has(assignment)) {
 		return cache.get(assignment)!;
 	}
 
-	const checker = request.program.getTypeChecker();
+	const checker = context.program.getTypeChecker();
 
 	// Relax the type we are looking at an expression in javascript files
 	//const inJavascriptFile = request.file.fileName.endsWith(".js");
@@ -29,31 +28,27 @@ export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, request:
 	const shouldRelaxTypeB = false; // Disable for now while collecting requirements
 
 	// Infer the type of the RHS
-	//const typeBInferred = shouldRelaxTypeB ? ({ kind: SimpleTypeKind.ANY } as SimpleType) : inferTypeFromAssignment(assignment, checker);
+	//const typeBInferred = shouldRelaxTypeB ? ({ kind: "ANY" } as SimpleType) : inferTypeFromAssignment(assignment, checker);
 	const typeBInferred = inferTypeFromAssignment(assignment, checker);
 
-	const typeB = (() => {
-		// Handle that typeB could be inferred through getDirective
-		const directive = getDirective(assignment, request);
-		const actualTypeB = directive?.actualType?.();
-
-		// Return the type inferred through the directive
-		if (actualTypeB != null) {
-			return actualTypeB;
-		}
-
-		// Else, convert typeB to SimpleType
-		else {
-			const type = isSimpleType(typeBInferred) ? typeBInferred : toSimpleType(typeBInferred, checker);
-			return shouldRelaxTypeB ? relaxType(type) : type;
-		}
+	// Convert typeB to SimpleType
+	let typeB = (() => {
+		const type = isSimpleType(typeBInferred) ? typeBInferred : toSimpleType(typeBInferred, checker);
+		return shouldRelaxTypeB ? relaxType(type) : type;
 	})();
 
 	// Find a corresponding target for this attribute
-	const htmlAttrTarget = request.htmlStore.getHtmlAttrTarget(assignment.htmlAttr);
+	const htmlAttrTarget = context.htmlStore.getHtmlAttrTarget(assignment.htmlAttr);
 	//if (htmlAttrTarget == null) return [];
 
-	const typeA = htmlAttrTarget == null ? ({ kind: SimpleTypeKind.ANY } as SimpleType) : htmlAttrTarget.getType();
+	const typeA = htmlAttrTarget == null ? ({ kind: "ANY" } as SimpleType) : htmlAttrTarget.getType();
+
+	// Handle directives
+	const directive = getDirective(assignment, context);
+	const directiveType = directive?.actualType?.();
+	if (directiveType != null) {
+		typeB = directiveType;
+	}
 
 	// Cache the result
 	const result = { typeA, typeB };
@@ -65,9 +60,9 @@ export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, request:
 export function inferTypeFromAssignment(assignment: HtmlNodeAttrAssignment, checker: TypeChecker): SimpleType | Type {
 	switch (assignment.kind) {
 		case HtmlNodeAttrAssignmentKind.STRING:
-			return { kind: SimpleTypeKind.STRING_LITERAL, value: assignment.value } as SimpleTypeStringLiteral;
+			return { kind: "STRING_LITERAL", value: assignment.value } as SimpleTypeStringLiteral;
 		case HtmlNodeAttrAssignmentKind.BOOLEAN:
-			return { kind: SimpleTypeKind.BOOLEAN_LITERAL, value: true } as SimpleTypeBooleanLiteral;
+			return { kind: "BOOLEAN_LITERAL", value: true } as SimpleTypeBooleanLiteral;
 		case HtmlNodeAttrAssignmentKind.EXPRESSION:
 			return checker.getTypeAtLocation(assignment.expression);
 		case HtmlNodeAttrAssignmentKind.MIXED:
@@ -81,7 +76,7 @@ export function inferTypeFromAssignment(assignment: HtmlNodeAttrAssignment, chec
 				}
 			}
 
-			return { kind: SimpleTypeKind.STRING } as SimpleTypeString;
+			return { kind: "STRING" } as SimpleTypeString;
 	}
 }
 
@@ -92,55 +87,55 @@ export function inferTypeFromAssignment(assignment: HtmlNodeAttrAssignment, chec
  */
 export function relaxType(type: SimpleType): SimpleType {
 	switch (type.kind) {
-		case SimpleTypeKind.INTERSECTION:
-		case SimpleTypeKind.UNION:
+		case "INTERSECTION":
+		case "UNION":
 			return {
 				...type,
 				types: type.types.map(t => relaxType(t))
 			};
 
-		case SimpleTypeKind.ENUM:
+		case "ENUM":
 			return {
 				...type,
 				types: type.types.map(t => relaxType(t) as SimpleTypeEnumMember)
 			};
 
-		case SimpleTypeKind.ARRAY:
+		case "ARRAY":
 			return {
 				...type,
 				type: relaxType(type.type)
 			};
 
-		case SimpleTypeKind.PROMISE:
+		case "PROMISE":
 			return {
 				...type,
 				type: relaxType(type.type)
 			};
 
-		case SimpleTypeKind.INTERFACE:
-		case SimpleTypeKind.OBJECT:
-		case SimpleTypeKind.FUNCTION:
-		case SimpleTypeKind.CLASS:
+		case "INTERFACE":
+		case "OBJECT":
+		case "FUNCTION":
+		case "CLASS":
 			return {
-				kind: SimpleTypeKind.ANY
+				kind: "ANY"
 			};
 
-		case SimpleTypeKind.NUMBER_LITERAL:
-			return { kind: SimpleTypeKind.NUMBER };
-		case SimpleTypeKind.STRING_LITERAL:
-			return { kind: SimpleTypeKind.STRING };
-		case SimpleTypeKind.BOOLEAN_LITERAL:
-			return { kind: SimpleTypeKind.BOOLEAN };
-		case SimpleTypeKind.BIG_INT_LITERAL:
-			return { kind: SimpleTypeKind.BIG_INT };
+		case "NUMBER_LITERAL":
+			return { kind: "NUMBER" };
+		case "STRING_LITERAL":
+			return { kind: "STRING" };
+		case "BOOLEAN_LITERAL":
+			return { kind: "BOOLEAN" };
+		case "BIG_INT_LITERAL":
+			return { kind: "BIG_INT" };
 
-		case SimpleTypeKind.ENUM_MEMBER:
+		case "ENUM_MEMBER":
 			return {
 				...type,
 				type: relaxType(type.type)
 			} as SimpleTypeEnumMember;
 
-		case SimpleTypeKind.ALIAS:
+		case "ALIAS":
 			return {
 				...type,
 				target: relaxType(type.target)

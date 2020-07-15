@@ -1,10 +1,10 @@
 import { SourceFile } from "typescript";
-import { AnalyzeComponentsResult, ComponentDefinition, ComponentDiagnostic } from "web-component-analyzer";
+import { AnalyzerResult, ComponentDeclaration, ComponentDefinition } from "web-component-analyzer";
 
 export interface AnalyzerDefinitionStore {
-	getAnalysisResultForFile(sourceFile: SourceFile): AnalyzeComponentsResult | undefined;
-	getAnalysisDiagnosticsInFile(sourceFile: SourceFile): ComponentDiagnostic[];
+	getAnalysisResultForFile(sourceFile: SourceFile): AnalyzerResult | undefined;
 	getDefinitionsWithDeclarationInFile(sourceFile: SourceFile): ComponentDefinition[];
+	getComponentDeclarationsInFile(sourceFile: SourceFile): ComponentDeclaration[];
 	getDefinitionForTagName(tagName: string): ComponentDefinition | undefined;
 	getDefinitionsInFile(sourceFile: SourceFile): ComponentDefinition[];
 }

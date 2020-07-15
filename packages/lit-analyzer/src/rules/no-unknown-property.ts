@@ -1,18 +1,25 @@
-import { LitAnalyzerConfig, litDiagnosticRuleSeverity } from "../analyze/lit-analyzer-config";
+import { LitAnalyzerConfig } from "../analyze/lit-analyzer-config";
 import { HtmlTag, litAttributeModifierForTarget } from "../analyze/parse/parse-html-data/html-tag";
 import { AnalyzerDefinitionStore } from "../analyze/store/analyzer-definition-store";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
 import { HtmlNodeKind } from "../analyze/types/html-node/html-node-types";
-import { LitHtmlDiagnosticKind } from "../analyze/types/lit-diagnostic";
-import { RuleModule } from "../analyze/types/rule-module";
+import { RuleFix } from "../analyze/types/rule/rule-fix";
+import { RuleModule } from "../analyze/types/rule/rule-module";
 import { suggestTargetForHtmlAttr } from "../analyze/util/attribute-util";
+import { iterableFirst } from "../analyze/util/iterable-util";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/range-util";
 
 /**
  * This rule validates that only known properties are used in bindings.
  */
 const rule: RuleModule = {
-	name: "no-unknown-property",
-	visitHtmlAttribute(htmlAttr, { htmlStore, config, definitionStore, document }) {
+	id: "no-unknown-property",
+	meta: {
+		priority: "low"
+	},
+	visitHtmlAttribute(htmlAttr, context) {
+		const { htmlStore, config, definitionStore } = context;
+
 		// Ignore "style" and "svg" attrs because I don't yet have all data for them.
 		if (htmlAttr.htmlNode.kind !== HtmlNodeKind.NODE) return;
 
@@ -28,23 +35,36 @@ const rule: RuleModule = {
 
 			// Get suggested target because the name could be a typo.
 			const suggestedTarget = suggestTargetForHtmlAttr(htmlAttr, htmlStore);
-			const suggestedMemberName = (suggestedTarget && `${litAttributeModifierForTarget(suggestedTarget)}${suggestedTarget.name}`) || undefined;
+			const suggestedModifier = suggestedTarget == null ? undefined : litAttributeModifierForTarget(suggestedTarget);
+			const suggestedMemberName = suggestedTarget == null ? undefined : suggestedTarget.name;
 
 			const suggestion = getSuggestionText({ config, definitionStore, htmlTag });
 
-			return [
-				{
-					kind: LitHtmlDiagnosticKind.UNKNOWN_TARGET,
-					message: `Unknown property '${htmlAttr.name}'.`,
-					fix: suggestedMemberName == null ? undefined : `Did you mean '${suggestedMemberName}'?`,
-					location: { document, ...htmlAttr.location.name },
-					source: "no-unknown-property",
-					severity: litDiagnosticRuleSeverity(config, "no-unknown-property"),
-					suggestion,
-					htmlAttr,
-					suggestedTarget
-				}
-			];
+			context.report({
+				location: rangeFromHtmlNodeAttr(htmlAttr),
+				message: `Unknown property '${htmlAttr.name}'.`,
+				fixMessage: suggestedMemberName == null ? undefined : `Did you mean '${suggestedModifier}${suggestedMemberName}'?`,
+				suggestion,
+				fix:
+					suggestedMemberName == null
+						? undefined
+						: () =>
+								({
+									message: `Change property to '${suggestedModifier}${suggestedMemberName}'`,
+									actions: [
+										{
+											kind: "changeAttributeModifier",
+											newModifier: suggestedModifier,
+											htmlAttr
+										},
+										{
+											kind: "changeAttributeName",
+											newName: suggestedMemberName,
+											htmlAttr
+										}
+									]
+								} as RuleFix)
+			});
 		}
 
 		return;
@@ -73,16 +93,16 @@ function getSuggestionText({
 		return undefined;
 	}
 
-	const definition = definitionStore.getDefinitionForTagName(htmlTag.tagName);
 	const tagHasDeclaration = htmlTag.declaration != null;
 	const tagIsBuiltIn = htmlTag.builtIn || false;
-	const tagIsFromLibrary = definition != null && definition.declaration.node.getSourceFile().isDeclarationFile;
+	const tagIsFromLibrary =
+		iterableFirst(definitionStore.getDefinitionForTagName(htmlTag.tagName)?.identifierNodes)?.getSourceFile().isDeclarationFile || false;
 
 	return tagIsBuiltIn
 		? `This is a built in tag. Please consider disabling the 'no-unknown-property' rule.`
 		: tagIsFromLibrary
 		? `If you are not the author of this component please consider disabling the 'no-unknown-property' rule.`
 		: tagHasDeclaration
-		? `This plugin can't automatically find all properties yet. Please consider adding a '@prop' tag to jsdoc on the component class or disabling the 'no-unknown-property' rule.`
+		? `Please consider adding a '@prop' tag to jsdoc on the component class or disabling the 'no-unknown-property' rule.`
 		: `Please consider disabling the 'no-unknown-property' rule.`;
 }
