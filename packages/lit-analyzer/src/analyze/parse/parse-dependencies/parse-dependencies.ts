@@ -1,4 +1,4 @@
-import { SourceFile } from "typescript";
+import { SourceFile, ImportDeclaration } from "typescript";
 import { ComponentDefinition } from "web-component-analyzer";
 import { LitAnalyzerContext } from "../../lit-analyzer-context";
 import { visitIndirectImportsFromSourceFile } from "./visit-dependencies";
@@ -9,7 +9,7 @@ const DIRECT_IMPORT_CACHE = new WeakMap<SourceFile, Set<SourceFile>>();
 
 // Two caches used to return the result of of a known source file right away
 const RESULT_CACHE = new WeakMap<SourceFile, { def: ComponentDefinition; range: Range }[]>();
-const IMPORTED_SOURCE_FILES_CACHE = new WeakMap<SourceFile, Map<SourceFile, Range>>();
+const IMPORTED_SOURCE_FILES_CACHE = new WeakMap<SourceFile, Map<SourceFile, ImportDeclaration>>();
 
 /**
  * Returns a map of imported component definitions in each file encountered from a source file recursively.
@@ -45,8 +45,9 @@ export function parseDependencies(sourceFile: SourceFile, context: LitAnalyzerCo
 	// Get component definitions from all these source files
 	const definitions = new Set<{ def: ComponentDefinition; range: Range }>();
 	for (const imports of importedSourceFiles) {
-		const [file, range] = imports;
+		const [file, importDeclaration] = imports;
 		for (const def of context.definitionStore.getDefinitionsInFile(file)) {
+			const range = { start: importDeclaration.pos, end: importDeclaration.end };
 			definitions.add({ def, range });
 		}
 	}
@@ -69,9 +70,9 @@ export function parseAllIndirectImports(
 	sourceFile: SourceFile,
 	context: LitAnalyzerContext,
 	{ maxExternalDepth, maxInternalDepth }: { maxExternalDepth?: number; maxInternalDepth?: number } = {}
-): Map<SourceFile, Range> {
+): Map<SourceFile, ImportDeclaration> {
 	// The Range destribes the location of the direct import statement.
-	const importedSourceFiles = new Map<SourceFile, Range>();
+	const importedSourceFiles = new Map<SourceFile, ImportDeclaration>();
 
 	visitIndirectImportsFromSourceFile(sourceFile, {
 		project: context.project,
@@ -80,14 +81,40 @@ export function parseAllIndirectImports(
 		directImportCache: DIRECT_IMPORT_CACHE,
 		maxExternalDepth: maxExternalDepth ?? context.config.maxNodeModuleImportDepth,
 		maxInternalDepth: maxInternalDepth ?? context.config.maxProjectImportDepth,
-		emitIndirectImport(file: SourceFile, range: Range): boolean {
+		emitIndirectImport(file: SourceFile, importDeclaration: ImportDeclaration): boolean {
 			if (importedSourceFiles.has(file)) {
+				const oldImport = importedSourceFiles.get(file);
+				const newImport = importDeclaration;
+				const oldFile = importedSourceFiles.get(file)?.getSourceFile();
+				const newFile = importDeclaration.getSourceFile();
+				// does .getSourceFile() return the Sourcefile where the importDeclaration is located as expected?
+				if (oldImport !== newImport) {
+					// Two importDeclarations load the same file
+					// How do we determine which one to keep?
+					// non-ideal solution: indirect imports > direct imports.
+					// replace existing import if it directly imports the file and if the new import indirectly imports the file.
+					const oldFileDirectlyImported = isDirectlyImported(sourceFile, oldFile);
+					const newFileDirectlyImported = isDirectlyImported(sourceFile, newFile);
+
+					if (oldFileDirectlyImported && !newFileDirectlyImported) {
+						importedSourceFiles.delete(file);
+						importedSourceFiles.set(file, importDeclaration);
+						return false;
+					}
+				}
 				return false;
 			}
-			importedSourceFiles.set(file, range);
+
+			importedSourceFiles.set(file, importDeclaration);
 			return true;
 		}
 	});
 
 	return importedSourceFiles;
+}
+
+function isDirectlyImported(parentFile: SourceFile, childFile: SourceFile | undefined): boolean {
+	if (childFile == null) return false;
+	const referencedFiles = parentFile.referencedFiles;
+	return referencedFiles.some(file => file.fileName === childFile.fileName);
 }
