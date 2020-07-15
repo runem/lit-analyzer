@@ -4,12 +4,14 @@ import { LitAnalyzerContext } from "../../lit-analyzer-context";
 import { visitIndirectImportsFromSourceFile } from "./visit-dependencies";
 import { Range } from "../../types/range";
 
+type importDeclarationWithDepth = { importDeclaration: ImportDeclaration; depth: number };
+
 // A cache used to prevent traversing through entire source files multiple times to find direct imports
 const DIRECT_IMPORT_CACHE = new WeakMap<SourceFile, Set<SourceFile>>();
 
 // Two caches used to return the result of of a known source file right away
 const RESULT_CACHE = new WeakMap<SourceFile, { def: ComponentDefinition; range: Range }[]>();
-const IMPORTED_SOURCE_FILES_CACHE = new WeakMap<SourceFile, Map<SourceFile, ImportDeclaration>>();
+const IMPORTED_SOURCE_FILES_CACHE = new WeakMap<SourceFile, Map<SourceFile, importDeclarationWithDepth>>();
 
 /**
  * Returns a map of imported component definitions in each file encountered from a source file recursively.
@@ -44,8 +46,8 @@ export function parseDependencies(sourceFile: SourceFile, context: LitAnalyzerCo
 
 	// Get component definitions from all these source files
 	const definitions = new Set<{ def: ComponentDefinition; range: Range }>();
-	for (const imports of importedSourceFiles) {
-		const [file, importDeclaration] = imports;
+	for (const importedSourceFile of importedSourceFiles) {
+		const [file, { importDeclaration }] = importedSourceFile;
 		for (const def of context.definitionStore.getDefinitionsInFile(file)) {
 			const range = { start: importDeclaration.pos, end: importDeclaration.end };
 			definitions.add({ def, range });
@@ -70,8 +72,8 @@ export function parseAllIndirectImports(
 	sourceFile: SourceFile,
 	context: LitAnalyzerContext,
 	{ maxExternalDepth, maxInternalDepth }: { maxExternalDepth?: number; maxInternalDepth?: number } = {}
-): Map<SourceFile, ImportDeclaration> {
-	const importedSourceFiles = new Map<SourceFile, { importDeclaration: ImportDeclaration; depth: number }>();
+): Map<SourceFile, importDeclarationWithDepth> {
+	const importedSourceFiles = new Map<SourceFile, importDeclarationWithDepth>();
 
 	visitIndirectImportsFromSourceFile(sourceFile, {
 		project: context.project,
@@ -99,9 +101,5 @@ export function parseAllIndirectImports(
 		}
 	});
 
-	const importedSourceFilesWithoutDepth = new Map<SourceFile, ImportDeclaration>();
-	importedSourceFiles.forEach((value, key) => {
-		importedSourceFilesWithoutDepth.set(key, value.importDeclaration);
-	});
-	return importedSourceFilesWithoutDepth;
+	return importedSourceFiles;
 }
