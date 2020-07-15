@@ -31,24 +31,25 @@ const rule: RuleModule = {
 
 		const range: Range = { start: importDeclaration.pos, end: importDeclaration.end };
 
+		// get the ComponentDefinitions imported by the import statement at the given range.
 		const importedDefinitions = dependencyStore.getImportedDefinitionByRangeOfImportStatement(file, range);
+
+		// check if any of the imported Definitions are used in the SourceFile
 		const anyImportedDefinitionsUsed = importedDefinitions.some((importedDefinition: ComponentDefinition) => {
 			return customElementsNodes.some(customElementNode => {
 				return customElementNode?.tagName === importedDefinition.tagName;
 			});
 		});
 
-		// TODO: Get path of the unused import and use it in message and fix message
-		// TODO: Write in fix message that the import might be needed for other sideEffects.
-
 		const reportRange = getReportRangeFromImportDeclaration(importDeclaration);
+		const path = importDeclaration.moduleSpecifier.getText();
 
 		if (!anyImportedDefinitionsUsed) {
 			context.report({
 				location: reportRange,
-				message: `Unused import statement.`,
+				message: `Unused import statement: ${path}`,
 				suggestion: config.dontSuggestConfigChanges ? undefined : `You can disable this check by disabling the 'no-unused-import' rule.`
-				// fix: () => {} // TODO: Add Codefix which removes import statement.
+				// fix: () => {} // TODO: Add Codefix which removes import statement. Write in fix message that the import might be needed for other sideEffects.
 			});
 		}
 	}
