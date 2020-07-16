@@ -25,12 +25,16 @@ export class DefaultAnalyzerDependencyStore implements AnalyzerDependencyStore {
 	getImportedDefinitionByRangeOfImportStatement(sourceFile: SourceFile, range: Range): ComponentDefinition[] {
 		const definitionsOfThisImport: ComponentDefinition[] = [];
 		for (const componentDefinitionWithImport of this.importedComponentDefinitionsInFile.get(sourceFile.fileName) || []) {
-			const rangeOfDefinition = {
-				start: componentDefinitionWithImport.importDeclaration.pos,
-				end: componentDefinitionWithImport.importDeclaration.end
+			const { importDeclaration, definition } = componentDefinitionWithImport;
+
+			if (importDeclaration === "rootSourceFile") break;
+			const importRangeOfDeclaration = {
+				start: importDeclaration.pos,
+				end: importDeclaration.end
 			};
-			if (rangeOfDefinition.start === range.start && rangeOfDefinition.end === range.end) {
-				definitionsOfThisImport.push(componentDefinitionWithImport.definition);
+
+			if (importRangeOfDeclaration.start === range.start && importRangeOfDeclaration.end === range.end) {
+				definitionsOfThisImport.push(definition);
 			}
 		}
 		return definitionsOfThisImport;

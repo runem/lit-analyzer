@@ -71,7 +71,7 @@
 	},
 	"ava": {
 		"cache": true,
-		"timeout": "200s",
+		"timeout": "9999s",
 		"extensions": [
 			"ts"
 		],
@@ -80,7 +80,7 @@
 		],
 		"snapshotDir": "test/snapshots/results",
 		"files": [
-			"test/**/*.ts",
+			"test/**/parse-dependencies.ts",
 			"!test/helpers/**/*"
 		]
 	},

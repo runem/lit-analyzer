@@ -1,12 +1,13 @@
 import * as tsModule from "typescript";
 import { Node, Program, SourceFile, ImportDeclaration } from "typescript";
+import { SourceFileWithImport } from "./parse-dependencies";
 
 interface IVisitDependenciesContext {
 	program: Program;
 	ts: typeof tsModule;
 	project: ts.server.Project | undefined;
 	directImportCache: WeakMap<SourceFile, Set<SourceFile>>;
-	emitIndirectImport(file: SourceFile, depthOfFile: number, importDeclaration?: ImportDeclaration): boolean;
+	emitIndirectImport(sourceFileWithImport: SourceFileWithImport): boolean;
 	emitDirectImport?(file: SourceFile, importDeclaration: ImportDeclaration): void;
 	depth?: number;
 	maxExternalDepth?: number;
@@ -22,9 +23,9 @@ interface IVisitDependenciesContext {
  */
 export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, context: IVisitDependenciesContext): void {
 	const currentDepth = context.depth ?? 0;
-
+	// if (sourceFile.fileName.includes('file2')) debugger;
 	// Emit a visit. If this file has been seen already, the function will return false, and traversal will stop
-	if (!context.emitIndirectImport(sourceFile, currentDepth, context.importDeclaration)) {
+	if (!context.emitIndirectImport({ sourceFile, importDeclaration: context.importDeclaration ?? "rootSourceFile" })) {
 		return;
 	}
 
@@ -40,7 +41,7 @@ export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, conte
 	// Get all direct imports from the cache
 	let directImports = context.directImportCache.get(sourceFile);
 	const importDeclarations = new Map<SourceFile, ImportDeclaration>();
-	// importDeclaration: ImportDeclaration
+
 	if (directImports == null || context.importDeclaration == null) {
 		// If the cache didn't have all direct imports, build up using the visitor function
 		directImports = new Set<SourceFile>();
