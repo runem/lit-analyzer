@@ -189,7 +189,10 @@ export function documentationForHtmlTag(htmlTag: HtmlTag, options: DescriptionOp
 		desc += `\n\n${descriptionList(
 			"Events",
 			items,
-			event => `${descriptionHeader(`@fires ${event.name}`, 0, options)}${event.description ? ` - ${event.description}` : ""}`,
+			event =>
+				`${descriptionHeader(`@fires ${typeToString(event.getType())} ${event.name}`, 0, options)}${
+					event.description ? ` - ${event.description}` : ""
+				}`,
 			options
 		)}`;
 	}
