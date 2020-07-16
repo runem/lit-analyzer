@@ -251,4 +251,21 @@ tsTest("Event binding: invalid event handler is not assignable to event", t => {
 		makeElement({ events: ["foo-event"] }),
 		"html`<my-element @foo-event=${(arg: boolean) => {}}></my-element>`"
 	]);
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});
+
+tsTest("Event binding: invalid event handler (generic custom event) is not assignable to typed event", t => {
+	const { diagnostics } = getDiagnostics([
+		makeElement({ events: ["{CustomEvent<string>} foo-event"] }),
+		"html`<my-element @foo-event=${(ev: CustomEvent<number>) => {}}></my-element>`"
+	]);
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});
+
+tsTest("Event binding: event handler (generic custom event) is assignable to typed event", t => {
+	const { diagnostics } = getDiagnostics([
+		makeElement({ events: ["{CustomEvent<string>} foo-event"] }),
+		"html`<my-element @foo-event=${(ev: CustomEvent<string>) => {}}></my-element>`"
+	]);
+	hasNoDiagnostics(t, diagnostics);
 });
