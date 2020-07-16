@@ -13,8 +13,11 @@ export class MyElement extends LitElement {
 		return ["this is a test", "testing"];
 	}
 
+	didClick(evt: KeyboardEvent) {}
+
 	render() {
 		return html`
+			<button @click="${this.didClick}"></button>
 			<my-tsconfig-element size="large"></my-tsconfig-element>
 			<unknown-element @heheheh="${() => {}}" globalattribute></unknown-element>
 			<heheheh></heheheh>

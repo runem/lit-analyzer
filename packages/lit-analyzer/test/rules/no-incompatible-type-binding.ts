@@ -269,3 +269,11 @@ tsTest("Event binding: event handler (generic custom event) is assignable to typ
 	]);
 	hasNoDiagnostics(t, diagnostics);
 });
+
+tsTest("Event binding: event handler is assignable to event with unknown type", t => {
+	const { diagnostics } = getDiagnostics([
+		makeElement({ events: ["foo-event"] }),
+		"html`<my-element @foo-event=${(ev: MouseEvent) => {}}></my-element>`"
+	]);
+	hasNoDiagnostics(t, diagnostics);
+});

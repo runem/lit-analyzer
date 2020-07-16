@@ -10,9 +10,20 @@ export function isAssignableInEventBinding(
 	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },
 	context: RuleModuleContext
 ): boolean | undefined {
+	let strictFunctionTypes: undefined | boolean = undefined;
+
 	// Treat type "ANY" as "Event"
 	if (typeA.kind === "ANY") {
 		typeA = parseSimpleJsDocTypeExpression("Event", context);
+
+		// If we don't know the exact type of event required, always type check
+		//   the event bivariant. In this case we only care if the parameter in
+		//   typeB is an Event, and this is achieved forcing "strictFunctionTypes"
+		//   to false (to have bivariant type checking for parameters)
+		// Examples on invalid error message we get if "strictFunctionTypes" is true:
+		//      Type '(event: MouseEvent) => void' is not assignable to '(event: Event) => void'
+		//      Type '(event: CustomEvent<string>) => void' is not assignable to '(event: Event) => void'
+		strictFunctionTypes = false;
 	}
 
 	// Construct an event handler type to perform type checking against
@@ -45,7 +56,7 @@ export function isAssignableInEventBinding(
 		}
 	}
 
-	if (!isAssignableToType({ typeA: expectedType, typeB }, context)) {
+	if (!isAssignableToType({ typeA: expectedType, typeB }, context, { strictFunctionTypes })) {
 		context.report({
 			location: rangeFromHtmlNodeAttr(htmlAttr),
 			message: `Type '${typeToString(typeB)}' is not assignable to '${typeToString(expectedType)}'`

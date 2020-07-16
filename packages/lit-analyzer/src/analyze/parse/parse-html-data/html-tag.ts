@@ -2,6 +2,7 @@ import { isAssignableToSimpleTypeKind, SimpleType, typeToString } from "ts-simpl
 import { ComponentCssPart, ComponentCssProperty, ComponentDeclaration, ComponentEvent, ComponentMember, ComponentSlot } from "web-component-analyzer";
 import { LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER, LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER, LIT_HTML_PROP_ATTRIBUTE_MODIFIER } from "../../constants";
 import { iterableDefined } from "../../util/iterable-util";
+import { lazy } from "../../util/general-util";
 
 export interface HtmlDataFeatures {
 	attributes: HtmlAttr[];
@@ -256,7 +257,31 @@ export function mergeHtmlProps(props: HtmlProp[]): HtmlProp[] {
 }
 
 export function mergeHtmlEvents(events: HtmlEvent[]): HtmlEvent[] {
-	return mergeFirstUnique(events, event => event.name);
+	if (events.length <= 1) {
+		return events;
+	}
+
+	const mergedEvents = new Map<string, HtmlEvent>();
+	for (const evt of events) {
+		const existingEvent = mergedEvents.get(evt.name);
+		if (existingEvent != null) {
+			mergedEvents.set(evt.name, {
+				...evt,
+				declaration: existingEvent.declaration || evt.declaration,
+				fromTagName: existingEvent.fromTagName || evt.fromTagName,
+				builtIn: existingEvent.builtIn || evt.builtIn,
+				global: existingEvent.global || evt.global,
+				description: existingEvent.description || evt.description,
+				getType: lazy(() => {
+					const type = existingEvent.getType();
+					return type.kind === "ANY" ? evt.getType() : type;
+				})
+			});
+		} else {
+			mergedEvents.set(evt.name, evt);
+		}
+	}
+	return Array.from(mergedEvents.values());
 }
 
 export function mergeHtmlSlots(slots: HtmlSlot[]): HtmlSlot[] {
