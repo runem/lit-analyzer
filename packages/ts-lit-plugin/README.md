@@ -129,7 +129,6 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | :------ | ----------- | --------------- | --------------- |
 | [no-invalid-boolean-binding](#-no-invalid-boolean-binding)       | Disallow boolean attribute bindings on non-boolean types. | error | error |
 | [no-expressionless-property-binding](#-no-expressionless-property-binding) | Disallow property bindings without an expression. | error | error |
-| [no-noncallable-event-binding](#-no-noncallable-event-binding)   | Disallow event listener bindings with a noncallable type. | error | error |
 | [no-boolean-in-attribute-binding](#-no-boolean-in-attribute-binding) | Disallow attribute bindings with a boolean type. | error | error |
 | [no-complex-attribute-binding](#-no-complex-attribute-binding)   | Disallow attribute bindings with a complex type. | error | error |
 | [no-nullable-attribute-binding](#-no-nullable-attribute-binding) | Disallow attribute bindings with nullable types such as "null" or "undefined".  | error | error |
@@ -394,26 +393,6 @@ The following example is not considered a warning:
 html`<input .value="${text}" />`
 ```
 
-#### 🌀 no-noncallable-event-binding
-
-It's a common mistake to incorrectly call the function when setting up an event handler binding instead of passing a reference to the function. This makes the function call whenever the code evaluates.
-
-The following examples are considered warnings:
-
-<!-- prettier-ignore -->
-```js
-html`<button @click="${myEventHandler()}">Click</button>`
-html`<button @click="${{hannndleEvent: console.log()}}">Click</button>`
-```
-
-The following examples are not considered warnings:
-
-<!-- prettier-ignore -->
-```js
-html`<button @click="${myEventHandler}">Click</button>`
-html`<button @click="${{handleEvent: console.log}}">Click</button>`
-```
-
 #### 😈 no-boolean-in-attribute-binding
 
 You should not be binding to a boolean type using an attribute binding because it could result in binding the string "true" or "false". Instead you should be using a **boolean** attribute binding.
@@ -484,6 +463,8 @@ html`<input type="wrongvalue" />`
 html`<input placeholder />`
 html`<input max="${"hello"}" />`
 html`<my-list .listItems="${123}"></my-list>`
+html`<button @click="${myEventHandler()}">Click</button>`
+html`<button @click="${{hannndleEvent: console.log()}}">Click</button>`
 ```
 
 The following examples are not considered warnings:
@@ -494,6 +475,8 @@ html`<input type="button" />`
 html`<input placeholder="a placeholder" />`
 html`<input max="${123}" />`
 html`<my-list .listItems="${listItems}"></my-list>`
+html`<button @click="${myEventHandler}">Click</button>`
+html`<button @click="${{handleEvent: console.log}}">Click</button>`
 ```
 
 #### 💥 no-invalid-directive-binding

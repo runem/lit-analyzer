@@ -1,4 +1,4 @@
-import { SimpleType, typeToString } from "ts-simple-type";
+import { isAssignableToSimpleTypeKind, SimpleType, typeToString, validateType } from "ts-simple-type";
 import { parseSimpleJsDocTypeExpression } from "web-component-analyzer";
 import { HtmlNodeAttr } from "../../../analyze/types/html-node/html-node-attr-types";
 import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
@@ -6,6 +6,25 @@ import { rangeFromHtmlNodeAttr } from "../../../analyze/util/range-util";
 import { isAssignableToType } from "./is-assignable-to-type";
 
 export function isAssignableInEventBinding(
+	htmlAttr: HtmlNodeAttr,
+	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },
+	context: RuleModuleContext
+): boolean | undefined {
+	// Make sure that the expression given to the event listener binding a function or an object with "handleEvent" property.
+	// This catches typos like: @click="onClick()"
+	if (!isTypeBindableToEventListener(typeB)) {
+		context.report({
+			location: rangeFromHtmlNodeAttr(htmlAttr),
+			message: `You are setting up an event listener with a non-callable type '${typeToString(typeB)}'`
+		});
+
+		return false;
+	}
+
+	return isEventAssignable(htmlAttr, { typeA, typeB }, context);
+}
+
+export function isEventAssignable(
 	htmlAttr: HtmlNodeAttr,
 	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },
 	context: RuleModuleContext
@@ -73,4 +92,38 @@ export function isAssignableInEventBinding(
 	}
 
 	return assignable;
+}
+
+/**
+ * Returns if this type can be used in a event listener binding
+ * @param type
+ */
+function isTypeBindableToEventListener(type: SimpleType): boolean {
+	// Return "true" if the type has a call signature
+	if ("call" in type && type.call != null) {
+		return true;
+	}
+
+	// Callable types can be used in the binding
+	if (isAssignableToSimpleTypeKind(type, ["FUNCTION", "METHOD", "UNKNOWN"], { matchAny: true })) {
+		return true;
+	}
+
+	return validateType(type, simpleType => {
+		switch (simpleType.kind) {
+			// Object types with attributes for the setup function of the event listener can be used
+			case "OBJECT":
+			case "INTERFACE": {
+				// The "handleEvent" property must be present
+				const handleEventMember = simpleType.members != null ? simpleType.members.find(m => m.name === "handleEvent") : undefined;
+
+				// The "handleEvent" property must be callable
+				if (handleEventMember != null) {
+					return isTypeBindableToEventListener(handleEventMember.type);
+				}
+			}
+		}
+
+		return undefined;
+	});
 }

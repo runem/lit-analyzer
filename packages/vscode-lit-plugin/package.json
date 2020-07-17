@@ -285,17 +285,6 @@
 							"error"
 						]
 					},
-					"lit-plugin.rules.no-noncallable-event-binding": {
-						"type": "string",
-						"description": "Disallow event listener bindings with a noncallable type.",
-						"default": "default",
-						"enum": [
-							"default",
-							"off",
-							"warning",
-							"error"
-						]
-					},
 					"lit-plugin.rules.no-boolean-in-attribute-binding": {
 						"type": "string",
 						"description": "Disallow attribute bindings with a boolean type.",

@@ -10,7 +10,6 @@ import noInvalidTagName from "./no-invalid-tag-name";
 import noLegacyAttribute from "./no-legacy-attribute";
 import noMissingElementTypeDefinition from "./no-missing-element-type-definition";
 import noMissingImport from "./no-missing-import";
-import noNoncallableEventBindingRule from "./no-noncallable-event-binding";
 import noNullableAttributeBindingRule from "./no-nullable-attribute-binding";
 import noPropertyVisibilityMismatch from "./no-property-visibility-mismatch";
 import noUnclosedTag from "./no-unclosed-tag";
@@ -25,7 +24,6 @@ export const ALL_RULES: RuleModule[] = [
 	noExpressionlessPropertyBindingRule,
 	noUnintendedMixedBindingRule,
 	noUnknownSlotRule,
-	noNoncallableEventBindingRule,
 	noNullableAttributeBindingRule,
 	noComplexAttributeBindingRule,
 	noBooleanInAttributeBindingRule,
