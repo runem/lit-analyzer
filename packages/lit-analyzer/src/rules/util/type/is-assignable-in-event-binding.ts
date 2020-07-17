@@ -29,20 +29,9 @@ export function isEventAssignable(
 	{ typeA, typeB }: { typeA: SimpleType; typeB: SimpleType },
 	context: RuleModuleContext
 ): boolean | undefined {
-	let strictFunctionTypes: undefined | boolean = undefined;
-
 	// Treat type "ANY" as "Event"
 	if (typeA.kind === "ANY") {
 		typeA = parseSimpleJsDocTypeExpression("Event", context);
-
-		// If we don't know the exact type of event required, always type check
-		//   the event bivariant. In this case we only care if the parameter in
-		//   typeB is an Event, and this is achieved forcing "strictFunctionTypes"
-		//   to false (to have bivariant type checking for parameters)
-		// Examples on invalid error message we get if "strictFunctionTypes" is true:
-		//      Type '(event: MouseEvent) => void' is not assignable to '(event: Event) => void'
-		//      Type '(event: CustomEvent<string>) => void' is not assignable to '(event: Event) => void'
-		strictFunctionTypes = false;
 	}
 
 	// Construct an event handler type to perform type checking against
@@ -81,6 +70,17 @@ export function isEventAssignable(
 		const mutedContext = { ...context, report() {} };
 		assignable = typeA.types.some(tA => isAssignableInEventBinding(htmlAttr, { typeA: tA, typeB }, mutedContext));
 	} else {
+		// We don't always know the exact type of event required. Therefore always type check
+		//   the parameters bivariant instead of contravariant. We primarily care if the parameter in
+		//   typeB is an Event (or something more specific), and this is achieved forcing "strictFunctionTypes"
+		//   to false (to have bivariant type checking for parameters)
+		// Examples on invalid error message we get if "strictFunctionTypes" is true:
+		//      Type '(event: MouseEvent) => void' is not assignable to '(event: Event) => void'
+		//      Type '(event: CustomEvent<string>) => void' is not assignable to '(event: Event) => void'
+		// In theory, we would be able to set "strictFunctionTypes: true" if we knew the exact type required,
+		//    but under many circumstances we don't know exactly
+		const strictFunctionTypes = false;
+
 		assignable = isAssignableToType({ typeA: expectedType, typeB }, context, { strictFunctionTypes });
 	}
 
