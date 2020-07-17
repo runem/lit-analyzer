@@ -277,3 +277,12 @@ tsTest("Event binding: event handler is assignable to event with unknown type", 
 	]);
 	hasNoDiagnostics(t, diagnostics);
 });
+
+tsTest("Event binding: event handler is assignable to merged event", t => {
+	const { diagnostics } = getDiagnostics([
+		makeElement({ events: ["{MouseEvent} foo-event"] }),
+		makeElement({ events: ["{KeyboardEvent} foo-event"] }),
+		"html`<my-element @foo-event=${(ev: MouseEvent) => {}}></my-element>`"
+	]);
+	hasNoDiagnostics(t, diagnostics);
+});

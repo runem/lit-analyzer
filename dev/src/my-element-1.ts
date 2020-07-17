@@ -13,7 +13,7 @@ export class MyElement extends LitElement {
 		return ["this is a test", "testing"];
 	}
 
-	didClick(evt: KeyboardEvent) {}
+	didClick(evt: MouseEvent) {}
 
 	render() {
 		return html`

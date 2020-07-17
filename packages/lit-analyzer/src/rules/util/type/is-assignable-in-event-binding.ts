@@ -56,14 +56,21 @@ export function isAssignableInEventBinding(
 		}
 	}
 
-	if (!isAssignableToType({ typeA: expectedType, typeB }, context, { strictFunctionTypes })) {
+	let assignable: boolean;
+	if (typeA.kind === "UNION") {
+		// If events have been merged into one UNION type, check each event type separately
+		const mutedContext = { ...context, report() {} };
+		assignable = typeA.types.some(tA => isAssignableInEventBinding(htmlAttr, { typeA: tA, typeB }, mutedContext));
+	} else {
+		assignable = isAssignableToType({ typeA: expectedType, typeB }, context, { strictFunctionTypes });
+	}
+
+	if (!assignable) {
 		context.report({
 			location: rangeFromHtmlNodeAttr(htmlAttr),
 			message: `Type '${typeToString(typeB)}' is not assignable to '${typeToString(expectedType)}'`
 		});
-
-		return false;
 	}
 
-	return true;
+	return assignable;
 }
