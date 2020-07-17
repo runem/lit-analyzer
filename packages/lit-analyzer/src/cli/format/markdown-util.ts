@@ -85,7 +85,15 @@ ${rows
  * @param text
  */
 function markdownEscapeTableCell(text: string): string {
-	return text.replace(/\n/g, "<br />").replace(/\|/g, "\\|");
+	return (
+		text
+			// Change newlines
+			.replace(/\n/g, "<br />")
+			// Change "@property" to "`@property`" (so eg. Github doesn't treat it as tagging a user)
+			.replace(/(@\S+)/g, "`$1`")
+			// Escape |, < and >
+			.replace(/([|<>])/g, "\\$1")
+	);
 }
 
 /**
