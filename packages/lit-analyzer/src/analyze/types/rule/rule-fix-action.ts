@@ -10,7 +10,8 @@ export type RuleFixActionKind =
 	| "changeAttributeName"
 	| "changeAttributeModifier"
 	| "changeAssignment"
-	| "import"
+	| "addImport"
+	| "removeImport"
 	| "extendGlobalDeclaration"
 	| "changeRange"
 	| "changeIdentifier";
@@ -57,11 +58,17 @@ export interface RuleFixActionChangeIdentifier extends RuleFixActionBase {
 	newText: string;
 }
 
-export interface RuleFixActionImport extends RuleFixActionBase {
-	kind: "import";
+export interface RuleFixActionAddImport extends RuleFixActionBase {
+	kind: "addImport";
 	file: SourceFile;
 	path: string;
 	identifiers?: string[];
+}
+
+export interface RuleFixActionRemoveImport extends RuleFixActionBase {
+	kind: "removeImport";
+	range: SourceFileRange;
+	file: SourceFile;
 }
 
 export interface RuleFixActionChangeRange extends RuleFixActionBase {
@@ -80,7 +87,8 @@ export type RuleFixAction =
 	| RuleFixActionChangeTagName
 	| RuleFixActionAddAttribute
 	| RuleFixActionChangeAttributeName
-	| RuleFixActionImport
+	| RuleFixActionAddImport
+	| RuleFixActionRemoveImport
 	| RuleFixActionChangeAttributeModifier
 	| RuleFixActionChangeAssignment
 	| RuleFixActionChangeIdentifier

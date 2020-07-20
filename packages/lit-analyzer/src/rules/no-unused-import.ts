@@ -17,10 +17,10 @@ const rule: RuleModule = {
 		priority: "low"
 	},
 	visitSourceFile(sourceFile, context) {
-		const { config, dependencyStore, documentStore, file } = context;
+		const { config, dependencyStore, documentStore } = context;
 
 		const documents = documentStore.getDocumentsInFile(sourceFile, config);
-		const importDeclarations = getImportStatementsInFile(file, context.ts);
+		const importDeclarations = getImportStatementsInFile(sourceFile, context.ts);
 		const htmlDocuments = documents.filter((document: TextDocument) => document instanceof HtmlDocument) as HtmlDocument[];
 
 		// loop over all import delarations in the SourceFile.
@@ -53,9 +53,20 @@ const rule: RuleModule = {
 			if (!anyImportedDefinitionsUsed) {
 				context.report({
 					location: reportRange,
-					message: `Unused import statement: ${path}`,
-					suggestion: config.dontSuggestConfigChanges ? undefined : `You can disable this check by disabling the 'no-unused-import' rule.`
-					// fix: () => {} // TODO: Add Codefix which removes import statement. Write in fix message that the import might be needed for other sideEffects.
+					message: `Unused import statement: ${path}.`,
+					suggestion: config.dontSuggestConfigChanges ? undefined : `You can disable this check by disabling the 'no-unused-import' rule.`,
+					fix: () => {
+						return {
+							message: `Remove unused import statement: ${path}.`,
+							actions: [
+								{
+									kind: "removeImport",
+									file: context.file,
+									range: reportRange
+								}
+							]
+						};
+					}
 				});
 			}
 		}
@@ -75,7 +86,7 @@ function getReportRangeFromImportDeclaration(importDeclaration: ImportDeclaratio
 	const fullText = importDeclaration.getFullText();
 	const text = importDeclaration.getText();
 	const rangeOffset = fullText.indexOf(text);
-	const reportRange: SourceFileRange = { start: importDeclaration.pos + rangeOffset, end: importDeclaration.end, _brand: "sourcefile" };
+	const reportRange: SourceFileRange = { start: importDeclaration.pos + rangeOffset, end: importDeclaration.end } as SourceFileRange;
 	return reportRange;
 }
 

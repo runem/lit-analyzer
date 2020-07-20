@@ -43,7 +43,7 @@ const rule: RuleModule = {
 						message: `Import <${definition.tagName}> from module "${importPath}"`,
 						actions: [
 							{
-								kind: "import",
+								kind: "addImport",
 								path: importPath,
 								file: context.file
 							}

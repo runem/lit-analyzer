@@ -273,7 +273,7 @@ export class LitAnalyzer {
 			}
 		}
 
-		return [];
+		return this.sourceFileAnalyzer.getCodeFixesAtOffsetRange(sourceFileRange, this.context);
 	}
 
 	getFormatEditsInFile(file: SourceFile, settings: ts.FormatCodeSettings): LitFormatEdit[] {
