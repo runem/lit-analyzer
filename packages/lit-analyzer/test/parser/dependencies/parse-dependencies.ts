@@ -198,21 +198,21 @@ tsTest("Correctly follows modules when going from internal to external module wh
 	t.deepEqual(sortedFileNames, ["file5.ts", "node_modules/file2.ts", "node_modules/file3.ts", "node_modules/file4.ts"]);
 });
 
-// tsTest("Correctly handles recursive imports", t => {
-// 	const { sourceFile, context } = prepareAnalyzer([
-// 		{ fileName: "file1.ts", text: `import * from "file3"` },
-// 		{ fileName: "file2.ts", text: `import * from "file1"` },
-// 		{ fileName: "file3.ts", text: `import * from "file2"`, entry: true }
-// 	]);
+tsTest("Correctly handles recursive imports", t => {
+	const { sourceFile, context } = prepareAnalyzer([
+		{ fileName: "file1.ts", text: `import * from "file3"` },
+		{ fileName: "file2.ts", text: `import * from "file1"` },
+		{ fileName: "file3.ts", text: `import * from "file2"`, entry: true }
+	]);
 
-// 	const dependencies = parseAllIndirectImports(sourceFile, context);
+	const dependencies = parseAllIndirectImports(sourceFile, context);
 
-// 	const sortedFileNames = Array.from(dependencies)
-// 		.map(fileWithImport => fileWithImport.sourceFile.fileName)
-// 		.sort();
+	const sortedFileNames = Array.from(dependencies)
+		.map(fileWithImport => fileWithImport.sourceFile.fileName)
+		.sort();
 
-// 	t.deepEqual(sortedFileNames, ["file1.ts", "file2.ts", "file3.ts"]);
-// });
+	t.deepEqual(sortedFileNames, ["file1.ts", "file2.ts", "file3.ts"]);
+});
 
 tsTest("Correctly follows both exports and imports", t => {
 	const { sourceFile, context } = prepareAnalyzer([

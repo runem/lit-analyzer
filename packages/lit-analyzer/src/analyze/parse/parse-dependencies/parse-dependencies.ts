@@ -85,8 +85,8 @@ export function parseAllIndirectImports(
 
 			if (importedSourceFiles.has(sourceFile)) {
 				const importDeclarations = importedSourceFiles.get(sourceFile)!;
-				if (importDeclarations.has(importDeclaration)) {
-					// Sourcefile has already been visited from this importDeclaration.
+				if (importDeclarations.has(importDeclaration) || importDeclarations.has("rootSourceFile")) {
+					// Sourcefile has already been visited from this importDeclaration or is the rootSourceFile.
 					return false;
 				} else {
 					// Sourcefile has already been visited from ANOTHER importDeclaration.
