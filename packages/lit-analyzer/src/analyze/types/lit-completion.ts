@@ -8,5 +8,6 @@ export interface LitCompletion {
 	insert: string;
 	range?: SourceFileRange;
 	importance?: "high" | "medium" | "low";
+	sortText?: string;
 	documentation?(): string | undefined;
 }

@@ -14,7 +14,6 @@ import { lazy } from "../../util/general-util";
 import { getPositionContextInDocument, grabWordInDirection } from "../../util/get-position-context-in-document";
 import { iterableFilter, iterableMap } from "../../util/iterable-util";
 import { documentRangeToSFRange } from "../../util/range-util";
-import { replacePrefix } from "../../util/str-util";
 
 function makeVscTextDocument(cssDocument: CssDocument): vscode.TextDocument {
 	return vscode.TextDocument.create("untitled://embedded.css", "css", 1, cssDocument.virtualDocument.text);
@@ -116,6 +115,11 @@ export class LitCssVscodeService {
 				positionContext.leftWord;
 		}
 
+		const range = documentRangeToSFRange(document, {
+			start: positionContext.offset - positionContext.leftWord.length,
+			end: positionContext.offset + positionContext.rightWord.length
+		});
+
 		const vscTextDocument = makeVscTextDocument(document);
 		const vscStylesheet = this.makeVscStylesheet(vscTextDocument);
 		const vscPosition = vscTextDocument.positionAt(offset);
@@ -127,10 +131,11 @@ export class LitCssVscodeService {
 				({
 					kind: i.kind == null ? "unknown" : translateCompletionItemKind(i.kind),
 					name: i.label,
-					insert: replacePrefix(i.label, positionContext.leftWord),
+					insert: i.label, //replacePrefix(i.label, positionContext.leftWord),
 					kindModifiers: i.kind === vscode.CompletionItemKind.Color ? "color" : undefined,
-					importance: i.label.startsWith("@") || i.label.startsWith("-") || i.label.startsWith(":") ? "low" : "medium",
-					documentation: lazy(() => (typeof i.documentation === "string" || i.documentation == null ? i.documentation : i.documentation.value))
+					documentation: lazy(() => (typeof i.documentation === "string" || i.documentation == null ? i.documentation : i.documentation.value)),
+					sortText: i.sortText,
+					range
 				} as LitCompletion)
 		);
 
@@ -143,9 +148,10 @@ export class LitCssVscodeService {
 			completions.push({
 				kind: "variableElement",
 				name: cssProp.name,
-				insert: replacePrefix(cssProp.name, positionContext.leftWord),
-				importance: positionContext.leftWord.startsWith("-") ? "high" : "medium",
-				documentation: lazy(() => documentationForCssProperty(cssProp))
+				insert: cssProp.name,
+				sortText: positionContext.leftWord.startsWith("-") ? "0" : "e_0",
+				documentation: lazy(() => documentationForCssProperty(cssProp)),
+				range
 			});
 		}
 
@@ -164,9 +170,10 @@ export class LitCssVscodeService {
 					completions.push({
 						kind: "variableElement",
 						name: cssPart.name,
-						insert: replacePrefix(cssPart.name, positionContext.leftWord),
-						importance: "high",
-						documentation: lazy(() => documentationForCssPart(cssPart))
+						insert: cssPart.name,
+						sortText: "0",
+						documentation: lazy(() => documentationForCssPart(cssPart)),
+						range
 					});
 				}
 			}

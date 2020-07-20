@@ -1,7 +1,7 @@
 import { LitCompletion } from "lit-analyzer";
 import { CompletionEntry, CompletionInfo } from "typescript";
-import { translateTargetKind } from "./translate-target-kind";
 import { translateRange } from "./translate-range";
+import { translateTargetKind } from "./translate-target-kind";
 
 export function translateCompletions(completions: LitCompletion[]): CompletionInfo | undefined {
 	const entries = completions.map(completion => translateCompletion(completion));
@@ -25,7 +25,7 @@ function translateCompletion(completion: LitCompletion): CompletionEntry {
 		name,
 		kind: translateTargetKind(kind),
 		kindModifiers: completion.kindModifiers,
-		sortText: importance === "high" ? "0" : importance === "medium" ? "1" : "2",
+		sortText: completion.sortText != null ? completion.sortText : importance === "high" ? "0" : importance === "medium" ? "1" : "2",
 		insertText: insert,
 		...(range != null ? { replacementSpan: translateRange(range) } : {})
 	};
