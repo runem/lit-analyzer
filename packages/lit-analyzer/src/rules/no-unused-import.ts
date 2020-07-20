@@ -37,10 +37,8 @@ const rule: RuleModule = {
 				})
 			);
 
-			const range: Range = { start: importDeclaration.pos, end: importDeclaration.end };
-
 			// get the ComponentDefinitions imported by the import declaration.
-			const importedDefinitions = dependencyStore.getImportedDefinitionByRangeOfImportStatement(file, range);
+			const importedDefinitions = dependencyStore.getImportedComponentDefinitionsByImportDeclaration(importDeclaration);
 
 			// check if any of the imported Definitions are used in the SourceFile
 			const anyImportedDefinitionsUsed = importedDefinitions.some((importedDefinition: ComponentDefinition) => {
