@@ -1,5 +1,5 @@
 import { RuleModule } from "../analyze/types/rule/rule-module";
-import { Range, SourceFileRange } from "../analyze/types/range";
+import { SourceFileRange } from "../analyze/types/range";
 import { ComponentDefinition } from "web-component-analyzer";
 import { isCustomElementTagName } from "../analyze/util/is-valid-name";
 import { arrayFlat } from "../analyze/util/array-util";
@@ -70,13 +70,12 @@ export default rule;
  * @returns SourceFileRange
  */
 function getReportRangeFromImportDeclaration(importDeclaration: ImportDeclaration): SourceFileRange {
-	let fullText = importDeclaration.getFullText();
-	const range: Range = { start: importDeclaration.pos, end: importDeclaration.end };
-	while (fullText.startsWith("\n")) {
-		range.start++;
-		fullText = fullText.replace("\n", "");
-	}
-	const reportRange: SourceFileRange = { ...range, _brand: "sourcefile" };
+	// The range that is included in the importDeclaration object points to the fulltext of the delcaration,
+	// which includes newlines and comments in front of the import declaration.
+	const fullText = importDeclaration.getFullText();
+	const text = importDeclaration.getText();
+	const rangeOffset = fullText.indexOf(text);
+	const reportRange: SourceFileRange = { start: importDeclaration.pos + rangeOffset, end: importDeclaration.end, _brand: "sourcefile" };
 	return reportRange;
 }
 
