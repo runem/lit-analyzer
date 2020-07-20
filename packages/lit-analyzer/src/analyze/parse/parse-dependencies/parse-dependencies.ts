@@ -72,7 +72,7 @@ export function parseAllIndirectImports(
 	context: LitAnalyzerContext,
 	{ maxExternalDepth, maxInternalDepth }: { maxExternalDepth?: number; maxInternalDepth?: number } = {}
 ): Set<SourceFileWithImport> {
-	const importedSourceFiles = new Set<SourceFileWithImport>();
+	const importedSourceFiles = new Map<SourceFile, Set<ImportDeclaration | "rootSourceFile">>();
 	visitIndirectImportsFromSourceFile(sourceFile, {
 		project: context.project,
 		program: context.program,
@@ -81,21 +81,34 @@ export function parseAllIndirectImports(
 		maxExternalDepth: maxExternalDepth ?? context.config.maxNodeModuleImportDepth,
 		maxInternalDepth: maxInternalDepth ?? context.config.maxProjectImportDepth,
 		emitIndirectImport(sourceFileWithImport: SourceFileWithImport): boolean {
-			// const importSpecifier = sourceFileWithImport.importDeclaration === "rootSourceFile" ?  "rootSourceFile" : sourceFileWithImport.importDeclaration.moduleSpecifier.getText();
-			// const key = sourceFileWithImport.sourceFile.fileName + importSpecifier;
+			const { sourceFile, importDeclaration } = sourceFileWithImport;
 
-			if (importedSourceFiles.has(sourceFileWithImport)) {
-				return false;
-			} else if (sourceFileWithImport.sourceFile === sourceFile) {
-				// The root rootSourceFile gets emitted.
-				// In case of a circular dependency, the rootSourceFile can be re-emitted with a (wrongly) set importDeclaration.
-				// if (importedSourceFiles.has({ sourceFile: sourceFileWithImport.sourceFile, importDeclaration: "rootSourceFile" })) return false;
+			if (importedSourceFiles.has(sourceFile)) {
+				const importDeclarations = importedSourceFiles.get(sourceFile)!;
+				if (importDeclarations.has(importDeclaration)) {
+					// Sourcefile has already been visited from this importDeclaration.
+					return false;
+				} else {
+					// Sourcefile has already been visited from ANOTHER importDeclaration.
+					// Adding this importDeclaration to the Set of importDeclarations.
+					importDeclarations.add(importDeclaration);
+					importedSourceFiles.set(sourceFile, importDeclarations);
+					return true;
+				}
 			}
-
-			importedSourceFiles.add(sourceFileWithImport);
+			// Sourcefile has not been visited yet.
+			const importDeclarations = new Set<ImportDeclaration | "rootSourceFile">();
+			importDeclarations.add(importDeclaration);
+			importedSourceFiles.set(sourceFile, importDeclarations);
 			return true;
 		}
 	});
 
-	return importedSourceFiles;
+	const result = new Set<SourceFileWithImport>();
+	for (const [sourceFile, importDeclarations] of importedSourceFiles) {
+		for (const importDeclaration of importDeclarations) {
+			result.add({ sourceFile, importDeclaration });
+		}
+	}
+	return result;
 }

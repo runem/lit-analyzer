@@ -23,7 +23,6 @@ interface IVisitDependenciesContext {
  */
 export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, context: IVisitDependenciesContext): void {
 	const currentDepth = context.depth ?? 0;
-	// if (sourceFile.fileName.includes('file2')) debugger;
 	// Emit a visit. If this file has been seen already, the function will return false, and traversal will stop
 	if (!context.emitIndirectImport({ sourceFile, importDeclaration: context.importDeclaration ?? "rootSourceFile" })) {
 		return;
@@ -161,7 +160,6 @@ function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, con
 		const resolvedModule = result.resolvedModule;
 		const sourceFile = context.program.getSourceFile(resolvedModule.resolvedFileName);
 		if (sourceFile != null) {
-			// const range = { start: node.pos, end: node.end };
 			const importDeclaration = node as ImportDeclaration;
 			context.emitDirectImport?.(sourceFile, importDeclaration);
 		}
