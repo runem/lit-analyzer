@@ -7,7 +7,6 @@ import { HtmlNode, HtmlNodeKind } from "./types/html-node/html-node-types";
 import { RuleDiagnostic } from "./types/rule/rule-diagnostic";
 import { RuleModule, RuleModuleImplementation } from "./types/rule/rule-module";
 import { RuleModuleContext } from "./types/rule/rule-module-context";
-import { ImportDeclaration } from "typescript";
 
 export interface ReportedRuleDiagnostic {
 	source: LitAnalyzerRuleId;
@@ -135,12 +134,9 @@ export class RuleCollection {
 		return diagnostics;
 	}
 
-	getDiagnosticsFromImportStatement(
-		importAndDocuments: { importDeclaration: ImportDeclaration; htmlDocuments: HtmlDocument[] },
-		baseContext: LitAnalyzerContext
-	): ReportedRuleDiagnostic[] {
+	getDiagnosticsFromSourceFile(baseContext: LitAnalyzerContext): ReportedRuleDiagnostic[] {
 		const diagnostics: ReportedRuleDiagnostic[] = [];
-		this.invokeRules("visitImportStatement", importAndDocuments, d => diagnostics.push(d), baseContext);
+		this.invokeRules("visitSourceFile", baseContext.currentFile, d => diagnostics.push(d), baseContext);
 		return diagnostics;
 	}
 }

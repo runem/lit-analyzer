@@ -2,15 +2,10 @@ import { LitAnalyzerContext } from "../lit-analyzer-context";
 import { ReportedRuleDiagnostic } from "../rule-collection";
 import { LitDiagnostic } from "../types/lit-diagnostic";
 import { convertRuleDiagnosticToLitDiagnostic } from "../util/rule-diagnostic-util";
-import { HtmlDocument } from "../parse/document/text-document/html-document/html-document";
-import { ImportDeclaration } from "typescript";
 
-export class ImportAnalyzer {
-	getDiagnostics(
-		importAndDocuments: { importDeclaration: ImportDeclaration; htmlDocuments: HtmlDocument[] },
-		context: LitAnalyzerContext
-	): LitDiagnostic[] {
-		return this.getRuleDiagnostics(importAndDocuments, context).map(diagnostic => convertRuleDiagnosticToLitDiagnostic(diagnostic, context));
+export class SourceFileAnalyzer {
+	getDiagnostics(context: LitAnalyzerContext): LitDiagnostic[] {
+		return this.getRuleDiagnostics(context).map(diagnostic => convertRuleDiagnosticToLitDiagnostic(diagnostic, context));
 	}
 
 	// TODO: Create Codefix and implement this function
@@ -27,10 +22,7 @@ export class ImportAnalyzer {
 	//     ).map(ruleFix => converRuleFixToLitCodeFix(ruleFix));
 	// }
 
-	private getRuleDiagnostics(
-		importAndDocuments: { importDeclaration: ImportDeclaration; htmlDocuments: HtmlDocument[] },
-		context: LitAnalyzerContext
-	): ReportedRuleDiagnostic[] {
-		return context.rules.getDiagnosticsFromImportStatement(importAndDocuments, context);
+	private getRuleDiagnostics(context: LitAnalyzerContext): ReportedRuleDiagnostic[] {
+		return context.rules.getDiagnosticsFromSourceFile(context);
 	}
 }
