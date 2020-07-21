@@ -41,11 +41,13 @@ const rule: RuleModule = {
 			const importedDefinitions = dependencyStore.getImportedComponentDefinitionsByImportDeclaration(importDeclaration);
 
 			// check if any of the imported Definitions are used in the SourceFile
-			const anyImportedDefinitionsUsed = importedDefinitions.some((importedDefinition: ComponentDefinition) => {
-				return customElementsNodes.some(customElementNode => {
-					return customElementNode?.tagName === importedDefinition.tagName;
+			const anyImportedDefinitionsUsed =
+				importedDefinitions.length > 0 &&
+				importedDefinitions.some((importedDefinition: ComponentDefinition) => {
+					return customElementsNodes.some(customElementNode => {
+						return customElementNode?.tagName === importedDefinition.tagName;
+					});
 				});
-			});
 
 			const reportRange = getReportRangeFromImportDeclaration(importDeclaration);
 			const path = importDeclaration.moduleSpecifier.getText();

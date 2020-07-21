@@ -27,7 +27,7 @@ export class DefaultAnalyzerDependencyStore implements AnalyzerDependencyStore {
 		for (const componentDefinitionWithImport of this.importedComponentDefinitionsInFile.get(sourceFile.fileName) || []) {
 			const { importDeclaration: currentImportDeclaration, definition } = componentDefinitionWithImport;
 
-			if (currentImportDeclaration === "rootSourceFile") break;
+			if (currentImportDeclaration === "rootSourceFile") continue;
 
 			if (currentImportDeclaration === importDeclaration) {
 				definitionsOfThisImport.push(definition);
