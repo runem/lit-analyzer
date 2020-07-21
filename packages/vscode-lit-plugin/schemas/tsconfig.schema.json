@@ -113,6 +113,11 @@
 											"description": "Check that custom elements used are imported.",
 											"enum": ["off", "warning", "error"]
 										},
+										"no-unused-import": {
+											"type": "string",
+											"description": "Check that any custom element loaded by an import statement is used.",
+											"enum": ["off", "warning", "error"]
+										},
 										"no-unclosed-tag": {
 											"type": "string",
 											"description": "Check that all tags are properly closed.",

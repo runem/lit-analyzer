@@ -113,6 +113,11 @@ function ruleFixActionConverter(action: RuleFixAction): LitCodeFixAction[] {
 		}
 
 		case "removeImport": {
+			const hasTrailingNewline = action.file.getFullText().charCodeAt(action.range.end) === 10;
+			if (hasTrailingNewline) {
+				// If the statement has a trailing newline we want to remove it as well.
+				action.range.end++;
+			}
 			return [
 				{
 					range: action.range,
