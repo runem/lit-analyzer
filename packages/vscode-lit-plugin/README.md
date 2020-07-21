@@ -45,6 +45,7 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | :------ | ----------- | --------------- | --------------- |
 | [no-unknown-tag-name](#-no-unknown-tag-name) | The existence of tag names are checked. Be aware that not all custom elements from libraries will be found out of the box. | off | warning |
 | [no-missing-import](#-no-missing-import)     | When using custom elements in HTML it is checked if the element has been imported and is available in the current context. | off | warning |
+| [no-unused-import](#-no-unused-import)       | When an import statement loads modules that define custom elements, it is checked whether any of the imported custom element definitions are used in the current file. | off | warning |
 | [no-unclosed-tag](#-no-unclosed-tag)         | Unclosed tags, and invalid self closing tags like custom elements tags, are checked. | warning | error |
 | [no-missing-element-type-definition](#no-missing-element-type-definition) | This rule will ensure that custom elements are registered on the `HTMLElementTagNameMap` Typescript interface. | off | off |
 
@@ -119,6 +120,27 @@ The following example is considered a warning:
 ```js
 // No import of "my-element"
 html`<my-element></my-element>`
+```
+
+The following example is not considered a warning:
+
+<!-- prettier-ignore -->
+```js
+import "my-element.js";
+html`<my-element></my-element>`
+```
+
+#### 🚮 no-unused-import
+
+When an import statement loads modules that define custom elements, it is checked whether any of the imported custom element definitions are used in the current file.
+An import statement is considered unused if none of its imported custom element definitions are used in a `lit-html` template. Currently, only import statements without import clauses (e. g. `import "my-element.js"`) are evaluated.
+
+The following example is considered a warning:
+
+<!-- prettier-ignore -->
+```js
+import "my-element.js";
+// "my-element" is not being used
 ```
 
 The following example is not considered a warning:
