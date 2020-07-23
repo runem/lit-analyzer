@@ -69,7 +69,7 @@ export const ALL_RULE_IDS = Object.keys(DEFAULT_RULES_SEVERITY).sort() as LitAna
 // The user should always use the "rule id" string.
 // Consider if this map should be manually maintained in the future.
 export const RULE_ID_CODE_MAP = ALL_RULE_IDS.reduce((acc, ruleId, i) => {
-	acc[ruleId] = i + 1;
+	acc[ruleId] = i + 1001;
 	return acc;
 }, {} as Record<LitAnalyzerRuleId, number>);
 
