@@ -24,13 +24,6 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 		...languageServiceExtension
 	};
 
-	// Decorate "getSupportedCodeFixes"
-	// Read more here: https://github.com/microsoft/TypeScript/issues/29051
-	const getSupportedCodeFixes = plugin.context.ts.getSupportedCodeFixes.bind(plugin.context.ts);
-	plugin.context.ts.getSupportedCodeFixes = () => {
-		return [...getSupportedCodeFixes(), ...plugin.getSupportedCodeFixes()];
-	};
-
 	// Make sure to call the old service if config.disable === true
 	for (const methodName of Object.getOwnPropertyNames(languageServiceExtension) as (keyof LanguageService)[]) {
 		const newMethod: Function | undefined = decoratedLanguageService[methodName]!;

@@ -3,7 +3,6 @@ import { ComponentAnalyzer } from "./component-analyzer/component-analyzer";
 import { LitCssDocumentAnalyzer } from "./document-analyzer/css/lit-css-document-analyzer";
 import { LitHtmlDocumentAnalyzer } from "./document-analyzer/html/lit-html-document-analyzer";
 import { renameLocationsForTagName } from "./document-analyzer/html/rename-locations/rename-locations-for-tag-name";
-import { RULE_ID_CODE_MAP } from "./lit-analyzer-config";
 import { LitAnalyzerContext } from "./lit-analyzer-context";
 import { CssDocument } from "./parse/document/text-document/css-document/css-document";
 import { HtmlDocument } from "./parse/document/text-document/html-document/html-document";
@@ -35,10 +34,6 @@ export class LitAnalyzer {
 		// Set the Typescript module
 		// I plan on removing this function, so only "context.ts" is used.
 		setTypescriptModule(context.ts);
-	}
-
-	getSupportedCodeFixes(): string[] {
-		return Object.values(RULE_ID_CODE_MAP).map(String);
 	}
 
 	getOutliningSpansInFile(file: SourceFile): LitOutliningSpan[] {
