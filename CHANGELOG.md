@@ -7,6 +7,14 @@ All notable changes to this project will be documented in this file.
 <!-- ### Removed -->
 <!-- ### Fixed -->
 
+## [1.2.1] - 25/7/2020
+
+### Fixed
+
+- Markdown output is no properly escaped ([#119](https://github.com/runem/lit-analyzer/issues/119))
+- Code fixes now works again in Webstorm (rule ids now start at 2300) ([#124](https://github.com/runem/lit-analyzer/issues/124))
+- Fixed CSS auto completion ([#120](https://github.com/runem/lit-analyzer/issues/120))
+
 ## [1.2.0] - 15/7/2020
 
 ### Added
