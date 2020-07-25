@@ -2,7 +2,6 @@
 import { LanguageService } from "typescript";
 import { logger } from "./logger";
 import { TsLitPlugin } from "./ts-lit-plugin/ts-lit-plugin";
-import { tsModule } from "./ts-module";
 
 export function decorateLanguageService(languageService: LanguageService, plugin: TsLitPlugin): LanguageService {
 	const languageServiceExtension: Partial<LanguageService> = {
@@ -23,13 +22,6 @@ export function decorateLanguageService(languageService: LanguageService, plugin
 	const decoratedLanguageService: LanguageService = {
 		...languageService,
 		...languageServiceExtension
-	};
-
-	// Decorate "getSupportedCodeFixes"
-	// Read more here: https://github.com/microsoft/TypeScript/issues/29051
-	const getSupportedCodeFixes = tsModule.ts.getSupportedCodeFixes.bind(tsModule.ts);
-	tsModule.ts.getSupportedCodeFixes = () => {
-		return [...getSupportedCodeFixes(), ...plugin.getSupportedCodeFixes()];
 	};
 
 	// Make sure to call the old service if config.disable === true
