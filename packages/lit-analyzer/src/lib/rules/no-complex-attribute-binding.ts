@@ -28,6 +28,9 @@ const rule: RuleModule = {
 		// Don't validate directives in this rule, because they are assignable even though they are complex types (functions).
 		if (isLitDirective(typeB)) return;
 
+		const htmlAttrTarget = context.htmlStore.getHtmlAttrTarget(htmlAttr);
+		const hasConverter = htmlAttrTarget?.declaration?.meta?.hasConverter;
+
 		// Only primitive types should be allowed as "typeB"
 		if (!isAssignableToPrimitiveType(typeB)) {
 			if (isAssignableBindingUnderSecuritySystem(htmlAttr, { typeA, typeB }, context) !== undefined) {
@@ -57,7 +60,7 @@ const rule: RuleModule = {
 		}
 
 		// Only primitive types should be allowed as "typeA"
-		else if (!isAssignableToPrimitiveType(typeA)) {
+		else if (!hasConverter && !isAssignableToPrimitiveType(typeA)) {
 			const message = `You are assigning the primitive '${typeToString(typeB)}' to a non-primitive type '${typeToString(typeA)}'.`;
 			const newModifier = ".";
 
