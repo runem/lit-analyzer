@@ -3,7 +3,7 @@
 	"private": true,
 	"displayName": "lit-plugin",
 	"description": "Syntax highlighting, type checking and code completion for lit-html",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"publisher": "runem",
 	"icon": "docs/assets/lit-plugin@256w.png",
 	"license": "MIT",
@@ -35,7 +35,7 @@
 	},
 	"dependencies": {
 		"lit-html": "https://github.com/mjbvz/vscode-lit-html.git#1.11.1",
-		"ts-lit-plugin": "1.2.0",
+		"ts-lit-plugin": "1.2.1",
 		"vscode-styled-components": "https://github.com/styled-components/vscode-styled-components#4320c223666ea835e8c63c85573c2704f550b7df",
 		"web-component-analyzer": "~1.1.1"
 	},
