@@ -59,8 +59,6 @@ export function parseDependencies(sourceFile: SourceFile, context: LitAnalyzerCo
  * Returns a map of component declarations in each file encountered from a source file recursively.
  * @param sourceFile
  * @param context
- * @param maxExternalDepth
- * @param minExternalDepth
  */
 export function parseAllIndirectImports(sourceFile: SourceFile, context: LitAnalyzerContext): Set<SourceFile> {
 	const importedSourceFiles = new Set<SourceFile>();
