@@ -51,14 +51,17 @@ tsTest("Correctly follows all project-internal imports with (default) maxInterna
 	t.deepEqual(sortedFileNames, ["file1.ts", "file2.ts", "file3.ts", "file4.ts", "file5.ts"]);
 });
 
-tsTest("Correctly follows project-internal imports with maxInternalDepth=1", t => {
-	const { sourceFile, context } = prepareAnalyzer([
-		{ fileName: "file1.ts", text: `export class MyClass { }` },
-		{ fileName: "file2.ts", text: `import * from "file1";export class MyClass { }` },
-		{ fileName: "file3.ts", text: `import * from "file2";export class MyClass { }`, entry: true }
-	]);
+tsTest("Correctly follows project-internal imports with maxProjectImportDepth=1", t => {
+	const { sourceFile, context } = prepareAnalyzer(
+		[
+			{ fileName: "file1.ts", text: `export class MyClass { }` },
+			{ fileName: "file2.ts", text: `import * from "file1";export class MyClass { }` },
+			{ fileName: "file3.ts", text: `import * from "file2";export class MyClass { }`, entry: true }
+		],
+		{ maxProjectImportDepth: 1 }
+	);
 
-	const dependencies = parseAllIndirectImports(sourceFile, context, { maxInternalDepth: 1 });
+	const dependencies = parseAllIndirectImports(sourceFile, context);
 
 	const sortedFileNames = Array.from(dependencies)
 		.map(file => file.fileName)
@@ -67,18 +70,21 @@ tsTest("Correctly follows project-internal imports with maxInternalDepth=1", t =
 	t.deepEqual(sortedFileNames, ["file2.ts", "file3.ts"]);
 });
 
-tsTest("Correctly follows project-internal imports with maxInternalDepth=5", t => {
-	const { sourceFile, context } = prepareAnalyzer([
-		{ fileName: "file1.ts", text: `export class MyClass { }` },
-		{ fileName: "file2.ts", text: `import * from "file1";export class MyClass { }` },
-		{ fileName: "file3.ts", text: `import * from "file2";export class MyClass { }` },
-		{ fileName: "file4.ts", text: `import * from "file3";export class MyClass { }` },
-		{ fileName: "file5.ts", text: `import * from "file4";export class MyClass { }` },
-		{ fileName: "file6.ts", text: `import * from "file5";export class MyClass { }` },
-		{ fileName: "file7.ts", text: `import * from "file6";export class MyClass { }`, entry: true }
-	]);
+tsTest("Correctly follows project-internal imports with maxProjectImportDepth=5", t => {
+	const { sourceFile, context } = prepareAnalyzer(
+		[
+			{ fileName: "file1.ts", text: `export class MyClass { }` },
+			{ fileName: "file2.ts", text: `import * from "file1";export class MyClass { }` },
+			{ fileName: "file3.ts", text: `import * from "file2";export class MyClass { }` },
+			{ fileName: "file4.ts", text: `import * from "file3";export class MyClass { }` },
+			{ fileName: "file5.ts", text: `import * from "file4";export class MyClass { }` },
+			{ fileName: "file6.ts", text: `import * from "file5";export class MyClass { }` },
+			{ fileName: "file7.ts", text: `import * from "file6";export class MyClass { }`, entry: true }
+		],
+		{ maxProjectImportDepth: 5 }
+	);
 
-	const dependencies = parseAllIndirectImports(sourceFile, context, { maxInternalDepth: 5 });
+	const dependencies = parseAllIndirectImports(sourceFile, context);
 
 	const sortedFileNames = Array.from(dependencies)
 		.map(file => file.fileName)
@@ -87,14 +93,17 @@ tsTest("Correctly follows project-internal imports with maxInternalDepth=5", t =
 	t.deepEqual(sortedFileNames, ["file2.ts", "file3.ts", "file4.ts", "file5.ts", "file6.ts", "file7.ts"]);
 });
 
-tsTest("Correctly follows project-external imports with maxExternalDepth=1", t => {
-	const { sourceFile, context } = prepareAnalyzer([
-		{ fileName: "node_modules/file1.ts", text: `export class MyClass { }` },
-		{ fileName: "node_modules/file2.ts", text: `import * from "./file1";export class MyClass { }` },
-		{ fileName: "node_modules/file3.ts", text: `import * from "./file2";export class MyClass { }`, entry: true }
-	]);
+tsTest("Correctly follows project-external imports with maxNodeModuleImportDepth=1", t => {
+	const { sourceFile, context } = prepareAnalyzer(
+		[
+			{ fileName: "node_modules/file1.ts", text: `export class MyClass { }` },
+			{ fileName: "node_modules/file2.ts", text: `import * from "./file1";export class MyClass { }` },
+			{ fileName: "node_modules/file3.ts", text: `import * from "./file2";export class MyClass { }`, entry: true }
+		],
+		{ maxNodeModuleImportDepth: 1 }
+	);
 
-	const dependencies = parseAllIndirectImports(sourceFile, context, { maxExternalDepth: 1 });
+	const dependencies = parseAllIndirectImports(sourceFile, context);
 
 	const sortedFileNames = Array.from(dependencies)
 		.map(file => file.fileName)
@@ -103,18 +112,21 @@ tsTest("Correctly follows project-external imports with maxExternalDepth=1", t =
 	t.deepEqual(sortedFileNames, ["node_modules/file2.ts", "node_modules/file3.ts"]);
 });
 
-tsTest("Correctly follows project-external imports with maxExternalDepth=5", t => {
-	const { sourceFile, context } = prepareAnalyzer([
-		{ fileName: "node_modules/file1.ts", text: `export class MyClass { }` },
-		{ fileName: "node_modules/file2.ts", text: `import * from "./file1";export class MyClass { }` },
-		{ fileName: "node_modules/file3.ts", text: `import * from "./file2";export class MyClass { }` },
-		{ fileName: "node_modules/file4.ts", text: `import * from "./file3";export class MyClass { }` },
-		{ fileName: "node_modules/file5.ts", text: `import * from "./file4";export class MyClass { }` },
-		{ fileName: "node_modules/file6.ts", text: `import * from "./file5";export class MyClass { }` },
-		{ fileName: "node_modules/file7.ts", text: `import * from "./file6";export class MyClass { }`, entry: true }
-	]);
+tsTest("Correctly follows project-external imports with maxNodeModuleImportDepth=5", t => {
+	const { sourceFile, context } = prepareAnalyzer(
+		[
+			{ fileName: "node_modules/file1.ts", text: `export class MyClass { }` },
+			{ fileName: "node_modules/file2.ts", text: `import * from "./file1";export class MyClass { }` },
+			{ fileName: "node_modules/file3.ts", text: `import * from "./file2";export class MyClass { }` },
+			{ fileName: "node_modules/file4.ts", text: `import * from "./file3";export class MyClass { }` },
+			{ fileName: "node_modules/file5.ts", text: `import * from "./file4";export class MyClass { }` },
+			{ fileName: "node_modules/file6.ts", text: `import * from "./file5";export class MyClass { }` },
+			{ fileName: "node_modules/file7.ts", text: `import * from "./file6";export class MyClass { }`, entry: true }
+		],
+		{ maxNodeModuleImportDepth: 5 }
+	);
 
-	const dependencies = parseAllIndirectImports(sourceFile, context, { maxExternalDepth: 5 });
+	const dependencies = parseAllIndirectImports(sourceFile, context);
 
 	const sortedFileNames = Array.from(dependencies)
 		.map(file => file.fileName)
@@ -130,14 +142,17 @@ tsTest("Correctly follows project-external imports with maxExternalDepth=5", t =
 	]);
 });
 
-tsTest("Correctly resets depth when going from internal to external module with maxInternalDepth=1", t => {
-	const { sourceFile, context } = prepareAnalyzer([
-		{ fileName: "node_modules/file1.ts", text: `export class MyClass { }` },
-		{ fileName: "node_modules/file2.ts", text: `import * from "./file1";export class MyClass { }` },
-		{ fileName: "file3.ts", text: `import * from "./node_modules/file2";export class MyClass { }`, entry: true }
-	]);
+tsTest("Correctly resets depth when going from internal to external module with maxProjectImportDepth=1", t => {
+	const { sourceFile, context } = prepareAnalyzer(
+		[
+			{ fileName: "node_modules/file1.ts", text: `export class MyClass { }` },
+			{ fileName: "node_modules/file2.ts", text: `import * from "./file1";export class MyClass { }` },
+			{ fileName: "file3.ts", text: `import * from "./node_modules/file2";export class MyClass { }`, entry: true }
+		],
+		{ maxProjectImportDepth: 1 }
+	);
 
-	const dependencies = parseAllIndirectImports(sourceFile, context, { maxInternalDepth: 1 });
+	const dependencies = parseAllIndirectImports(sourceFile, context);
 
 	const sortedFileNames = Array.from(dependencies)
 		.map(file => file.fileName)
@@ -145,15 +160,18 @@ tsTest("Correctly resets depth when going from internal to external module with 
 	t.deepEqual(sortedFileNames, ["file3.ts", "node_modules/file2.ts"]);
 });
 
-tsTest("Correctly resets depth when going from internal to external module with maxInternalDepth=2", t => {
-	const { sourceFile, context } = prepareAnalyzer([
-		{ fileName: "node_modules/file1.ts", text: `export class MyClass { }` },
-		{ fileName: "node_modules/file2.ts", text: `import * from "./file1";export class MyClass { }` },
-		{ fileName: "file3.ts", text: `import * from "./node_modules/file2";export class MyClass { }` },
-		{ fileName: "file4.ts", text: `import * from "./file3";export class MyClass { }`, entry: true }
-	]);
+tsTest("Correctly resets depth when going from internal to external module with maxProjectImportDepth=2", t => {
+	const { sourceFile, context } = prepareAnalyzer(
+		[
+			{ fileName: "node_modules/file1.ts", text: `export class MyClass { }` },
+			{ fileName: "node_modules/file2.ts", text: `import * from "./file1";export class MyClass { }` },
+			{ fileName: "file3.ts", text: `import * from "./node_modules/file2";export class MyClass { }` },
+			{ fileName: "file4.ts", text: `import * from "./file3";export class MyClass { }`, entry: true }
+		],
+		{ maxProjectImportDepth: 2 }
+	);
 
-	const dependencies = parseAllIndirectImports(sourceFile, context, { maxInternalDepth: 2 });
+	const dependencies = parseAllIndirectImports(sourceFile, context);
 
 	const sortedFileNames = Array.from(dependencies)
 		.map(file => file.fileName)
@@ -163,14 +181,17 @@ tsTest("Correctly resets depth when going from internal to external module with 
 });
 
 tsTest("Correctly resets depth when going from internal to external module when first external module is a facade module", t => {
-	const { sourceFile, context } = prepareAnalyzer([
-		{ fileName: "node_modules/file1.ts", text: `export class MyClass { }` },
-		{ fileName: "node_modules/file2.ts", text: `import * from "./file1";export class MyClass { }` },
-		{ fileName: "node_modules/file3.ts", text: `import * from "./file2"` },
-		{ fileName: "file4.ts", text: `import * from "./node_modules/file3";export class MyClass { }`, entry: true }
-	]);
+	const { sourceFile, context } = prepareAnalyzer(
+		[
+			{ fileName: "node_modules/file1.ts", text: `export class MyClass { }` },
+			{ fileName: "node_modules/file2.ts", text: `import * from "./file1";export class MyClass { }` },
+			{ fileName: "node_modules/file3.ts", text: `import * from "./file2"` },
+			{ fileName: "file4.ts", text: `import * from "./node_modules/file3";export class MyClass { }`, entry: true }
+		],
+		{ maxProjectImportDepth: 1 }
+	);
 
-	const dependencies = parseAllIndirectImports(sourceFile, context, { maxInternalDepth: 1 });
+	const dependencies = parseAllIndirectImports(sourceFile, context);
 
 	const sortedFileNames = Array.from(dependencies)
 		.map(file => file.fileName)
@@ -180,15 +201,18 @@ tsTest("Correctly resets depth when going from internal to external module when 
 });
 
 tsTest("Correctly follows modules when going from internal to external module when second external module is a facade module", t => {
-	const { sourceFile, context } = prepareAnalyzer([
-		{ fileName: "node_modules/file1.ts", text: `export class MyClass { }` },
-		{ fileName: "node_modules/file2.ts", text: `import * from "./file1";export class MyClass { }` },
-		{ fileName: "node_modules/file3.ts", text: `import * from "./file2"` },
-		{ fileName: "node_modules/file4.ts", text: `import * from "./file3";export class MyClass { }` },
-		{ fileName: "file5.ts", text: `import * from "./node_modules/file4";export class MyClass { }`, entry: true }
-	]);
+	const { sourceFile, context } = prepareAnalyzer(
+		[
+			{ fileName: "node_modules/file1.ts", text: `export class MyClass { }` },
+			{ fileName: "node_modules/file2.ts", text: `import * from "./file1";export class MyClass { }` },
+			{ fileName: "node_modules/file3.ts", text: `import * from "./file2"` },
+			{ fileName: "node_modules/file4.ts", text: `import * from "./file3";export class MyClass { }` },
+			{ fileName: "file5.ts", text: `import * from "./node_modules/file4";export class MyClass { }`, entry: true }
+		],
+		{ maxProjectImportDepth: 1, maxNodeModuleImportDepth: 2 }
+	);
 
-	const dependencies = parseAllIndirectImports(sourceFile, context, { maxInternalDepth: 1, maxExternalDepth: 2 });
+	const dependencies = parseAllIndirectImports(sourceFile, context);
 
 	const sortedFileNames = Array.from(dependencies)
 		.map(file => file.fileName)
@@ -246,14 +270,17 @@ tsTest("Correctly identifies facade modules", t => {
 });
 
 tsTest("Correctly follows facade modules one level", t => {
-	const { sourceFile, context } = prepareAnalyzer([
-		{ fileName: "file1.ts", text: `export class MyClass { }` },
-		{ fileName: "file2.ts", text: `import * from "file1"; export class MyClass { }` },
-		{ fileName: "file3.ts", text: `import * from "file2";` },
-		{ fileName: "file4.ts", text: `import * from "file3"; export class MyClass { }"`, entry: true }
-	]);
+	const { sourceFile, context } = prepareAnalyzer(
+		[
+			{ fileName: "file1.ts", text: `export class MyClass { }` },
+			{ fileName: "file2.ts", text: `import * from "file1"; export class MyClass { }` },
+			{ fileName: "file3.ts", text: `import * from "file2";` },
+			{ fileName: "file4.ts", text: `import * from "file3"; export class MyClass { }"`, entry: true }
+		],
+		{ maxProjectImportDepth: 1 }
+	);
 
-	const dependencies = parseAllIndirectImports(sourceFile, context, { maxInternalDepth: 1 });
+	const dependencies = parseAllIndirectImports(sourceFile, context);
 
 	const sortedFileNames = Array.from(dependencies)
 		.map(file => file.fileName)
@@ -263,15 +290,18 @@ tsTest("Correctly follows facade modules one level", t => {
 });
 
 tsTest("Correctly follows facade modules multiple levels", t => {
-	const { sourceFile, context } = prepareAnalyzer([
-		{ fileName: "file0.ts", text: `export class MyClass { }` },
-		{ fileName: "file1.ts", text: `export * from "file0"; export class MyClass { }` },
-		{ fileName: "file2.ts", text: `export * from "file1";` },
-		{ fileName: "file3.ts", text: `import * from "file2";` },
-		{ fileName: "file4.ts", text: `import * from "file3"; export class MyClass { }"`, entry: true }
-	]);
+	const { sourceFile, context } = prepareAnalyzer(
+		[
+			{ fileName: "file0.ts", text: `export class MyClass { }` },
+			{ fileName: "file1.ts", text: `export * from "file0"; export class MyClass { }` },
+			{ fileName: "file2.ts", text: `export * from "file1";` },
+			{ fileName: "file3.ts", text: `import * from "file2";` },
+			{ fileName: "file4.ts", text: `import * from "file3"; export class MyClass { }"`, entry: true }
+		],
+		{ maxProjectImportDepth: 1 }
+	);
 
-	const dependencies = parseAllIndirectImports(sourceFile, context, { maxInternalDepth: 1 });
+	const dependencies = parseAllIndirectImports(sourceFile, context);
 
 	const sortedFileNames = Array.from(dependencies)
 		.map(file => file.fileName)

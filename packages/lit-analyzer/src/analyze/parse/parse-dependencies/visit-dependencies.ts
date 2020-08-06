@@ -1,16 +1,16 @@
 import * as tsModule from "typescript";
 import { Node, Program, SourceFile } from "typescript";
+import { LitAnalyzerConfig } from "../../lit-analyzer-config";
 
 interface IVisitDependenciesContext {
 	program: Program;
 	ts: typeof tsModule;
 	project: ts.server.Project | undefined;
 	directImportCache: WeakMap<SourceFile, Set<SourceFile>>;
-	emitIndirectImport(file: SourceFile, importedFrom?: SourceFile): boolean;
+	emitIndirectImport(file: SourceFile): boolean;
 	emitDirectImport?(file: SourceFile): void;
 	depth?: number;
-	maxExternalDepth?: number;
-	maxInternalDepth?: number;
+	config: LitAnalyzerConfig;
 }
 
 /**
@@ -30,9 +30,9 @@ export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, conte
 	const inExternal = context.program.isSourceFileFromExternalLibrary(sourceFile);
 
 	// Check if we have traversed too deep
-	if (inExternal && currentDepth >= (context.maxExternalDepth ?? Infinity)) {
+	if (inExternal && currentDepth >= (context.config.maxNodeModuleImportDepth ?? Infinity)) {
 		return;
-	} else if (!inExternal && currentDepth >= (context.maxInternalDepth ?? Infinity)) {
+	} else if (!inExternal && currentDepth >= (context.config.maxProjectImportDepth ?? Infinity)) {
 		return;
 	}
 

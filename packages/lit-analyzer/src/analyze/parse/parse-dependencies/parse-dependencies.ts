@@ -62,11 +62,7 @@ export function parseDependencies(sourceFile: SourceFile, context: LitAnalyzerCo
  * @param maxExternalDepth
  * @param minExternalDepth
  */
-export function parseAllIndirectImports(
-	sourceFile: SourceFile,
-	context: LitAnalyzerContext,
-	{ maxExternalDepth, maxInternalDepth }: { maxExternalDepth?: number; maxInternalDepth?: number } = {}
-): Set<SourceFile> {
+export function parseAllIndirectImports(sourceFile: SourceFile, context: LitAnalyzerContext): Set<SourceFile> {
 	const importedSourceFiles = new Set<SourceFile>();
 
 	visitIndirectImportsFromSourceFile(sourceFile, {
@@ -74,8 +70,7 @@ export function parseAllIndirectImports(
 		program: context.program,
 		ts: context.ts,
 		directImportCache: DIRECT_IMPORT_CACHE,
-		maxExternalDepth: maxExternalDepth ?? context.config.maxNodeModuleImportDepth,
-		maxInternalDepth: maxInternalDepth ?? context.config.maxProjectImportDepth,
+		config: context.config,
 		emitIndirectImport(file: SourceFile): boolean {
 			if (importedSourceFiles.has(file)) {
 				return false;
