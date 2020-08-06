@@ -7,4 +7,5 @@ export interface AnalyzerDefinitionStore {
 	getComponentDeclarationsInFile(sourceFile: SourceFile): ComponentDeclaration[];
 	getDefinitionForTagName(tagName: string): ComponentDefinition | undefined;
 	getDefinitionsInFile(sourceFile: SourceFile): ComponentDefinition[];
+	absorbAnalysisResult(sourceFile: SourceFile, result: AnalyzerResult): void;
 }

@@ -7,7 +7,8 @@ import {
 	HtmlMember,
 	HtmlProp,
 	HtmlSlot,
-	HtmlTag
+	HtmlTag,
+	HtmlDataCollection
 } from "../parse/parse-html-data/html-tag";
 import {
 	HtmlNodeAttr,
@@ -17,6 +18,7 @@ import {
 	IHtmlNodeBooleanAttribute
 } from "../types/html-node/html-node-attr-types";
 import { HtmlNode } from "../types/html-node/html-node-types";
+import { HtmlDataSourceKind } from "./html-store/html-data-source-merged";
 
 export interface AnalyzerHtmlStore {
 	/*absorbAnalysisResult(sourceFile: SourceFile, result: AnalyzeComponentsResult): void;
@@ -28,7 +30,7 @@ export interface AnalyzerHtmlStore {
 	getDefinitionForTagName(tagName: string): ComponentDefinition | undefined;
 	getDefinitionsInFile(sourceFile: SourceFile): ComponentDefinition[];
 	hasTagNameBeenImported(fileName: string, tagName: string): boolean;*/
-
+	absorbCollection(collection: HtmlDataCollection, register: HtmlDataSourceKind): void;
 	getHtmlTag(htmlNode: HtmlNode | string): HtmlTag | undefined;
 	getGlobalTags(): Iterable<HtmlTag>;
 	getAllAttributesForTag(htmlNode: HtmlNode | string): Iterable<HtmlAttr>;

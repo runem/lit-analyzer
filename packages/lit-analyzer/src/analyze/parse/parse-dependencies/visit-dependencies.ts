@@ -1,7 +1,10 @@
 import * as tsModule from "typescript";
 import { Node, Program, SourceFile } from "typescript";
+import { getSourceFileFromSymlinkedDependency, findComponentDefinitionsInSymlinkedFile } from "../../util/symlink-util";
+import { AnalyzerHtmlStore } from "../../store/analyzer-html-store";
+import { AnalyzerDefinitionStore } from "../../store/analyzer-definition-store";
 
-interface IVisitDependenciesContext {
+export interface IVisitDependenciesContext {
 	program: Program;
 	ts: typeof tsModule;
 	project: ts.server.Project | undefined;
@@ -11,6 +14,8 @@ interface IVisitDependenciesContext {
 	depth?: number;
 	maxExternalDepth?: number;
 	maxInternalDepth?: number;
+	htmlStore: AnalyzerHtmlStore;
+	definitionStore: AnalyzerDefinitionStore;
 }
 
 /**
@@ -21,7 +26,6 @@ interface IVisitDependenciesContext {
  */
 export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, context: IVisitDependenciesContext): void {
 	const currentDepth = context.depth ?? 0;
-
 	// Emit a visit. If this file has been seen already, the function will return false, and traversal will stop
 	if (!context.emitIndirectImport(sourceFile)) {
 		return;
@@ -90,7 +94,6 @@ export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, conte
 			// Facade modules are ignored when calculating depth
 			newDepth--;
 		}
-
 		// Visit direct imported source files recursively
 		visitIndirectImportsFromSourceFile(file, {
 			...context,
@@ -141,7 +144,6 @@ function visitDirectImports(node: Node, context: IVisitDependenciesContext): voi
  */
 function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, context: IVisitDependenciesContext) {
 	const fromSourceFile = node.getSourceFile();
-
 	// Resolve the imported string
 	const result = context.project
 		? context.project.getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, fromSourceFile.fileName)
@@ -152,7 +154,19 @@ function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, con
 
 	if (result?.resolvedModule?.resolvedFileName != null) {
 		const resolvedModule = result.resolvedModule;
-		const sourceFile = context.program.getSourceFile(resolvedModule.resolvedFileName);
+
+		let sourceFile;
+		if (resolvedModule.originalPath != null) {
+			// Module is symlinked - originalPath is only present when a symlink had to be followed when resolving the module.
+			sourceFile = getSourceFileFromSymlinkedDependency(resolvedModule.originalPath, context.project);
+			findComponentDefinitionsInSymlinkedFile(sourceFile!, context);
+		}
+
+		sourceFile = sourceFile ?? context.program.getSourceFile(resolvedModule.resolvedFileName);
+		// When a module is a dependency of a module that was recently added as a project root,
+		// it can in some cases not be loaded by the program.
+		sourceFile = sourceFile ?? context.project?.getSourceFile(resolvedModule.resolvedFileName);
+
 		if (sourceFile != null) {
 			context.emitDirectImport?.(sourceFile);
 		}
