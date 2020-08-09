@@ -89,10 +89,30 @@ function checkClosureSecurityAssignability(typeB: SimpleType, htmlAttr: HtmlNode
 	return true;
 }
 
-function matchesAtLeastOneNominalType(typeNames: string[], typeB: SimpleType): boolean {
-	if (typeB.name !== undefined && typeNames.includes(typeB.name)) {
-		return true;
+function normalizeTypeName(typeName: string) {
+	// Attempt to take a clutz type name for a goog.module type, which looks like
+	// module$contents$goog$html$SafeUrl_SafeUrl and extract the
+	// actual type name (SafeUrl in that case)
+	const match = typeName.match(/module\$.*_(.*)/);
+	if (match == null) {
+		return undefined;
 	}
+	return match[1];
+}
+
+function matchesAtLeastOneNominalType(typeNames: string[], typeB: SimpleType): boolean {
+	// Check if typeB.name is in typeNames, either before or after normalization.
+	const typeBName = typeB.name;
+	if (typeBName !== undefined) {
+		if (typeNames.includes(typeBName)) {
+			return true;
+		}
+		const normalized = normalizeTypeName(typeBName);
+		if (normalized !== undefined && typeNames.includes(typeBName)) {
+			return true;
+		}
+	}
+	// Otherwise, check for other cases beyond just a simple named type.
 	switch (typeB.kind) {
 		case "UNION":
 			return typeB.types.every(t => matchesAtLeastOneNominalType(typeNames, t));
