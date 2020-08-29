@@ -109,7 +109,7 @@ function visitDirectImports(node: Node, context: IVisitDependenciesContext): voi
 	if (node == null) return;
 
 	// Handle top level imports/exports: (import "..."), (import { ... } from "..."), (export * from "...")
-	if (context.ts.isImportDeclaration(node) || context.ts.isExportDeclaration(node)) {
+	if ((context.ts.isImportDeclaration(node) && !node.importClause?.isTypeOnly) || context.ts.isExportDeclaration(node)) {
 		if (node.moduleSpecifier != null && context.ts.isStringLiteral(node.moduleSpecifier) && context.ts.isSourceFile(node.parent)) {
 			// Potentially ignore all imports/exports with named imports/exports because importing an interface would not
 			//    necessarily result in the custom element being defined. An even better solution would be to ignore all
