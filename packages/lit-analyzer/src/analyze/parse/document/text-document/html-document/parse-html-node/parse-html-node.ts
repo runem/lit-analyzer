@@ -1,7 +1,7 @@
+import { Element, Node } from "parse5";
 import { TS_IGNORE_FLAG } from "../../../../../constants";
 import { HtmlNode, HtmlNodeKind, IHtmlNodeBase, IHtmlNodeSourceCodeLocation } from "../../../../../types/html-node/html-node-types";
 import { isCommentNode, isTagNode } from "../parse-html-p5/parse-html";
-import { getSourceLocation, IP5TagNode, P5Node } from "../parse-html-p5/parse-html-types";
 import { parseHtmlNodeAttrs } from "./parse-html-attribute";
 import { ParseHtmlContext } from "./parse-html-context";
 
@@ -11,7 +11,7 @@ import { ParseHtmlContext } from "./parse-html-context";
  * @param parent
  * @param context
  */
-export function parseHtmlNodes(p5Nodes: P5Node[], parent: HtmlNode | undefined, context: ParseHtmlContext): HtmlNode[] {
+export function parseHtmlNodes(p5Nodes: Node[], parent: HtmlNode | undefined, context: ParseHtmlContext): HtmlNode[] {
 	const htmlNodes: HtmlNode[] = [];
 	let ignoreNextNode = false;
 	for (const p5Node of p5Nodes) {
@@ -43,9 +43,9 @@ export function parseHtmlNodes(p5Nodes: P5Node[], parent: HtmlNode | undefined, 
  * @param parent
  * @param context
  */
-export function parseHtmlNode(p5Node: IP5TagNode, parent: HtmlNode | undefined, context: ParseHtmlContext): HtmlNode | undefined {
+export function parseHtmlNode(p5Node: Element, parent: HtmlNode | undefined, context: ParseHtmlContext): HtmlNode | undefined {
 	// `sourceCodeLocation` will be undefined if the element was implicitly created by the parser.
-	if (getSourceLocation(p5Node) == null) return undefined;
+	if (p5Node.sourceCodeLocation == null) return undefined;
 
 	const htmlNodeBase: IHtmlNodeBase = {
 		tagName: p5Node.tagName.toLowerCase(),
@@ -74,9 +74,9 @@ export function parseHtmlNode(p5Node: IP5TagNode, parent: HtmlNode | undefined, 
  * @param p5Node
  * @param context
  */
-function isSelfClosed(p5Node: IP5TagNode, context: ParseHtmlContext) {
+function isSelfClosed(p5Node: Element, context: ParseHtmlContext) {
 	const isEmpty = p5Node.childNodes == null || p5Node.childNodes.length === 0;
-	const isSelfClosed = getSourceLocation(p5Node)!.startTag.endOffset === getSourceLocation(p5Node)!.endOffset;
+	const isSelfClosed = p5Node.sourceCodeLocation!.startTag.endOffset === p5Node.sourceCodeLocation!.endOffset;
 	return isEmpty && isSelfClosed;
 }
 
@@ -85,8 +85,8 @@ function isSelfClosed(p5Node: IP5TagNode, context: ParseHtmlContext) {
  * @param p5Node
  * @param context
  */
-function makeHtmlNodeLocation(p5Node: IP5TagNode, context: ParseHtmlContext): IHtmlNodeSourceCodeLocation {
-	const loc = getSourceLocation(p5Node)!;
+function makeHtmlNodeLocation(p5Node: Element, context: ParseHtmlContext): IHtmlNodeSourceCodeLocation {
+	const loc = p5Node.sourceCodeLocation!;
 
 	return {
 		start: loc.startOffset,

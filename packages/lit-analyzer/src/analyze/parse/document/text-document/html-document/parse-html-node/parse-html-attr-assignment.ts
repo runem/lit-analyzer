@@ -1,7 +1,7 @@
+import { Attribute, Element } from "parse5";
 import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../../../types/html-node/html-node-attr-assignment-types";
 import { HtmlNodeAttr } from "../../../../../types/html-node/html-node-attr-types";
 import { Range } from "../../../../../types/range";
-import { getSourceLocation, IP5NodeAttr, IP5TagNode } from "../parse-html-p5/parse-html-types";
 import { ParseHtmlContext } from "./parse-html-context";
 
 /**
@@ -12,8 +12,8 @@ import { ParseHtmlContext } from "./parse-html-context";
  * @param context
  */
 export function parseHtmlAttrAssignment(
-	p5Node: IP5TagNode,
-	p5Attr: IP5NodeAttr,
+	p5Node: Element,
+	p5Attr: Attribute,
 	htmlAttr: HtmlNodeAttr,
 	context: ParseHtmlContext
 ): HtmlNodeAttrAssignment | undefined {
@@ -54,8 +54,8 @@ export function parseHtmlAttrAssignment(
 	}
 }
 
-function getAssignmentLocation(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, htmlAttr: HtmlNodeAttr, context: ParseHtmlContext): Range | undefined {
-	const sourceLocation = getSourceLocation(p5Node);
+function getAssignmentLocation(p5Node: Element, p5Attr: Attribute, htmlAttr: HtmlNodeAttr, context: ParseHtmlContext): Range | undefined {
+	const sourceLocation = p5Node.sourceCodeLocation;
 	if (sourceLocation == null) {
 		return undefined;
 	}

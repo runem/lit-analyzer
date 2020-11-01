@@ -1,3 +1,4 @@
+import { Attribute, Element } from "parse5";
 import {
 	LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER,
 	LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER,
@@ -10,7 +11,6 @@ import {
 	IHtmlNodeAttrSourceCodeLocation
 } from "../../../../../types/html-node/html-node-attr-types";
 import { parseLitAttrName } from "../../../../../util/general-util";
-import { getSourceLocation, IP5NodeAttr, IP5TagNode } from "../parse-html-p5/parse-html-types";
 import { parseHtmlAttrAssignment } from "./parse-html-attr-assignment";
 import { ParseHtmlAttrContext } from "./parse-html-attr-context";
 
@@ -19,7 +19,7 @@ import { ParseHtmlAttrContext } from "./parse-html-attr-context";
  * @param p5Node
  * @param context
  */
-export function parseHtmlNodeAttrs(p5Node: IP5TagNode, context: ParseHtmlAttrContext): HtmlNodeAttr[] {
+export function parseHtmlNodeAttrs(p5Node: Element, context: ParseHtmlAttrContext): HtmlNodeAttr[] {
 	return p5Node.attrs
 		.map(htmlAttr =>
 			parseHtmlNodeAttr(p5Node, htmlAttr, {
@@ -36,7 +36,7 @@ export function parseHtmlNodeAttrs(p5Node: IP5TagNode, context: ParseHtmlAttrCon
  * @param p5Attr
  * @param context
  */
-export function parseHtmlNodeAttr(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, context: ParseHtmlAttrContext): HtmlNodeAttr | undefined {
+export function parseHtmlNodeAttr(p5Node: Element, p5Attr: Attribute, context: ParseHtmlAttrContext): HtmlNodeAttr | undefined {
 	const { htmlNode } = context;
 	const { name, modifier } = parseLitAttrName(p5Attr.name);
 
@@ -66,10 +66,10 @@ export function parseHtmlNodeAttr(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, conte
  * @param p5Attr
  * @param context
  */
-function makeHtmlAttrLocation(p5Node: IP5TagNode, p5Attr: IP5NodeAttr, context: ParseHtmlAttrContext): IHtmlNodeAttrSourceCodeLocation | undefined {
+function makeHtmlAttrLocation(p5Node: Element, p5Attr: Attribute, context: ParseHtmlAttrContext): IHtmlNodeAttrSourceCodeLocation | undefined {
 	const { name, modifier } = parseLitAttrName(p5Attr.name);
 
-	const sourceLocation = getSourceLocation(p5Node);
+	const sourceLocation = p5Node.sourceCodeLocation;
 	if (sourceLocation == null) {
 		return undefined;
 	}
