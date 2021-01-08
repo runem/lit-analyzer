@@ -1,11 +1,4 @@
-import {
-	parseFragment,
-	Element,
-	DocumentFragment,
-	Node,
-	TextNode,
-	CommentNode
-} from "parse5";
+import { parseFragment, Element, DocumentFragment, Node, TextNode, CommentNode } from "parse5";
 
 /**
  * Returns if a p5Node is a tag node.
