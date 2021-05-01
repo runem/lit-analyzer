@@ -58,7 +58,7 @@ const HTML_5_ATTR_TYPES: { [key: string]: string | string[] | [string[]] } = {
 	title: "string",
 	manifest: "",
 	href: "string",
-	target: ["_blank", "_parent", "_self", "_top"],
+	target: "string|\"_blank\"|\"_parent\"|\"_self\"|\"_top\"",
 	rel: "",
 	media: "",
 	hreflang: "",

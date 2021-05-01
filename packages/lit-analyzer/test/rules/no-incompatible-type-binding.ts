@@ -224,3 +224,10 @@ html\`<input step="\${myDirective("foo")}" /> \`
 
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
+
+tsTest("Attribute binding: the target attribute is correctly type checked when given a string", t => {
+	const { diagnostics } = getDiagnostics(`html\`<a target="custom-target"></a>\`
+	`);
+
+	hasNoDiagnostics(t, diagnostics);
+});
