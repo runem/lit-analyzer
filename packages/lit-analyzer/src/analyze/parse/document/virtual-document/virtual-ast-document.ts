@@ -4,15 +4,12 @@ import { DocumentOffset, DocumentRange, Range, SourceFilePosition, SourceFileRan
 import { intersects, makeSourceFileRange } from "../../../util/range-util";
 import { VirtualDocument } from "./virtual-document";
 
-function getPartLength(part: Node): number {
-	const end = part.parent && tsModule.ts.isTemplateSpan(part.parent) ? part.parent.literal.getStart() : part.getEnd();
-	return end - part.getFullStart();
-}
-
 export class VirtualAstDocument implements VirtualDocument {
 	readonly fileName: string;
 	readonly location: SourceFileRange;
 	private readonly parts: (Expression | string)[];
+	protected readonly substitutions: WeakMap<Expression, string> = new WeakMap();
+	protected substitutionIndex: number = 0;
 
 	private _text?: string;
 
@@ -28,8 +25,8 @@ export class VirtualAstDocument implements VirtualDocument {
 					str += part.substring(i === 0 ? 0 : 1, part.length - (isLastPart ? 0 : 2));
 					prevPart = part;
 				} else {
-					const length = getPartLength(part) + 3;
-					const substitution = this.substituteExpression(length, part, prevPart, this.parts[i + 1] as string);
+					const substitution = this.substituteExpression(part, prevPart, this.parts[i + 1] as string);
+					this.substitutions.set(part, substitution);
 					str += substitution;
 				}
 			});
@@ -56,11 +53,11 @@ export class VirtualAstDocument implements VirtualDocument {
 				const startPadding = i === 0 ? 0 : 1;
 				const endPadding = isLastPart ? 0 : 2;
 
-				offset += part.length;
+				offset += part.length - endPadding - startPadding;
 
 				const literalPartRange: Range = {
-					start: startOffset + startPadding,
-					end: offset - endPadding
+					start: startOffset,
+					end: offset
 				};
 
 				if (
@@ -75,15 +72,19 @@ export class VirtualAstDocument implements VirtualDocument {
 					resultParts.push(substr);
 				}
 			} else {
-				offset += getPartLength(part);
+				const sub = this.substitutions.get(part);
 
-				const expressionPartRange: Range = {
-					start: startOffset,
-					end: offset
-				};
+				if (sub) {
+					offset += sub.length;
 
-				if (intersects(expressionPartRange, range)) {
-					resultParts.push(part);
+					const expressionPartRange: Range = {
+						start: startOffset,
+						end: offset
+					};
+
+					if (intersects(expressionPartRange, range)) {
+						resultParts.push(part);
+					}
 				}
 			}
 		});
@@ -129,8 +130,8 @@ export class VirtualAstDocument implements VirtualDocument {
 		}
 	}
 
-	protected substituteExpression(length: number, expression: Expression, prev: string, next: string | undefined): string {
-		return "_".repeat(length);
+	protected substituteExpression(expression: Expression, prev: string, next: string | undefined): string {
+		return `la_expr_${this.substitutionIndex++}`;
 	}
 }
 

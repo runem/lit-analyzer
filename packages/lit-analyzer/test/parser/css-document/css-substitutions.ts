@@ -17,29 +17,29 @@ function isTemplateText(t: ExecutionContext, text: string, testFile: string) {
 }
 
 tsTest("Substitute for template followed by percent", t => {
-	isTemplateText(t, "{ div { transform-origin: 0000% 0000%; } }", "css`{ div { transform-origin: ${x}% ${y}%; } }`");
+	isTemplateText(t, "{ div { transform-origin: 00% 01%; } }", "css`{ div { transform-origin: ${x}% ${y}%; } }`");
 });
 
 tsTest("Substitute for template last in css list", t => {
-	isTemplateText(t, "{ div { border: 2px solid ________; } }", "css`{ div { border: 2px solid ${COLOR}; } }`");
+	isTemplateText(t, "{ div { border: 2px solid _0; } }", "css`{ div { border: 2px solid ${COLOR}; } }`");
 });
 
 tsTest("Substitute for template first in css list", t => {
-	isTemplateText(t, "{ div { border: ________ solid #ffffff; } }", "css`{ div { border: ${WIDTH} solid #ffffff; } }`");
+	isTemplateText(t, "{ div { border: _0 solid #ffffff; } }", "css`{ div { border: ${WIDTH} solid #ffffff; } }`");
 });
 
 tsTest("Substitute for template middle in css list", t => {
-	isTemplateText(t, "{ div { border: 2px ________ #ffffff; } }", "css`{ div { border: 2px ${STYLE} #ffffff; } }`");
+	isTemplateText(t, "{ div { border: 2px _0 #ffffff; } }", "css`{ div { border: 2px ${STYLE} #ffffff; } }`");
 });
 
 tsTest("Substitute for template css key-value pair", t => {
-	isTemplateText(t, "{ div { $_:_______________________; } }", "css`{ div { ${unsafeCSS('color: red')}; } }`");
+	isTemplateText(t, "{ div { $_:_0; } }", "css`{ div { ${unsafeCSS('color: red')}; } }`");
 });
 
 tsTest("Substitute for template css value only", t => {
-	isTemplateText(t, "{ div { color: ___________________; } }", "css`{ div { color: ${unsafeCSS('red')}; } }`");
+	isTemplateText(t, "{ div { color: _0; } }", "css`{ div { color: ${unsafeCSS('red')}; } }`");
 });
 
 tsTest("Substitute for template css key only", t => {
-	isTemplateText(t, "{ div { $____________________: red; } }", "css`{ div { ${unsafeCSS('color')}: red; } }`");
+	isTemplateText(t, "{ div { $_0: red; } }", "css`{ div { ${unsafeCSS('color')}: red; } }`");
 });
