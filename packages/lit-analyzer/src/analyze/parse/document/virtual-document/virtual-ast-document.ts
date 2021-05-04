@@ -4,12 +4,12 @@ import { DocumentOffset, DocumentRange, Range, SourceFilePosition, SourceFileRan
 import { intersects, makeSourceFileRange } from "../../../util/range-util";
 import { VirtualDocument } from "./virtual-document";
 
+const marker = `lit$analyzer$`;
+
 export class VirtualAstDocument implements VirtualDocument {
 	readonly fileName: string;
 	readonly location: SourceFileRange;
 	private readonly parts: (Expression | string)[];
-	protected readonly substitutions: WeakMap<Expression, string> = new WeakMap();
-	protected substitutionIndex: number = 0;
 
 	private _text?: string;
 
@@ -17,17 +17,13 @@ export class VirtualAstDocument implements VirtualDocument {
 		if (this._text == null) {
 			let str = "";
 
-			let prevPart = "";
 			this.parts.forEach((part, i) => {
 				const isLastPart = i >= this.parts.length - 1;
 
 				if (typeof part === "string") {
 					str += part.substring(i === 0 ? 0 : 1, part.length - (isLastPart ? 0 : 2));
-					prevPart = part;
 				} else {
-					const substitution = this.substituteExpression(part, prevPart, this.parts[i + 1] as string);
-					this.substitutions.set(part, substitution);
-					str += substitution;
+					str += marker;
 				}
 			});
 
@@ -72,19 +68,15 @@ export class VirtualAstDocument implements VirtualDocument {
 					resultParts.push(substr);
 				}
 			} else {
-				const sub = this.substitutions.get(part);
+				offset += marker.length;
 
-				if (sub) {
-					offset += sub.length;
+				const expressionPartRange: Range = {
+					start: startOffset,
+					end: offset
+				};
 
-					const expressionPartRange: Range = {
-						start: startOffset,
-						end: offset
-					};
-
-					if (intersects(expressionPartRange, range)) {
-						resultParts.push(part);
-					}
+				if (intersects(expressionPartRange, range)) {
+					resultParts.push(part);
 				}
 			}
 		});
@@ -128,10 +120,6 @@ export class VirtualAstDocument implements VirtualDocument {
 
 			this.fileName = this.fileName = astNodeOrParts.getSourceFile().fileName;
 		}
-	}
-
-	protected substituteExpression(expression: Expression, prev: string, next: string | undefined): string {
-		return `la_expr_${this.substitutionIndex++}`;
 	}
 }
 
