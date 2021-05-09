@@ -300,3 +300,24 @@ tsTest("Ignores type-only imports in a file", t => {
 
 	t.deepEqual(sortedFileNames, ["file2.ts"]);
 });
+
+tsTest("Ignores type-only exports in a file", t => {
+	const { sourceFile, context } = prepareAnalyzer([
+		{ fileName: "file1.ts", text: `` },
+		{
+			fileName: "file2.ts",
+			text: `
+				export type { MyElement } from "./file1";
+			`,
+			entry: true
+		}
+	]);
+
+	const dependencies = parseAllIndirectImports(sourceFile, context);
+
+	const sortedFileNames = Array.from(dependencies)
+		.map(file => file.fileName)
+		.sort();
+
+	t.deepEqual(sortedFileNames, ["file2.ts"]);
+});
