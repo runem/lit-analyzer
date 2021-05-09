@@ -227,13 +227,20 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 			ts: this.ts,
 			config: {
 				features: ["event", "member", "slot", "csspart", "cssproperty"],
-				analyzeGlobalFeatures: !isDefaultLibrary, // Don't analyze global features in lib.dom.d.ts
+				analyzeGlobalFeatures: true,
 				analyzeDefaultLib: true,
 				analyzeDependencies: true,
 				analyzeAllDeclarations: false,
 				excludedDeclarationNames: ["HTMLElement"]
 			}
 		});
+
+		// Don't analyze global members in lib.dom.d.ts for now
+		// We already merge in content from "HTMLElement", but in the future we might
+		//   only use "globalFeatures" instead
+		if (isDefaultLibrary && analyzeResult.globalFeatures != null) {
+			analyzeResult.globalFeatures.members = [];
+		}
 
 		const reg = isDefaultLibrary ? HtmlDataSourceKind.BUILT_IN_DECLARED : HtmlDataSourceKind.DECLARED;
 

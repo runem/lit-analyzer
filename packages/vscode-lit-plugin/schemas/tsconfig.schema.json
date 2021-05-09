@@ -148,11 +148,6 @@
 											"description": "Disallow property bindings without an expression.",
 											"enum": ["off", "warning", "error"]
 										},
-										"no-noncallable-event-binding": {
-											"type": "string",
-											"description": "Disallow event listener bindings with a noncallable type.",
-											"enum": ["off", "warning", "error"]
-										},
 										"no-boolean-in-attribute-binding": {
 											"type": "string",
 											"description": "Disallow attribute bindings with a boolean type.",

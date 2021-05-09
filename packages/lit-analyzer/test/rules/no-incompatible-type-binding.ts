@@ -224,3 +224,120 @@ html\`<input step="\${myDirective("foo")}" /> \`
 
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
+
+tsTest("Event binding: event handler is assignable to valid event", t => {
+	const { diagnostics } = getDiagnostics([makeElement({ events: ["foo-event"] }), "html`<my-element @foo-event=${(ev) => {}}></my-element>`"]);
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Event binding: event handler is assignable to valid typed event", t => {
+	const { diagnostics } = getDiagnostics([
+		makeElement({ events: ["{MouseEvent} foo-event"] }),
+		"html`<my-element @foo-event=${(ev: MouseEvent) => {}}></my-element>`"
+	]);
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Event binding: invalid event handler is not assignable to typed event", t => {
+	const { diagnostics } = getDiagnostics([
+		makeElement({ events: ["{MouseEvent} foo-event"] }),
+		"html`<my-element @foo-event=${(ev: KeyboardEvent) => {}}></my-element>`"
+	]);
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});
+
+tsTest("Event binding: invalid event handler is not assignable to event", t => {
+	const { diagnostics } = getDiagnostics([
+		makeElement({ events: ["foo-event"] }),
+		"html`<my-element @foo-event=${(arg: boolean) => {}}></my-element>`"
+	]);
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});
+
+tsTest("Event binding: invalid event handler (generic custom event) is not assignable to typed event", t => {
+	const { diagnostics } = getDiagnostics([
+		makeElement({ events: ["{CustomEvent<string>} foo-event"] }),
+		"html`<my-element @foo-event=${(ev: CustomEvent<number>) => {}}></my-element>`"
+	]);
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});
+
+tsTest("Event binding: event handler (generic custom event) is assignable to typed event", t => {
+	const { diagnostics } = getDiagnostics([
+		makeElement({ events: ["{CustomEvent<string>} foo-event"] }),
+		"html`<my-element @foo-event=${(ev: CustomEvent<string>) => {}}></my-element>`"
+	]);
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Event binding: event handler is assignable to event with unknown type", t => {
+	const { diagnostics } = getDiagnostics([
+		makeElement({ events: ["foo-event"] }),
+		"html`<my-element @foo-event=${(ev: MouseEvent) => {}}></my-element>`"
+	]);
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Event binding: event handler is assignable to merged event", t => {
+	const { diagnostics } = getDiagnostics([
+		makeElement({ events: ["{MouseEvent} foo-event"] }),
+		makeElement({ events: ["{KeyboardEvent} foo-event"] }),
+		"html`<my-element @foo-event=${(ev: MouseEvent) => {}}></my-element>`"
+	]);
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Event binding: Callable value is bindable", t => {
+	const { diagnostics } = getDiagnostics('html`<input @change="${() => {}}" />`');
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Event binding: Non callback value is not bindable", t => {
+	const { diagnostics } = getDiagnostics('html`<input @change="${(() => {})()}" />`');
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});
+
+tsTest("Event binding: Number is not bindable", t => {
+	const { diagnostics } = getDiagnostics('html`<input @change="${123}" />`');
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});
+
+tsTest("Event binding: Function is bindable", t => {
+	const { diagnostics } = getDiagnostics('function foo() {}; html`<input @change="${foo}" />`');
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Event binding: Called function is not bindable", t => {
+	const { diagnostics } = getDiagnostics('function foo() {}; html`<input @change="${foo()}" />`');
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});
+
+tsTest("Event binding: Any type is bindable", t => {
+	const { diagnostics } = getDiagnostics('html`<input @change="${{} as any}" />`');
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Event binding: Object with callable 'handleEvent' is bindable 1", t => {
+	const { diagnostics } = getDiagnostics('html`<input @change="${{handleEvent: () => {}}}" />`');
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Event binding: Object with callable 'handleEvent' is bindable 2", t => {
+	const { diagnostics } = getDiagnostics('function foo() {}; html`<input @change="${{handleEvent: foo}}" />`');
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Event binding: Object with called 'handleEvent' is not bindable", t => {
+	const { diagnostics } = getDiagnostics('function foo() {}; html`<input @change="${{handleEvent: foo()}}" />`');
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});
+
+tsTest("Event binding: Object literal without 'handleEvent' is not bindable", t => {
+	const { diagnostics } = getDiagnostics('function foo() {}; html`<input @change="${{foo: "bar"}}" />`');
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});
+
+tsTest("Event binding: Mixed value binding with first expression being callable is bindable", t => {
+	const { diagnostics } = getDiagnostics('html`<input @change="foo${console.log}bar" />`');
+	hasNoDiagnostics(t, diagnostics);
+});

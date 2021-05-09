@@ -458,24 +458,34 @@ function mergeRelatedMembers<T extends HtmlMember>(members: Iterable<T>): Readon
 	return mergedMembers;
 }
 
-function mergeRelatedTypeToUnion(typeA: SimpleType, typeB: SimpleType): SimpleType {
+function mergeRelatedTypeToUnion(typeA: SimpleType, typeB: SimpleType, { collapseAny = true }: { collapseAny?: boolean } = {}): SimpleType {
 	if (typeA.kind === typeB.kind) {
-		switch (typeA.kind) {
-			case "ANY":
-				return typeA;
+		return typeA;
+	}
+
+	if (collapseAny) {
+		if (typeB.kind === "ANY") {
+			return typeA;
+		} else if (typeA.kind === "ANY") {
+			return typeB;
 		}
 	}
 
-	switch (typeA.kind) {
-		case "UNION":
-			if (typeB.kind === "ANY" && typeA.types.find(t => t.kind === "ANY") != null) {
-				return typeA;
-			} else {
-				return {
-					...typeA,
-					types: [...typeA.types, typeB]
-				};
+	if (typeA.kind === "UNION" && typeB.kind === "UNION") {
+		if (collapseAny) {
+			if (typeA.types.some(t => t.kind === "ANY")) {
+				return typeB;
 			}
+
+			if (typeB.types.some(t => t.kind === "ANY")) {
+				return typeA;
+			}
+		}
+
+		return {
+			...typeA,
+			types: Array.from(new Set([...typeA.types, ...typeB.types]))
+		};
 	}
 
 	return {
@@ -533,7 +543,7 @@ function mergeRelatedEvents(events: Iterable<HtmlEvent>): ReadonlyMap<string, Ht
 				...existingEvent,
 				global: existingEvent.global && event.global,
 				description: undefined,
-				getType: lazy(() => mergeRelatedTypeToUnion(prevType(), event.getType())),
+				getType: lazy(() => mergeRelatedTypeToUnion(prevType(), event.getType(), { collapseAny: false })),
 				related: existingEvent.related == null ? [existingEvent, event] : [...existingEvent.related, event],
 				fromTagName: existingEvent.fromTagName || event.fromTagName
 			});

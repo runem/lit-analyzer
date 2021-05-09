@@ -8,6 +8,7 @@ import { extractBindingTypes } from "./util/type/extract-binding-types";
 import { isAssignableInAttributeBinding } from "./util/type/is-assignable-in-attribute-binding";
 import { isAssignableInBooleanBinding } from "./util/type/is-assignable-in-boolean-binding";
 import { isAssignableInPropertyBinding } from "./util/type/is-assignable-in-property-binding";
+import { isAssignableInEventBinding } from "./util/type/is-assignable-in-event-binding";
 
 /**
  * This rule validate if the types of a binding are assignable.
@@ -37,6 +38,7 @@ const rule: RuleModule = {
 				break;
 
 			case LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER:
+				isAssignableInEventBinding(htmlAttr, { typeA, typeB }, context);
 				break;
 
 			default: {

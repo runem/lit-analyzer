@@ -14,7 +14,6 @@ export type LitAnalyzerRuleId =
 	| "no-unintended-mixed-binding"
 	| "no-invalid-boolean-binding"
 	| "no-expressionless-property-binding"
-	| "no-noncallable-event-binding"
 	| "no-boolean-in-attribute-binding"
 	| "no-complex-attribute-binding"
 	| "no-nullable-attribute-binding"
@@ -45,7 +44,6 @@ const DEFAULT_RULES_SEVERITY: Record<LitAnalyzerRuleId, [LitAnalyzerRuleSeverity
 	"no-unintended-mixed-binding": ["warn", "warn"],
 	"no-invalid-boolean-binding": ["error", "error"],
 	"no-expressionless-property-binding": ["error", "error"],
-	"no-noncallable-event-binding": ["error", "error"],
 	"no-boolean-in-attribute-binding": ["error", "error"],
 	"no-complex-attribute-binding": ["error", "error"],
 	"no-nullable-attribute-binding": ["error", "error"],
@@ -252,7 +250,6 @@ function getDeprecatedMappedRules(userOptions: Partial<LitAnalyzerConfig>): LitA
 	if (getDeprecatedOption(userOptions, "skipTypeChecking") === true) {
 		Object.assign(mappedDeprecatedRules, {
 			"no-invalid-boolean-binding": "off",
-			"no-noncallable-event-binding": "off",
 			"no-boolean-in-attribute-binding": "off",
 			"no-complex-attribute-binding": "off",
 			"no-nullable-attribute-binding": "off",
