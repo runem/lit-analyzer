@@ -30,13 +30,13 @@
 		"watch": "tsc -watch -p ./",
 		"publish": "vsce publish",
 		"package": "vsce package",
-		"install:safe": "npm install --ignore-scripts --no-package-lock && npm i --no-package-lock",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json"
 	},
 	"dependencies": {
 		"vscode-lit-html": "mjbvz/vscode-lit-html#1.11.1",
 		"ts-lit-plugin": "1.2.1",
 		"vscode-styled-components": "styled-components/vscode-styled-components#v1.4.0",
+		"lit-analyzer": "^1.2.1",
 		"web-component-analyzer": "~1.1.1"
 	},
 	"devDependencies": {
