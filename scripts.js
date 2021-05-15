@@ -36,7 +36,7 @@ async function copyPackage(linkPackageName, destPackageName) {
 	console.log(`Copying ${linkPackageName} to ${destPackageName}/node_modules`);
 	await remove(`./packages/${destPackageName}/node_modules/${linkPackageName}`);
 	await copy(`./packages/${linkPackageName}`, `./packages/${destPackageName}/node_modules/${linkPackageName}`, {
-		filter: (path) => !path.includes('node_modules')
+		filter: path => !path.includes("node_modules") && !path.startsWith(`packages/${linkPackageName}/src`)
 	});
 
 	// Get rid of any "extraneous" according to "npm list --production --parseable --depth=99999" in nested node_modules
