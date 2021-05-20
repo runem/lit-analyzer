@@ -134,7 +134,7 @@ export function getDirective(assignment: HtmlNodeAttrAssignment, context: RuleMo
 						// Factories can mark which parameters might be assigned to the property with the generic type in DirectiveFn<T>
 						// Here we get the actual type of the directive if the it is a generic directive with type. Example: DirectiveFn<string>
 						// Read more: https://github.com/Polymer/lit-html/pull/1151
-						// TODO: Implement this for Lit 2 DirectiveResult
+						// TODO: Implement this for Lit 2 DirectiveResult<typeof Class>
 						const actualType =
 							typeB.kind === "GENERIC_ARGUMENTS" && typeB.target.name === "DirectiveFn" && typeB.typeArguments.length > 0 // && typeB.typeArguments[0].kind !== "UNKNOWN"
 								? () => typeB.typeArguments[0]

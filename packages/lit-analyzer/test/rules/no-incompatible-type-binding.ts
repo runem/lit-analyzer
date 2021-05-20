@@ -120,9 +120,9 @@ tsTest("Attribute binding: Union of 'string | Directive' type expression is assi
 	hasNoDiagnostics(t, diagnostics);
 });
 
-tsTest("Attribute binding: Union of 'string | (a: number) => DirectiveResult' type expression is assignable to string", t => {
+tsTest("Attribute binding: Union of 'string | DirectiveResult' type expression is assignable to string", t => {
 	const { diagnostics } = getDiagnostics(
-		'class Directive {};interface DirectiveClass {new (part: Object): Directive;}interface DirectiveResult<T extends DirectiveClass = DirectiveClass>{}; html`<input placeholder="${{} as (a: number) => DirectiveResult)}" />`'
+		'class Directive {};interface DirectiveClass {new (part: Object): Directive;}interface DirectiveResult<T extends DirectiveClass = DirectiveClass>{}; html`<input placeholder="${{} as string | DirectiveResult}" />`'
 	);
 	hasNoDiagnostics(t, diagnostics);
 });
