@@ -120,6 +120,13 @@ tsTest("Attribute binding: Union of 'string | Directive' type expression is assi
 	hasNoDiagnostics(t, diagnostics);
 });
 
+tsTest("Attribute binding: Union of 'string | (a: number) => DirectiveResult' type expression is assignable to string", t => {
+	const { diagnostics } = getDiagnostics(
+		'class Directive {};interface DirectiveClass {new (part: Object): Directive;}interface DirectiveResult<T extends DirectiveClass = DirectiveClass>{}; html`<input placeholder="${{} as (a: number) => DirectiveResult)}" />`'
+	);
+	hasNoDiagnostics(t, diagnostics);
+});
+
 tsTest("Boolean binding: Empty string literal is not assignable in a boolean attribute binding", t => {
 	const { diagnostics } = getDiagnostics('html`<input ?required="${""}" />`');
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
@@ -178,12 +185,16 @@ tsTest("Attribute binding: 'guard' directive correctly infers correct type from 
 tsTest("Attribute binding: using custom directive won't result in diagnostics", t => {
 	const { diagnostics } = getDiagnostics(`
 export interface Part { }
+export interface DirectiveResult<T = unknown> {}
 
 const ifDefined: (value: unknown) => (part: Part) => void
+const ifDefinedLit2: (value: unknown) => DirectiveResult;
 
 const ifExists = (value: any) => ifDefined(value === null ? undefined : value);
+const ifExistsLit2 = (value: any) => ifDefinedLit2(value === null ? undefined : value);
 
 html\`<input step="\${ifExists(10)}" />\`
+html\`<input step="\${ifExistsLit2(10)}" />\`
 	`);
 	hasNoDiagnostics(t, diagnostics);
 });
@@ -209,6 +220,7 @@ const ${name} = {} as (<T>(arg: T) => DirectiveFn<T>);
 `;
 }
 
+// Currently no Lit 2 directive value inference
 tsTest("Attribute binding: correctly infers type of generic directive function", t => {
 	const { diagnostics } = getDiagnostics(`${makeCustomDirective("myDirective")}
 html\`<input step="\${myDirective(10)}" /> \`
@@ -217,6 +229,7 @@ html\`<input step="\${myDirective(10)}" /> \`
 	hasNoDiagnostics(t, diagnostics);
 });
 
+// Currently no Lit 2 directive value inference
 tsTest("Attribute binding: correctly infers type of generic directive function and fails type checking", t => {
 	const { diagnostics } = getDiagnostics(`${makeCustomDirective("myDirective")}
 html\`<input step="\${myDirective("foo")}" /> \`
