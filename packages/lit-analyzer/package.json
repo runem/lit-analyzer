@@ -45,8 +45,8 @@
 		"fast-glob": "^2.2.6",
 		"parse5": "5.1.0",
 		"ts-simple-type": "~1.0.5",
-		"vscode-css-languageservice": "4.3.0",
-		"vscode-html-languageservice": "3.1.0",
+		"vscode-css-languageservice": "4.4.0",
+		"vscode-html-languageservice": "3.2.0",
 		"web-component-analyzer": "~1.1.1"
 	},
 	"devDependencies": {
@@ -67,7 +67,7 @@
 		"typescript-3.7": "npm:typescript@~3.7.4",
 		"typescript-3.8": "npm:typescript@~3.8.3",
 		"typescript-3.9": "npm:typescript@~3.9.3",
-		"vscode-web-custom-data": "0.3.0"
+		"vscode-web-custom-data": "0.3.4"
 	},
 	"ava": {
 		"cache": true,

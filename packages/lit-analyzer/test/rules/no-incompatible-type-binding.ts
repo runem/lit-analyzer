@@ -115,6 +115,16 @@ tsTest("Attribute binding: Boolean type expression (false) is assignable to 'tru
 	hasNoDiagnostics(t, diagnostics);
 });
 
+tsTest("Attribute binding: Non boolean expression (dialog) is assignable to aria-haspopup", t => {
+	const { diagnostics } = getDiagnostics('html`<input aria-haspopup="dialog" />`', { rules: { "no-boolean-in-attribute-binding": false } });
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Attribute binding: Random string literal is not assignable to aria-haspopup", t => {
+	const { diagnostics } = getDiagnostics('html`<input aria-haspopup="test" />`', { rules: { "no-boolean-in-attribute-binding": false } });
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});
+
 tsTest("Attribute binding: Union of 'string | Directive' type expression is assignable to string", t => {
 	const { diagnostics } = getDiagnostics('type DirectiveFn = {}; html`<input placeholder="${{} as string | DirectiveFn}" />`');
 	hasNoDiagnostics(t, diagnostics);
