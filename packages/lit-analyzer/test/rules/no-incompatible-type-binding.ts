@@ -116,12 +116,12 @@ tsTest("Attribute binding: Boolean type expression (false) is assignable to 'tru
 });
 
 tsTest("Attribute binding: Non boolean expression (dialog) is assignable to aria-haspopup", t => {
-	const { diagnostics } = getDiagnostics('html`<input aria-haspopup="dialog" />`', { rules: { "no-boolean-in-attribute-binding": false } });
+	const { diagnostics } = getDiagnostics('html`<input aria-haspopup="dialog" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
 
 tsTest("Attribute binding: Random string literal is not assignable to aria-haspopup", t => {
-	const { diagnostics } = getDiagnostics('html`<input aria-haspopup="test" />`', { rules: { "no-boolean-in-attribute-binding": false } });
+	const { diagnostics } = getDiagnostics('html`<input aria-haspopup="test" />`');
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
