@@ -26,17 +26,18 @@
 	"scripts": {
 		"clean": "rimraf lib",
 		"prepare": "npm run build",
-		"build": "npm run clean & rollup -c",
-		"watch": "rollup -c --watch",
+		"build": "npm run clean & npm run build:ts",
+		"build:ts": "tsc",
+		"watch": "tsc --watch",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
-		"test": "cross-env TS_MODULE=current ava --color",
+		"test": "ava --color",
 		"test:all": "ava --color --fail-fast",
-		"test:watch": "cross-env TS_MODULE=current ava --watch --color"
+		"test:watch": "ava --watch --color"
 	},
-	"main": "lib/index.cjs.js",
-	"typings": "lib/index.cjs.d.ts",
+	"main": "index.js",
 	"files": [
 		"/lib/",
+		"index.{js|js.map|d.ts|d.ts.map}",
 		"cli.js"
 	],
 	"dependencies": {
@@ -57,10 +58,8 @@
 		"@types/node": "^14.0.13",
 		"@wessberg/rollup-plugin-ts": "^1.2.25",
 		"ava": "^3.8.2",
-		"cross-env": "^7.0.2",
 		"rimraf": "^3.0.2",
 		"rollup": "^2.18.2",
-		"ts-node": "^8.10.2",
 		"tslib": "^2.0.0",
 		"typescript": "^3.7.5",
 		"typescript-3.6": "npm:typescript@~3.6.4",
@@ -73,14 +72,11 @@
 		"cache": true,
 		"timeout": "200s",
 		"extensions": [
-			"ts"
-		],
-		"require": [
-			"ts-node/register/transpile-only"
+			"js"
 		],
 		"snapshotDir": "test/snapshots/results",
 		"files": [
-			"test/**/*.ts",
+			"test/**/*.js",
 			"!test/helpers/**/*"
 		]
 	},

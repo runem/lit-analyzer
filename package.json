@@ -34,7 +34,7 @@
 		"publish:next": "lerna run prepare && echo \"When asked, please choose 'Custom Prerelease' and use default value\" && lerna publish --dist-tag next --preid next --exact && npm run postpublish",
 		"bootstrap": "lerna clean --yes && lerna bootstrap --hoist --ignore lit-plugin && lerna run install:safe --scope lit-plugin && npm run copylink",
 		"lint": "eslint .",
-		"build": "lerna run build --parallel --stream",
+		"build": "lerna run build --stream",
 		"watch": "lerna run watch --parallel --stream",
 		"test": "lerna run test --parallel --stream",
 		"test:all": "lerna run test:all --parallel --stream",
