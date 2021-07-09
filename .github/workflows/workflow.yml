@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
-        node: [10, 12]
+        node: [12, 14]
 
     steps:
       - name: Checkout code
@@ -33,19 +33,19 @@ jobs:
         run: npm run lint
 
       - name: Prettier
-        if: matrix.os == 'ubuntu-latest' && matrix.node == 12
+        if: matrix.os == 'ubuntu-latest'
         run: npm run prettier:check
 
       - name: Test
         run: npm run test:all
 
       - name: Package vscode plugin
-        if: matrix.os == 'ubuntu-latest' && matrix.node == 12
+        if: matrix.os == 'ubuntu-latest'
         run: npx lerna run package --scope lit-plugin && mkdir vscode-lit-plugin && mv packages/vscode-lit-plugin/lit-plugin-*.vsix vscode-lit-plugin
 
       - name: Upload artifacts
         uses: actions/upload-artifact@master
-        if: matrix.os == 'ubuntu-latest' && matrix.node == 12
+        if: matrix.os == 'ubuntu-latest'
         with:
           name: vscode-lit-plugin
           path: vscode-lit-plugin
