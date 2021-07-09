@@ -1,5 +1,5 @@
 import { InterfaceDeclaration, ModuleDeclaration, SourceFile } from "typescript";
-import { tsModule } from "../../../../ts-lit-plugin/src/ts-module";
+import { tsModule } from "../ts-module";
 import { LitCodeFix } from "../types/lit-code-fix";
 import { LitCodeFixAction } from "../types/lit-code-fix-action";
 import { RuleFix } from "../types/rule/rule-fix";
