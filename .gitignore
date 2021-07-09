@@ -6,7 +6,9 @@ node_modules
 *.log
 todo.md
 .DS_Store
-lib
 dist
 out
 *.vsix
+
+/packages/*/lib
+/packages/*/index.*
