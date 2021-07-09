@@ -1,12 +1,12 @@
-import { LitAnalyzerContext } from "../../../lit-analyzer-context";
-import { HtmlDocument } from "../../../parse/document/text-document/html-document/html-document";
-import { documentationForHtmlTag } from "../../../parse/parse-html-data/html-tag";
-import { HtmlNode } from "../../../types/html-node/html-node-types";
-import { LitCompletion } from "../../../types/lit-completion";
-import { lazy } from "../../../util/general-util";
-import { DocumentPositionContext } from "../../../util/get-position-context-in-document";
-import { isCustomElementTagName } from "../../../util/is-valid-name";
-import { documentRangeToSFRange } from "../../../util/range-util";
+import { LitAnalyzerContext } from "../../../lit-analyzer-context.js";
+import { HtmlDocument } from "../../../parse/document/text-document/html-document/html-document.js";
+import { documentationForHtmlTag } from "../../../parse/parse-html-data/html-tag.js";
+import { HtmlNode } from "../../../types/html-node/html-node-types.js";
+import { LitCompletion } from "../../../types/lit-completion.js";
+import { lazy } from "../../../util/general-util.js";
+import { DocumentPositionContext } from "../../../util/get-position-context-in-document.js";
+import { isCustomElementTagName } from "../../../util/is-valid-name.js";
+import { documentRangeToSFRange } from "../../../util/range-util.js";
 
 export function completionsForHtmlNodes(
 	document: HtmlDocument,

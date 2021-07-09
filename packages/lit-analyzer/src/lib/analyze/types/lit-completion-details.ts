@@ -1,4 +1,4 @@
-import { LitTargetKind } from "./lit-target-kind";
+import { LitTargetKind } from "./lit-target-kind.js";
 
 export interface LitCompletionDetails {
 	name: string;

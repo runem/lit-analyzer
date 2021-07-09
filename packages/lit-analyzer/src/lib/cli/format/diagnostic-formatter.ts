@@ -1,6 +1,6 @@
 import { SourceFile } from "typescript";
-import { LitDiagnostic } from "../../analyze/types/lit-diagnostic";
-import { LitAnalyzerCliConfig } from "../lit-analyzer-cli-config";
+import { LitDiagnostic } from "../../analyze/types/lit-diagnostic.js";
+import { LitAnalyzerCliConfig } from "../lit-analyzer-cli-config.js";
 
 export interface AnalysisStats {
 	diagnostics: number;

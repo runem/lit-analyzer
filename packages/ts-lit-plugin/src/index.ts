@@ -2,13 +2,13 @@
 import { LitAnalyzerConfig, LitAnalyzerLoggerLevel, makeConfig, VERSION } from "lit-analyzer";
 import * as ts from "typescript";
 import { CompilerOptions } from "typescript";
-import * as tsServer from "typescript/lib/tsserverlibrary";
+import * as tsServer from "typescript/lib/tsserverlibrary.js";
 import { VERSION as WCA_VERSION } from "web-component-analyzer";
-import { decorateLanguageService } from "./decorate-language-service";
-import { logger } from "./logger";
-import { LitPluginContext } from "./ts-lit-plugin/lit-plugin-context";
-import { TsLitPlugin } from "./ts-lit-plugin/ts-lit-plugin";
-import { setTypescriptModule } from "./ts-module";
+import { decorateLanguageService } from "./decorate-language-service.js";
+import { logger } from "./logger.js";
+import { LitPluginContext } from "./ts-lit-plugin/lit-plugin-context.js";
+import { TsLitPlugin } from "./ts-lit-plugin/ts-lit-plugin.js";
+import { setTypescriptModule } from "./ts-module.js";
 
 const tsHtmlPluginSymbol = Symbol.for("__tsHtmlPlugin__");
 

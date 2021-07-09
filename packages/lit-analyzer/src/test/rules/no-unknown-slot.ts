@@ -1,7 +1,7 @@
-import { getDiagnostics } from "../helpers/analyze";
-import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert";
-import { makeElement } from "../helpers/generate-test-file";
-import { tsTest } from "../helpers/ts-test";
+import { getDiagnostics } from "../helpers/analyze.js";
+import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert.js";
+import { makeElement } from "../helpers/generate-test-file.js";
+import { tsTest } from "../helpers/ts-test.js";
 
 tsTest("Report unknown slot name", t => {
 	const { diagnostics } = getDiagnostics([makeElement({ slots: ["foo"] }), "html`<my-element><div slot='bar'></div></my-element>`"], {

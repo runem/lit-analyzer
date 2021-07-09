@@ -1,12 +1,12 @@
-import { LitAnalyzerConfig } from "../analyze/lit-analyzer-config";
-import { HtmlTag, litAttributeModifierForTarget } from "../analyze/parse/parse-html-data/html-tag";
-import { AnalyzerDefinitionStore } from "../analyze/store/analyzer-definition-store";
-import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types";
-import { HtmlNodeKind } from "../analyze/types/html-node/html-node-types";
-import { RuleFix } from "../analyze/types/rule/rule-fix";
-import { RuleModule } from "../analyze/types/rule/rule-module";
-import { suggestTargetForHtmlAttr } from "../analyze/util/attribute-util";
-import { rangeFromHtmlNodeAttr } from "../analyze/util/range-util";
+import { LitAnalyzerConfig } from "../analyze/lit-analyzer-config.js";
+import { HtmlTag, litAttributeModifierForTarget } from "../analyze/parse/parse-html-data/html-tag.js";
+import { AnalyzerDefinitionStore } from "../analyze/store/analyzer-definition-store.js";
+import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types.js";
+import { HtmlNodeKind } from "../analyze/types/html-node/html-node-types.js";
+import { RuleFix } from "../analyze/types/rule/rule-fix.js";
+import { RuleModule } from "../analyze/types/rule/rule-module.js";
+import { suggestTargetForHtmlAttr } from "../analyze/util/attribute-util.js";
+import { rangeFromHtmlNodeAttr } from "../analyze/util/range-util.js";
 
 /**
  * This rule validates that only known attributes are used in attribute bindings.

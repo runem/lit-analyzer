@@ -8,10 +8,10 @@ import {
 	toSimpleType
 } from "ts-simple-type";
 import { Expression, Type, TypeChecker } from "typescript";
-import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../analyze/types/html-node/html-node-attr-assignment-types";
-import { HtmlNodeAttrKind } from "../../../analyze/types/html-node/html-node-attr-types";
-import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
-import { getDirective } from "../directive/get-directive";
+import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../analyze/types/html-node/html-node-attr-assignment-types.js";
+import { HtmlNodeAttrKind } from "../../../analyze/types/html-node/html-node-attr-types.js";
+import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context.js";
+import { getDirective } from "../directive/get-directive.js";
 
 const cache = new WeakMap<HtmlNodeAttrAssignment, { typeA: SimpleType; typeB: SimpleType }>();
 

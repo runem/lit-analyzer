@@ -1,7 +1,7 @@
-import { RuleModule } from "../analyze/types/rule/rule-module";
-import { findParent, getNodeIdentifier } from "../analyze/util/ast-util";
-import { iterableFind } from "../analyze/util/iterable-util";
-import { rangeFromNode } from "../analyze/util/range-util";
+import { RuleModule } from "../analyze/types/rule/rule-module.js";
+import { findParent, getNodeIdentifier } from "../analyze/util/ast-util.js";
+import { iterableFind } from "../analyze/util/iterable-util.js";
+import { rangeFromNode } from "../analyze/util/range-util.js";
 
 /**
  * This rule validates that legacy Polymer attribute bindings are not used.

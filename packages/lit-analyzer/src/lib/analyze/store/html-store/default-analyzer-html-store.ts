@@ -9,7 +9,7 @@ import {
 	HtmlSlot,
 	HtmlTag,
 	NamedHtmlDataCollection
-} from "../../parse/parse-html-data/html-tag";
+} from "../../parse/parse-html-data/html-tag.js";
 import {
 	HtmlNodeAttr,
 	HtmlNodeAttrKind,
@@ -17,10 +17,10 @@ import {
 	IHtmlNodeAttrEventListener,
 	IHtmlNodeAttrProp,
 	IHtmlNodeBooleanAttribute
-} from "../../types/html-node/html-node-attr-types";
-import { HtmlNode } from "../../types/html-node/html-node-types";
-import { AnalyzerHtmlStore } from "../analyzer-html-store";
-import { HtmlDataSourceKind, HtmlDataSourceMerged } from "./html-data-source-merged";
+} from "../../types/html-node/html-node-attr-types.js";
+import { HtmlNode } from "../../types/html-node/html-node-types.js";
+import { AnalyzerHtmlStore } from "../analyzer-html-store.js";
+import { HtmlDataSourceKind, HtmlDataSourceMerged } from "./html-data-source-merged.js";
 
 export class DefaultAnalyzerHtmlStore implements AnalyzerHtmlStore {
 	private dataSource = new HtmlDataSourceMerged();

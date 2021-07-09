@@ -1,6 +1,6 @@
-import { getDiagnostics } from "../helpers/analyze";
-import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert";
-import { tsTest } from "../helpers/ts-test";
+import { getDiagnostics } from "../helpers/analyze.js";
+import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert.js";
+import { tsTest } from "../helpers/ts-test.js";
 
 tsTest("Event binding: Callable value is bindable", t => {
 	const { diagnostics } = getDiagnostics('html`<input @change="${() => {}}" />`');

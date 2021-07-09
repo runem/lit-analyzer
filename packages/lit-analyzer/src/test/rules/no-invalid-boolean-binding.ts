@@ -1,6 +1,6 @@
-import { getDiagnostics } from "../helpers/analyze";
-import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert";
-import { tsTest } from "../helpers/ts-test";
+import { getDiagnostics } from "../helpers/analyze.js";
+import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert.js";
+import { tsTest } from "../helpers/ts-test.js";
 
 tsTest.skip("Emits 'no-invalid-boolean-binding' diagnostic when a boolean binding is used on a non-boolean type", t => {
 	const { diagnostics } = getDiagnostics('html`<input ?type="${true}" />`');

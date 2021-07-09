@@ -1,5 +1,5 @@
 import { SimpleType, SimpleTypeStringLiteral, SimpleTypeUnion } from "ts-simple-type";
-import { makePrimitiveArrayType } from "../util/type-util";
+import { makePrimitiveArrayType } from "../util/type-util.js";
 
 const HTML_5_ATTR_TYPES: { [key: string]: string | string[] | [string[]] } = {
 	onafterprint: "string",

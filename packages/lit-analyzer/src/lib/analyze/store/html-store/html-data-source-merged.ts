@@ -17,10 +17,10 @@ import {
 	NamedHtmlDataCollection,
 	HtmlCssProperty,
 	mergeCssProperties
-} from "../../parse/parse-html-data/html-tag";
-import { lazy } from "../../util/general-util";
-import { iterableDefined } from "../../util/iterable-util";
-import { HtmlDataSource } from "./html-data-source";
+} from "../../parse/parse-html-data/html-tag.js";
+import { lazy } from "../../util/general-util.js";
+import { iterableDefined } from "../../util/iterable-util.js";
+import { HtmlDataSource } from "./html-data-source.js";
 
 export enum HtmlDataSourceKind {
 	DECLARED = 0,

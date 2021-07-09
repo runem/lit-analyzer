@@ -1,8 +1,8 @@
 import { Node } from "typescript";
-import { TextDocument } from "../parse/document/text-document/text-document";
-import { HtmlNodeAttr } from "../types/html-node/html-node-attr-types";
-import { HtmlNode } from "../types/html-node/html-node-types";
-import { DocumentRange, Range, SourceFileRange } from "../types/range";
+import { TextDocument } from "../parse/document/text-document/text-document.js";
+import { HtmlNodeAttr } from "../types/html-node/html-node-attr-types.js";
+import { HtmlNode } from "../types/html-node/html-node-types.js";
+import { DocumentRange, Range, SourceFileRange } from "../types/range.js";
 
 export function makeSourceFileRange(range: Range): SourceFileRange {
 	return range as SourceFileRange;

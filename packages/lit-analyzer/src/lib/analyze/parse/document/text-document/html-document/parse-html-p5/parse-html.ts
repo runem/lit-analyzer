@@ -1,4 +1,4 @@
-import { IP5CommentNode, IP5DocumentFragmentNode, IP5NodeBase, IP5TagNode, IP5TextNode, P5Node } from "./parse-html-types";
+import { IP5CommentNode, IP5DocumentFragmentNode, IP5NodeBase, IP5TagNode, IP5TextNode, P5Node } from "./parse-html-types.js";
 
 const { parseFragment } = require("parse5");
 

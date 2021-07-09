@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { TextSpan } from "typescript";
-import { AnalysisStats } from "./diagnostic-formatter";
+import { AnalysisStats } from "./diagnostic-formatter.js";
 
 export function generalReport(stats: AnalysisStats): string {
 	function numberStatText(n: number, text: string): string {

@@ -1,6 +1,6 @@
-import { getDiagnostics } from "../helpers/analyze";
-import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert";
-import { tsTest } from "../helpers/ts-test";
+import { getDiagnostics } from "../helpers/analyze.js";
+import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert.js";
+import { tsTest } from "../helpers/ts-test.js";
 
 tsTest("'no-incompatible-property-type' is not emitted for string types without configuration", t => {
 	const { diagnostics } = getDiagnostics(

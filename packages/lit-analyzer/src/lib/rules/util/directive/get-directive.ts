@@ -1,10 +1,10 @@
 import { SimpleType, toSimpleType } from "ts-simple-type";
 import { Expression } from "typescript";
-import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../analyze/types/html-node/html-node-attr-assignment-types";
-import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
-import { lazy } from "../../../analyze/util/general-util";
-import { removeUndefinedFromType } from "../type/remove-undefined-from-type";
-import { isLitDirective } from "./is-lit-directive";
+import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../analyze/types/html-node/html-node-attr-assignment-types.js";
+import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context.js";
+import { lazy } from "../../../analyze/util/general-util.js";
+import { removeUndefinedFromType } from "../type/remove-undefined-from-type.js";
+import { isLitDirective } from "./is-lit-directive.js";
 
 export type BuiltInDirectiveKind =
 	| "ifDefined"

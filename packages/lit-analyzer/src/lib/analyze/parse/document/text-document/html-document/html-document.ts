@@ -1,9 +1,9 @@
-import { HtmlNodeAttr } from "../../../../types/html-node/html-node-attr-types";
-import { HtmlNode } from "../../../../types/html-node/html-node-types";
-import { DocumentOffset, DocumentRange } from "../../../../types/range";
-import { intersects } from "../../../../util/range-util";
-import { VirtualDocument } from "../../virtual-document/virtual-document";
-import { TextDocument } from "../text-document";
+import { HtmlNodeAttr } from "../../../../types/html-node/html-node-attr-types.js";
+import { HtmlNode } from "../../../../types/html-node/html-node-types.js";
+import { DocumentOffset, DocumentRange } from "../../../../types/range.js";
+import { intersects } from "../../../../util/range-util.js";
+import { VirtualDocument } from "../../virtual-document/virtual-document.js";
+import { TextDocument } from "../text-document.js";
 
 export class HtmlDocument extends TextDocument {
 	constructor(virtualDocument: VirtualDocument, public rootNodes: HtmlNode[]) {

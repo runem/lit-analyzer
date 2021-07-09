@@ -1,6 +1,6 @@
 import { Expression } from "typescript";
-import { Range } from "../range";
-import { HtmlNodeAttr } from "./html-node-attr-types";
+import { Range } from "../range.js";
+import { HtmlNodeAttr } from "./html-node-attr-types.js";
 
 export enum HtmlNodeAttrAssignmentKind {
 	BOOLEAN = "BOOLEAN",

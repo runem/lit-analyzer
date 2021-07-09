@@ -1,16 +1,16 @@
 import chalk from "chalk";
 import { appendFileSync, writeFileSync } from "fs";
 import { Program, SourceFile } from "typescript";
-import { DefaultLitAnalyzerContext } from "../analyze/default-lit-analyzer-context";
-import { LitAnalyzer } from "../analyze/lit-analyzer";
-import { LitAnalyzerConfig, makeConfig } from "../analyze/lit-analyzer-config";
-import { analyzeGlobs } from "./analyze-globs";
-import { readLitAnalyzerConfigFromTsConfig } from "./compile";
-import { CodeDiagnosticFormatter } from "./format/code-diagnostic-formatter";
-import { AnalysisStats, DiagnosticFormatter } from "./format/diagnostic-formatter";
-import { ListDiagnosticFormatter } from "./format/list-diagnostic-formatter";
-import { MarkdownDiagnosticFormatter } from "./format/markdown-formatter";
-import { FormatterFormat, LitAnalyzerCliConfig } from "./lit-analyzer-cli-config";
+import { DefaultLitAnalyzerContext } from "../analyze/default-lit-analyzer-context.js";
+import { LitAnalyzer } from "../analyze/lit-analyzer.js";
+import { LitAnalyzerConfig, makeConfig } from "../analyze/lit-analyzer-config.js";
+import { analyzeGlobs } from "./analyze-globs.js";
+import { readLitAnalyzerConfigFromTsConfig } from "./compile.js";
+import { CodeDiagnosticFormatter } from "./format/code-diagnostic-formatter.js";
+import { AnalysisStats, DiagnosticFormatter } from "./format/diagnostic-formatter.js";
+import { ListDiagnosticFormatter } from "./format/list-diagnostic-formatter.js";
+import { MarkdownDiagnosticFormatter } from "./format/markdown-formatter.js";
+import { FormatterFormat, LitAnalyzerCliConfig } from "./lit-analyzer-cli-config.js";
 
 function printText(text: string, config: LitAnalyzerCliConfig) {
 	if (config.outFile != null) {

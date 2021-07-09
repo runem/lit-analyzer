@@ -1,8 +1,8 @@
 import { Expression, Node, TaggedTemplateExpression } from "typescript";
-import { tsModule } from "../../../ts-module";
-import { DocumentOffset, DocumentRange, Range, SourceFilePosition, SourceFileRange } from "../../../types/range";
-import { intersects, makeSourceFileRange } from "../../../util/range-util";
-import { VirtualDocument } from "./virtual-document";
+import { tsModule } from "../../../ts-module.js";
+import { DocumentOffset, DocumentRange, Range, SourceFilePosition, SourceFileRange } from "../../../types/range.js";
+import { intersects, makeSourceFileRange } from "../../../util/range-util.js";
+import { VirtualDocument } from "./virtual-document.js";
 
 function getPartLength(part: Node): number {
 	const end = part.parent && tsModule.ts.isTemplateSpan(part.parent) ? part.parent.literal.getStart() : part.getEnd();

@@ -1,7 +1,7 @@
-import { getDiagnostics } from "../helpers/analyze";
-import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert";
-import { makeElement } from "../helpers/generate-test-file";
-import { tsTest } from "../helpers/ts-test";
+import { getDiagnostics } from "../helpers/analyze.js";
+import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert.js";
+import { makeElement } from "../helpers/generate-test-file.js";
+import { tsTest } from "../helpers/ts-test.js";
 
 tsTest("Cannot assign 'undefined' in attribute binding", t => {
 	const { diagnostics } = getDiagnostics('html`<input maxlength="${{} as number | undefined}" />`');

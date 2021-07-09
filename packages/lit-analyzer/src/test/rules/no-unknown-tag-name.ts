@@ -1,7 +1,7 @@
-import { getDiagnostics } from "../helpers/analyze";
-import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert";
-import { makeElement } from "../helpers/generate-test-file";
-import { tsTest } from "../helpers/ts-test";
+import { getDiagnostics } from "../helpers/analyze.js";
+import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert.js";
+import { makeElement } from "../helpers/generate-test-file.js";
+import { tsTest } from "../helpers/ts-test.js";
 
 tsTest("Report unknown custom elements", t => {
 	const { diagnostics } = getDiagnostics("html`<unknown-element></unknown-element>`", { rules: { "no-unknown-tag-name": true } });

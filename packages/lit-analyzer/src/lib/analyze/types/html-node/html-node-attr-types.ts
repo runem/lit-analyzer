@@ -1,8 +1,8 @@
-import { LitHtmlAttributeModifier } from "../../constants";
-import { HtmlDocument } from "../../parse/document/text-document/html-document/html-document";
-import { Range } from "../range";
-import { HtmlNodeAttrAssignment } from "./html-node-attr-assignment-types";
-import { HtmlNode } from "./html-node-types";
+import { LitHtmlAttributeModifier } from "../../constants.js";
+import { HtmlDocument } from "../../parse/document/text-document/html-document/html-document.js";
+import { Range } from "../range.js";
+import { HtmlNodeAttrAssignment } from "./html-node-attr-assignment-types.js";
+import { HtmlNode } from "./html-node-types.js";
 
 export enum HtmlNodeAttrKind {
 	EVENT_LISTENER = "EVENT_LISTENER",

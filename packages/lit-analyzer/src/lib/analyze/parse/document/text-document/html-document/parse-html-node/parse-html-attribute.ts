@@ -2,17 +2,17 @@ import {
 	LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER,
 	LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER,
 	LIT_HTML_PROP_ATTRIBUTE_MODIFIER
-} from "../../../../../constants";
+} from "../../../../../constants.js";
 import {
 	HtmlNodeAttr,
 	HtmlNodeAttrKind,
 	IHtmlNodeAttrBase,
 	IHtmlNodeAttrSourceCodeLocation
-} from "../../../../../types/html-node/html-node-attr-types";
-import { parseLitAttrName } from "../../../../../util/general-util";
-import { getSourceLocation, IP5NodeAttr, IP5TagNode } from "../parse-html-p5/parse-html-types";
-import { parseHtmlAttrAssignment } from "./parse-html-attr-assignment";
-import { ParseHtmlAttrContext } from "./parse-html-attr-context";
+} from "../../../../../types/html-node/html-node-attr-types.js";
+import { parseLitAttrName } from "../../../../../util/general-util.js";
+import { getSourceLocation, IP5NodeAttr, IP5TagNode } from "../parse-html-p5/parse-html-types.js";
+import { parseHtmlAttrAssignment } from "./parse-html-attr-assignment.js";
+import { ParseHtmlAttrContext } from "./parse-html-attr-context.js";
 
 /**
  * Creates multiple html attributes based on multiple p5Attributes.

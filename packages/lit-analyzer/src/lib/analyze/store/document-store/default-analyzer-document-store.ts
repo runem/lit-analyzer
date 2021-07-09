@@ -1,9 +1,9 @@
 import { SourceFile } from "typescript";
-import { LitAnalyzerConfig } from "../../lit-analyzer-config";
-import { parseDocumentsInSourceFile } from "../../parse/document/parse-documents-in-source-file";
-import { TextDocument } from "../../parse/document/text-document/text-document";
-import { SourceFilePosition } from "../../types/range";
-import { AnalyzerDocumentStore } from "../analyzer-document-store";
+import { LitAnalyzerConfig } from "../../lit-analyzer-config.js";
+import { parseDocumentsInSourceFile } from "../../parse/document/parse-documents-in-source-file.js";
+import { TextDocument } from "../../parse/document/text-document/text-document.js";
+import { SourceFilePosition } from "../../types/range.js";
+import { AnalyzerDocumentStore } from "../analyzer-document-store.js";
 
 export class DefaultAnalyzerDocumentStore implements AnalyzerDocumentStore {
 	getDocumentAtPosition(sourceFile: SourceFile, position: SourceFilePosition, options: LitAnalyzerConfig): TextDocument | undefined {

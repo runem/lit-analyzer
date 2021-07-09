@@ -1,5 +1,5 @@
 import { HTMLDataV1 } from "vscode-html-languageservice";
-import { LitDiagnosticSeverity } from "./types/lit-diagnostic";
+import { LitDiagnosticSeverity } from "./types/lit-diagnostic.js";
 
 export type LitAnalyzerRuleSeverity = "on" | "off" | "warn" | "warning" | "error" | 0 | 1 | 2 | true | false;
 

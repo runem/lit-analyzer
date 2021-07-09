@@ -3,14 +3,14 @@ import {
 	LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER,
 	LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER,
 	LIT_HTML_PROP_ATTRIBUTE_MODIFIER
-} from "../../../constants";
-import { documentationForTarget, HtmlAttrTarget, isHtmlAttr, isHtmlEvent, isHtmlProp } from "../../../parse/parse-html-data/html-tag";
-import { HtmlNode } from "../../../types/html-node/html-node-types";
-import { DocumentPositionContext } from "../../../util/get-position-context-in-document";
-import { iterableFilter, iterableMap } from "../../../util/iterable-util";
-import { lazy } from "../../../util/general-util";
-import { LitAnalyzerContext } from "../../../lit-analyzer-context";
-import { LitCompletion } from "../../../types/lit-completion";
+} from "../../../constants.js";
+import { documentationForTarget, HtmlAttrTarget, isHtmlAttr, isHtmlEvent, isHtmlProp } from "../../../parse/parse-html-data/html-tag.js";
+import { HtmlNode } from "../../../types/html-node/html-node-types.js";
+import { DocumentPositionContext } from "../../../util/get-position-context-in-document.js";
+import { iterableFilter, iterableMap } from "../../../util/iterable-util.js";
+import { lazy } from "../../../util/general-util.js";
+import { LitAnalyzerContext } from "../../../lit-analyzer-context.js";
+import { LitCompletion } from "../../../types/lit-completion.js";
 
 export function completionsForHtmlAttrs(htmlNode: HtmlNode, location: DocumentPositionContext, { htmlStore }: LitAnalyzerContext): LitCompletion[] {
 	const onTagName = htmlNode.tagName;

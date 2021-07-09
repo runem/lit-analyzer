@@ -1,7 +1,7 @@
 import { SourceFile } from "typescript";
 import { ComponentDefinition } from "web-component-analyzer";
-import { LitAnalyzerContext } from "../../lit-analyzer-context";
-import { visitIndirectImportsFromSourceFile } from "./visit-dependencies";
+import { LitAnalyzerContext } from "../../lit-analyzer-context.js";
+import { visitIndirectImportsFromSourceFile } from "./visit-dependencies.js";
 
 // A cache used to prevent traversing through entire source files multiple times to find direct imports
 const DIRECT_IMPORT_CACHE = new WeakMap<SourceFile, Set<SourceFile>>();

@@ -1,6 +1,6 @@
-import { getDiagnostics } from "../helpers/analyze";
-import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert";
-import { tsTest } from "../helpers/ts-test";
+import { getDiagnostics } from "../helpers/analyze.js";
+import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert.js";
+import { tsTest } from "../helpers/ts-test.js";
 
 tsTest("Non-boolean-binding with an empty string value is valid", t => {
 	const { diagnostics } = getDiagnostics('html`<input required="" />`', { rules: { "no-boolean-in-attribute-binding": true } });

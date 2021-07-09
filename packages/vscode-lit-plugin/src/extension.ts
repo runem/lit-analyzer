@@ -1,6 +1,6 @@
 import { ALL_RULE_IDS, LitAnalyzerConfig } from "lit-analyzer";
 import { join } from "path";
-import { ColorProvider } from "./color-provider";
+import { ColorProvider } from "./color-provider.js";
 import * as vscode from "vscode";
 
 const tsLitPluginId = "ts-lit-plugin";

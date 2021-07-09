@@ -1,6 +1,6 @@
 import { Node, SourceFile, TaggedTemplateExpression } from "typescript";
-import { tsModule } from "../../ts-module";
-import { findParent, getNodeAtPosition } from "../../util/ast-util";
+import { tsModule } from "../../ts-module.js";
+import { findParent, getNodeAtPosition } from "../../util/ast-util.js";
 
 /**
  * Returns all virtual documents in a given file.

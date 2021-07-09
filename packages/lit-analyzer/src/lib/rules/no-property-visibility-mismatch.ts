@@ -1,10 +1,10 @@
 import { Identifier, ObjectLiteralExpression } from "typescript";
 import { ComponentMember } from "web-component-analyzer";
-import { RuleFixAction, RuleFixActionChangeRange } from "../analyze/types/rule/rule-fix-action";
-import { RuleModule } from "../analyze/types/rule/rule-module";
-import { RuleModuleContext } from "../analyze/types/rule/rule-module-context";
-import { findChild, getNodeIdentifier } from "../analyze/util/ast-util";
-import { makeSourceFileRange, rangeFromNode } from "../analyze/util/range-util";
+import { RuleFixAction, RuleFixActionChangeRange } from "../analyze/types/rule/rule-fix-action.js";
+import { RuleModule } from "../analyze/types/rule/rule-module.js";
+import { RuleModuleContext } from "../analyze/types/rule/rule-module-context.js";
+import { findChild, getNodeIdentifier } from "../analyze/util/ast-util.js";
+import { makeSourceFileRange, rangeFromNode } from "../analyze/util/range-util.js";
 
 /**
  * Returns the identifier of the decorator used on the member if any

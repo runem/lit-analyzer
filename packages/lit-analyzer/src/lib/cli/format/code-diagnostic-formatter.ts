@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import { SourceFile } from "typescript";
-import { LitDiagnostic } from "../../analyze/types/lit-diagnostic";
-import { AnalysisStats, DiagnosticFormatter } from "./diagnostic-formatter";
-import { generalReport, markText, relativeFileName } from "./util";
+import { LitDiagnostic } from "../../analyze/types/lit-diagnostic.js";
+import { AnalysisStats, DiagnosticFormatter } from "./diagnostic-formatter.js";
+import { generalReport, markText, relativeFileName } from "./util.js";
 
 export class CodeDiagnosticFormatter implements DiagnosticFormatter {
 	report(stats: AnalysisStats): string | undefined {

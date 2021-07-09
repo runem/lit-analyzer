@@ -1,9 +1,9 @@
 import { isSimpleTypeLiteral, SimpleType } from "ts-simple-type";
-import { LitAnalyzerContext } from "../../../lit-analyzer-context";
-import { HtmlNodeAttrAssignmentKind } from "../../../types/html-node/html-node-attr-assignment-types";
-import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types";
-import { LitCompletion } from "../../../types/lit-completion";
-import { DocumentPositionContext } from "../../../util/get-position-context-in-document";
+import { LitAnalyzerContext } from "../../../lit-analyzer-context.js";
+import { HtmlNodeAttrAssignmentKind } from "../../../types/html-node/html-node-attr-assignment-types.js";
+import { HtmlNodeAttr, HtmlNodeAttrKind } from "../../../types/html-node/html-node-attr-types.js";
+import { LitCompletion } from "../../../types/lit-completion.js";
+import { DocumentPositionContext } from "../../../util/get-position-context-in-document.js";
 
 export function completionsForHtmlAttrValues(
 	htmlNodeAttr: HtmlNodeAttr,

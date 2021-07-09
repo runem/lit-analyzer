@@ -1,6 +1,6 @@
-import { getDiagnostics } from "../helpers/analyze";
-import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert";
-import { tsTest } from "../helpers/ts-test";
+import { getDiagnostics } from "../helpers/analyze.js";
+import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert.js";
+import { tsTest } from "../helpers/ts-test.js";
 
 tsTest("Don't report legacy attributes when 'no-legacy-attribute' is turned off", t => {
 	const { diagnostics } = getDiagnostics("html`<input required?=${true} />`", { rules: { "no-legacy-attribute": false } });

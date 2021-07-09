@@ -1,13 +1,13 @@
 import * as tsMod from "typescript";
 import { Program, SourceFile } from "typescript";
-import * as tsServer from "typescript/lib/tsserverlibrary";
-import { LitAnalyzerConfig } from "./lit-analyzer-config";
-import { LitAnalyzerLogger } from "./lit-analyzer-logger";
-import { RuleCollection } from "./rule-collection";
-import { AnalyzerDefinitionStore } from "./store/analyzer-definition-store";
-import { AnalyzerDependencyStore } from "./store/analyzer-dependency-store";
-import { AnalyzerDocumentStore } from "./store/analyzer-document-store";
-import { AnalyzerHtmlStore } from "./store/analyzer-html-store";
+import * as tsServer from "typescript/lib/tsserverlibrary.js";
+import { LitAnalyzerConfig } from "./lit-analyzer-config.js";
+import { LitAnalyzerLogger } from "./lit-analyzer-logger.js";
+import { RuleCollection } from "./rule-collection.js";
+import { AnalyzerDefinitionStore } from "./store/analyzer-definition-store.js";
+import { AnalyzerDependencyStore } from "./store/analyzer-dependency-store.js";
+import { AnalyzerDocumentStore } from "./store/analyzer-document-store.js";
+import { AnalyzerHtmlStore } from "./store/analyzer-html-store.js";
 
 export interface LitAnalyzerContext {
 	readonly ts: typeof tsMod;

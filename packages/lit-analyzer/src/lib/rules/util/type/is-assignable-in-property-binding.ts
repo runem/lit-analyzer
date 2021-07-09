@@ -1,9 +1,9 @@
 import { SimpleType, typeToString } from "ts-simple-type";
-import { HtmlNodeAttr } from "../../../analyze/types/html-node/html-node-attr-types";
-import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
-import { rangeFromHtmlNodeAttr } from "../../../analyze/util/range-util";
-import { isAssignableBindingUnderSecuritySystem } from "./is-assignable-binding-under-security-system";
-import { isAssignableToType } from "./is-assignable-to-type";
+import { HtmlNodeAttr } from "../../../analyze/types/html-node/html-node-attr-types.js";
+import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context.js";
+import { rangeFromHtmlNodeAttr } from "../../../analyze/util/range-util.js";
+import { isAssignableBindingUnderSecuritySystem } from "./is-assignable-binding-under-security-system.js";
+import { isAssignableToType } from "./is-assignable-to-type.js";
 
 export function isAssignableInPropertyBinding(
 	htmlAttr: HtmlNodeAttr,

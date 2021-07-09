@@ -1,8 +1,8 @@
-import { LitAnalyzerContext } from "../../../lit-analyzer-context";
-import { HtmlNode } from "../../../types/html-node/html-node-types";
-import { LitDefinition } from "../../../types/lit-definition";
-import { getNodeIdentifier } from "../../../util/ast-util";
-import { rangeFromHtmlNode } from "../../../util/range-util";
+import { LitAnalyzerContext } from "../../../lit-analyzer-context.js";
+import { HtmlNode } from "../../../types/html-node/html-node-types.js";
+import { LitDefinition } from "../../../types/lit-definition.js";
+import { getNodeIdentifier } from "../../../util/ast-util.js";
+import { rangeFromHtmlNode } from "../../../util/range-util.js";
 
 export function definitionForHtmlNode(htmlNode: HtmlNode, { htmlStore, ts }: LitAnalyzerContext): LitDefinition | undefined {
 	const tag = htmlStore.getHtmlTag(htmlNode);

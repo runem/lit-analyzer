@@ -1,12 +1,12 @@
 import { ComponentDeclaration, ComponentDefinition } from "web-component-analyzer";
-import { isRuleEnabled, LitAnalyzerRuleId } from "./lit-analyzer-config";
-import { LitAnalyzerContext } from "./lit-analyzer-context";
-import { HtmlDocument } from "./parse/document/text-document/html-document/html-document";
-import { HtmlNodeAttr } from "./types/html-node/html-node-attr-types";
-import { HtmlNode, HtmlNodeKind } from "./types/html-node/html-node-types";
-import { RuleDiagnostic } from "./types/rule/rule-diagnostic";
-import { RuleModule, RuleModuleImplementation } from "./types/rule/rule-module";
-import { RuleModuleContext } from "./types/rule/rule-module-context";
+import { isRuleEnabled, LitAnalyzerRuleId } from "./lit-analyzer-config.js";
+import { LitAnalyzerContext } from "./lit-analyzer-context.js";
+import { HtmlDocument } from "./parse/document/text-document/html-document/html-document.js";
+import { HtmlNodeAttr } from "./types/html-node/html-node-attr-types.js";
+import { HtmlNode, HtmlNodeKind } from "./types/html-node/html-node-types.js";
+import { RuleDiagnostic } from "./types/rule/rule-diagnostic.js";
+import { RuleModule, RuleModuleImplementation } from "./types/rule/rule-module.js";
+import { RuleModuleContext } from "./types/rule/rule-module-context.js";
 
 export interface ReportedRuleDiagnostic {
 	source: LitAnalyzerRuleId;

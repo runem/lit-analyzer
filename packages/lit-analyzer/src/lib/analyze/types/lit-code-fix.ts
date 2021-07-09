@@ -1,4 +1,4 @@
-import { LitCodeFixAction } from "./lit-code-fix-action";
+import { LitCodeFixAction } from "./lit-code-fix-action.js";
 
 export interface LitCodeFix {
 	name: string;

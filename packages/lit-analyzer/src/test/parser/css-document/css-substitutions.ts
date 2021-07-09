@@ -1,10 +1,10 @@
 import { ExecutionContext } from "ava";
-import { CssDocument } from "../../../lib/analyze/parse/document/text-document/css-document/css-document";
-import { VirtualAstCssDocument } from "../../../lib/analyze/parse/document/virtual-document/virtual-css-document";
-import { findTaggedTemplates } from "../../../lib/analyze/parse/tagged-template/find-tagged-templates";
+import { CssDocument } from "../../../lib/analyze/parse/document/text-document/css-document/css-document.js";
+import { VirtualAstCssDocument } from "../../../lib/analyze/parse/document/virtual-document/virtual-css-document.js";
+import { findTaggedTemplates } from "../../../lib/analyze/parse/tagged-template/find-tagged-templates.js";
 
-import { compileFiles } from "../../helpers/compile-files";
-import { tsTest } from "../../helpers/ts-test";
+import { compileFiles } from "../../helpers/compile-files.js";
+import { tsTest } from "../../helpers/ts-test.js";
 
 function createCssDocument(testFile: string) {
 	const { sourceFile } = compileFiles(testFile);

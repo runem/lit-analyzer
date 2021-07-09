@@ -1,25 +1,25 @@
-import { RuleModule } from "../analyze/types/rule/rule-module";
-import noBooleanInAttributeBindingRule from "./no-boolean-in-attribute-binding";
-import noComplexAttributeBindingRule from "./no-complex-attribute-binding";
-import noExpressionlessPropertyBindingRule from "./no-expressionless-property-binding";
-import noIncompatiblePropertyType from "./no-incompatible-property-type";
-import noIncompatibleTypeBindingRule from "./no-incompatible-type-binding";
-import noInvalidAttributeName from "./no-invalid-attribute-name";
-import noInvalidDirectiveBindingRule from "./no-invalid-directive-binding";
-import noInvalidTagName from "./no-invalid-tag-name";
-import noLegacyAttribute from "./no-legacy-attribute";
-import noMissingElementTypeDefinition from "./no-missing-element-type-definition";
-import noMissingImport from "./no-missing-import";
-import noNoncallableEventBindingRule from "./no-noncallable-event-binding";
-import noNullableAttributeBindingRule from "./no-nullable-attribute-binding";
-import noPropertyVisibilityMismatch from "./no-property-visibility-mismatch";
-import noUnclosedTag from "./no-unclosed-tag";
-import noUnintendedMixedBindingRule from "./no-unintended-mixed-binding";
-import noUnknownAttribute from "./no-unknown-attribute";
-import noUnknownEvent from "./no-unknown-event";
-import noUnknownProperty from "./no-unknown-property";
-import noUnknownSlotRule from "./no-unknown-slot";
-import noUnknownTagName from "./no-unknown-tag-name";
+import { RuleModule } from "../analyze/types/rule/rule-module.js";
+import noBooleanInAttributeBindingRule from "./no-boolean-in-attribute-binding.js";
+import noComplexAttributeBindingRule from "./no-complex-attribute-binding.js";
+import noExpressionlessPropertyBindingRule from "./no-expressionless-property-binding.js";
+import noIncompatiblePropertyType from "./no-incompatible-property-type.js";
+import noIncompatibleTypeBindingRule from "./no-incompatible-type-binding.js";
+import noInvalidAttributeName from "./no-invalid-attribute-name.js";
+import noInvalidDirectiveBindingRule from "./no-invalid-directive-binding.js";
+import noInvalidTagName from "./no-invalid-tag-name.js";
+import noLegacyAttribute from "./no-legacy-attribute.js";
+import noMissingElementTypeDefinition from "./no-missing-element-type-definition.js";
+import noMissingImport from "./no-missing-import.js";
+import noNoncallableEventBindingRule from "./no-noncallable-event-binding.js";
+import noNullableAttributeBindingRule from "./no-nullable-attribute-binding.js";
+import noPropertyVisibilityMismatch from "./no-property-visibility-mismatch.js";
+import noUnclosedTag from "./no-unclosed-tag.js";
+import noUnintendedMixedBindingRule from "./no-unintended-mixed-binding.js";
+import noUnknownAttribute from "./no-unknown-attribute.js";
+import noUnknownEvent from "./no-unknown-event.js";
+import noUnknownProperty from "./no-unknown-property.js";
+import noUnknownSlotRule from "./no-unknown-slot.js";
+import noUnknownTagName from "./no-unknown-tag-name.js";
 
 export const ALL_RULES: RuleModule[] = [
 	noExpressionlessPropertyBindingRule,
