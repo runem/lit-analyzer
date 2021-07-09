@@ -5,7 +5,7 @@
 	},
 	"extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier", "prettier/@typescript-eslint"],
 	"parser": "@typescript-eslint/parser",
-	"plugins": ["@typescript-eslint"],
+	"plugins": ["@typescript-eslint", "import"],
 	"rules": {
 		"no-console": "error",
 		"prefer-rest-params": "off",
@@ -23,6 +23,7 @@
 		"@typescript-eslint/no-non-null-assertion": "off",
 		"@typescript-eslint/prefer-interface": "off",
 		"@typescript-eslint/no-empty-interface": "off",
-		"no-dupe-class-members": "off"
+		"no-dupe-class-members": "off",
+		"import/extensions": ["error", "always"]
 	}
 }
