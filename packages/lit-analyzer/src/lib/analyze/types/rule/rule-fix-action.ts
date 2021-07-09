@@ -1,8 +1,8 @@
 import { Identifier, SourceFile } from "typescript";
-import { HtmlNodeAttrAssignment } from "../html-node/html-node-attr-assignment-types";
-import { HtmlNodeAttr } from "../html-node/html-node-attr-types";
-import { HtmlNode } from "../html-node/html-node-types";
-import { SourceFileRange } from "../range";
+import { HtmlNodeAttrAssignment } from "../html-node/html-node-attr-assignment-types.js";
+import { HtmlNodeAttr } from "../html-node/html-node-attr-types.js";
+import { HtmlNode } from "../html-node/html-node-types.js";
+import { SourceFileRange } from "../range.js";
 
 export type RuleFixActionKind =
 	| "changeTagName"

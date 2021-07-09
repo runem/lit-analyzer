@@ -12,7 +12,7 @@ import {
 	ScriptTarget,
 	SourceFile
 } from "typescript";
-import { LitAnalyzerConfig } from "../analyze/lit-analyzer-config";
+import { LitAnalyzerConfig } from "../analyze/lit-analyzer-config.js";
 
 const requiredCompilerOptions: CompilerOptions = {
 	noEmitOnError: false,

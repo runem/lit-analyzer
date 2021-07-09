@@ -1,8 +1,8 @@
-import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../../../types/html-node/html-node-attr-assignment-types";
-import { HtmlNodeAttr } from "../../../../../types/html-node/html-node-attr-types";
-import { Range } from "../../../../../types/range";
-import { getSourceLocation, IP5NodeAttr, IP5TagNode } from "../parse-html-p5/parse-html-types";
-import { ParseHtmlContext } from "./parse-html-context";
+import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../../../types/html-node/html-node-attr-assignment-types.js";
+import { HtmlNodeAttr } from "../../../../../types/html-node/html-node-attr-types.js";
+import { Range } from "../../../../../types/range.js";
+import { getSourceLocation, IP5NodeAttr, IP5TagNode } from "../parse-html-p5/parse-html-types.js";
+import { ParseHtmlContext } from "./parse-html-context.js";
 
 /**
  * Parses a html attribute assignment.

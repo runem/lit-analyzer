@@ -1,6 +1,6 @@
 import { LitTargetKind } from "lit-analyzer";
 import { ScriptElementKind } from "typescript";
-import { tsModule } from "../../ts-module";
+import { tsModule } from "../../ts-module.js";
 
 export function translateTargetKind(kind: LitTargetKind): ScriptElementKind {
 	switch (kind) {

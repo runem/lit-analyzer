@@ -1,8 +1,8 @@
 import { SimpleType, SimpleTypeStringLiteral } from "ts-simple-type";
 import { HTMLDataV1, IAttributeData, ITagData, IValueData, IValueSet } from "vscode-html-languageservice";
 import { MarkupContent } from "vscode-languageserver-types";
-import { lazy } from "../../util/general-util";
-import { HtmlAttr, HtmlDataCollection, HtmlEvent, HtmlTag } from "./html-tag";
+import { lazy } from "../../util/general-util.js";
+import { HtmlAttr, HtmlDataCollection, HtmlEvent, HtmlTag } from "./html-tag.js";
 
 export interface ParseVscodeHtmlDataConfig {
 	builtIn?: boolean;

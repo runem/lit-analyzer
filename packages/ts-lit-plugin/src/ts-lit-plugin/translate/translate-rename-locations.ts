@@ -1,5 +1,5 @@
 import { LitRenameLocation } from "lit-analyzer";
-import { translateRange } from "./translate-range";
+import { translateRange } from "./translate-range.js";
 import { RenameLocation } from "typescript";
 
 export function translateRenameLocations(renameLocations: LitRenameLocation[]): RenameLocation[] {

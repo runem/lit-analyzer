@@ -1,12 +1,12 @@
-import { LitAnalyzerContext } from "../../../lit-analyzer-context";
-import { HtmlDocument } from "../../../parse/document/text-document/html-document/html-document";
-import { LitCompletion } from "../../../types/lit-completion";
-import { DocumentOffset } from "../../../types/range";
-import { getPositionContextInDocument } from "../../../util/get-position-context-in-document";
-import { rangeFromHtmlNodeAttr } from "../../../util/range-util";
-import { completionsForHtmlAttrValues } from "./completions-for-html-attr-values";
-import { completionsForHtmlAttrs } from "./completions-for-html-attrs";
-import { completionsForHtmlNodes } from "./completions-for-html-nodes";
+import { LitAnalyzerContext } from "../../../lit-analyzer-context.js";
+import { HtmlDocument } from "../../../parse/document/text-document/html-document/html-document.js";
+import { LitCompletion } from "../../../types/lit-completion.js";
+import { DocumentOffset } from "../../../types/range.js";
+import { getPositionContextInDocument } from "../../../util/get-position-context-in-document.js";
+import { rangeFromHtmlNodeAttr } from "../../../util/range-util.js";
+import { completionsForHtmlAttrValues } from "./completions-for-html-attr-values.js";
+import { completionsForHtmlAttrs } from "./completions-for-html-attrs.js";
+import { completionsForHtmlNodes } from "./completions-for-html-nodes.js";
 
 export function completionsAtOffset(document: HtmlDocument, offset: DocumentOffset, context: LitAnalyzerContext): LitCompletion[] {
 	const positionContext = getPositionContextInDocument(document, offset);

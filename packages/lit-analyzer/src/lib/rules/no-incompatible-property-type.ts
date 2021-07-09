@@ -1,11 +1,11 @@
 import { isAssignableToSimpleTypeKind, isSimpleType, SimpleType, SimpleTypeKind, toSimpleType, typeToString } from "ts-simple-type";
 import { Node } from "typescript";
 import { LitElementPropertyConfig } from "web-component-analyzer";
-import { RuleModule } from "../analyze/types/rule/rule-module";
-import { RuleModuleContext } from "../analyze/types/rule/rule-module-context";
-import { joinArray } from "../analyze/util/array-util";
-import { lazy } from "../analyze/util/general-util";
-import { rangeFromNode } from "../analyze/util/range-util";
+import { RuleModule } from "../analyze/types/rule/rule-module.js";
+import { RuleModuleContext } from "../analyze/types/rule/rule-module-context.js";
+import { joinArray } from "../analyze/util/array-util.js";
+import { lazy } from "../analyze/util/general-util.js";
+import { rangeFromNode } from "../analyze/util/range-util.js";
 
 const rule: RuleModule = {
 	id: "no-incompatible-property-type",

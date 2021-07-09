@@ -1,7 +1,7 @@
 import { LitDefinition, LitDefinitionTarget } from "lit-analyzer";
 import { DefinitionInfo, DefinitionInfoAndBoundSpan } from "typescript";
-import { tsModule } from "../../ts-module";
-import { translateRange } from "./translate-range";
+import { tsModule } from "../../ts-module.js";
+import { translateRange } from "./translate-range.js";
 
 export function translateDefinition(definition: LitDefinition): DefinitionInfoAndBoundSpan {
 	return {

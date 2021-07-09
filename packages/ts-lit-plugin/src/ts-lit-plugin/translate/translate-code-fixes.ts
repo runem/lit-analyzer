@@ -1,6 +1,6 @@
 import { LitCodeFix, LitCodeFixAction } from "lit-analyzer";
 import { CodeFixAction, FileTextChanges, SourceFile } from "typescript";
-import { translateRange } from "./translate-range";
+import { translateRange } from "./translate-range.js";
 
 export function translateCodeFixes(codeFixes: LitCodeFix[], file: SourceFile): CodeFixAction[] {
 	return codeFixes.map(codeFix => translateCodeFix(file, codeFix));

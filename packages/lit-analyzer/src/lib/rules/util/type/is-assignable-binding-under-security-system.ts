@@ -1,8 +1,8 @@
 import { SimpleType, typeToString } from "ts-simple-type";
-import { HtmlNodeAttr } from "../../../analyze/types/html-node/html-node-attr-types";
-import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
-import { isLitDirective } from "../directive/is-lit-directive";
-import { rangeFromHtmlNodeAttr } from "../../../analyze/util/range-util";
+import { HtmlNodeAttr } from "../../../analyze/types/html-node/html-node-attr-types.js";
+import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context.js";
+import { isLitDirective } from "../directive/is-lit-directive.js";
+import { rangeFromHtmlNodeAttr } from "../../../analyze/util/range-util.js";
 
 /**
  * If the user's security policy overrides normal type checking for this

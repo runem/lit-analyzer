@@ -1,11 +1,11 @@
 import { InterfaceDeclaration, ModuleDeclaration, SourceFile } from "typescript";
-import { tsModule } from "../ts-module";
-import { LitCodeFix } from "../types/lit-code-fix";
-import { LitCodeFixAction } from "../types/lit-code-fix-action";
-import { RuleFix } from "../types/rule/rule-fix";
-import { RuleFixAction } from "../types/rule/rule-fix-action";
-import { arrayFlat } from "./array-util";
-import { documentRangeToSFRange, makeSourceFileRange, rangeFromHtmlNodeAttr, rangeFromNode } from "./range-util";
+import { tsModule } from "../ts-module.js";
+import { LitCodeFix } from "../types/lit-code-fix.js";
+import { LitCodeFixAction } from "../types/lit-code-fix-action.js";
+import { RuleFix } from "../types/rule/rule-fix.js";
+import { RuleFixAction } from "../types/rule/rule-fix-action.js";
+import { arrayFlat } from "./array-util.js";
+import { documentRangeToSFRange, makeSourceFileRange, rangeFromHtmlNodeAttr, rangeFromNode } from "./range-util.js";
 
 export function converRuleFixToLitCodeFix(codeFix: RuleFix): LitCodeFix {
 	return {

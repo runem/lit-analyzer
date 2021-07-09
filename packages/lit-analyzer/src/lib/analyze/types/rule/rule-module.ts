@@ -1,9 +1,9 @@
 import { ComponentDeclaration, ComponentDefinition, ComponentMember } from "web-component-analyzer";
-import { LitAnalyzerRuleId } from "../../lit-analyzer-config";
-import { HtmlNodeAttrAssignment } from "../html-node/html-node-attr-assignment-types";
-import { HtmlNodeAttr } from "../html-node/html-node-attr-types";
-import { HtmlNode } from "../html-node/html-node-types";
-import { RuleModuleContext } from "./rule-module-context";
+import { LitAnalyzerRuleId } from "../../lit-analyzer-config.js";
+import { HtmlNodeAttrAssignment } from "../html-node/html-node-attr-assignment-types.js";
+import { HtmlNodeAttr } from "../html-node/html-node-attr-types.js";
+import { HtmlNode } from "../html-node/html-node-types.js";
+import { RuleModuleContext } from "./rule-module-context.js";
 
 export type RuleModulePriority = "low" | "medium" | "high";
 

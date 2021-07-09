@@ -1,7 +1,7 @@
 import { LitQuickInfo } from "lit-analyzer";
 import { QuickInfo } from "typescript";
-import { tsModule } from "../../ts-module";
-import { translateRange } from "./translate-range";
+import { tsModule } from "../../ts-module.js";
+import { translateRange } from "./translate-range.js";
 
 export function translateQuickInfo(quickInfo: LitQuickInfo): QuickInfo {
 	return {

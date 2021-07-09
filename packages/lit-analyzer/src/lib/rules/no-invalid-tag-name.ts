@@ -1,7 +1,7 @@
-import { RuleModule } from "../analyze/types/rule/rule-module";
-import { isValidCustomElementName } from "../analyze/util/is-valid-name";
-import { iterableFirst } from "../analyze/util/iterable-util";
-import { rangeFromNode } from "../analyze/util/range-util";
+import { RuleModule } from "../analyze/types/rule/rule-module.js";
+import { isValidCustomElementName } from "../analyze/util/is-valid-name.js";
+import { iterableFirst } from "../analyze/util/iterable-util.js";
+import { rangeFromNode } from "../analyze/util/range-util.js";
 
 const rule: RuleModule = {
 	id: "no-invalid-tag-name",

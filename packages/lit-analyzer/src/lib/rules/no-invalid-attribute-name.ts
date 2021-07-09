@@ -1,7 +1,7 @@
 import { Node } from "typescript";
-import { RuleModule } from "../analyze/types/rule/rule-module";
-import { isValidAttributeName } from "../analyze/util/is-valid-name";
-import { rangeFromNode } from "../analyze/util/range-util";
+import { RuleModule } from "../analyze/types/rule/rule-module.js";
+import { isValidAttributeName } from "../analyze/util/is-valid-name.js";
+import { rangeFromNode } from "../analyze/util/range-util.js";
 
 const rule: RuleModule = {
 	id: "no-invalid-attribute-name",

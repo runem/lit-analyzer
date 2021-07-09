@@ -1,19 +1,19 @@
 import * as vscode from "vscode-css-languageservice";
 import { IAtDirectiveData, ICSSDataProvider, IPropertyData, IPseudoClassData, IPseudoElementData } from "vscode-css-languageservice";
-import { isRuleDisabled } from "../../lit-analyzer-config";
-import { LitAnalyzerContext } from "../../lit-analyzer-context";
-import { CssDocument } from "../../parse/document/text-document/css-document/css-document";
-import { documentationForCssPart, documentationForCssProperty, documentationForHtmlTag } from "../../parse/parse-html-data/html-tag";
-import { AnalyzerHtmlStore } from "../../store/analyzer-html-store";
-import { LitCompletion } from "../../types/lit-completion";
-import { LitDiagnostic } from "../../types/lit-diagnostic";
-import { LitQuickInfo } from "../../types/lit-quick-info";
-import { LitTargetKind } from "../../types/lit-target-kind";
-import { DocumentOffset } from "../../types/range";
-import { lazy } from "../../util/general-util";
-import { getPositionContextInDocument, grabWordInDirection } from "../../util/get-position-context-in-document";
-import { iterableFilter, iterableMap } from "../../util/iterable-util";
-import { documentRangeToSFRange } from "../../util/range-util";
+import { isRuleDisabled } from "../../lit-analyzer-config.js";
+import { LitAnalyzerContext } from "../../lit-analyzer-context.js";
+import { CssDocument } from "../../parse/document/text-document/css-document/css-document.js";
+import { documentationForCssPart, documentationForCssProperty, documentationForHtmlTag } from "../../parse/parse-html-data/html-tag.js";
+import { AnalyzerHtmlStore } from "../../store/analyzer-html-store.js";
+import { LitCompletion } from "../../types/lit-completion.js";
+import { LitDiagnostic } from "../../types/lit-diagnostic.js";
+import { LitQuickInfo } from "../../types/lit-quick-info.js";
+import { LitTargetKind } from "../../types/lit-target-kind.js";
+import { DocumentOffset } from "../../types/range.js";
+import { lazy } from "../../util/general-util.js";
+import { getPositionContextInDocument, grabWordInDirection } from "../../util/get-position-context-in-document.js";
+import { iterableFilter, iterableMap } from "../../util/iterable-util.js";
+import { documentRangeToSFRange } from "../../util/range-util.js";
 
 function makeVscTextDocument(cssDocument: CssDocument): vscode.TextDocument {
 	return vscode.TextDocument.create("untitled://embedded.css", "css", 1, cssDocument.virtualDocument.text);

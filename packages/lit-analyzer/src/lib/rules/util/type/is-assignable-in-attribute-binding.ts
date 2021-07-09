@@ -1,12 +1,12 @@
 import { isAssignableToType as _isAssignableToType, SimpleType, SimpleTypeComparisonOptions, typeToString } from "ts-simple-type";
-import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../analyze/types/html-node/html-node-attr-assignment-types";
-import { HtmlNodeAttr } from "../../../analyze/types/html-node/html-node-attr-types";
-import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context";
-import { documentRangeToSFRange, rangeFromHtmlNodeAttr } from "../../../analyze/util/range-util";
-import { isPrimitiveArrayType } from "../../../analyze/util/type-util";
-import { isLitDirective } from "../directive/is-lit-directive";
-import { isAssignableBindingUnderSecuritySystem } from "./is-assignable-binding-under-security-system";
-import { isAssignableToType } from "./is-assignable-to-type";
+import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../analyze/types/html-node/html-node-attr-assignment-types.js";
+import { HtmlNodeAttr } from "../../../analyze/types/html-node/html-node-attr-types.js";
+import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context.js";
+import { documentRangeToSFRange, rangeFromHtmlNodeAttr } from "../../../analyze/util/range-util.js";
+import { isPrimitiveArrayType } from "../../../analyze/util/type-util.js";
+import { isLitDirective } from "../directive/is-lit-directive.js";
+import { isAssignableBindingUnderSecuritySystem } from "./is-assignable-binding-under-security-system.js";
+import { isAssignableToType } from "./is-assignable-to-type.js";
 
 export function isAssignableInAttributeBinding(
 	htmlAttr: HtmlNodeAttr,

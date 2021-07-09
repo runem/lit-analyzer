@@ -1,11 +1,11 @@
 import * as ts from "typescript";
 import * as vscode from "vscode-html-languageservice";
-import { HtmlDocument } from "../../parse/document/text-document/html-document/html-document";
-import { textPartsToRanges } from "../../parse/document/virtual-document/virtual-document";
-import { LitClosingTagInfo } from "../../types/lit-closing-tag-info";
-import { LitFormatEdit } from "../../types/lit-format-edit";
-import { DocumentOffset } from "../../types/range";
-import { documentRangeToSFRange, makeDocumentRange } from "../../util/range-util";
+import { HtmlDocument } from "../../parse/document/text-document/html-document/html-document.js";
+import { textPartsToRanges } from "../../parse/document/virtual-document/virtual-document.js";
+import { LitClosingTagInfo } from "../../types/lit-closing-tag-info.js";
+import { LitFormatEdit } from "../../types/lit-format-edit.js";
+import { DocumentOffset } from "../../types/range.js";
+import { documentRangeToSFRange, makeDocumentRange } from "../../util/range-util.js";
 
 const htmlService = vscode.getLanguageService();
 

@@ -1,7 +1,7 @@
 import { SourceFile } from "typescript";
-import { LitAnalyzerConfig } from "../lit-analyzer-config";
-import { TextDocument } from "../parse/document/text-document/text-document";
-import { SourceFilePosition } from "../types/range";
+import { LitAnalyzerConfig } from "../lit-analyzer-config.js";
+import { TextDocument } from "../parse/document/text-document/text-document.js";
+import { SourceFilePosition } from "../types/range.js";
 
 export interface AnalyzerDocumentStore {
 	getDocumentAtPosition(sourceFile: SourceFile, position: SourceFilePosition, options: LitAnalyzerConfig): TextDocument | undefined;

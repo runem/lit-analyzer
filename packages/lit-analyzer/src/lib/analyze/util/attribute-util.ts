@@ -1,7 +1,7 @@
-import { HtmlAttrTarget } from "../parse/parse-html-data/html-tag";
-import { AnalyzerHtmlStore } from "../store/analyzer-html-store";
-import { HtmlNodeAttr, HtmlNodeAttrKind } from "../types/html-node/html-node-attr-types";
-import { findBestMatch } from "./find-best-match";
+import { HtmlAttrTarget } from "../parse/parse-html-data/html-tag.js";
+import { AnalyzerHtmlStore } from "../store/analyzer-html-store.js";
+import { HtmlNodeAttr, HtmlNodeAttrKind } from "../types/html-node/html-node-attr-types.js";
+import { findBestMatch } from "./find-best-match.js";
 
 export function suggestTargetForHtmlAttr(htmlNodeAttr: HtmlNodeAttr, htmlStore: AnalyzerHtmlStore): HtmlAttrTarget | undefined {
 	const properties = htmlStore.getAllPropertiesForTag(htmlNodeAttr.htmlNode);

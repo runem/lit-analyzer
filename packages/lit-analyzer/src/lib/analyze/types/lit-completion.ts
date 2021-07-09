@@ -1,5 +1,5 @@
-import { LitTargetKind } from "./lit-target-kind";
-import { SourceFileRange } from "./range";
+import { LitTargetKind } from "./lit-target-kind.js";
+import { SourceFileRange } from "./range.js";
 
 export interface LitCompletion {
 	name: string;

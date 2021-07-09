@@ -1,7 +1,7 @@
-import { parseAllIndirectImports } from "../../../lib/analyze/parse/parse-dependencies/parse-dependencies";
-import { isFacadeModule } from "../../../lib/analyze/parse/parse-dependencies/visit-dependencies";
-import { prepareAnalyzer } from "../../helpers/analyze";
-import { tsTest } from "../../helpers/ts-test";
+import { parseAllIndirectImports } from "../../../lib/analyze/parse/parse-dependencies/parse-dependencies.js";
+import { isFacadeModule } from "../../../lib/analyze/parse/parse-dependencies/visit-dependencies.js";
+import { prepareAnalyzer } from "../../helpers/analyze.js";
+import { tsTest } from "../../helpers/ts-test.js";
 
 tsTest("Correctly finds all imports in a file", t => {
 	const { sourceFile, context } = prepareAnalyzer([

@@ -1,7 +1,7 @@
 import { SourceFile } from "typescript";
 import { AnalyzerResult, ComponentDeclaration, ComponentDefinition, visitAllHeritageClauses } from "web-component-analyzer";
-import { getDeclarationsInFile } from "../../util/component-util";
-import { AnalyzerDefinitionStore } from "../analyzer-definition-store";
+import { getDeclarationsInFile } from "../../util/component-util.js";
+import { AnalyzerDefinitionStore } from "../analyzer-definition-store.js";
 
 export class DefaultAnalyzerDefinitionStore implements AnalyzerDefinitionStore {
 	private analysisResultForFile = new Map<string, AnalyzerResult>();

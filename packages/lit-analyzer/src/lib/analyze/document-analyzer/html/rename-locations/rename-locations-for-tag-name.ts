@@ -1,11 +1,11 @@
 import { JSDocUnknownTag } from "typescript";
-import { LitAnalyzerContext } from "../../../lit-analyzer-context";
-import { HtmlDocument } from "../../../parse/document/text-document/html-document/html-document";
-import { HtmlNode } from "../../../types/html-node/html-node-types";
-import { LitRenameLocation } from "../../../types/lit-rename-location";
-import { findChild } from "../../../util/ast-util";
-import { iterableFirst } from "../../../util/iterable-util";
-import { documentRangeToSFRange, makeSourceFileRange } from "../../../util/range-util";
+import { LitAnalyzerContext } from "../../../lit-analyzer-context.js";
+import { HtmlDocument } from "../../../parse/document/text-document/html-document/html-document.js";
+import { HtmlNode } from "../../../types/html-node/html-node-types.js";
+import { LitRenameLocation } from "../../../types/lit-rename-location.js";
+import { findChild } from "../../../util/ast-util.js";
+import { iterableFirst } from "../../../util/iterable-util.js";
+import { documentRangeToSFRange, makeSourceFileRange } from "../../../util/range-util.js";
 
 export function renameLocationsForTagName(tagName: string, context: LitAnalyzerContext): LitRenameLocation[] {
 	const locations: LitRenameLocation[] = [];

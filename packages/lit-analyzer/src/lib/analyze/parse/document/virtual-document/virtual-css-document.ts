@@ -1,5 +1,5 @@
 import { Expression } from "typescript";
-import { VirtualAstDocument } from "./virtual-ast-document";
+import { VirtualAstDocument } from "./virtual-ast-document.js";
 
 export class VirtualAstCssDocument extends VirtualAstDocument {
 	protected substituteExpression(length: number, expression: Expression, prev: string, next: string | undefined): string {

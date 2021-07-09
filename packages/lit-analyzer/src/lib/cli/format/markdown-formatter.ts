@@ -1,8 +1,8 @@
 import { SourceFile } from "typescript";
-import { LitDiagnostic } from "../../analyze/types/lit-diagnostic";
-import { AnalysisStats, DiagnosticFormatter } from "./diagnostic-formatter";
-import { markdownHeader, markdownHighlight, markdownTable } from "./markdown-util";
-import { relativeFileName } from "./util";
+import { LitDiagnostic } from "../../analyze/types/lit-diagnostic.js";
+import { AnalysisStats, DiagnosticFormatter } from "./diagnostic-formatter.js";
+import { markdownHeader, markdownHighlight, markdownTable } from "./markdown-util.js";
+import { relativeFileName } from "./util.js";
 
 export class MarkdownDiagnosticFormatter implements DiagnosticFormatter {
 	report(stats: AnalysisStats): string | undefined {

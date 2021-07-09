@@ -2,12 +2,12 @@ import {
 	LIT_HTML_BOOLEAN_ATTRIBUTE_MODIFIER,
 	LIT_HTML_EVENT_LISTENER_ATTRIBUTE_MODIFIER,
 	LIT_HTML_PROP_ATTRIBUTE_MODIFIER
-} from "../analyze/constants";
-import { RuleModule } from "../analyze/types/rule/rule-module";
-import { extractBindingTypes } from "./util/type/extract-binding-types";
-import { isAssignableInAttributeBinding } from "./util/type/is-assignable-in-attribute-binding";
-import { isAssignableInBooleanBinding } from "./util/type/is-assignable-in-boolean-binding";
-import { isAssignableInPropertyBinding } from "./util/type/is-assignable-in-property-binding";
+} from "../analyze/constants.js";
+import { RuleModule } from "../analyze/types/rule/rule-module.js";
+import { extractBindingTypes } from "./util/type/extract-binding-types.js";
+import { isAssignableInAttributeBinding } from "./util/type/is-assignable-in-attribute-binding.js";
+import { isAssignableInBooleanBinding } from "./util/type/is-assignable-in-boolean-binding.js";
+import { isAssignableInPropertyBinding } from "./util/type/is-assignable-in-property-binding.js";
 
 /**
  * This rule validate if the types of a binding are assignable.

@@ -1,9 +1,9 @@
-import { LitAnalyzerContext } from "../../../lit-analyzer-context";
-import { isHtmlEvent, isHtmlMember } from "../../../parse/parse-html-data/html-tag";
-import { HtmlNodeAttr } from "../../../types/html-node/html-node-attr-types";
-import { LitDefinition } from "../../../types/lit-definition";
-import { getNodeIdentifier } from "../../../util/ast-util";
-import { rangeFromHtmlNodeAttr } from "../../../util/range-util";
+import { LitAnalyzerContext } from "../../../lit-analyzer-context.js";
+import { isHtmlEvent, isHtmlMember } from "../../../parse/parse-html-data/html-tag.js";
+import { HtmlNodeAttr } from "../../../types/html-node/html-node-attr-types.js";
+import { LitDefinition } from "../../../types/lit-definition.js";
+import { getNodeIdentifier } from "../../../util/ast-util.js";
+import { rangeFromHtmlNodeAttr } from "../../../util/range-util.js";
 
 export function definitionForHtmlAttr(htmlAttr: HtmlNodeAttr, { htmlStore, ts }: LitAnalyzerContext): LitDefinition | undefined {
 	const target = htmlStore.getHtmlAttrTarget(htmlAttr);

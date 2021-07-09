@@ -1,8 +1,8 @@
 import { isSimpleType, SimpleType, toSimpleType } from "ts-simple-type";
 import { TypeChecker } from "typescript";
 import { AnalyzerResult, ComponentDeclaration, ComponentDefinition, ComponentFeatures } from "web-component-analyzer";
-import { lazy } from "../util/general-util";
-import { HtmlDataCollection, HtmlDataFeatures, HtmlMemberBase, HtmlTag } from "./parse-html-data/html-tag";
+import { lazy } from "../util/general-util.js";
+import { HtmlDataCollection, HtmlDataFeatures, HtmlMemberBase, HtmlTag } from "./parse-html-data/html-tag.js";
 
 export interface AnalyzeResultConversionOptions {
 	addDeclarationPropertiesAsAttributes?: boolean;

@@ -1,8 +1,8 @@
 import { ComponentDefinition } from "web-component-analyzer";
-import { HtmlDocument } from "../parse/document/text-document/html-document/html-document";
-import { HtmlNode } from "./html-node/html-node-types";
-import { LitTargetKind } from "./lit-target-kind";
-import { SourceFileRange } from "./range";
+import { HtmlDocument } from "../parse/document/text-document/html-document/html-document.js";
+import { HtmlNode } from "./html-node/html-node-types.js";
+import { LitTargetKind } from "./lit-target-kind.js";
+import { SourceFileRange } from "./range.js";
 
 export interface RenameInfoBase {
 	kind: LitTargetKind;

@@ -1,13 +1,13 @@
 import { ComponentDeclaration, ComponentDefinition } from "web-component-analyzer";
-import { LitAnalyzerContext } from "../lit-analyzer-context";
-import { ReportedRuleDiagnostic } from "../rule-collection";
-import { LitCodeFix } from "../types/lit-code-fix";
-import { LitDiagnostic } from "../types/lit-diagnostic";
-import { SourceFileRange } from "../types/range";
-import { arrayDefined, arrayFlat } from "../util/array-util";
-import { intersects } from "../util/range-util";
-import { convertRuleDiagnosticToLitDiagnostic } from "../util/rule-diagnostic-util";
-import { converRuleFixToLitCodeFix } from "../util/rule-fix-util";
+import { LitAnalyzerContext } from "../lit-analyzer-context.js";
+import { ReportedRuleDiagnostic } from "../rule-collection.js";
+import { LitCodeFix } from "../types/lit-code-fix.js";
+import { LitDiagnostic } from "../types/lit-diagnostic.js";
+import { SourceFileRange } from "../types/range.js";
+import { arrayDefined, arrayFlat } from "../util/array-util.js";
+import { intersects } from "../util/range-util.js";
+import { convertRuleDiagnosticToLitDiagnostic } from "../util/rule-diagnostic-util.js";
+import { converRuleFixToLitCodeFix } from "../util/rule-fix-util.js";
 
 export class ComponentAnalyzer {
 	getDiagnostics(definitionOrDeclaration: ComponentDefinition | ComponentDeclaration, context: LitAnalyzerContext): LitDiagnostic[] {

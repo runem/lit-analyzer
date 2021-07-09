@@ -1,5 +1,5 @@
-import { TextDocument } from "../parse/document/text-document/text-document";
-import { DocumentOffset } from "../types/range";
+import { TextDocument } from "../parse/document/text-document/text-document.js";
+import { DocumentOffset } from "../types/range.js";
 
 export interface DocumentPositionContext {
 	text: string;

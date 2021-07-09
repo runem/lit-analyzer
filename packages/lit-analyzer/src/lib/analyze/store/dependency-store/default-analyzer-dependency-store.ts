@@ -1,6 +1,6 @@
 import { SourceFile } from "typescript";
 import { ComponentDefinition } from "web-component-analyzer";
-import { AnalyzerDependencyStore } from "../analyzer-dependency-store";
+import { AnalyzerDependencyStore } from "../analyzer-dependency-store.js";
 
 export class DefaultAnalyzerDependencyStore implements AnalyzerDependencyStore {
 	importedComponentDefinitionsInFile = new Map<string, ComponentDefinition[]>();

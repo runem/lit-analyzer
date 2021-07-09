@@ -1,16 +1,16 @@
-import { LitAnalyzerContext } from "../../lit-analyzer-context";
-import { CssDocument } from "../../parse/document/text-document/css-document/css-document";
-import { LitCompletion } from "../../types/lit-completion";
-import { LitCompletionDetails } from "../../types/lit-completion-details";
-import { LitDefinition } from "../../types/lit-definition";
-import { LitDiagnostic } from "../../types/lit-diagnostic";
-import { LitQuickInfo } from "../../types/lit-quick-info";
-import { DocumentOffset } from "../../types/range";
-import { getNodeIdentifier } from "../../util/ast-util";
-import { getPositionContextInDocument } from "../../util/get-position-context-in-document";
-import { iterableDefined } from "../../util/iterable-util";
-import { documentRangeToSFRange } from "../../util/range-util";
-import { LitCssVscodeService } from "./lit-css-vscode-service";
+import { LitAnalyzerContext } from "../../lit-analyzer-context.js";
+import { CssDocument } from "../../parse/document/text-document/css-document/css-document.js";
+import { LitCompletion } from "../../types/lit-completion.js";
+import { LitCompletionDetails } from "../../types/lit-completion-details.js";
+import { LitDefinition } from "../../types/lit-definition.js";
+import { LitDiagnostic } from "../../types/lit-diagnostic.js";
+import { LitQuickInfo } from "../../types/lit-quick-info.js";
+import { DocumentOffset } from "../../types/range.js";
+import { getNodeIdentifier } from "../../util/ast-util.js";
+import { getPositionContextInDocument } from "../../util/get-position-context-in-document.js";
+import { iterableDefined } from "../../util/iterable-util.js";
+import { documentRangeToSFRange } from "../../util/range-util.js";
+import { LitCssVscodeService } from "./lit-css-vscode-service.js";
 
 export class LitCssDocumentAnalyzer {
 	private vscodeCssService = new LitCssVscodeService();

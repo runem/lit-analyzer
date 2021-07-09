@@ -8,7 +8,7 @@ import {
 	HtmlSlot,
 	HtmlTag,
 	NamedHtmlDataCollection
-} from "../../parse/parse-html-data/html-tag";
+} from "../../parse/parse-html-data/html-tag.js";
 
 export class HtmlDataSource {
 	private _globalTags = new Map<string, HtmlTag>();

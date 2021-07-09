@@ -1,6 +1,6 @@
 import { SourceFile } from "typescript";
-import { LitAnalyzerRuleId } from "../lit-analyzer-config";
-import { SourceFileRange } from "./range";
+import { LitAnalyzerRuleId } from "../lit-analyzer-config.js";
+import { SourceFileRange } from "./range.js";
 
 export type LitDiagnosticSeverity = "error" | "warning";
 

@@ -1,6 +1,6 @@
 import { DefaultLitAnalyzerContext, LitAnalyzer, LitAnalyzerConfig, LitAnalyzerContext, makeConfig } from "lit-analyzer";
 import ts, { Diagnostic } from "typescript";
-import { translateDiagnostics } from "./ts-lit-plugin/translate/translate-diagnostics";
+import { translateDiagnostics } from "./ts-lit-plugin/translate/translate-diagnostics.js";
 
 // See https://github.com/bazelbuild/rules_typescript/blob/master/internal/tsc_wrapped/plugin_api.ts
 interface DiagnosticPlugin {

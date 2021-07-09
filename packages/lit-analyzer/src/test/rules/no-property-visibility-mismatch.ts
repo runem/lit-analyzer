@@ -1,7 +1,7 @@
-import { getDiagnostics } from "../helpers/analyze";
-import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert";
-import { tsTest } from "../helpers/ts-test";
-import { TestFile } from "../helpers/compile-files";
+import { getDiagnostics } from "../helpers/analyze.js";
+import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert.js";
+import { tsTest } from "../helpers/ts-test.js";
+import { TestFile } from "../helpers/compile-files.js";
 
 function makeTestElement({ properties }: { properties?: Array<{ visibility: string; name: string; internal: boolean }> }): TestFile {
 	return {

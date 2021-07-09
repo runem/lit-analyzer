@@ -1,7 +1,7 @@
-import { HtmlNodeKind } from "../analyze/types/html-node/html-node-types";
-import { RuleModule } from "../analyze/types/rule/rule-module";
-import { findBestStringMatch } from "../analyze/util/find-best-match";
-import { rangeFromHtmlNode } from "../analyze/util/range-util";
+import { HtmlNodeKind } from "../analyze/types/html-node/html-node-types.js";
+import { RuleModule } from "../analyze/types/rule/rule-module.js";
+import { findBestStringMatch } from "../analyze/util/find-best-match.js";
+import { rangeFromHtmlNode } from "../analyze/util/range-util.js";
 
 /**
  * This rule checks that all tag names used in a template are defined.

@@ -2,9 +2,9 @@ import { async } from "fast-glob";
 import { existsSync, lstatSync } from "fs";
 import { join } from "path";
 import { Diagnostic, Program, SourceFile } from "typescript";
-import { arrayFlat } from "../analyze/util/array-util";
-import { CompileResult, compileTypescript } from "./compile";
-import { LitAnalyzerCliConfig } from "./lit-analyzer-cli-config";
+import { arrayFlat } from "../analyze/util/array-util.js";
+import { CompileResult, compileTypescript } from "./compile.js";
+import { LitAnalyzerCliConfig } from "./lit-analyzer-cli-config.js";
 
 //const IGNORE_GLOBS = ["!**/node_modules/**", "!**/web_modules/**"];
 const IGNORE_GLOBS: string[] = [];

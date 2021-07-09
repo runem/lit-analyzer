@@ -1,7 +1,7 @@
 import { basename, dirname, posix } from "path";
-import { RuleModule } from "../analyze/types/rule/rule-module";
-import { isCustomElementTagName } from "../analyze/util/is-valid-name";
-import { rangeFromHtmlNode } from "../analyze/util/range-util";
+import { RuleModule } from "../analyze/types/rule/rule-module.js";
+import { isCustomElementTagName } from "../analyze/util/is-valid-name.js";
+import { rangeFromHtmlNode } from "../analyze/util/range-util.js";
 
 /**
  * This rule makes sure that all custom elements used are imported in a given file.

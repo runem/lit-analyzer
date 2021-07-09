@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { CompilerHost, CompilerOptions, ModuleKind, Program, ScriptKind, ScriptTarget, SourceFile } from "typescript";
-import { getCurrentTsModule, getCurrentTsModuleDirectory } from "./ts-test";
+import { getCurrentTsModule, getCurrentTsModuleDirectory } from "./ts-test.js";
 
 // tslint:disable:no-any
 

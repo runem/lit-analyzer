@@ -1,13 +1,13 @@
 import { Program, SourceFile } from "typescript";
-import { DefaultLitAnalyzerContext } from "../../lib/analyze/default-lit-analyzer-context";
-import { LitAnalyzer } from "../../lib/analyze/lit-analyzer";
-import { LitAnalyzerConfig, makeConfig } from "../../lib/analyze/lit-analyzer-config";
-import { LitAnalyzerContext } from "../../lib/analyze/lit-analyzer-context";
-import { LitDiagnostic } from "../../lib/analyze/types/lit-diagnostic";
-import { compileFiles, TestFile } from "./compile-files";
-import { getCurrentTsModule } from "./ts-test";
-import { Range } from "../../lib/analyze/types/range";
-import { LitCodeFix } from "../../lib/analyze/types/lit-code-fix";
+import { DefaultLitAnalyzerContext } from "../../lib/analyze/default-lit-analyzer-context.js";
+import { LitAnalyzer } from "../../lib/analyze/lit-analyzer.js";
+import { LitAnalyzerConfig, makeConfig } from "../../lib/analyze/lit-analyzer-config.js";
+import { LitAnalyzerContext } from "../../lib/analyze/lit-analyzer-context.js";
+import { LitDiagnostic } from "../../lib/analyze/types/lit-diagnostic.js";
+import { compileFiles, TestFile } from "./compile-files.js";
+import { getCurrentTsModule } from "./ts-test.js";
+import { Range } from "../../lib/analyze/types/range.js";
+import { LitCodeFix } from "../../lib/analyze/types/lit-code-fix.js";
 
 /**
  * Prepares both the Typescript program and the LitAnalyzer

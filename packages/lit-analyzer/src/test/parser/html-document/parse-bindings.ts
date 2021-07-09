@@ -2,9 +2,9 @@ import {
 	HtmlNodeAttrAssignmentKind,
 	IHtmlNodeAttrAssignmentMixed,
 	IHtmlNodeAttrAssignmentString
-} from "../../../lib/analyze/types/html-node/html-node-attr-assignment-types";
-import { parseHtml } from "../../helpers/parse-html";
-import { tsTest } from "../../helpers/ts-test";
+} from "../../../lib/analyze/types/html-node/html-node-attr-assignment-types.js";
+import { parseHtml } from "../../helpers/parse-html.js";
+import { tsTest } from "../../helpers/ts-test.js";
 
 // https://github.com/runem/lit-analyzer/issues/44
 tsTest("Correctly parses binding without a missing start quote", t => {

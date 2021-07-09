@@ -1,10 +1,10 @@
 import { SimpleType } from "ts-simple-type";
 import { HTMLDataV1 } from "vscode-html-languageservice";
 import htmlDataJson from "vscode-web-custom-data/data/browsers.html-data.json";
-import { HtmlAttr, HtmlDataCollection } from "../parse/parse-html-data/html-tag";
-import { parseVscodeHtmlData } from "../parse/parse-html-data/parse-vscode-html-data";
-import { lazy } from "../util/general-util";
-import { EXTRA_HTML5_EVENTS, hasTypeForAttrName, html5TagAttrType } from "./extra-html-data";
+import { HtmlAttr, HtmlDataCollection } from "../parse/parse-html-data/html-tag.js";
+import { parseVscodeHtmlData } from "../parse/parse-html-data/parse-vscode-html-data.js";
+import { lazy } from "../util/general-util.js";
+import { EXTRA_HTML5_EVENTS, hasTypeForAttrName, html5TagAttrType } from "./extra-html-data.js";
 
 export function getBuiltInHtmlCollection(): HtmlDataCollection {
 	const vscodeHtmlData = htmlDataJson as HTMLDataV1;
