@@ -26,13 +26,14 @@
 	"scripts": {
 		"clean": "rimraf lib",
 		"prepare": "npm run build",
-		"build": "npm run clean & npm run build:ts",
+		"build": "npm run clean && npm run build:ts && npm run check-version",
 		"build:ts": "tsc",
 		"watch": "tsc --watch",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
 		"test": "ava --color",
 		"test:all": "ava --color --fail-fast",
-		"test:watch": "ava --watch --color"
+		"test:watch": "ava --watch --color",
+		"check-version": "node scripts/check-version.js"
 	},
 	"main": "index.js",
 	"files": [

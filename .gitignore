@@ -12,4 +12,5 @@ out
 
 /packages/*/lib
 /packages/lit-analyzer/test
+/packages/lit-analyzer/scripts
 /packages/*/index.*
