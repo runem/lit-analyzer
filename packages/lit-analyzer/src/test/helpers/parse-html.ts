@@ -1,6 +1,6 @@
 import { Node, TaggedTemplateExpression } from "typescript";
-import { HtmlDocument } from "../../src/analyze/parse/document/text-document/html-document/html-document";
-import { parseHtmlDocument } from "../../src/analyze/parse/document/text-document/html-document/parse-html-document";
+import { HtmlDocument } from "../../lib/analyze/parse/document/text-document/html-document/html-document";
+import { parseHtmlDocument } from "../../lib/analyze/parse/document/text-document/html-document/parse-html-document";
 import { compileFiles } from "./compile-files";
 import { getCurrentTsModule } from "./ts-test";
 

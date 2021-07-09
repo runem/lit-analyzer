@@ -2,7 +2,7 @@ import {
 	HtmlNodeAttrAssignmentKind,
 	IHtmlNodeAttrAssignmentMixed,
 	IHtmlNodeAttrAssignmentString
-} from "../../../src/analyze/types/html-node/html-node-attr-assignment-types";
+} from "../../../lib/analyze/types/html-node/html-node-attr-assignment-types";
 import { parseHtml } from "../../helpers/parse-html";
 import { tsTest } from "../../helpers/ts-test";
 
