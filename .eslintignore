@@ -1,5 +1,9 @@
 node_modules
 out
-lib
 dist
 dev
+
+/packages/*/lib
+/packages/*/test
+/packages/*/scripts
+/packages/*/index.*
