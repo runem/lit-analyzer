@@ -1,7 +1,7 @@
 import test, { Implementation } from "ava";
 import { dirname } from "path";
 import * as tsModule from "typescript";
-import { setTypescriptModule } from "../../src/analyze/ts-module";
+import { setTypescriptModule } from "../../lib/analyze/ts-module";
 
 type TestFunction = (title: string, implementation: Implementation) => void;
 

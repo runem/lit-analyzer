@@ -1,5 +1,5 @@
-import { parseAllIndirectImports } from "../../../src/analyze/parse/parse-dependencies/parse-dependencies";
-import { isFacadeModule } from "../../../src/analyze/parse/parse-dependencies/visit-dependencies";
+import { parseAllIndirectImports } from "../../../lib/analyze/parse/parse-dependencies/parse-dependencies";
+import { isFacadeModule } from "../../../lib/analyze/parse/parse-dependencies/visit-dependencies";
 import { prepareAnalyzer } from "../../helpers/analyze";
 import { tsTest } from "../../helpers/ts-test";
 

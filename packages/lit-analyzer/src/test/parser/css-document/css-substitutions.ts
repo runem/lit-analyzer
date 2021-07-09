@@ -1,7 +1,7 @@
 import { ExecutionContext } from "ava";
-import { CssDocument } from "../../../src/analyze/parse/document/text-document/css-document/css-document";
-import { VirtualAstCssDocument } from "../../../src/analyze/parse/document/virtual-document/virtual-css-document";
-import { findTaggedTemplates } from "../../../src/analyze/parse/tagged-template/find-tagged-templates";
+import { CssDocument } from "../../../lib/analyze/parse/document/text-document/css-document/css-document";
+import { VirtualAstCssDocument } from "../../../lib/analyze/parse/document/virtual-document/virtual-css-document";
+import { findTaggedTemplates } from "../../../lib/analyze/parse/tagged-template/find-tagged-templates";
 
 import { compileFiles } from "../../helpers/compile-files";
 import { tsTest } from "../../helpers/ts-test";

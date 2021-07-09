@@ -1,6 +1,6 @@
 import { ExecutionContext } from "ava";
-import { LitAnalyzerRuleId } from "../../src/analyze/lit-analyzer-config";
-import { LitDiagnostic } from "../../src/analyze/types/lit-diagnostic";
+import { LitAnalyzerRuleId } from "../../lib/analyze/lit-analyzer-config";
+import { LitDiagnostic } from "../../lib/analyze/types/lit-diagnostic";
 
 export function hasDiagnostic(t: ExecutionContext, diagnostics: LitDiagnostic[], ruleName: LitAnalyzerRuleId): void {
 	if (diagnostics.length !== 1) {

@@ -1,13 +1,13 @@
 import { Program, SourceFile } from "typescript";
-import { DefaultLitAnalyzerContext } from "../../src/analyze/default-lit-analyzer-context";
-import { LitAnalyzer } from "../../src/analyze/lit-analyzer";
-import { LitAnalyzerConfig, makeConfig } from "../../src/analyze/lit-analyzer-config";
-import { LitAnalyzerContext } from "../../src/analyze/lit-analyzer-context";
-import { LitDiagnostic } from "../../src/analyze/types/lit-diagnostic";
+import { DefaultLitAnalyzerContext } from "../../lib/analyze/default-lit-analyzer-context";
+import { LitAnalyzer } from "../../lib/analyze/lit-analyzer";
+import { LitAnalyzerConfig, makeConfig } from "../../lib/analyze/lit-analyzer-config";
+import { LitAnalyzerContext } from "../../lib/analyze/lit-analyzer-context";
+import { LitDiagnostic } from "../../lib/analyze/types/lit-diagnostic";
 import { compileFiles, TestFile } from "./compile-files";
 import { getCurrentTsModule } from "./ts-test";
-import { Range } from "../../src/analyze/types/range";
-import { LitCodeFix } from "../../src/analyze/types/lit-code-fix";
+import { Range } from "../../lib/analyze/types/range";
+import { LitCodeFix } from "../../lib/analyze/types/lit-code-fix";
 
 /**
  * Prepares both the Typescript program and the LitAnalyzer
