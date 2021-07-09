@@ -4,10 +4,7 @@ import { DocumentOffset, DocumentRange, Range, SourceFilePosition, SourceFileRan
 import { intersects, makeSourceFileRange } from "../../../util/range-util";
 import { VirtualDocument } from "./virtual-document";
 
-function getPartLength(part: Node): number {
-	const end = part.parent && tsModule.ts.isTemplateSpan(part.parent) ? part.parent.literal.getStart() : part.getEnd();
-	return end - part.getFullStart();
-}
+const marker = `lit$analyzer$`;
 
 export class VirtualAstDocument implements VirtualDocument {
 	readonly fileName: string;
@@ -20,17 +17,13 @@ export class VirtualAstDocument implements VirtualDocument {
 		if (this._text == null) {
 			let str = "";
 
-			let prevPart = "";
 			this.parts.forEach((part, i) => {
 				const isLastPart = i >= this.parts.length - 1;
 
 				if (typeof part === "string") {
 					str += part.substring(i === 0 ? 0 : 1, part.length - (isLastPart ? 0 : 2));
-					prevPart = part;
 				} else {
-					const length = getPartLength(part) + 3;
-					const substitution = this.substituteExpression(length, part, prevPart, this.parts[i + 1] as string);
-					str += substitution;
+					str += marker;
 				}
 			});
 
@@ -56,11 +49,11 @@ export class VirtualAstDocument implements VirtualDocument {
 				const startPadding = i === 0 ? 0 : 1;
 				const endPadding = isLastPart ? 0 : 2;
 
-				offset += part.length;
+				offset += part.length - endPadding - startPadding;
 
 				const literalPartRange: Range = {
-					start: startOffset + startPadding,
-					end: offset - endPadding
+					start: startOffset,
+					end: offset
 				};
 
 				if (
@@ -75,7 +68,7 @@ export class VirtualAstDocument implements VirtualDocument {
 					resultParts.push(substr);
 				}
 			} else {
-				offset += getPartLength(part);
+				offset += marker.length;
 
 				const expressionPartRange: Range = {
 					start: startOffset,
@@ -127,10 +120,6 @@ export class VirtualAstDocument implements VirtualDocument {
 
 			this.fileName = this.fileName = astNodeOrParts.getSourceFile().fileName;
 		}
-	}
-
-	protected substituteExpression(length: number, expression: Expression, prev: string, next: string | undefined): string {
-		return "_".repeat(length);
 	}
 }
 
