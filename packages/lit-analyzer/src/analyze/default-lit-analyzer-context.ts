@@ -278,7 +278,7 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 	}
 
 	private findDependenciesInFile(file: SourceFile) {
-		if (isRuleDisabled(this.config, "no-missing-import")) return;
+		if (isRuleDisabled(this.config, "no-missing-import") && isRuleDisabled(this.config, "no-unused-import")) return;
 
 		// Build a graph of component dependencies
 		const res = parseDependencies(file, this);

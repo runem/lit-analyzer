@@ -1,16 +1,18 @@
 import * as tsModule from "typescript";
-import { Node, Program, SourceFile } from "typescript";
+import { Node, Program, SourceFile, ImportDeclaration } from "typescript";
+import { SourceFileWithImport } from "./parse-dependencies";
 
 interface IVisitDependenciesContext {
 	program: Program;
 	ts: typeof tsModule;
 	project: ts.server.Project | undefined;
 	directImportCache: WeakMap<SourceFile, Set<SourceFile>>;
-	emitIndirectImport(file: SourceFile, importedFrom?: SourceFile): boolean;
-	emitDirectImport?(file: SourceFile): void;
+	emitIndirectImport(sourceFileWithImport: SourceFileWithImport): boolean;
+	emitDirectImport?(file: SourceFile, importDeclaration: ImportDeclaration): void;
 	depth?: number;
 	maxExternalDepth?: number;
 	maxInternalDepth?: number;
+	importDeclaration?: ImportDeclaration;
 }
 
 /**
@@ -21,9 +23,8 @@ interface IVisitDependenciesContext {
  */
 export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, context: IVisitDependenciesContext): void {
 	const currentDepth = context.depth ?? 0;
-
 	// Emit a visit. If this file has been seen already, the function will return false, and traversal will stop
-	if (!context.emitIndirectImport(sourceFile)) {
+	if (!context.emitIndirectImport({ sourceFile, importDeclaration: context.importDeclaration ?? "rootSourceFile" })) {
 		return;
 	}
 
@@ -38,15 +39,17 @@ export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, conte
 
 	// Get all direct imports from the cache
 	let directImports = context.directImportCache.get(sourceFile);
+	const importDeclarations = new Map<SourceFile, ImportDeclaration>();
 
-	if (directImports == null) {
+	if (directImports == null || context.importDeclaration == null) {
 		// If the cache didn't have all direct imports, build up using the visitor function
 		directImports = new Set<SourceFile>();
 
 		const newContext = {
 			...context,
-			emitDirectImport(file: SourceFile) {
+			emitDirectImport(file: SourceFile, importDeclaration: ImportDeclaration) {
 				directImports!.add(file);
+				importDeclarations.set(file, importDeclaration);
 			}
 		};
 
@@ -91,9 +94,12 @@ export function visitIndirectImportsFromSourceFile(sourceFile: SourceFile, conte
 			newDepth--;
 		}
 
+		const importDeclaration = context.importDeclaration ?? importDeclarations.get(file);
+
 		// Visit direct imported source files recursively
 		visitIndirectImportsFromSourceFile(file, {
 			...context,
+			importDeclaration,
 			depth: newDepth
 		});
 	}
@@ -154,7 +160,8 @@ function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, con
 		const resolvedModule = result.resolvedModule;
 		const sourceFile = context.program.getSourceFile(resolvedModule.resolvedFileName);
 		if (sourceFile != null) {
-			context.emitDirectImport?.(sourceFile);
+			const importDeclaration = node as ImportDeclaration;
+			context.emitDirectImport?.(sourceFile, importDeclaration);
 		}
 	}
 }

@@ -24,11 +24,13 @@ import { arrayFlat } from "./util/array-util";
 import { getNodeAtPosition, nodeIntersects } from "./util/ast-util";
 import { iterableFirst } from "./util/iterable-util";
 import { makeSourceFileRange, sfRangeToDocumentRange } from "./util/range-util";
+import { SourceFileAnalyzer } from "./sourcefile-analyzer/sourcefile-analyzer";
 
 export class LitAnalyzer {
 	private litHtmlDocumentAnalyzer = new LitHtmlDocumentAnalyzer();
 	private litCssDocumentAnalyzer = new LitCssDocumentAnalyzer();
 	private componentAnalyzer = new ComponentAnalyzer();
+	private sourceFileAnalyzer = new SourceFileAnalyzer();
 
 	constructor(private context: LitAnalyzerContext) {
 		// Set the Typescript module
@@ -228,6 +230,9 @@ export class LitAnalyzer {
 			}
 		}
 
+		// Get general diagnostics for this file.
+		diagnostics.push(...this.sourceFileAnalyzer.getDiagnostics(this.context));
+
 		return diagnostics;
 	}
 
@@ -263,7 +268,7 @@ export class LitAnalyzer {
 			}
 		}
 
-		return [];
+		return this.sourceFileAnalyzer.getCodeFixesAtOffsetRange(sourceFileRange, this.context);
 	}
 
 	getFormatEditsInFile(file: SourceFile, settings: ts.FormatCodeSettings): LitFormatEdit[] {

@@ -1,26 +1,30 @@
-import { SourceFile } from "typescript";
+import { SourceFile, ImportDeclaration } from "typescript";
 import { ComponentDefinition } from "web-component-analyzer";
 import { LitAnalyzerContext } from "../../lit-analyzer-context";
 import { visitIndirectImportsFromSourceFile } from "./visit-dependencies";
+
+export type ComponentDefinitionWithImport = { definition: ComponentDefinition; importDeclaration: ImportDeclaration | "rootSourceFile" };
+export type SourceFileWithImport = { sourceFile: SourceFile; importDeclaration: ImportDeclaration | "rootSourceFile" };
 
 // A cache used to prevent traversing through entire source files multiple times to find direct imports
 const DIRECT_IMPORT_CACHE = new WeakMap<SourceFile, Set<SourceFile>>();
 
 // Two caches used to return the result of of a known source file right away
-const RESULT_CACHE = new WeakMap<SourceFile, ComponentDefinition[]>();
-const IMPORTED_SOURCE_FILES_CACHE = new WeakMap<SourceFile, Set<SourceFile>>();
+const RESULT_CACHE = new WeakMap<SourceFile, ComponentDefinitionWithImport[]>();
+const IMPORTED_SOURCE_FILES_CACHE = new WeakMap<SourceFile, Set<SourceFileWithImport>>();
 
 /**
  * Returns a map of imported component definitions in each file encountered from a source file recursively.
  * @param sourceFile
  * @param context
  */
-export function parseDependencies(sourceFile: SourceFile, context: LitAnalyzerContext): ComponentDefinition[] {
+export function parseDependencies(sourceFile: SourceFile, context: LitAnalyzerContext): ComponentDefinitionWithImport[] {
 	if (RESULT_CACHE.has(sourceFile)) {
 		let invalidate = false;
 
 		// Check if the cache has been invalidated
-		for (const file of IMPORTED_SOURCE_FILES_CACHE.get(sourceFile) || []) {
+		for (const fileWithImport of IMPORTED_SOURCE_FILES_CACHE.get(sourceFile) || []) {
+			const { sourceFile: file } = fileWithImport;
 			// If we get a SourceFile with a certain fileName but it's not the same reference, the file has been updated
 			if (context.program.getSourceFile(file.fileName) !== file) {
 				invalidate = true;
@@ -41,10 +45,11 @@ export function parseDependencies(sourceFile: SourceFile, context: LitAnalyzerCo
 	IMPORTED_SOURCE_FILES_CACHE.set(sourceFile, importedSourceFiles);
 
 	// Get component definitions from all these source files
-	const definitions = new Set<ComponentDefinition>();
-	for (const file of importedSourceFiles) {
-		for (const def of context.definitionStore.getDefinitionsInFile(file)) {
-			definitions.add(def);
+	const definitions = new Set<ComponentDefinitionWithImport>();
+	for (const importedSourceFile of importedSourceFiles) {
+		const { sourceFile, importDeclaration } = importedSourceFile;
+		for (const definition of context.definitionStore.getDefinitionsInFile(sourceFile)) {
+			definitions.add({ definition, importDeclaration });
 		}
 	}
 
@@ -56,7 +61,7 @@ export function parseDependencies(sourceFile: SourceFile, context: LitAnalyzerCo
 }
 
 /**
- * Returns a map of component declarations in each file encountered from a source file recursively.
+ * Returns a set of component declarations in each file encountered from a source file recursively.
  * @param sourceFile
  * @param context
  * @param maxExternalDepth
@@ -66,9 +71,8 @@ export function parseAllIndirectImports(
 	sourceFile: SourceFile,
 	context: LitAnalyzerContext,
 	{ maxExternalDepth, maxInternalDepth }: { maxExternalDepth?: number; maxInternalDepth?: number } = {}
-): Set<SourceFile> {
-	const importedSourceFiles = new Set<SourceFile>();
-
+): Set<SourceFileWithImport> {
+	const importedSourceFiles = new Map<SourceFile, Set<ImportDeclaration | "rootSourceFile">>();
 	visitIndirectImportsFromSourceFile(sourceFile, {
 		project: context.project,
 		program: context.program,
@@ -76,16 +80,35 @@ export function parseAllIndirectImports(
 		directImportCache: DIRECT_IMPORT_CACHE,
 		maxExternalDepth: maxExternalDepth ?? context.config.maxNodeModuleImportDepth,
 		maxInternalDepth: maxInternalDepth ?? context.config.maxProjectImportDepth,
-		emitIndirectImport(file: SourceFile): boolean {
-			if (importedSourceFiles.has(file)) {
-				return false;
+		emitIndirectImport(sourceFileWithImport: SourceFileWithImport): boolean {
+			const { sourceFile, importDeclaration } = sourceFileWithImport;
+
+			if (importedSourceFiles.has(sourceFile)) {
+				const importDeclarations = importedSourceFiles.get(sourceFile)!;
+				if (importDeclarations.has(importDeclaration) || importDeclarations.has("rootSourceFile")) {
+					// Sourcefile has already been visited from this importDeclaration or is the rootSourceFile.
+					return false;
+				} else {
+					// Sourcefile has already been visited from ANOTHER importDeclaration.
+					// Adding this importDeclaration to the Set of importDeclarations.
+					importDeclarations.add(importDeclaration);
+					importedSourceFiles.set(sourceFile, importDeclarations);
+					return true;
+				}
 			}
-
-			importedSourceFiles.add(file);
-
+			// Sourcefile has not been visited yet.
+			const importDeclarations = new Set<ImportDeclaration | "rootSourceFile">();
+			importDeclarations.add(importDeclaration);
+			importedSourceFiles.set(sourceFile, importDeclarations);
 			return true;
 		}
 	});
 
-	return importedSourceFiles;
+	const result = new Set<SourceFileWithImport>();
+	for (const [sourceFile, importDeclarations] of importedSourceFiles) {
+		for (const importDeclaration of importDeclarations) {
+			result.add({ sourceFile, importDeclaration });
+		}
+	}
+	return result;
 }

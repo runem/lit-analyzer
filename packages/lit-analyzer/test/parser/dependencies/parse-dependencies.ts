@@ -27,7 +27,7 @@ tsTest("Correctly finds all imports in a file", t => {
 	const dependencies = parseAllIndirectImports(sourceFile, context);
 
 	const sortedFileNames = Array.from(dependencies)
-		.map(file => file.fileName)
+		.map(fileWithImport => fileWithImport.sourceFile.fileName)
 		.sort();
 
 	t.deepEqual(sortedFileNames, ["file1.ts", "file2.ts", "file3.ts", "file4.ts", "file5.ts"]);
@@ -45,7 +45,7 @@ tsTest("Correctly follows all project-internal imports with (default) maxInterna
 	const dependencies = parseAllIndirectImports(sourceFile, context);
 
 	const sortedFileNames = Array.from(dependencies)
-		.map(file => file.fileName)
+		.map(fileWithImport => fileWithImport.sourceFile.fileName)
 		.sort();
 
 	t.deepEqual(sortedFileNames, ["file1.ts", "file2.ts", "file3.ts", "file4.ts", "file5.ts"]);
@@ -61,7 +61,7 @@ tsTest("Correctly follows project-internal imports with maxInternalDepth=1", t =
 	const dependencies = parseAllIndirectImports(sourceFile, context, { maxInternalDepth: 1 });
 
 	const sortedFileNames = Array.from(dependencies)
-		.map(file => file.fileName)
+		.map(fileWithImport => fileWithImport.sourceFile.fileName)
 		.sort();
 
 	t.deepEqual(sortedFileNames, ["file2.ts", "file3.ts"]);
@@ -81,7 +81,7 @@ tsTest("Correctly follows project-internal imports with maxInternalDepth=5", t =
 	const dependencies = parseAllIndirectImports(sourceFile, context, { maxInternalDepth: 5 });
 
 	const sortedFileNames = Array.from(dependencies)
-		.map(file => file.fileName)
+		.map(fileWithImport => fileWithImport.sourceFile.fileName)
 		.sort();
 
 	t.deepEqual(sortedFileNames, ["file2.ts", "file3.ts", "file4.ts", "file5.ts", "file6.ts", "file7.ts"]);
@@ -97,7 +97,7 @@ tsTest("Correctly follows project-external imports with maxExternalDepth=1", t =
 	const dependencies = parseAllIndirectImports(sourceFile, context, { maxExternalDepth: 1 });
 
 	const sortedFileNames = Array.from(dependencies)
-		.map(file => file.fileName)
+		.map(fileWithImport => fileWithImport.sourceFile.fileName)
 		.sort();
 
 	t.deepEqual(sortedFileNames, ["node_modules/file2.ts", "node_modules/file3.ts"]);
@@ -117,7 +117,7 @@ tsTest("Correctly follows project-external imports with maxExternalDepth=5", t =
 	const dependencies = parseAllIndirectImports(sourceFile, context, { maxExternalDepth: 5 });
 
 	const sortedFileNames = Array.from(dependencies)
-		.map(file => file.fileName)
+		.map(fileWithImport => fileWithImport.sourceFile.fileName)
 		.sort();
 
 	t.deepEqual(sortedFileNames, [
@@ -140,8 +140,9 @@ tsTest("Correctly resets depth when going from internal to external module with 
 	const dependencies = parseAllIndirectImports(sourceFile, context, { maxInternalDepth: 1 });
 
 	const sortedFileNames = Array.from(dependencies)
-		.map(file => file.fileName)
+		.map(fileWithImport => fileWithImport.sourceFile.fileName)
 		.sort();
+
 	t.deepEqual(sortedFileNames, ["file3.ts", "node_modules/file2.ts"]);
 });
 
@@ -156,7 +157,7 @@ tsTest("Correctly resets depth when going from internal to external module with 
 	const dependencies = parseAllIndirectImports(sourceFile, context, { maxInternalDepth: 2 });
 
 	const sortedFileNames = Array.from(dependencies)
-		.map(file => file.fileName)
+		.map(fileWithImport => fileWithImport.sourceFile.fileName)
 		.sort();
 
 	t.deepEqual(sortedFileNames, ["file3.ts", "file4.ts", "node_modules/file2.ts"]);
@@ -173,7 +174,7 @@ tsTest("Correctly resets depth when going from internal to external module when 
 	const dependencies = parseAllIndirectImports(sourceFile, context, { maxInternalDepth: 1 });
 
 	const sortedFileNames = Array.from(dependencies)
-		.map(file => file.fileName)
+		.map(fileWithImport => fileWithImport.sourceFile.fileName)
 		.sort();
 
 	t.deepEqual(sortedFileNames, ["file4.ts", "node_modules/file2.ts", "node_modules/file3.ts"]);
@@ -191,7 +192,7 @@ tsTest("Correctly follows modules when going from internal to external module wh
 	const dependencies = parseAllIndirectImports(sourceFile, context, { maxInternalDepth: 1, maxExternalDepth: 2 });
 
 	const sortedFileNames = Array.from(dependencies)
-		.map(file => file.fileName)
+		.map(fileWithImport => fileWithImport.sourceFile.fileName)
 		.sort();
 
 	t.deepEqual(sortedFileNames, ["file5.ts", "node_modules/file2.ts", "node_modules/file3.ts", "node_modules/file4.ts"]);
@@ -207,7 +208,7 @@ tsTest("Correctly handles recursive imports", t => {
 	const dependencies = parseAllIndirectImports(sourceFile, context);
 
 	const sortedFileNames = Array.from(dependencies)
-		.map(file => file.fileName)
+		.map(fileWithImport => fileWithImport.sourceFile.fileName)
 		.sort();
 
 	t.deepEqual(sortedFileNames, ["file1.ts", "file2.ts", "file3.ts"]);
@@ -223,7 +224,7 @@ tsTest("Correctly follows both exports and imports", t => {
 	const dependencies = parseAllIndirectImports(sourceFile, context);
 
 	const sortedFileNames = Array.from(dependencies)
-		.map(file => file.fileName)
+		.map(fileWithImport => fileWithImport.sourceFile.fileName)
 		.sort();
 
 	t.deepEqual(sortedFileNames, ["file1.ts", "file2.ts", "file3.ts"]);
@@ -256,7 +257,7 @@ tsTest("Correctly follows facade modules one level", t => {
 	const dependencies = parseAllIndirectImports(sourceFile, context, { maxInternalDepth: 1 });
 
 	const sortedFileNames = Array.from(dependencies)
-		.map(file => file.fileName)
+		.map(fileWithImport => fileWithImport.sourceFile.fileName)
 		.sort();
 
 	t.deepEqual(sortedFileNames, ["file2.ts", "file3.ts", "file4.ts"]);
@@ -274,7 +275,7 @@ tsTest("Correctly follows facade modules multiple levels", t => {
 	const dependencies = parseAllIndirectImports(sourceFile, context, { maxInternalDepth: 1 });
 
 	const sortedFileNames = Array.from(dependencies)
-		.map(file => file.fileName)
+		.map(fileWithImport => fileWithImport.sourceFile.fileName)
 		.sort();
 
 	t.deepEqual(sortedFileNames, ["file1.ts", "file2.ts", "file3.ts", "file4.ts"]);

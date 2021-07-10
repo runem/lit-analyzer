@@ -197,6 +197,16 @@
 							"error"
 						]
 					},
+					"lit-plugin.rules.no-unused-import": {
+						"type": "string",
+						"description": "Check that any custom element loaded by an import statement is used.",
+						"default": "default",
+						"enum": [
+							"off",
+							"warning",
+							"error"
+						]
+					},
 					"lit-plugin.rules.no-missing-element-type-definition": {
 						"type": "string",
 						"description": "This rule will ensure that custom elements are registered on the HTMLElementTagNameMap Typescript interface.",

@@ -4,12 +4,15 @@ import { HtmlNodeAttrAssignment } from "../html-node/html-node-attr-assignment-t
 import { HtmlNodeAttr } from "../html-node/html-node-attr-types";
 import { HtmlNode } from "../html-node/html-node-types";
 import { RuleModuleContext } from "./rule-module-context";
+import { SourceFile } from "typescript";
 
 export type RuleModulePriority = "low" | "medium" | "high";
 
 //export type RuleModuleCategory = "HTML" | "CSS" | "Component";
 
 export interface RuleModuleImplementation {
+	visitSourceFile?(sourceFile: SourceFile, context: RuleModuleContext): void;
+
 	// Document based rules
 	visitHtmlNode?(node: HtmlNode, context: RuleModuleContext): void;
 	visitHtmlAttribute?(attribute: HtmlNodeAttr, context: RuleModuleContext): void;
