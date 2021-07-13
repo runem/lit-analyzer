@@ -9,7 +9,10 @@ import { getUserConfigHtmlCollection } from "./data/get-user-config-html-collect
 import { isRuleDisabled, LitAnalyzerConfig, makeConfig } from "./lit-analyzer-config.js";
 import { LitAnalyzerContext, LitAnalyzerContextBaseOptions, LitPluginContextHandler } from "./lit-analyzer-context.js";
 import { DefaultLitAnalyzerLogger, LitAnalyzerLoggerLevel } from "./lit-analyzer-logger.js";
-import { convertAnalyzeResultToHtmlCollection, convertComponentDeclarationToHtmlTag } from "./parse/convert-component-definitions-to-html-collection.js";
+import {
+	convertAnalyzeResultToHtmlCollection,
+	convertComponentDeclarationToHtmlTag
+} from "./parse/convert-component-definitions-to-html-collection.js";
 import { parseDependencies } from "./parse/parse-dependencies/parse-dependencies.js";
 import { RuleCollection } from "./rule-collection.js";
 import { DefaultAnalyzerDefinitionStore } from "./store/definition-store/default-analyzer-definition-store.js";
