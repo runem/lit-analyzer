@@ -6,7 +6,6 @@ node_modules
 *.tgz
 *.log
 .DS_Store
-lib
 dist
 out
 *.vsix
@@ -17,3 +16,9 @@ out
 .gitignore
 .prettierignore
 .vscodeignore
+
+/packages/*/lib
+/packages/*/out
+/packages/*/scripts
+/packages/*/test
+/packages/*/index.*
