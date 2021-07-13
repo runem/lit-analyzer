@@ -4,6 +4,7 @@ dist
 dev
 
 /packages/*/lib
-/packages/*/test
+/packages/*/out
 /packages/*/scripts
+/packages/*/test
 /packages/*/index.*

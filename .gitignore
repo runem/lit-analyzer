@@ -11,6 +11,7 @@ out
 *.vsix
 
 /packages/*/lib
-/packages/lit-analyzer/test
-/packages/lit-analyzer/scripts
+/packages/*/out
+/packages/*/scripts
+/packages/*/test
 /packages/*/index.*
