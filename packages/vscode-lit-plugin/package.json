@@ -34,9 +34,9 @@
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json"
 	},
 	"dependencies": {
-		"lit-html": "https://github.com/mjbvz/vscode-lit-html.git#1.11.1",
+		"lit-html": "mjbvz/vscode-lit-html#1.11.1",
 		"ts-lit-plugin": "1.2.1",
-		"vscode-styled-components": "https://github.com/styled-components/vscode-styled-components#v1.4.0",
+		"vscode-styled-components": "styled-components/vscode-styled-components#v1.4.0",
 		"web-component-analyzer": "~1.1.1"
 	},
 	"devDependencies": {
