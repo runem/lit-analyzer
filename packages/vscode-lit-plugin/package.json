@@ -34,7 +34,7 @@
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json"
 	},
 	"dependencies": {
-		"lit-html": "mjbvz/vscode-lit-html#1.11.1",
+		"vscode-lit-html": "mjbvz/vscode-lit-html#1.11.1",
 		"ts-lit-plugin": "1.2.1",
 		"vscode-styled-components": "styled-components/vscode-styled-components#v1.4.0",
 		"web-component-analyzer": "~1.1.1"
@@ -645,7 +645,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html",
-				"path": "./node_modules/lit-html/syntaxes/lit-html.json",
+				"path": "./node_modules/vscode-lit-html/syntaxes/lit-html.json",
 				"embeddedLanguages": {
 					"meta.embedded.block.html": "html",
 					"meta.embedded.block.css": "css",
@@ -662,7 +662,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html.string.injection",
-				"path": "./node_modules/lit-html/syntaxes/lit-html-string-injection.json",
+				"path": "./node_modules/vscode-lit-html/syntaxes/lit-html-string-injection.json",
 				"embeddedLanguages": {
 					"meta.template.expression.ts": "typescript"
 				}
@@ -677,7 +677,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html.style.injection",
-				"path": "./node_modules/lit-html/syntaxes/lit-html-style-injection.json",
+				"path": "./node_modules/vscode-lit-html/syntaxes/lit-html-style-injection.json",
 				"embeddedLanguages": {
 					"meta.template.expression.ts": "typescript"
 				}
@@ -692,7 +692,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html-svg",
-				"path": "./node_modules/lit-html/syntaxes/lit-html-svg.json",
+				"path": "./node_modules/vscode-lit-html/syntaxes/lit-html-svg.json",
 				"embeddedLanguages": {
 					"meta.embedded.block.svg": "xml"
 				}
