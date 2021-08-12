@@ -29,7 +29,8 @@ export class VirtualAstDocument implements VirtualDocument {
 					prevPart = part;
 				} else {
 					const length = getPartLength(part) + 3;
-					const substitution = this.substituteExpression(length, part, prevPart, this.parts[i + 1] as string);
+					const expressionIndex = (i - 1) / 2;
+					const substitution = this.substituteExpression(length, part, prevPart, this.parts[i + 1] as string, expressionIndex);
 					str += substitution;
 				}
 			});
@@ -129,8 +130,15 @@ export class VirtualAstDocument implements VirtualDocument {
 		}
 	}
 
-	protected substituteExpression(length: number, expression: Expression, prev: string, next: string | undefined): string {
-		return "_".repeat(length);
+	protected substituteExpression(length: number, expression: Expression, prev: string, next: string | undefined, index: number): string {
+		if (length < 4) {
+			throw new Error("Unexpected expression length: " + length);
+		}
+		const indexString = index + "";
+		if (indexString.length > length - 2) {
+			throw new Error("Too many expressions in this template: " + indexString);
+		}
+		return "_".repeat(length - indexString.length - 1) + indexString + "_";
 	}
 }
 
