@@ -132,12 +132,14 @@ export class VirtualAstDocument implements VirtualDocument {
 
 	protected substituteExpression(length: number, expression: Expression, prev: string, next: string | undefined, index: number): string {
 		if (length < 4) {
-			throw new Error("Unexpected expression length: " + length);
+			throw new Error("Internal error: unexpected expression length: " + length);
 		}
 		const indexString = index + "";
 		if (indexString.length > length - 2) {
 			throw new Error("Too many expressions in this template: " + indexString);
 		}
+		// To support element expressions, where we substitute into attribute name
+		// position, we create a unique substitution by using the expression index
 		return "_".repeat(length - indexString.length - 1) + indexString + "_";
 	}
 }

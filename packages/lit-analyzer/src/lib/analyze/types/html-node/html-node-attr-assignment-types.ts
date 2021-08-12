@@ -6,7 +6,8 @@ export enum HtmlNodeAttrAssignmentKind {
 	BOOLEAN = "BOOLEAN",
 	EXPRESSION = "EXPRESSION",
 	STRING = "STRING",
-	MIXED = "MIXED"
+	MIXED = "MIXED",
+	ELEMENT = "ELEMENT"
 }
 
 export interface IHtmlNodeAttrAssignmentBase {
@@ -17,6 +18,11 @@ export interface IHtmlNodeAttrAssignmentBase {
 export interface IHtmlNodeAttrAssignmentExpression extends IHtmlNodeAttrAssignmentBase {
 	kind: HtmlNodeAttrAssignmentKind.EXPRESSION;
 	location: Range;
+	expression: Expression;
+}
+
+export interface IHtmlNodeAttrAssignmentElement extends IHtmlNodeAttrAssignmentBase {
+	kind: HtmlNodeAttrAssignmentKind.ELEMENT;
 	expression: Expression;
 }
 
@@ -40,4 +46,5 @@ export type HtmlNodeAttrAssignment =
 	| IHtmlNodeAttrAssignmentBoolean
 	| IHtmlNodeAttrAssignmentExpression
 	| IHtmlNodeAttrAssignmentString
-	| IHtmlNodeAttrAssignmentMixed;
+	| IHtmlNodeAttrAssignmentMixed
+	| IHtmlNodeAttrAssignmentElement;

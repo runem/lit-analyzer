@@ -3,6 +3,43 @@ import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert.js";
 import { makeElement } from "../helpers/generate-test-file.js";
 import { tsTest } from "../helpers/ts-test.js";
 
+tsTest("Element binding: non-directive not allowed", t => {
+	const { diagnostics } = getDiagnostics("html`<input ${123} />`");
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});
+
+tsTest("Element binding: directive allowed", t => {
+	const { diagnostics } = getDiagnostics(`
+export interface Part { }
+
+const ifDefined: (value: unknown) => (part: Part) => void;
+
+html\`<input \${ifDefined(10)} />\`
+	`);
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Element binding: custom directive allowed", t => {
+	const { diagnostics } = getDiagnostics(`
+export interface Part { }
+
+const ifDefined: (value: unknown) => (part: Part) => void;
+const ifExists = (value: any) => ifDefined(value === null ? undefined : value);
+
+html\`<input \${ifExists(10)} />\`
+	`);
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Element binding: any allowed", t => {
+	const { diagnostics } = getDiagnostics(`
+const ifDefined: any;
+
+html\`<input \${ifDefined(10)} />\`
+	`);
+	hasNoDiagnostics(t, diagnostics);
+});
+
 tsTest("Attribute binding: 'no-incompatible-type-binding' is not emitted when the rule is turned off", t => {
 	const { diagnostics } = getDiagnostics('html`<input maxlength="foo" />`', { rules: { "no-incompatible-type-binding": "off" } });
 	hasNoDiagnostics(t, diagnostics);
