@@ -23,7 +23,7 @@ export function parseHtmlAttrAssignment(
 	if (location == null) {
 		// A null assignment location might be an element expression, which only
 		// has an attribute name and no attribute "assignment".
-		if (htmlAttr.name.match(/_+\d+_/)) {
+		if (htmlAttr.name.match(/_+[0-9a-zA-Z]+_/)) {
 			// Here we have an element expression, which doesn't have an "assignment"
 			// in HTML. The parts will be in the range of the attribute name instead.
 			const values = context.getPartsAtOffsetRange(htmlAttr.location);

@@ -31,6 +31,13 @@ tsTest("Parses multiple element bindings", t => {
 	t.is(input.attributes.length, 2);
 });
 
+tsTest("Parses more than 10 element bindings", t => {
+	const res = parseHtml("<input ${a} ${b} ${c} ${d} ${e} ${f} ${g} ${h} ${i} ${j} ${k}/>");
+	const input = res.rootNodes[0];
+	t.is(input.attributes.length, 11);
+	t.is(input.attributes[10].assignment!.kind, HtmlNodeAttrAssignmentKind.ELEMENT_EXPRESSION);
+});
+
 tsTest("Correctly parses binding with no quotes", t => {
 	const res = parseHtml('<input value=${"text"} />');
 	const attr = res.findAttr(attr => attr.name === "value")!;
