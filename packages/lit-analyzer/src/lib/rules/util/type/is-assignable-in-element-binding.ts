@@ -15,7 +15,7 @@ import { isLitDirective } from "../directive/is-lit-directive.js";
 export function isAssignableInElementBinding(htmlAttr: HtmlNodeAttr, type: SimpleType, context: RuleModuleContext): boolean | undefined {
 	// TODO (justinfagnani): is there a better way to determine if the
 	// type *contains* any, rather than *is* any?
-	if (!isLitDirective(type) && !(type.kind === "ANY")) {
+	if (!isLitDirective(type) && type.kind !== "ANY") {
 		context.report({
 			location: rangeFromHtmlNodeAttr(htmlAttr),
 			message: `Type '${typeToString(type)}' is not a directive'`

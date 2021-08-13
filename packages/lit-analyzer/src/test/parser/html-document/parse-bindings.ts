@@ -20,7 +20,7 @@ tsTest("Correctly parses binding without a missing start quote", t => {
 tsTest("Parses element binding", t => {
 	const res = parseHtml("<input ${ref(testRef)} />");
 	const attr = res.findAttr(attr => attr.name.startsWith("_"))!;
-	t.is(attr.assignment!.kind, HtmlNodeAttrAssignmentKind.ELEMENT);
+	t.is(attr.assignment!.kind, HtmlNodeAttrAssignmentKind.ELEMENT_EXPRESSION);
 });
 
 tsTest("Parses multiple element bindings", t => {

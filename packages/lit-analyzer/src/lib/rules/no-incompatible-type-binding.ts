@@ -22,7 +22,7 @@ const rule: RuleModule = {
 	visitHtmlAssignment(assignment, context) {
 		const { htmlAttr } = assignment;
 
-		if (assignment.kind === HtmlNodeAttrAssignmentKind.ELEMENT) {
+		if (assignment.kind === HtmlNodeAttrAssignmentKind.ELEMENT_EXPRESSION) {
 			// For element bindings we only care about the expression type
 			const { typeB } = extractBindingTypes(assignment, context);
 			isAssignableInElementBinding(htmlAttr, typeB, context);

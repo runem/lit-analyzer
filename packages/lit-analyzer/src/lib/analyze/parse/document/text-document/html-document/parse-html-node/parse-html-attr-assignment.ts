@@ -28,7 +28,7 @@ export function parseHtmlAttrAssignment(
 			// in HTML. The parts will be in the range of the attribute name instead.
 			const values = context.getPartsAtOffsetRange(htmlAttr.location);
 			return {
-				kind: HtmlNodeAttrAssignmentKind.ELEMENT,
+				kind: HtmlNodeAttrAssignmentKind.ELEMENT_EXPRESSION,
 				htmlAttr,
 				location: htmlAttr.location,
 				expression: values[0] as Expression
