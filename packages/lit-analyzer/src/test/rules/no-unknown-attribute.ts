@@ -28,3 +28,8 @@ tsTest("Don't report unknown data- attributes", t => {
 	const { diagnostics } = getDiagnostics("html`<input data-foo='' />`", { rules: { "no-unknown-attribute": true } });
 	hasNoDiagnostics(t, diagnostics);
 });
+
+tsTest("Don't report element expressions", t => {
+	const { diagnostics } = getDiagnostics("html`<input ${x} />`", { rules: { "no-unknown-attribute": true } });
+	hasNoDiagnostics(t, diagnostics);
+});
