@@ -22,9 +22,9 @@ export function isLitDirective(type: SimpleType): boolean {
 export function isLit1Directive(type: SimpleType): boolean {
 	switch (type.kind) {
 		case "ALIAS":
-			return type.name === "DirectiveFn" || isLitDirective(type.target);
+			return type.name === "DirectiveFn" || isLit1Directive(type.target);
 		case "OBJECT":
-			return type.call != null && isLitDirective(type.call);
+			return type.call != null && isLit1Directive(type.call);
 		case "FUNCTION": {
 			// We expect a directive to be a function with at least one argument that
 			// returns void.
@@ -46,7 +46,7 @@ export function isLit1Directive(type: SimpleType): boolean {
 		}
 		case "GENERIC_ARGUMENTS":
 			// Test for the built in type from lit-html: Directive<NodePart>
-			return (type.target.kind === "FUNCTION" && type.target.name === "Directive") || isLitDirective(type.target);
+			return (type.target.kind === "FUNCTION" && type.target.name === "Directive") || isLit1Directive(type.target);
 		default:
 			return false;
 	}
