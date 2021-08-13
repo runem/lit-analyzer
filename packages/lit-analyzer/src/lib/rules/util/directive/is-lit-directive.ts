@@ -10,11 +10,16 @@ const partTypeNames: ReadonlySet<string | undefined> = new Set([
 ]);
 
 /**
- * Checks whether a type is a lit directive.
- * It will return true if the type is a function that takes a Part type and returns a void.
- * @param type
+ * Checks whether a type is a lit-html 1.x or Lit 2 directive.
  */
 export function isLitDirective(type: SimpleType): boolean {
+	return isLit1Directive(type) || isLit2Directive(type);
+}
+
+/**
+ * Checks whether a type is a lit-html 1.x directive.
+ */
+export function isLit1Directive(type: SimpleType): boolean {
 	switch (type.kind) {
 		case "ALIAS":
 			return type.name === "DirectiveFn" || isLitDirective(type.target);
@@ -45,4 +50,11 @@ export function isLitDirective(type: SimpleType): boolean {
 		default:
 			return false;
 	}
+}
+
+/**
+ * Checks whether a type is a Lit 2 directive.
+ */
+export function isLit2Directive(type: SimpleType): boolean {
+	return type.kind === "INTERFACE" && type.name === "DirectiveResult";
 }
