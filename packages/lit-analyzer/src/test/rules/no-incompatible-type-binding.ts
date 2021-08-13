@@ -3,12 +3,32 @@ import { hasDiagnostic, hasNoDiagnostics } from "../helpers/assert.js";
 import { makeElement } from "../helpers/generate-test-file.js";
 import { tsTest } from "../helpers/ts-test.js";
 
+const lit2DirectiveSetup = `
+	export class Directive { }
+
+	export interface DirectiveClass {
+		new (part: PartInfo): Directive;
+	}
+
+	export type DirectiveParameters<C extends Directive> = Parameters<C['render']>;
+
+	// TODO (justinfagnani): ts-simple-type has a bug, so I remove the generic
+	export interface DirectiveResult {
+		values: unknown[];
+	}
+
+	export const directive = <C extends DirectiveClass>(c: C) => (...values: DirectiveParameters<InstanceType<C>>): DirectiveResult => ({
+    ['_$litDirective$']: c,
+    values,
+  });
+`;
+
 tsTest("Element binding: non-directive not allowed", t => {
 	const { diagnostics } = getDiagnostics("html`<input ${123} />`");
 	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
-tsTest("Element binding: directive allowed", t => {
+tsTest("Element binding: lit-html 1 directives are not allowed", t => {
 	const { diagnostics } = getDiagnostics(`
 export interface Part { }
 
@@ -16,17 +36,22 @@ const ifDefined: (value: unknown) => (part: Part) => void;
 
 html\`<input \${ifDefined(10)} />\`
 	`);
-	hasNoDiagnostics(t, diagnostics);
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
 });
 
-tsTest("Element binding: custom directive allowed", t => {
+tsTest("Element binding: Lit 2 directives are allowed", t => {
 	const { diagnostics } = getDiagnostics(`
-export interface Part { }
 
-const ifDefined: (value: unknown) => (part: Part) => void;
-const ifExists = (value: any) => ifDefined(value === null ? undefined : value);
+${lit2DirectiveSetup}
 
-html\`<input \${ifExists(10)} />\`
+class MyDirective extends Directive {
+  render(): number {
+		return 42;
+	}
+}
+const myDirective = directive(MyDirective);
+
+html\`<input \${myDirective()} />\`
 	`);
 	hasNoDiagnostics(t, diagnostics);
 });
