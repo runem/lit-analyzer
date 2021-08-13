@@ -32,3 +32,8 @@ tsTest("Don't check for the assignability of complex types in attribute bindings
 	);
 	hasNoDiagnostics(t, diagnostics);
 });
+
+tsTest("Ignore element expressions", t => {
+	const { diagnostics } = getDiagnostics("html`<input ${{x: 1}} />`", { rules: { "no-incompatible-type-binding": false } });
+	hasNoDiagnostics(t, diagnostics);
+});

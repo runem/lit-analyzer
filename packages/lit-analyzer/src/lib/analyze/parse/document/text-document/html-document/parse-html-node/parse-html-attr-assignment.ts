@@ -1,3 +1,4 @@
+import { Expression } from "typescript";
 import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../../../types/html-node/html-node-attr-assignment-types.js";
 import { HtmlNodeAttr } from "../../../../../types/html-node/html-node-attr-types.js";
 import { Range } from "../../../../../types/range.js";
@@ -20,6 +21,19 @@ export function parseHtmlAttrAssignment(
 	const location = getAssignmentLocation(p5Node, p5Attr, htmlAttr, context);
 
 	if (location == null) {
+		// A null assignment location might be an element expression, which only
+		// has an attribute name and no attribute "assignment".
+		if (htmlAttr.name.match(/_+[0-9a-zA-Z]+_/)) {
+			// Here we have an element expression, which doesn't have an "assignment"
+			// in HTML. The parts will be in the range of the attribute name instead.
+			const values = context.getPartsAtOffsetRange(htmlAttr.location);
+			return {
+				kind: HtmlNodeAttrAssignmentKind.ELEMENT_EXPRESSION,
+				htmlAttr,
+				location: htmlAttr.location,
+				expression: values[0] as Expression
+			};
+		}
 		return { kind: HtmlNodeAttrAssignmentKind.BOOLEAN, htmlAttr };
 	}
 

@@ -29,7 +29,8 @@ export class VirtualAstDocument implements VirtualDocument {
 					prevPart = part;
 				} else {
 					const length = getPartLength(part) + 3;
-					const substitution = this.substituteExpression(length, part, prevPart, this.parts[i + 1] as string);
+					const expressionIndex = (i - 1) / 2;
+					const substitution = this.substituteExpression(length, part, prevPart, this.parts[i + 1] as string, expressionIndex);
 					str += substitution;
 				}
 			});
@@ -129,8 +130,30 @@ export class VirtualAstDocument implements VirtualDocument {
 		}
 	}
 
-	protected substituteExpression(length: number, expression: Expression, prev: string, next: string | undefined): string {
-		return "_".repeat(length);
+	protected substituteExpression(length: number, expression: Expression, prev: string, next: string | undefined, index: number): string {
+		if (length < 4) {
+			throw new Error("Internal error: unexpected expression length: " + length);
+		}
+		const indexString = index.toString(36);
+		if (indexString.length > length - 2) {
+			throw new Error("Too many expressions in this template: " + indexString);
+		}
+		// To support element expressions, where we substitute into attribute name
+		// position, we create a unique substitution by using the expression index
+		//
+		// We need this substitution to be valid in HTML for all valid lit-html
+		// expression positions - so it must be a valid unquoted attribute value,
+		// attribute name, and text content. Ideally the substitution would also
+		// be a valid tag name to support some analysis of Lit 2 static templates.
+		//
+		// Example substitution:
+		//
+		//     html`<a href=${u}>${text}</a>`
+		//
+		// becomes:
+		//
+		//     html`<a href=__0_>_____1_</a>`
+		return "_".repeat(length - indexString.length - 1) + indexString + "_";
 	}
 }
 

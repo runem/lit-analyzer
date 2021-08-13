@@ -63,6 +63,8 @@ export function inferTypeFromAssignment(assignment: HtmlNodeAttrAssignment, chec
 			return { kind: "STRING_LITERAL", value: assignment.value } as SimpleTypeStringLiteral;
 		case HtmlNodeAttrAssignmentKind.BOOLEAN:
 			return { kind: "BOOLEAN_LITERAL", value: true } as SimpleTypeBooleanLiteral;
+		case HtmlNodeAttrAssignmentKind.ELEMENT_EXPRESSION:
+			return checker.getTypeAtLocation(assignment.expression);
 		case HtmlNodeAttrAssignmentKind.EXPRESSION:
 			return checker.getTypeAtLocation(assignment.expression);
 		case HtmlNodeAttrAssignmentKind.MIXED:

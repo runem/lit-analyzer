@@ -1,4 +1,5 @@
 import { isAssignableToPrimitiveType, typeToString } from "ts-simple-type";
+import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node-attr-assignment-types.js";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types.js";
 import { RuleModule } from "../analyze/types/rule/rule-module.js";
 import { rangeFromHtmlNodeAttr } from "../analyze/util/range-util.js";
@@ -18,6 +19,9 @@ const rule: RuleModule = {
 		// Only validate attribute bindings, because you are able to assign complex types in property bindings.
 		const { htmlAttr } = assignment;
 		if (htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE) return;
+
+		// Ignore element expressions
+		if (assignment.kind === HtmlNodeAttrAssignmentKind.ELEMENT_EXPRESSION) return;
 
 		const { typeA, typeB } = extractBindingTypes(assignment, context);
 

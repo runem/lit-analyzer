@@ -1,6 +1,7 @@
 import { LitAnalyzerConfig } from "../analyze/lit-analyzer-config.js";
 import { HtmlTag, litAttributeModifierForTarget } from "../analyze/parse/parse-html-data/html-tag.js";
 import { AnalyzerDefinitionStore } from "../analyze/store/analyzer-definition-store.js";
+import { HtmlNodeAttrAssignmentKind } from "../analyze/types/html-node/html-node-attr-assignment-types.js";
 import { HtmlNodeAttrKind } from "../analyze/types/html-node/html-node-attr-types.js";
 import { HtmlNodeKind } from "../analyze/types/html-node/html-node-types.js";
 import { RuleFix } from "../analyze/types/rule/rule-fix.js";
@@ -34,6 +35,9 @@ const rule: RuleModule = {
 
 			// Ignore unknown "data-" attributes
 			if (htmlAttr.name.startsWith("data-")) return;
+
+			// Ignore element expressions
+			if (htmlAttr.assignment?.kind === HtmlNodeAttrAssignmentKind.ELEMENT_EXPRESSION) return;
 
 			// Get suggested target
 			const suggestedTarget = suggestTargetForHtmlAttr(htmlAttr, htmlStore);
