@@ -30,13 +30,10 @@
 		"watch": "tsc -watch -p ./",
 		"publish": "vsce publish",
 		"package": "vsce package",
-		"install:safe": "npm install --ignore-scripts --no-package-lock && npm i --no-package-lock",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json"
 	},
 	"dependencies": {
-		"vscode-lit-html": "mjbvz/vscode-lit-html#1.11.1",
 		"ts-lit-plugin": "^1.3.0-next.0",
-		"vscode-styled-components": "styled-components/vscode-styled-components#v1.4.0",
 		"web-component-analyzer": "^2.0.0-next.2"
 	},
 	"devDependencies": {
@@ -645,7 +642,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html",
-				"path": "./node_modules/vscode-lit-html/syntaxes/lit-html.json",
+				"path": "./syntaxes/lit-html.json",
 				"embeddedLanguages": {
 					"meta.embedded.block.html": "html",
 					"meta.embedded.block.css": "css",
@@ -662,7 +659,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html.string.injection",
-				"path": "./node_modules/vscode-lit-html/syntaxes/lit-html-string-injection.json",
+				"path": "./syntaxes/lit-html-string-injection.json",
 				"embeddedLanguages": {
 					"meta.template.expression.ts": "typescript"
 				}
@@ -677,7 +674,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html.style.injection",
-				"path": "./node_modules/vscode-lit-html/syntaxes/lit-html-style-injection.json",
+				"path": "./syntaxes/lit-html-style-injection.json",
 				"embeddedLanguages": {
 					"meta.template.expression.ts": "typescript"
 				}
@@ -692,14 +689,14 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html-svg",
-				"path": "./node_modules/vscode-lit-html/syntaxes/lit-html-svg.json",
+				"path": "./syntaxes/lit-html-svg.json",
 				"embeddedLanguages": {
 					"meta.embedded.block.svg": "xml"
 				}
 			},
 			{
 				"scopeName": "source.css.styled",
-				"path": "./node_modules/vscode-styled-components/syntaxes/css.styled.json"
+				"path": "./syntaxes/css.styled.json"
 			},
 			{
 				"injectTo": [
@@ -710,7 +707,7 @@
 					"source.tsx"
 				],
 				"scopeName": "styled",
-				"path": "./node_modules/vscode-styled-components/syntaxes/styled-components.json",
+				"path": "./syntaxes/styled-components.json",
 				"embeddedLanguages": {
 					"source.css.scss": "css",
 					"meta.embedded.line.ts": "typescript"

@@ -41,10 +41,6 @@ In order to debug `vscode-lit-plugin` you can open vscode from `packages/vscode-
 
 You can use this script if you want to generate an installable package of vscode-lit-plugin. You can install the bundled package from vscode.
 
-### `npm run install:safe`
-
-Some dependencies are installed directly from Github URLs (see [syntaxes](#syntaxes)). In order to prevent `postinstall` scripts to run when installing these dependencies (which will crash), they are installed with `--ignore-scripts`. `npm run bootstrap` will make sure to execute `install:safe` when running.
-
 ### `npm run copylink` (main package.json)
 
 VS Code doesn't support debugging symlinked dependencies. Therefore there are no symlinked dependencies in `packages/vscode-lit-plugin`. This means that local changes to `lit-analyzer` are not automatically reflected when debugging `vscode-lit-plugin`.
