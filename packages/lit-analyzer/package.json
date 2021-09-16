@@ -30,7 +30,7 @@
 		"build:ts": "tsc",
 		"watch": "tsc --watch",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
-		"test": "ava --color",
+		"test": "TS_MODULE=current ava --color",
 		"test:all": "ava --color --fail-fast",
 		"test:watch": "ava --watch --color",
 		"check-version": "node scripts/check-version.js"
@@ -49,7 +49,7 @@
 		"ts-simple-type": "^2.0.0-next.0",
 		"vscode-css-languageservice": "4.3.0",
 		"vscode-html-languageservice": "3.1.0",
-		"web-component-analyzer": "^2.0.0-next.2"
+		"web-component-analyzer": "^2.0.0-next.3"
 	},
 	"devDependencies": {
 		"@appnest/readme": "^1.2.7",
@@ -74,7 +74,7 @@
 		],
 		"snapshotDir": "test/snapshots/results",
 		"files": [
-			"test/**/*.js",
+			"test/**/security-system.js",
 			"!test/helpers/**/*"
 		]
 	},
