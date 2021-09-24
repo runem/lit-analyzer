@@ -3,11 +3,12 @@
 	"include": ["./src"],
 	"exclude": ["node_modules"],
 	"compilerOptions": {
-		"module": "commonjs",
-		"target": "es6",
+		"module": "esnext",
+		"target": "es2019",
 		"outDir": "out",
-		"lib": ["es6"],
+		"lib": ["es2020"],
 		"sourceMap": true,
-		"rootDir": "src"
+		"rootDir": "src",
+		"moduleResolution": "node"
 	}
 }

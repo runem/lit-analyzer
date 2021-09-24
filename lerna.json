@@ -1,5 +1,4 @@
 {
 	"version": "1.2.1",
-	"packages": ["packages/*"],
-	"nohoist": ["vscode", "vscode-styled-components", "lit-html", "typescript"]
+	"packages": ["packages/*"]
 }

@@ -3,7 +3,7 @@
 	"private": true,
 	"displayName": "lit-plugin",
 	"description": "Syntax highlighting, type checking and code completion for lit-html",
-	"version": "1.2.1",
+	"version": "1.3.0-next.0",
 	"publisher": "runem",
 	"icon": "docs/assets/lit-plugin@256w.png",
 	"license": "MIT",
@@ -22,26 +22,33 @@
 		"type": "git",
 		"url": "https://github.com/runem/lit-analyzer.git"
 	},
-	"main": "./out/extension",
+	"main": "./out/extension.js",
 	"scripts": {
 		"clean": "rimraf out",
-		"vscode:prepublish": "npm run compile",
-		"compile": "npm run clean & tsc -p ./",
-		"watch": "tsc -watch -p ./",
+		"build": "npm run clean && rollup -c",
+		"watch": "rollup -c --watch",
 		"publish": "vsce publish",
 		"package": "vsce package",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json"
 	},
 	"dependencies": {
+		"lit-analyzer": "^1.3.0-next.0",
 		"ts-lit-plugin": "^1.3.0-next.0",
 		"web-component-analyzer": "^2.0.0-next.3"
 	},
 	"devDependencies": {
+		"@appnest/readme": "^1.2.7",
+		"@rollup/plugin-commonjs": "^20.0.0",
+		"@rollup/plugin-json": "^4.1.0",
+		"@rollup/plugin-node-resolve": "^13.0.4",
+		"@rollup/plugin-typescript": "^8.2.5",
 		"@types/node": "^14.0.13",
 		"@types/vscode": "^1.30.0",
+		"rollup": "^2.57.0",
 		"rimraf": "^3.0.2",
+		"ts-lit-plugin": "1.2.1",
 		"typescript": "^3.7.5",
-		"vsce": "^1.58.0"
+		"vsce": "^1.99.0"
 	},
 	"activationEvents": [
 		"onCommand:lit-plugin.analyze",

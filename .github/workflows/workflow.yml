@@ -44,7 +44,7 @@ jobs:
 
       - name: Package vscode plugin
         if: matrix.os == 'ubuntu-latest'
-        run: npx lerna run package --scope lit-plugin && mkdir vscode-lit-plugin && mv packages/vscode-lit-plugin/lit-plugin-*.vsix vscode-lit-plugin
+        run: lerna bootstrap --scope lit-plugin && npx lerna run package --scope lit-plugin && mkdir vscode-lit-plugin && mv packages/vscode-lit-plugin/lit-plugin-*.vsix vscode-lit-plugin
 
       - name: Upload artifacts
         uses: actions/upload-artifact@master
