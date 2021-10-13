@@ -48,8 +48,8 @@
 		"@types/vscode": "^1.30.0",
 		"mocha": "^9.1.4",
 		"rimraf": "^3.0.2",
-		"typescript": "^3.7.5",
-		"vsce": "^1.103.1"
+		"vsce": "^1.103.1",
+		"typescript": "^4.4.4"
 	},
 	"activationEvents": [
 		"onCommand:lit-plugin.analyze",

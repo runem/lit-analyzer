@@ -2,6 +2,7 @@ import { LitAnalyzer } from "lit-analyzer";
 import {
 	CodeFixAction,
 	CompletionEntryDetails,
+	CompletionEntryData,
 	CompletionInfo,
 	DefinitionInfoAndBoundSpan,
 	Diagnostic,
@@ -48,13 +49,14 @@ export class TsLitPlugin {
 		name: string,
 		formatOptions: FormatCodeOptions | FormatCodeSettings | undefined,
 		source: string | undefined,
-		preferences: UserPreferences | undefined
+		preferences: UserPreferences | undefined,
+		data: CompletionEntryData | undefined
 	): CompletionEntryDetails | undefined {
 		const file = this.program.getSourceFile(fileName)!;
 		const result = this.litAnalyzer.getCompletionDetailsAtPosition(file, position, name);
 		return (
 			(result && translateCompletionDetails(result, this.context)) ||
-			this.prevLangService.getCompletionEntryDetails(fileName, position, name, formatOptions, source, preferences)
+			this.prevLangService.getCompletionEntryDetails(fileName, position, name, formatOptions, source, preferences, data)
 		);
 	}
 
