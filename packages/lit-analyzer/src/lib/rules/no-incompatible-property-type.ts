@@ -132,7 +132,7 @@ function validateLitPropertyConfig(
 	}
 
 	// Don't continue if we don't know the property type (eg if we are in a js file)
-	// Don't continue if this proper
+	// Don't continue if this property has a custom converter (because then we don't know how the value will be converted)
 	if (simplePropType == null || litConfig.hasConverter || typeof litConfig.type === "string") {
 		return;
 	}
