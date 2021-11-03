@@ -34,6 +34,24 @@ tsTest("'no-incompatible-property-type' is not emitted for string types with Str
 	hasNoDiagnostics(t, diagnostics);
 });
 
+tsTest("'no-incompatible-property-type' not is emitted when the configuration is a variable", t => {
+	const { diagnostics } = getDiagnostics(
+		`
+  
+	class SomeComplexType {}
+	/**
+   * @element
+	 */ 
+	class MyElement extends LitElement {
+		@property(aVariable) color: SomeComplexType;
+	}
+	`,
+		{ rules: { "no-incompatible-property-type": "on" } }
+	);
+
+	hasNoDiagnostics(t, diagnostics);
+});
+
 tsTest("'no-incompatible-property-type' is emitted for string types with non-String configuration", t => {
 	const { diagnostics } = getDiagnostics(
 		`

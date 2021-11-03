@@ -17,6 +17,11 @@ const rule: RuleModule = {
 
 		if ((member.meta.node?.type ?? member.node)?.getSourceFile() !== context.file) return;
 
+		// In case of @property(someVariable) we can't check
+		if (member.meta?.node?.decorator?.arguments?.[0]?.constructor?.name === "IdentifierObject") {
+			return;
+		}
+
 		// Grab the type and fallback to "any"
 		const type = member.type?.() || { kind: "ANY" };
 
@@ -127,7 +132,7 @@ function validateLitPropertyConfig(
 	}
 
 	// Don't continue if we don't know the property type (eg if we are in a js file)
-	// Don't continue if this property has a custom converter (because then we don't know how the value will be converted)
+	// Don't continue if this proper
 	if (simplePropType == null || litConfig.hasConverter || typeof litConfig.type === "string") {
 		return;
 	}
