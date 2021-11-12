@@ -49,7 +49,7 @@
 		"mocha": "^9.1.4",
 		"rimraf": "^3.0.2",
 		"vsce": "^1.103.1",
-		"typescript": "^4.4.4"
+		"typescript": "~4.4.3"
 	},
 	"activationEvents": [
 		"onCommand:lit-plugin.analyze",
