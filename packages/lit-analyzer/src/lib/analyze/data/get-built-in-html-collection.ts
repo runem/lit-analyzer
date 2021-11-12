@@ -10,7 +10,7 @@ export function getBuiltInHtmlCollection(): HtmlDataCollection {
 	const vscodeHtmlData = htmlDataJson as HTMLDataV1;
 
 	const version = vscodeHtmlData.version;
-	const globalAttributes = [...vscodeHtmlData.globalAttributes];
+	const globalAttributes = [...(vscodeHtmlData.globalAttributes ?? [])];
 
 	// Modify valueSets
 	const valueSets = (vscodeHtmlData.valueSets || []).map(valueSet => {

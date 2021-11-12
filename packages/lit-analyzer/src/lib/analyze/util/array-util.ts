@@ -11,7 +11,11 @@ export function arrayFlat<T>(items: (T[] | T)[]): T[] {
 
 	const flattenArray: T[] = [];
 	for (const item of items) {
-		flattenArray.push(...item);
+		if (Array.isArray(item)) {
+			flattenArray.push(...item);
+		} else {
+			flattenArray.push(item);
+		}
 	}
 	return flattenArray;
 }
