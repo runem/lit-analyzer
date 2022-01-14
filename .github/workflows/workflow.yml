@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
-        node: [12, 14]
+        node: [12, 14, 16]
 
     steps:
       - name: Checkout code
@@ -36,7 +36,6 @@ jobs:
         run: npm run lint
 
       - name: Prettier
-        if: matrix.os == 'ubuntu-latest'
         run: npm run prettier:check
 
       - name: Test
@@ -48,7 +47,7 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@master
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest' && matrix.node == 16
         with:
           name: vscode-lit-plugin
-          path: vscode-lit-plugin
+          path: vscode-lit-plugin # is this right? the actual path is packages/vscode-lit-plugin
