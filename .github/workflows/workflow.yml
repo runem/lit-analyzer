@@ -36,6 +36,7 @@ jobs:
         run: npm run lint
 
       - name: Prettier
+        if: matrix.os == 'ubuntu-latest' # this fails on windows. newlines?
         run: npm run prettier:check
 
       - name: Test
