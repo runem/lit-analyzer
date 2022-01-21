@@ -1,6 +1,7 @@
 /.vsCode
 .idea
 node_modules
+.vscode-test/
 *.txt
 *.tgz
 *.log
