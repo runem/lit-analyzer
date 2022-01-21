@@ -2,7 +2,7 @@ name: VSCode Integration Test
 on: [push]
 
 jobs:
-  build:
+  test:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
@@ -15,8 +15,9 @@ jobs:
         with:
           node-version: 16.x
       - run: npm ci
-      - run: cd packages/vscode-lit-plugin
       - run: xvfb-run -a npm test
+        working-directory: packages/vscode-lit-plugin
         if: runner.os == 'Linux'
       - run: npm test
+        working-directory: packages/vscode-lit-plugin
         if: runner.os != 'Linux'
