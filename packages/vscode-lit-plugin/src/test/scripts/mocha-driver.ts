@@ -3,7 +3,7 @@ import Mocha from "mocha";
 import glob from "glob";
 
 /**
- * Finds all test files and runs them.
+ * Runs all tests in src/test that are named like *-test.ts with Mocha.
  *
  * Called by @vscode/test-electron's runTests function in ./test-runner
  *
@@ -16,7 +16,7 @@ export async function run(): Promise<void> {
 	});
 
 	const testsRoot = path.join(__dirname, "..");
-	const files = glob.sync("**/**-test.js", { cwd: testsRoot });
+	const files = glob.sync("**/*-test.js", { cwd: testsRoot });
 	for (const file of files) {
 		mocha.addFile(path.resolve(testsRoot, file));
 	}
