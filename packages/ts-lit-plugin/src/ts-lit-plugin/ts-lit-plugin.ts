@@ -54,7 +54,7 @@ export class TsLitPlugin {
 		const result = this.litAnalyzer.getCompletionDetailsAtPosition(file, position, name);
 		return (
 			(result && translateCompletionDetails(result, this.context)) ||
-			this.prevLangService.getCompletionEntryDetails(fileName, position, name, formatOptions, source, preferences)
+			this.prevLangService.getCompletionEntryDetails(fileName, position, name, formatOptions, source, preferences, undefined)
 		);
 	}
 

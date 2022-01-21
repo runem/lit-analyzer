@@ -4,16 +4,7 @@
  * @param items
  */
 export function arrayFlat<T>(items: (T[] | T)[]): T[] {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	if ("flat" in (items as any)) {
-		return items.flat() as T[];
-	}
-
-	const flattenArray: T[] = [];
-	for (const item of items) {
-		flattenArray.push(...item);
-	}
-	return flattenArray;
+	return items.flat() as T[];
 }
 
 /**
