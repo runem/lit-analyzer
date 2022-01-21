@@ -1,0 +1,23 @@
+name: VSCode Integration Test
+on: [push]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - run: xvfb-run -a npm test
+        working-directory: packages/vscode-lit-plugin
+        if: runner.os == 'Linux'
+      - run: npm test
+        working-directory: packages/vscode-lit-plugin
+        if: runner.os != 'Linux'
