@@ -16,6 +16,9 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest]
         node: [12, 14, 16]
+        exclude:
+          - os: windows-latest
+            node_version: "14"
 
     steps:
       - name: Checkout code
