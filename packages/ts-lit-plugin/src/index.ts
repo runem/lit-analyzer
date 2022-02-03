@@ -43,6 +43,7 @@ function init({ typescript }: { typescript: typeof ts }): tsServer.server.Plugin
 			if ((info.languageService as any)[tsHtmlPluginSymbol] != null) {
 				return info.languageService;
 			}
+			logger.setTsServerLogging(info.project.projectService.logger);
 
 			// Save the current working directory
 			info.config.cwd = info.config.cwd || info.project.getCurrentDirectory();
