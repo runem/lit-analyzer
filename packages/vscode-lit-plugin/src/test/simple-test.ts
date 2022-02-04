@@ -45,4 +45,51 @@ suite("Extension Test Suite", () => {
 			["'my-element' has not been registered on HTMLElementTagNameMap"]
 		);
 	});
+
+	test("We generate completions", async () => {
+		const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(path.join(__dirname, "../../src/test/fixtures/completions.ts")));
+		const editor = await vscode.window.showTextDocument(doc);
+
+		const tagCompletionPosition = new vscode.Position(27, 8);
+		const propertyCompletionPosition = new vscode.Position(25, 6);
+
+		editor.selection = new vscode.Selection(tagCompletionPosition, tagCompletionPosition);
+
+		async function getCompletions(expected: string) {
+			for (let i = 0; i < 100; i++) {
+				const completions = await vscode.commands.executeCommand<vscode.CompletionList>(
+					"vscode.executeCompletionItemProvider",
+					doc.uri,
+					editor.selection.active
+				);
+				if (completions && completions.items.length > 0) {
+					for (const completion of completions.items) {
+						if (completion.label === expected) {
+							return completions.items;
+						}
+					}
+				}
+				// Is there a better way to wait for the ts server to be ready?
+				// Maybe we can listen for the event that displays and hides the "initializing TS/JS language features" message?
+				await new Promise(resolve => setTimeout(resolve, 100));
+			}
+			throw new Error("No completions found");
+		}
+
+		const elemCompletions = await getCompletions("complete-me");
+		const elemLabels = elemCompletions.map(c => c.label);
+		assert.ok(elemLabels.includes("complete-me"), `Expected to find completion 'complete-me' in completions: ${JSON.stringify(elemLabels)}`);
+
+		editor.selection = new vscode.Selection(propertyCompletionPosition, propertyCompletionPosition);
+		// type a '.' character
+		await editor.edit(editBuilder => {
+			editBuilder.insert(editor.selection.active, ".");
+		});
+
+		const propCompletions = await getCompletions(".prop1");
+		const propLabels = propCompletions.map(c => c.label);
+		assert.ok(propLabels.includes(".prop1"), `Expected to find completion '.prop1' in completions: ${JSON.stringify(propLabels)}`);
+		assert.ok(propLabels.includes(".prop2"), `Expected to find completion '.prop2' in completions: ${JSON.stringify(propLabels)}`);
+		assert.ok(propLabels.includes(".prop3"), `Expected to find completion '.prop3' in completions: ${JSON.stringify(propLabels)}`);
+	});
 });
