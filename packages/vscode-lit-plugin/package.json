@@ -38,6 +38,7 @@
 		"ts-lit-plugin": "1.2.1",
 		"vscode-lit-html": "mjbvz/vscode-lit-html#1.11.1",
 		"vscode-styled-components": "styled-components/vscode-styled-components#v1.7.2",
+		"vscode-web-custom-data": "^0.3.6",
 		"web-component-analyzer": "~1.1.1"
 	},
 	"devDependencies": {
@@ -47,7 +48,7 @@
 		"mocha": "^9.1.4",
 		"rimraf": "^3.0.2",
 		"typescript": "^3.7.5",
-		"vsce": "^1.58.0"
+		"vsce": "^2.6.7"
 	},
 	"activationEvents": [
 		"onCommand:lit-plugin.analyze",
