@@ -14,7 +14,7 @@ async function main() {
 		if (process.argv.length === 3) {
 			extensionDevelopmentPath = path.resolve(process.argv[2]);
 		} else {
-			extensionDevelopmentPath = path.join(__dirname, "../../");
+			extensionDevelopmentPath = path.join(__dirname, "../../../");
 		}
 		const extensionTestsPath = path.resolve(__dirname, "./mocha-driver");
 
