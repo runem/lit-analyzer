@@ -50,7 +50,10 @@ suite("Extension Test Suite", () => {
 		const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(path.join(__dirname, "../../src/test/fixtures/completions.ts")));
 		const editor = await vscode.window.showTextDocument(doc);
 
-		editor.selection = new vscode.Selection(new vscode.Position(24, 8), new vscode.Position(24, 8));
+		const tagCompletionPosition = new vscode.Position(27, 8);
+		const propertyCompletionPosition = new vscode.Position(25, 6);
+
+		editor.selection = new vscode.Selection(tagCompletionPosition, tagCompletionPosition);
 
 		async function getCompletions(expected: string) {
 			for (let i = 0; i < 100; i++) {
@@ -77,7 +80,7 @@ suite("Extension Test Suite", () => {
 		const elemLabels = elemCompletions.map(c => c.label);
 		assert.ok(elemLabels.includes("complete-me"), `Expected to find completion 'complete-me' in completions: ${JSON.stringify(elemLabels)}`);
 
-		editor.selection = new vscode.Selection(new vscode.Position(22, 6), new vscode.Position(22, 6));
+		editor.selection = new vscode.Selection(propertyCompletionPosition, propertyCompletionPosition);
 		// type a '.' character
 		await editor.edit(editBuilder => {
 			editBuilder.insert(editor.selection.active, ".");

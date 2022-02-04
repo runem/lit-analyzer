@@ -18,6 +18,9 @@ declare global {
 	}
 }
 
+// These lines are used as a basis for testing completions, with hardcoded
+// line and character offsets in the test file. So if you change this file,
+// you'll likely need to update those offsets in ../simple-test.ts
 html`
 	<complete-me
 	  
