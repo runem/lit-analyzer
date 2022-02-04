@@ -10,8 +10,12 @@ import { runTests } from "@vscode/test-electron";
 async function main() {
 	try {
 		// Passed to `--extensionDevelopmentPath`
-		const extensionDevelopmentPath = path.resolve(__dirname, "..", "..", "..");
-		// The path to the extension test runner script
+		let extensionDevelopmentPath;
+		if (process.argv.length === 3) {
+			extensionDevelopmentPath = path.resolve(process.argv[2]);
+		} else {
+			extensionDevelopmentPath = path.join(__dirname, "../../");
+		}
 		const extensionTestsPath = path.resolve(__dirname, "./mocha-driver");
 
 		const fixturesDir = path.join(__dirname, "..", "..", "..", "src", "test", "fixtures");

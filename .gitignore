@@ -15,3 +15,5 @@ out
 /packages/*/scripts
 /packages/*/test
 /packages/*/index.*
+
+/packaged-extension/
