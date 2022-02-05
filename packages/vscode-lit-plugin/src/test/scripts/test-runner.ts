@@ -12,8 +12,10 @@ async function main() {
 		// Passed to `--extensionDevelopmentPath`
 		let extensionDevelopmentPath;
 		if (process.argv.length === 3) {
+			// When testing the packaged-and-then-unzipped extension, we'll be handed the path to it.
 			extensionDevelopmentPath = path.resolve(process.argv[2]);
 		} else {
+			// Otherwise just use the root dir of the vscode-lit-plugin package.
 			extensionDevelopmentPath = path.join(__dirname, "../../../");
 		}
 		const extensionTestsPath = path.resolve(__dirname, "./mocha-driver");
