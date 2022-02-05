@@ -39,6 +39,7 @@
 		"ts-lit-plugin": "1.2.1",
 		"vscode-lit-html": "mjbvz/vscode-lit-html#1.11.1",
 		"vscode-styled-components": "styled-components/vscode-styled-components#v1.7.2",
+		"vscode-web-custom-data": "^0.3.6",
 		"web-component-analyzer": "~1.1.1"
 	},
 	"devDependencies": {
