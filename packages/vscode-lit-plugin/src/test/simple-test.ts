@@ -27,7 +27,7 @@ suite("Extension Test Suite", () => {
 
 		// wait until the TS language server is ready and diagnostics are produced
 		async function getDiagnostics() {
-			for (let i = 0; i < 100; i++) {
+			for (let i = 0; i < 1000; i++) {
 				const diagnostics = vscode.languages.getDiagnostics(doc.uri);
 				if (diagnostics.length > 0) {
 					return diagnostics;
@@ -56,7 +56,7 @@ suite("Extension Test Suite", () => {
 		editor.selection = new vscode.Selection(tagCompletionPosition, tagCompletionPosition);
 
 		async function getCompletions(expected: string) {
-			for (let i = 0; i < 100; i++) {
+			for (let i = 0; i < 1000; i++) {
 				const completions = await vscode.commands.executeCommand<vscode.CompletionList>(
 					"vscode.executeCompletionItemProvider",
 					doc.uri,

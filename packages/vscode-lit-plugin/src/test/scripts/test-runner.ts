@@ -10,8 +10,14 @@ import { runTests } from "@vscode/test-electron";
 async function main() {
 	try {
 		// Passed to `--extensionDevelopmentPath`
-		const extensionDevelopmentPath = path.resolve(__dirname, "..", "..", "..");
-		// The path to the extension test runner script
+		let extensionDevelopmentPath;
+		if (process.argv.length === 3) {
+			// When testing the packaged-and-then-unzipped extension, we'll be handed the path to it.
+			extensionDevelopmentPath = path.resolve(process.argv[2]);
+		} else {
+			// Otherwise just use the root dir of the vscode-lit-plugin package.
+			extensionDevelopmentPath = path.join(__dirname, "../../../");
+		}
 		const extensionTestsPath = path.resolve(__dirname, "./mocha-driver");
 
 		const fixturesDir = path.join(__dirname, "..", "..", "..", "src", "test", "fixtures");
