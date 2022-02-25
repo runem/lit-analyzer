@@ -31,20 +31,25 @@
 		"publish": "vsce publish",
 		"package": "vsce package",
 		"install:safe": "npm install --ignore-scripts --no-package-lock && npm i --no-package-lock",
-		"readme": "readme generate -i readme.blueprint.md -c readme.config.json"
+		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
+		"test": "npm run compile && node ./out/test/scripts/test-runner.js",
+		"test-packaged": "vsce package -o ./out/packaged.vsix && rm -rf ../../../packaged-extension/ && mkdir ../../../packaged-extension/ && unzip -qq ./out/packaged.vsix -d ../../../packaged-extension/ && node ./out/test/scripts/test-runner.js ../../../packaged-extension/extension/"
 	},
 	"dependencies": {
-		"lit-html": "https://github.com/mjbvz/vscode-lit-html.git#1.11.1",
 		"ts-lit-plugin": "1.2.1",
-		"vscode-styled-components": "https://github.com/styled-components/vscode-styled-components#v1.4.0",
+		"vscode-lit-html": "mjbvz/vscode-lit-html#1.11.1",
+		"vscode-styled-components": "styled-components/vscode-styled-components#v1.7.2",
+		"vscode-web-custom-data": "^0.3.6",
 		"web-component-analyzer": "~1.1.1"
 	},
 	"devDependencies": {
+		"@types/mocha": "^9.1.0",
 		"@types/node": "^14.0.13",
 		"@types/vscode": "^1.30.0",
+		"mocha": "^9.1.4",
 		"rimraf": "^3.0.2",
 		"typescript": "^3.7.5",
-		"vsce": "^1.58.0"
+		"vsce": "^1.103.1"
 	},
 	"activationEvents": [
 		"onCommand:lit-plugin.analyze",
@@ -645,7 +650,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html",
-				"path": "./node_modules/lit-html/syntaxes/lit-html.json",
+				"path": "./node_modules/vscode-lit-html/syntaxes/lit-html.json",
 				"embeddedLanguages": {
 					"meta.embedded.block.html": "html",
 					"meta.embedded.block.css": "css",
@@ -662,7 +667,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html.string.injection",
-				"path": "./node_modules/lit-html/syntaxes/lit-html-string-injection.json",
+				"path": "./node_modules/vscode-lit-html/syntaxes/lit-html-string-injection.json",
 				"embeddedLanguages": {
 					"meta.template.expression.ts": "typescript"
 				}
@@ -677,7 +682,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html.style.injection",
-				"path": "./node_modules/lit-html/syntaxes/lit-html-style-injection.json",
+				"path": "./node_modules/vscode-lit-html/syntaxes/lit-html-style-injection.json",
 				"embeddedLanguages": {
 					"meta.template.expression.ts": "typescript"
 				}
@@ -692,7 +697,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html-svg",
-				"path": "./node_modules/lit-html/syntaxes/lit-html-svg.json",
+				"path": "./node_modules/vscode-lit-html/syntaxes/lit-html-svg.json",
 				"embeddedLanguages": {
 					"meta.embedded.block.svg": "xml"
 				}

@@ -2,13 +2,13 @@
 import { LitAnalyzerConfig, LitAnalyzerLoggerLevel, makeConfig, VERSION } from "lit-analyzer";
 import * as ts from "typescript";
 import { CompilerOptions } from "typescript";
-import * as tsServer from "typescript/lib/tsserverlibrary";
+import * as tsServer from "typescript/lib/tsserverlibrary.js";
 import { VERSION as WCA_VERSION } from "web-component-analyzer";
-import { decorateLanguageService } from "./decorate-language-service";
-import { logger } from "./logger";
-import { LitPluginContext } from "./ts-lit-plugin/lit-plugin-context";
-import { TsLitPlugin } from "./ts-lit-plugin/ts-lit-plugin";
-import { setTypescriptModule } from "./ts-module";
+import { decorateLanguageService } from "./decorate-language-service.js";
+import { logger } from "./logger.js";
+import { LitPluginContext } from "./ts-lit-plugin/lit-plugin-context.js";
+import { TsLitPlugin } from "./ts-lit-plugin/ts-lit-plugin.js";
+import { setTypescriptModule } from "./ts-module.js";
 
 const tsHtmlPluginSymbol = Symbol.for("__tsHtmlPlugin__");
 
@@ -43,6 +43,7 @@ function init({ typescript }: { typescript: typeof ts }): tsServer.server.Plugin
 			if ((info.languageService as any)[tsHtmlPluginSymbol] != null) {
 				return info.languageService;
 			}
+			logger.setTsServerLogging(info.project.projectService.logger);
 
 			// Save the current working directory
 			info.config.cwd = info.config.cwd || info.project.getCurrentDirectory();

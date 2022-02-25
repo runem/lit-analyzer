@@ -1,4 +1,4 @@
-name: Main Workflow
+name: Test
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - master
 
 jobs:
-  run:
+  test:
     name: Run
 
     runs-on: ${{ matrix.os }}
@@ -15,16 +15,24 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
-        node: [10, 12]
+        node: [12, 14, 16]
+        exclude:
+          - os: windows-latest
+            node: "14"
+          - os: windows-latest
+            node: "12"
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: Setup Node
-        uses: actions/setup-node@master
+        uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
+
+      - name: Install latest npm
+        run: npm i -g npm
 
       - name: Install
         run: npm ci
@@ -33,19 +41,19 @@ jobs:
         run: npm run lint
 
       - name: Prettier
-        if: matrix.os == 'ubuntu-latest' && matrix.node == 12
+        if: matrix.os == 'ubuntu-latest' # this fails on windows. newlines?
         run: npm run prettier:check
 
       - name: Test
         run: npm run test:all
 
       - name: Package vscode plugin
-        if: matrix.os == 'ubuntu-latest' && matrix.node == 12
-        run: npx lerna run package --scope lit-plugin && mkdir vscode-lit-plugin && mv packages/vscode-lit-plugin/lit-plugin-*.vsix vscode-lit-plugin
+        if: matrix.os == 'ubuntu-latest'
+        run: npx lerna run install:safe --scope lit-plugin && npx lerna run package --scope lit-plugin && mkdir vscode-lit-plugin && mv packages/vscode-lit-plugin/lit-plugin-*.vsix vscode-lit-plugin
 
       - name: Upload artifacts
         uses: actions/upload-artifact@master
-        if: matrix.os == 'ubuntu-latest' && matrix.node == 12
+        if: matrix.os == 'ubuntu-latest' && matrix.node == 16
         with:
           name: vscode-lit-plugin
-          path: vscode-lit-plugin
+          path: vscode-lit-plugin # is this right? the actual path is packages/vscode-lit-plugin

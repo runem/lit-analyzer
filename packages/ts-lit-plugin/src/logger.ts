@@ -3,6 +3,7 @@ import { appendFileSync, writeFileSync } from "fs";
 import { DefaultLitAnalyzerLogger, LitAnalyzerLoggerLevel } from "lit-analyzer";
 import { join } from "path";
 import { inspect } from "util";
+import * as tsServer from "typescript/lib/tsserverlibrary.js";
 
 const LOG_FILE_NAME = "lit-plugin.log";
 
@@ -12,6 +13,17 @@ const LOG_FILE_NAME = "lit-plugin.log";
  */
 export class Logger extends DefaultLitAnalyzerLogger {
 	level = LitAnalyzerLoggerLevel.OFF;
+
+	private tsLogger: tsServer.server.Logger | undefined = undefined;
+
+	/**
+	 * Call this with the TS Server's logger so that we can log to the TS server logs.
+	 *
+	 * Access in VS Code via > TypeScript: Open TS Server log
+	 */
+	setTsServerLogging(tsLogger: tsServer.server.Logger | undefined): void {
+		this.tsLogger = tsLogger;
+	}
 
 	/**
 	 * Logs if this.level >= DEBUG
@@ -68,25 +80,19 @@ export class Logger extends DefaultLitAnalyzerLogger {
 	private appendLogWithLevel(level: LitAnalyzerLoggerLevel, ...args: any[]) {
 		if (this.level >= level) {
 			const prefix = this.getLogLevelPrefix(level);
-			this.appendLog(prefix, ...args);
-		}
-	}
-
-	/**
-	 * Appends a log entry to the log file.
-	 * @param prefix
-	 * @param args
-	 */
-	private appendLog(prefix: string, ...args: any[]) {
-		appendFileSync(
-			this.logPath,
-			`${prefix}${inspect(args, {
+			const message = inspect(args, {
 				colors: true,
 				depth: 6,
 				breakLength: 50,
 				maxArrayLength: 10
-			})}\n`
-		);
+			});
+			try {
+				appendFileSync(this.logPath, `${prefix}${message}\n`);
+			} catch {
+				// ignore
+			}
+			this.tsLogger?.msg(`[ts-lit-plugin] ${message}`, level === LitAnalyzerLoggerLevel.ERROR ? tsServer.server.Msg.Err : tsServer.server.Msg.Info);
+		}
 	}
 
 	private getLogLevelPrefix(level: LitAnalyzerLoggerLevel) {

@@ -35,6 +35,12 @@ async function copyPackage(linkPackageName, destPackageName) {
 	// eslint-disable-next-line no-console
 	console.log(`Copying ${linkPackageName} to ${destPackageName}/node_modules`);
 	await copy(`./packages/${linkPackageName}/lib`, `./packages/${destPackageName}/node_modules/${linkPackageName}/lib`);
+	await copy(`./packages/${linkPackageName}/index.js`, `./packages/${destPackageName}/node_modules/${linkPackageName}/index.js`, err => {
+		// the source might not exist, it's ok.
+	});
+	await copy(`./packages/${linkPackageName}/index.d.ts`, `./packages/${destPackageName}/node_modules/${linkPackageName}/index.d.ts`, err => {
+		// the source might not exist, it's ok.
+	});
 	await copy(`./packages/${linkPackageName}/package.json`, `./packages/${destPackageName}/node_modules/${linkPackageName}/package.json`);
 
 	// Get rid of any "extraneous" according to "npm list --production --parseable --depth=99999" in nested node_modules

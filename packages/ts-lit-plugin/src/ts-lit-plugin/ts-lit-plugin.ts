@@ -21,17 +21,17 @@ import {
 	TextChange,
 	UserPreferences
 } from "typescript";
-import { LitPluginContext } from "./lit-plugin-context";
-import { translateCodeFixes } from "./translate/translate-code-fixes";
-import { translateCompletionDetails } from "./translate/translate-completion-details";
-import { translateCompletions } from "./translate/translate-completions";
-import { translateDefinition } from "./translate/translate-definition";
-import { translateDiagnostics } from "./translate/translate-diagnostics";
-import { translateFormatEdits } from "./translate/translate-format-edits";
-import { translateOutliningSpans } from "./translate/translate-outlining-spans";
-import { translateQuickInfo } from "./translate/translate-quick-info";
-import { translateRenameInfo } from "./translate/translate-rename-info";
-import { translateRenameLocations } from "./translate/translate-rename-locations";
+import { LitPluginContext } from "./lit-plugin-context.js";
+import { translateCodeFixes } from "./translate/translate-code-fixes.js";
+import { translateCompletionDetails } from "./translate/translate-completion-details.js";
+import { translateCompletions } from "./translate/translate-completions.js";
+import { translateDefinition } from "./translate/translate-definition.js";
+import { translateDiagnostics } from "./translate/translate-diagnostics.js";
+import { translateFormatEdits } from "./translate/translate-format-edits.js";
+import { translateOutliningSpans } from "./translate/translate-outlining-spans.js";
+import { translateQuickInfo } from "./translate/translate-quick-info.js";
+import { translateRenameInfo } from "./translate/translate-rename-info.js";
+import { translateRenameLocations } from "./translate/translate-rename-locations.js";
 
 export class TsLitPlugin {
 	private litAnalyzer = new LitAnalyzer(this.context);
