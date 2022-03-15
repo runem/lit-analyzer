@@ -63,8 +63,14 @@ function wrapTryCatch<T extends Function>(newMethod: T, oldMethod: T | undefined
 		try {
 			return newMethod(...args);
 		} catch (e) {
-			const err = e as Error;
-			logger.error(`Error [${methodName}]: (${err.stack}) ${err.message}`, err);
+			let details: string;
+
+			if (e instanceof Error) {
+				details = `${e.message}\n${e.stack}`;
+			} else {
+				details = String(e);
+			}
+			logger.error(`Error [${methodName}]: ${details}`, e);
 
 			// Always return the old method if anything fails
 			// Don't crash everything :-)
