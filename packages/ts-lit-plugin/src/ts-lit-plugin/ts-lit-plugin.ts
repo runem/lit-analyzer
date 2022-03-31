@@ -5,21 +5,15 @@ import {
 	CompletionInfo,
 	DefinitionInfoAndBoundSpan,
 	Diagnostic,
-	FormatCodeOptions,
-	FormatCodeSettings,
-	GetCompletionsAtPositionOptions,
 	JsxClosingTagInfo,
 	LanguageService,
 	OutliningSpan,
 	Program,
 	QuickInfo,
 	RenameInfo,
-	RenameInfoOptions,
 	RenameLocation,
 	SignatureHelpItems,
-	SignatureHelpItemsOptions,
-	TextChange,
-	UserPreferences
+	TextChange
 } from "typescript";
 import { LitPluginContext } from "./lit-plugin-context.js";
 import { translateCodeFixes } from "./translate/translate-code-fixes.js";
