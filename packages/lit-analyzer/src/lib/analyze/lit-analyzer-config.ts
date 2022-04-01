@@ -215,7 +215,7 @@ function getDefaultRules(userOptions: Partial<LitAnalyzerConfig>): LitAnalyzerRu
 		const severities = DEFAULT_RULES_SEVERITY[ruleId];
 		acc[ruleId] = isStrict ? severities[1] : severities[0];
 		return acc;
-	}, ({} as unknown) as LitAnalyzerRules);
+	}, {} as unknown as LitAnalyzerRules);
 }
 
 function getDeprecatedMappedRules(userOptions: Partial<LitAnalyzerConfig>): LitAnalyzerRules {

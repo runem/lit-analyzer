@@ -116,7 +116,7 @@ export function isAssignableToTypeWithStringCoercion(
 
 			// Test if a potential string literal is a assignable to a number
 			// Example: max="123"
-			if (!isNaN((typeB.value as unknown) as number)) {
+			if (!isNaN(typeB.value as unknown as number)) {
 				if (
 					_isAssignableToType(
 						typeA,

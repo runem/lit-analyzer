@@ -12,7 +12,7 @@ function translateOutliningSpan(outliningSpan: LitOutliningSpan): ts.OutliningSp
 		autoCollapse: outliningSpan.autoCollapse || false,
 		textSpan: span,
 		hintSpan: span,
-		kind: (outliningSpan.kind as unknown) as ts.OutliningSpanKind,
+		kind: outliningSpan.kind as unknown as ts.OutliningSpanKind,
 		bannerText: outliningSpan.bannerText
 	};
 }
