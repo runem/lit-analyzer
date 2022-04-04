@@ -145,7 +145,6 @@ export class TsLitPlugin {
 	getFormattingEditsForRange(...args: Parameters<LanguageService["getFormattingEditsForRange"]>): TextChange[] {
 		const [fileName, , , settings] = args;
 		const prev = this.prevLangService.getFormattingEditsForRange(...args);
-
 		// Return previous result if we need to skip formatting.
 		if (this.context.config.format.disable) {
 			return prev;

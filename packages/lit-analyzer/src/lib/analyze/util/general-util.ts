@@ -23,9 +23,9 @@ export function lazy<T extends Function>(func: T): T {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let value: any;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	return (((...args: any[]) => {
+	return ((...args: any[]) => {
 		if (called) return value;
 		called = true;
 		return (value = func(...args));
-	}) as unknown) as T;
+	}) as unknown as T;
 }

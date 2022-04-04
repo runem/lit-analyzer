@@ -58,9 +58,10 @@ function toLitPropertyTypeString(simpleTypeKind: SimpleTypeKind): string {
  * This tester function uses a cache for performance.
  * @param simpleType
  */
-function prepareSimpleAssignabilityTester(
-	simpleType: SimpleType
-): { isAssignableTo: (kind: SimpleTypeKind) => boolean; acceptedTypeKinds: () => SimpleTypeKind[] } {
+function prepareSimpleAssignabilityTester(simpleType: SimpleType): {
+	isAssignableTo: (kind: SimpleTypeKind) => boolean;
+	acceptedTypeKinds: () => SimpleTypeKind[];
+} {
 	// Test assignments to all possible type kinds
 	const _isAssignableToCache = new Map<SimpleTypeKind, boolean>();
 	function isAssignableTo(simpleTypeKind: SimpleTypeKind): boolean {

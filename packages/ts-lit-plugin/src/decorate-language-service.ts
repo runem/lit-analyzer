@@ -59,17 +59,24 @@ export function decorateLanguageService(languageService: LanguageService, plugin
  * @param methodName
  */
 function wrapTryCatch<T extends Function>(newMethod: T, oldMethod: T | undefined, methodName: string): T {
-	return (((...args: unknown[]) => {
+	return ((...args: unknown[]) => {
 		try {
 			return newMethod(...args);
 		} catch (e) {
-			logger.error(`Error [${methodName}]: (${e.stack}) ${e.message}`, e);
+			let details: string;
+
+			if (e instanceof Error) {
+				details = `${e.message}\n${e.stack}`;
+			} else {
+				details = String(e);
+			}
+			logger.error(`Error [${methodName}]: ${details}`, e);
 
 			// Always return the old method if anything fails
 			// Don't crash everything :-)
 			return oldMethod?.(...args);
 		}
-	}) as unknown) as T;
+	}) as unknown as T;
 }
 
 /**
@@ -79,7 +86,7 @@ function wrapTryCatch<T extends Function>(newMethod: T, oldMethod: T | undefined
  * @param plugin
  */
 function wrapLog<T extends Function>(name: string, proxy: T, plugin: TsLitPlugin): T {
-	return (((...args: unknown[]) => {
+	return ((...args: unknown[]) => {
 		if (plugin.context.config.logging === "verbose") {
 			/**/
 			const startTime = Date.now();
@@ -97,5 +104,5 @@ function wrapLog<T extends Function>(name: string, proxy: T, plugin: TsLitPlugin
 		} else {
 			return proxy(...args);
 		}
-	}) as unknown) as T;
+	}) as unknown as T;
 }

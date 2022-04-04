@@ -60,6 +60,6 @@ export function getSourceLocation(node: P5Node): IP5BaseSourceCodeLocation | nul
 		sourceCodeLocation: IP5BaseSourceCodeLocation | null;
 		__location: IP5BaseSourceCodeLocation | null;
 	}
-	const nodeWithLocation = (node as unknown) as NodeWithSourceLocations;
+	const nodeWithLocation = node as unknown as NodeWithSourceLocations;
 	return nodeWithLocation.sourceCodeLocation || nodeWithLocation.__location;
 }
