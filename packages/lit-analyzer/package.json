@@ -48,7 +48,8 @@
 				"index.js",
 				"index.d.ts",
 				"index.d.ts.map"
-			]
+			],
+			"clean": false
 		},
 		"test": {
 			"dependencies": [

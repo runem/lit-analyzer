@@ -45,7 +45,7 @@
 				"../lit-analyzer:build",
 				"../../:copylink"
 			],
-			"command": "tsc --build",
+			"command": "tsc --version && tsc --build",
 			"files": [
 				"src/**/*",
 				"tsconfig.json"
@@ -54,7 +54,8 @@
 				"out/**/*.js",
 				"out/**/*.d.ts",
 				"out/**/*.d.ts.map"
-			]
+			],
+			"clean": false
 		},
 		"test": {
 			"dependencies": [
