@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 <!-- ### Removed -->
 <!-- ### Fixed -->
 
+## Unreleased
+
+### Breaking
+
+- Dropped support for older versions of NodeJS. Minimum version is Node 16.
+
 ## [1.2.1] - 25/7/2020
 
 ### Fixed
