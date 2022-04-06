@@ -36,7 +36,7 @@ jobs:
         run: npm ci
 
       - name: test
-        run: npm test
+        run: npm run test:headless
 
       - name: Package vscode plugin
         if: matrix.os == 'ubuntu-latest'

@@ -37,6 +37,7 @@
 		"build": "wireit",
 		"watch": "lerna run watch --parallel --stream",
 		"test": "wireit",
+		"test:headless": "wireit",
 		"test:watch": "lerna run test:watch --parallel --stream",
 		"readme": "lerna run readme && readme generate -i readme.blueprint.md -c readme.config.json",
 		"dev": "cd dev && TSS_DEBUG=5999 code . --disable-extension runem.lit-plugin",
@@ -55,8 +56,13 @@
 		},
 		"test": {
 			"dependencies": [
+				"test:headless",
+				"./packages/vscode-lit-plugin:test"
+			]
+		},
+		"test:headless": {
+			"dependencies": [
 				"./packages/lit-analyzer:test",
-				"./packages/vscode-lit-plugin:test",
 				"lint",
 				"prettier:check"
 			]
