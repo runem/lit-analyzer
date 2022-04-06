@@ -32,7 +32,7 @@
 		"postpublish": "lerna run install:safe --scope lit-plugin && echo \"🎉 Published successfully! You can now publish the vscode extension seperately by running 'cd packages/vscode-lit-plugin && npm run publish'\"",
 		"publish": "lerna run prepare && lerna publish --exact && npm run postpublish",
 		"publish:next": "lerna run prepare && echo \"When asked, please choose 'Custom Prerelease' and use default value\" && lerna publish --dist-tag next --preid next --exact && npm run postpublish",
-		"bootstrap": "lerna clean --yes && lerna bootstrap --hoist --ignore lit-plugin && lerna run install:safe --scope lit-plugin && npm run copylink",
+		"bootstrap": "lerna clean --yes && lerna bootstrap && lerna run install:safe --scope lit-plugin && npm run copylink",
 		"lint": "wireit",
 		"build": "wireit",
 		"watch": "lerna run watch --parallel --stream",
@@ -66,14 +66,6 @@
 				"./packages/lit-analyzer:build",
 				"./packages/ts-lit-plugin:build"
 			],
-			"files": [
-				"packages/lit-analyzer",
-				"!packages/lit-analyzer/node_modules",
-				"!packages/lit-analyzer/.wireit",
-				"packages/ts-lit-plugin",
-				"!packages/ts-lit-plugin/node_modules",
-				"!packages/ts-lit-plugin/.wireit"
-			],
 			"command": "node scripts.js copylink"
 		},
 		"lint": {
@@ -98,8 +90,10 @@
 		"nodemon": "^2.0.4",
 		"prettier": "^2.4.1",
 		"typescript": "~4.4.3",
-		"wireit": "^0.0.0"
+		"wireit": "^0.0.0",
+		"ava": "^3.8.2"
 	},
+	"comment": "remove ava once https://github.com/google/wireit/issues/81 is fixed",
 	"husky": {
 		"hooks": {
 			"pre-commit": "lint-staged"

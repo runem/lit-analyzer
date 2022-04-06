@@ -10,6 +10,7 @@ dist
 out
 *.vsix
 .wireit/
+tsconfig.tsbuildinfo
 
 /packages/*/lib
 /packages/*/out

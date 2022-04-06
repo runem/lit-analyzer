@@ -36,7 +36,8 @@
 			"command": "tsc --build",
 			"files": [
 				"src/**/*",
-				"tsconfig.json"
+				"tsconfig.json",
+				"tsconfig.tsbuildinfo"
 			],
 			"output": [
 				"lib"

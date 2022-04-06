@@ -48,7 +48,8 @@
 			"command": "tsc --version && tsc --build",
 			"files": [
 				"src/**/*",
-				"tsconfig.json"
+				"tsconfig.json",
+				"tsconfig.tsbuildinfo"
 			],
 			"output": [
 				"out/**/*.js",
