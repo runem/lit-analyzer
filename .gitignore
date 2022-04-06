@@ -9,6 +9,7 @@ todo.md
 dist
 out
 *.vsix
+.wireit/
 
 /packages/*/lib
 /packages/*/out

@@ -25,15 +25,75 @@
 	"main": "./out/extension",
 	"scripts": {
 		"clean": "rimraf out",
-		"vscode:prepublish": "npm run compile",
-		"compile": "npm run clean & tsc -p ./",
+		"vscode:prepublish": "npm run build",
 		"watch": "tsc -watch -p ./",
 		"publish": "vsce publish",
 		"package": "vsce package",
 		"install:safe": "npm install --ignore-scripts --no-package-lock && npm i --no-package-lock",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
-		"test": "npm run compile && node ./out/test/scripts/test-runner.js",
+		"test": "wireit",
+		"build": "wireit",
+		"test:normal": "wireit",
+		"test:packaged": "wireit",
+		"package-for-test": "wireit",
 		"test-packaged": "vsce package -o ./out/packaged.vsix && rm -rf ../../../packaged-extension/ && mkdir ../../../packaged-extension/ && unzip -qq ./out/packaged.vsix -d ../../../packaged-extension/ && node ./out/test/scripts/test-runner.js ../../../packaged-extension/extension/"
+	},
+	"wireit": {
+		"build": {
+			"dependencies": [
+				"../ts-lit-plugin:build",
+				"../lit-analyzer:build",
+				"../../:copylink"
+			],
+			"command": "tsc --build",
+			"files": [
+				"src/**/*",
+				"tsconfig.json"
+			],
+			"output": [
+				"out/**/*.js",
+				"out/**/*.d.ts",
+				"out/**/*.d.ts.map"
+			]
+		},
+		"test": {
+			"dependencies": [
+				"test:normal"
+			],
+			"comment": "This should include test:packaged once https://github.com/google/wireit/issues/81 is fixed"
+		},
+		"test:normal": {
+			"dependencies": [
+				"build"
+			],
+			"files": [
+				"package.json",
+				"schemas/**/*"
+			],
+			"output": [],
+			"command": "node ./out/test/scripts/test-runner.js"
+		},
+		"test:packaged": {
+			"dependencies": [
+				"build",
+				"package-for-test"
+			],
+			"files": [],
+			"output": [],
+			"command": "node ./out/test/scripts/test-runner.js ../../../packaged-extension/extension/"
+		},
+		"package-for-test": {
+			"dependencies": [
+				"build"
+			],
+			"files": [],
+			"output": [
+				"./out/packaged.vsix",
+				"../../../packaged-extension"
+			],
+			"command": "vsce package -o ./out/packaged.vsix && rm -rf ../../../packaged-extension/ && mkdir ../../../packaged-extension/ && unzip -qq ./out/packaged.vsix -d ../../../packaged-extension/",
+			"clean": false
+		}
 	},
 	"dependencies": {
 		"ts-lit-plugin": "1.2.1",
@@ -48,8 +108,9 @@
 		"@types/vscode": "^1.30.0",
 		"mocha": "^9.1.4",
 		"rimraf": "^3.0.2",
+		"typescript": "~4.4.3",
 		"vsce": "^2.7.0",
-		"typescript": "~4.4.3"
+		"wireit": "^0.0.0"
 	},
 	"activationEvents": [
 		"onCommand:lit-plugin.analyze",

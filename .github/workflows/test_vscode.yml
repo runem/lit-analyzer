@@ -15,13 +15,13 @@ jobs:
         with:
           node-version: 16.x
       - run: npm ci
-      - run: xvfb-run -a npm run test-packaged
+      - run: xvfb-run -a npm run test:packaged
         working-directory: packages/vscode-lit-plugin
         if: runner.os == 'Linux'
-      - run: npm run test
+      - run: npm test
         working-directory: packages/vscode-lit-plugin
         if: runner.os == 'Windows'
-      - run: npm run test-packaged
+      - run: npm run test:packaged
         working-directory: packages/vscode-lit-plugin
         if: runner.os == 'macOS'
       - run: npm run package

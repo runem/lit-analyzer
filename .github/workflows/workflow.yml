@@ -37,15 +37,8 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Lint
-        run: npm run lint
-
-      - name: Prettier
-        if: matrix.os == 'ubuntu-latest' # this fails on windows. newlines?
-        run: npm run prettier:check
-
-      - name: Test
-        run: npm run test:all
+      - name: test
+        run: npm test
 
       - name: Package vscode plugin
         if: matrix.os == 'ubuntu-latest'

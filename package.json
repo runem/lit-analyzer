@@ -27,29 +27,67 @@
 	],
 	"scripts": {
 		"postinstall": "npm run bootstrap",
-		"prettier:check": "prettier --check \"packages/*/src/**/*.ts\"",
+		"prettier:check": "wireit",
 		"prettier:write": "prettier --write \"packages/*/src/**/*.ts\"",
 		"postpublish": "lerna run install:safe --scope lit-plugin && echo \"🎉 Published successfully! You can now publish the vscode extension seperately by running 'cd packages/vscode-lit-plugin && npm run publish'\"",
 		"publish": "lerna run prepare && lerna publish --exact && npm run postpublish",
 		"publish:next": "lerna run prepare && echo \"When asked, please choose 'Custom Prerelease' and use default value\" && lerna publish --dist-tag next --preid next --exact && npm run postpublish",
 		"bootstrap": "lerna clean --yes && lerna bootstrap --hoist --ignore lit-plugin && lerna run install:safe --scope lit-plugin && npm run copylink",
-		"lint": "eslint .",
-		"build": "lerna run build --stream",
+		"lint": "wireit",
+		"build": "wireit",
 		"watch": "lerna run watch --parallel --stream",
-		"test": "lerna run test --parallel --stream",
-		"test:all": "lerna run test:all --parallel --stream",
+		"test": "wireit",
 		"test:watch": "lerna run test:watch --parallel --stream",
 		"readme": "lerna run readme && readme generate -i readme.blueprint.md -c readme.config.json",
 		"dev": "cd dev && TSS_DEBUG=5999 code . --disable-extension runem.lit-plugin",
 		"dev:logs": "touch dev/lit-plugin.log && tail -f dev/lit-plugin.log",
-		"copylink": "node scripts.js copylink",
-		"copylink:watch": "nodemon --exec \"npm run copylink\""
+		"copylink": "wireit",
+		"copylink:watch": "nodemon --exec \"npm run copylink\"",
+		"just-package": "wireit"
+	},
+	"wireit": {
+		"build": {
+			"dependencies": [
+				"./packages/lit-analyzer:build",
+				"./packages/ts-lit-plugin:build",
+				"./packages/vscode-lit-plugin:build"
+			]
+		},
+		"test": {
+			"dependencies": [
+				"./packages/lit-analyzer:test",
+				"./packages/vscode-lit-plugin:test",
+				"lint",
+				"prettier:check"
+			]
+		},
+		"copylink": {
+			"dependencies": [
+				"./packages/lit-analyzer:build",
+				"./packages/ts-lit-plugin:build"
+			],
+			"files": [
+				"packages/lit-analyzer",
+				"!packages/lit-analyzer/node_modules",
+				"!packages/lit-analyzer/.wireit",
+				"packages/ts-lit-plugin",
+				"!packages/ts-lit-plugin/node_modules",
+				"!packages/ts-lit-plugin/.wireit"
+			],
+			"command": "node scripts.js copylink"
+		},
+		"lint": {
+			"command": "eslint ."
+		},
+		"prettier:check": {
+			"command": "prettier --check \"packages/*/src/**/*.ts\""
+		}
 	},
 	"devDependencies": {
 		"@appnest/readme": "^1.2.7",
-		"@vscode/test-electron": "^2.1.1",
 		"@typescript-eslint/eslint-plugin": "^5.0.0",
 		"@typescript-eslint/parser": "^5.0.0",
+		"@vscode/test-electron": "^2.1.1",
 		"eslint": "^8.0.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-import": "^2.25.2",
@@ -59,7 +97,8 @@
 		"lint-staged": "^10.2.10",
 		"nodemon": "^2.0.4",
 		"prettier": "^2.4.1",
-		"typescript": "~4.4.3"
+		"typescript": "~4.4.3",
+		"wireit": "^0.0.0"
 	},
 	"husky": {
 		"hooks": {
