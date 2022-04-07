@@ -40,11 +40,11 @@ jobs:
 
       - name: Package vscode plugin
         if: matrix.os == 'ubuntu-latest'
-        run: npx lerna run install:safe --scope lit-plugin && npx lerna run package --scope lit-plugin && mkdir vscode-lit-plugin && mv packages/vscode-lit-plugin/lit-plugin-*.vsix vscode-lit-plugin
+        run: npx lerna run install:safe --scope lit-plugin && npx lerna run package --scope lit-plugin && mkdir vscode-lit-plugin && mv packages/vscode-lit-plugin/out/packaged.vsix vscode-lit-plugin
 
       - name: Upload artifacts
         uses: actions/upload-artifact@master
         if: matrix.os == 'ubuntu-latest' && matrix.node == 16
         with:
-          name: vscode-lit-plugin
-          path: vscode-lit-plugin # is this right? the actual path is packages/vscode-lit-plugin
+          name: vscode-lit-plugin.vsix
+          path: vscode-lit-plugin.vsix
