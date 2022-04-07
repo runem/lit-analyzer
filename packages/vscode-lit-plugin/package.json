@@ -25,7 +25,7 @@
 	"main": "./out/extension",
 	"scripts": {
 		"clean": "rimraf out",
-		"###vscode:prepublish": "npm run build",
+		"vscode:prepublish": "npm run build",
 		"watch": "tsc -watch -p ./",
 		"publish": "vsce publish",
 		"package": "vsce package",
