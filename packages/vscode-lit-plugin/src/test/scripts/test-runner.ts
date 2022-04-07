@@ -23,8 +23,6 @@ async function main() {
 		const fixturesDir = path.join(__dirname, "..", "..", "..", "src", "test", "fixtures");
 		// Download VS Code, unzip it and run the integration test
 		await runTests({ extensionDevelopmentPath, extensionTestsPath, launchArgs: [fixturesDir] });
-		// Ensure that we exit in a timely fashion.
-		process.exit(0);
 	} catch (err) {
 		// eslint-disable-next-line no-console
 		console.error(err);
