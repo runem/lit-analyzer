@@ -27,24 +27,23 @@
 	],
 	"scripts": {
 		"postinstall": "npm run bootstrap",
-		"prettier:check": "wireit",
 		"prettier:write": "prettier --write \"packages/*/src/**/*.ts\"",
 		"postpublish": "lerna run install:safe --scope lit-plugin && echo \"🎉 Published successfully! You can now publish the vscode extension seperately by running 'cd packages/vscode-lit-plugin && npm run publish'\"",
 		"publish": "lerna run prepare && lerna publish --exact && npm run postpublish",
 		"publish:next": "lerna run prepare && echo \"When asked, please choose 'Custom Prerelease' and use default value\" && lerna publish --dist-tag next --preid next --exact && npm run postpublish",
 		"bootstrap": "lerna clean --yes && lerna bootstrap && lerna run install:safe --scope lit-plugin",
-		"lint": "wireit",
-		"build": "wireit",
-		"watch": "lerna run watch --parallel --stream",
-		"test": "wireit",
-		"test:headless": "wireit",
-		"test:headful": "wireit",
 		"test:watch": "lerna run test:watch --parallel --stream",
 		"readme": "lerna run readme && readme generate -i readme.blueprint.md -c readme.config.json",
 		"dev": "cd dev && TSS_DEBUG=5999 code . --disable-extension runem.lit-plugin",
 		"dev:logs": "touch dev/lit-plugin.log && tail -f dev/lit-plugin.log",
+		"lint": "wireit",
+		"build": "wireit",
+		"test": "wireit",
+		"test:headless": "wireit",
+		"test:headful": "wireit",
 		"copylink": "wireit",
-		"copylink:watch": "nodemon --exec \"npm run copylink\""
+		"eslint": "wireit",
+		"prettier:check": "wireit"
 	},
 	"wireit": {
 		"build": {
@@ -57,14 +56,19 @@
 		"test": {
 			"dependencies": [
 				"test:headless",
-				"test:headful"
+				"test:headful",
+				"lint"
+			]
+		},
+		"lint": {
+			"dependencies": [
+				"eslint",
+				"prettier:check"
 			]
 		},
 		"test:headless": {
 			"dependencies": [
-				"./packages/lit-analyzer:test",
-				"lint",
-				"prettier:check"
+				"./packages/lit-analyzer:test"
 			]
 		},
 		"test:headful": {
@@ -79,7 +83,7 @@
 			],
 			"command": "node scripts.js copylink"
 		},
-		"lint": {
+		"eslint": {
 			"command": "eslint ."
 		},
 		"prettier:check": {
