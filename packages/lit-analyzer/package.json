@@ -105,7 +105,7 @@
 		"typescript-3.7": "npm:typescript@~3.7.4",
 		"typescript-3.8": "npm:typescript@~3.8.3",
 		"typescript-3.9": "npm:typescript@~3.9.3",
-		"wireit": "^0.0.0"
+		"wireit": "^0.1.0"
 	},
 	"ava": {
 		"cache": true,

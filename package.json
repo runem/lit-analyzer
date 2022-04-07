@@ -38,13 +38,13 @@
 		"watch": "lerna run watch --parallel --stream",
 		"test": "wireit",
 		"test:headless": "wireit",
+		"test:headfull": "wireit",
 		"test:watch": "lerna run test:watch --parallel --stream",
 		"readme": "lerna run readme && readme generate -i readme.blueprint.md -c readme.config.json",
 		"dev": "cd dev && TSS_DEBUG=5999 code . --disable-extension runem.lit-plugin",
 		"dev:logs": "touch dev/lit-plugin.log && tail -f dev/lit-plugin.log",
 		"copylink": "wireit",
-		"copylink:watch": "nodemon --exec \"npm run copylink\"",
-		"just-package": "wireit"
+		"copylink:watch": "nodemon --exec \"npm run copylink\""
 	},
 	"wireit": {
 		"build": {
@@ -57,7 +57,7 @@
 		"test": {
 			"dependencies": [
 				"test:headless",
-				"./packages/vscode-lit-plugin:test"
+				"test:headfull"
 			]
 		},
 		"test:headless": {
@@ -65,6 +65,11 @@
 				"./packages/lit-analyzer:test",
 				"lint",
 				"prettier:check"
+			]
+		},
+		"test:headfull": {
+			"dependencies": [
+				"./packages/vscode-lit-plugin:test"
 			]
 		},
 		"copylink": {
@@ -96,8 +101,7 @@
 		"nodemon": "^2.0.4",
 		"prettier": "^2.4.1",
 		"typescript": "~4.4.3",
-		"wireit": "^0.0.0",
-		"ava": "^3.8.2"
+		"wireit": "^0.1.0"
 	},
 	"comment": "remove ava once https://github.com/google/wireit/issues/81 is fixed",
 	"husky": {

@@ -49,6 +49,23 @@ async function copyPackage(linkPackageName, destPackageName) {
 	// Get rid of any "extraneous" according to "npm list --production --parseable --depth=99999" in nested node_modules
 	// The reason this script needs to run is because vscode extension development doesn't yet support symlinked node_modules.
 	const extraneous = [
+		"ansi-regex",
+		"camelcase",
+		"cliui",
+		"decamelize",
+		"find-up",
+		"is-fullwidth-code-point",
+		"locate-path",
+		"p-limit",
+		"p-locate",
+		"string-width",
+		"strip-ansi",
+		"typescript",
+		"wrap-ansi",
+		"y18n",
+		"yargs-parser",
+		"yargs",
+		"ts-simple-type",
 		"web-component-analyzer",
 		"fast-glob",
 		"glob-parent",
