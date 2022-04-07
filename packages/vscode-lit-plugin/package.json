@@ -28,14 +28,15 @@
 		"vscode:prepublish": "npm run build",
 		"watch": "tsc -watch -p ./",
 		"publish": "vsce publish",
-		"package": "vsce package",
+		"package": "wireit",
 		"install:safe": "npm install --ignore-scripts --no-package-lock && npm i --no-package-lock",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
 		"test": "wireit",
 		"build": "wireit",
 		"test:normal": "wireit",
 		"test:packaged": "wireit",
-		"package-for-test": "wireit"
+		"create-isolated-extension-dir": "wireit",
+		"test:packaged-sequentialized": "wireit"
 	},
 	"wireit": {
 		"build": {
@@ -60,7 +61,7 @@
 		"test": {
 			"dependencies": [
 				"test:normal",
-				"test:packaged"
+				"test:packaged-sequentialized"
 			]
 		},
 		"test:normal": {
@@ -77,22 +78,47 @@
 		"test:packaged": {
 			"dependencies": [
 				"build",
-				"package-for-test"
+				"create-isolated-extension-dir"
 			],
 			"files": [],
 			"output": [],
 			"command": "node ./out/test/scripts/test-runner.js ../../../packaged-extension/extension/"
 		},
-		"package-for-test": {
+		"test:packaged-sequentialized": {
+			"#comment": "like test:packaged, only it ensures that test:normal runs first",
+			"dependencies": [
+				"test:normal",
+				"build",
+				"create-isolated-extension-dir"
+			],
+			"files": [],
+			"output": [],
+			"command": "node ./out/test/scripts/test-runner.js ../../../packaged-extension/extension/"
+		},
+		"package": {
 			"dependencies": [
 				"build"
 			],
-			"files": [],
-			"output": [
-				"./out/packaged.vsix",
-				"../../../packaged-extension"
+			"files": [
+				"package.json",
+				"schemas/**/*"
 			],
-			"command": "vsce package -o ./out/packaged.vsix && rm -rf ../../../packaged-extension/ && mkdir ../../../packaged-extension/ && unzip -qq ./out/packaged.vsix -d ../../../packaged-extension/",
+			"output": [
+				"./out/packaged.vsix"
+			],
+			"command": "vsce package -o ./out/packaged.vsix"
+		},
+		"create-isolated-extension-dir": {
+			"dependencies": [
+				"package"
+			],
+			"files": [
+				"./out/packaged.vsix"
+			],
+			"output": [
+				"../../packaged-extension/extension/**/*"
+			],
+			"command": "rm -rf ../../../packaged-extension/ && mkdir ../../../packaged-extension/ && unzip -qq ./out/packaged.vsix -d ../../../packaged-extension/",
 			"clean": false
 		}
 	},
