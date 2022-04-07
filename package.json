@@ -103,7 +103,6 @@
 		"typescript": "~4.4.3",
 		"wireit": "^0.1.0"
 	},
-	"comment": "remove ava once https://github.com/google/wireit/issues/81 is fixed",
 	"husky": {
 		"hooks": {
 			"pre-commit": "lint-staged"
