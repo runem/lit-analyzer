@@ -11,6 +11,7 @@ out
 *.vsix
 .wireit/
 .tsbuildinfo
+.rollup.cache/
 
 /packages/*/lib
 /packages/*/out

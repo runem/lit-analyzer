@@ -18,7 +18,7 @@ let context: LitPluginContext | undefined = undefined;
  * Export a function for the ts-service to initialize our plugin.
  * @param typescript
  */
-function init({ typescript }: { typescript: typeof ts }): tsServer.server.PluginModule {
+export function init({ typescript }: { typescript: typeof ts }): tsServer.server.PluginModule {
 	// Cache the typescript module
 	setTypescriptModule(typescript);
 
@@ -30,7 +30,6 @@ function init({ typescript }: { typescript: typeof ts }): tsServer.server.Plugin
 		if (logger.level >= LitAnalyzerLoggerLevel.DEBUG) {
 			logger.debug(`Lit Analyzer: ${VERSION}`);
 			logger.debug(`Web Component Analyzer: ${WCA_VERSION}`);
-			logger.debug(`Installed Typescript: ${ts.version}`);
 			logger.debug(`Running Typescript: ${typescript.version}`);
 			logger.debug(`DIRNAME: ${__dirname}`);
 			printDebugOnce = undefined;
@@ -125,5 +124,3 @@ function readLitAnalyzerConfigFromCompilerOptions(compilerOptions: CompilerOptio
 
 	return undefined;
 }
-
-export = init;
