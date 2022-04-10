@@ -11,7 +11,7 @@ const config = {
 	input: "src/index.ts",
 	external: ["typescript"],
 	output: {
-		file: "lib/bundle.js",
+		file: "lib/bundle-rollup.js",
 		format: "cjs",
 		sourcemap: true,
 		compact: true
