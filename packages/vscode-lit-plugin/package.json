@@ -44,18 +44,18 @@
 				"../lit-analyzer:build",
 				"../../:copylink"
 			],
-			"command": "tsc --version && tsc --build",
+			"command": "tsc --build --pretty",
 			"files": [
 				"src/**/*",
-				"tsconfig.json",
-				"tsconfig.tsbuildinfo"
+				"tsconfig.json"
 			],
 			"output": [
 				"out/**/*.js",
 				"out/**/*.d.ts",
-				"out/**/*.d.ts.map"
+				"out/**/*.d.ts.map",
+				".tsbuildinfo"
 			],
-			"clean": false
+			"clean": "if-file-deleted"
 		},
 		"test": {
 			"dependencies": [
@@ -138,7 +138,7 @@
 		"mocha": "^9.1.4",
 		"rimraf": "^3.0.2",
 		"vsce": "^2.7.0",
-		"wireit": "^0.1.0"
+		"wireit": "^0.1.1"
 	},
 	"activationEvents": [
 		"onCommand:lit-plugin.analyze",

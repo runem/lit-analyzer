@@ -33,16 +33,16 @@
 			"dependencies": [
 				"../lit-analyzer:build"
 			],
-			"command": "tsc --build",
+			"command": "tsc --build --pretty",
 			"files": [
 				"src/**/*",
-				"tsconfig.json",
-				"tsconfig.tsbuildinfo"
+				"tsconfig.json"
 			],
 			"output": [
-				"lib"
+				"lib",
+				"./tsbuildinfo"
 			],
-			"clean": false
+			"clean": "if-file-deleted"
 		},
 		"test": {
 			"dependencies": [
@@ -63,7 +63,7 @@
 		"@types/node": "^14.0.13",
 		"rimraf": "^3.0.2",
 		"typescript": "~4.4.3",
-		"wireit": "^0.1.0"
+		"wireit": "^0.1.1"
 	},
 	"contributors": [
 		{

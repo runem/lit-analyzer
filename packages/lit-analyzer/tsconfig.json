@@ -5,6 +5,7 @@
 	"compilerOptions": {
 		"rootDir": "./src",
 		"outDir": "./",
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"tsBuildInfoFile": "./.tsbuildinfo"
 	}
 }
