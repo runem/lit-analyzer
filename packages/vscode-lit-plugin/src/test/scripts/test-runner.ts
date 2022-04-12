@@ -30,8 +30,10 @@ async function main() {
 		// Note that at this point, the test has completed successfully.
 		if (!inCI) {
 			setTimeout(function () {
+				// eslint-disable-next-line no-console
+				console.log(`[tests completed successfully, but some resource leak is preventing the test runner from exiting, so manually exiting]`);
 				process.exit(0);
-			}, 10_000);
+			}, 10_000).unref();
 		}
 	} catch (err) {
 		// eslint-disable-next-line no-console
