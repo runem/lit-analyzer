@@ -27,6 +27,7 @@
 	],
 	"scripts": {
 		"postinstall": "npm run bootstrap",
+		"prettier:check": "prettier --check \"packages/*/src/**/*.ts\"",
 		"prettier:write": "prettier --write \"packages/*/src/**/*.ts\"",
 		"postpublish": "lerna run install:safe --scope lit-plugin && echo \"🎉 Published successfully! You can now publish the vscode extension seperately by running 'cd packages/vscode-lit-plugin && npm run publish'\"",
 		"publish": "lerna run prepare && lerna publish --exact && npm run postpublish",
@@ -37,13 +38,12 @@
 		"dev": "cd dev && TSS_DEBUG=5999 code . --disable-extension runem.lit-plugin",
 		"dev:logs": "touch dev/lit-plugin.log && tail -f dev/lit-plugin.log",
 		"lint": "wireit",
+		"eslint": "eslint .",
 		"build": "wireit",
 		"test": "wireit",
 		"test:headless": "wireit",
 		"test:headful": "wireit",
-		"copylink": "wireit",
-		"eslint": "wireit",
-		"prettier:check": "wireit"
+		"copylink": "wireit"
 	},
 	"wireit": {
 		"build": {
@@ -82,12 +82,6 @@
 				"./packages/ts-lit-plugin:build"
 			],
 			"command": "node scripts.js copylink"
-		},
-		"eslint": {
-			"command": "eslint ."
-		},
-		"prettier:check": {
-			"command": "prettier --check \"packages/*/src/**/*.ts\""
 		}
 	},
 	"devDependencies": {

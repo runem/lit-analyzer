@@ -24,9 +24,15 @@ async function main() {
 		// Download VS Code, unzip it and run the integration test
 		await runTests({ extensionDevelopmentPath, extensionTestsPath, launchArgs: [fixturesDir] });
 
-		setTimeout(function () {
-			process.exit(0);
-		}, 10_000);
+		const inCI = !!process.env.CI;
+		// For reasons unknown, the test runner sometimes fails to free some
+		// resource after testing is done when running locally.
+		// Note that at this point, the test has completed successfully.
+		if (!inCI) {
+			setTimeout(function () {
+				process.exit(0);
+			}, 10_000);
+		}
 	} catch (err) {
 		// eslint-disable-next-line no-console
 		console.error(err);

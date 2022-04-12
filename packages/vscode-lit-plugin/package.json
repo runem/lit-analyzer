@@ -114,9 +114,6 @@
 			"files": [
 				"./out/packaged.vsix"
 			],
-			"output": [
-				"../../packaged-extension/extension/**/*"
-			],
 			"command": "rm -rf ../../../packaged-extension/ && mkdir ../../../packaged-extension/ && unzip -qq ./out/packaged.vsix -d ../../../packaged-extension/",
 			"clean": false
 		}

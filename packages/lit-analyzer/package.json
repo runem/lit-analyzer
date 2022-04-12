@@ -47,7 +47,7 @@
 				"index.js",
 				"index.d.ts",
 				"index.d.ts.map",
-				"./.tsbuildinfo"
+				".tsbuildinfo"
 			],
 			"clean": "if-file-deleted"
 		},
@@ -70,7 +70,8 @@
 				"build"
 			],
 			"files": [
-				"package.json"
+				"package.json",
+				"scripts/check-version.js"
 			],
 			"command": "node scripts/check-version.js"
 		}
