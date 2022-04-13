@@ -9,6 +9,8 @@ todo.md
 dist
 out
 *.vsix
+.wireit/
+.tsbuildinfo
 
 /packages/*/lib
 /packages/*/out

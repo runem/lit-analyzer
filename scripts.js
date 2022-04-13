@@ -23,7 +23,10 @@ async function run(command) {
 }
 
 const command = process.argv[2];
-run(command).catch(console.log);
+run(command).catch(e => {
+	console.error(e);
+	process.exitCode = 1;
+});
 
 /**
  * Copies content of a linkPackageName to the node_modules of destPackageName
@@ -46,6 +49,23 @@ async function copyPackage(linkPackageName, destPackageName) {
 	// Get rid of any "extraneous" according to "npm list --production --parseable --depth=99999" in nested node_modules
 	// The reason this script needs to run is because vscode extension development doesn't yet support symlinked node_modules.
 	const extraneous = [
+		"ansi-regex",
+		"camelcase",
+		"cliui",
+		"decamelize",
+		"find-up",
+		"is-fullwidth-code-point",
+		"locate-path",
+		"p-limit",
+		"p-locate",
+		"string-width",
+		"strip-ansi",
+		"typescript",
+		"wrap-ansi",
+		"y18n",
+		"yargs-parser",
+		"yargs",
+		"ts-simple-type",
 		"web-component-analyzer",
 		"fast-glob",
 		"glob-parent",
@@ -58,10 +78,5 @@ async function copyPackage(linkPackageName, destPackageName) {
 	];
 	for (const mod of extraneous) {
 		await remove(`./packages/${destPackageName}/node_modules/${linkPackageName}/node_modules/${mod}`);
-	}
-
-	const missing = ["ts-simple-type"];
-	for (const mod of missing) {
-		await copy(`./node_modules/${mod}`, `./packages/${destPackageName}/node_modules/${mod}`);
 	}
 }
