@@ -90,8 +90,13 @@
 				"scripts.js"
 			],
 			"output": [
-				"./packages/vscode-lit-plugin/built",
-				"!./packages/vscode-lit-plugin/built/bundle.js"
+				"./packages/vscode-lit-plugin/built/docs",
+				"./packages/vscode-lit-plugin/built/node_modules",
+				"./packages/vscode-lit-plugin/built/schemas",
+				"./packages/vscode-lit-plugin/built/syntaxes",
+				"./packages/vscode-lit-plugin/built/LICENSE.md",
+				"./packages/vscode-lit-plugin/built/package.json",
+				"./packages/vscode-lit-plugin/built/README.md"
 			],
 			"command": "node scripts.js copylink",
 			"#comment": "TODO: rename this script"

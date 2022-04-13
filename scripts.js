@@ -17,10 +17,6 @@ async function run(command) {
 			await writeFile("./packages/vscode-lit-plugin/built/node_modules/ts-lit-plugin/package.json", JSON.stringify(tsPluginPackageJson, null, 2));
 			await copy("./packages/ts-lit-plugin/index.js", "./packages/vscode-lit-plugin//built/node_modules/ts-lit-plugin/index.js");
 			await copy(
-				"./packages/ts-lit-plugin/lib/bundle-rollup.js",
-				"./packages/vscode-lit-plugin//built/node_modules/ts-lit-plugin/lib/bundle-rollup.js"
-			);
-			await copy(
 				"./packages/ts-lit-plugin/lib/bundle-esbuild.js",
 				"./packages/vscode-lit-plugin//built/node_modules/ts-lit-plugin/lib/bundle-esbuild.js"
 			);
