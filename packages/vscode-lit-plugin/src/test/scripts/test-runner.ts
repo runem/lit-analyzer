@@ -29,7 +29,7 @@ async function main() {
 				// eslint-disable-next-line no-console
 				console.log(`[tests completed successfully, but some resource leak is preventing the test runner from exiting, so manually exiting]`);
 				process.exit(0);
-			}, 10_000).unref();
+			}, 1_000).unref();
 		}
 	} catch (err) {
 		// eslint-disable-next-line no-console

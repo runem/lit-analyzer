@@ -42,7 +42,6 @@
 		"test": "wireit",
 		"test:headless": "wireit",
 		"test:headful": "wireit",
-		"copylink": "wireit",
 		"prettier:check": "wireit"
 	},
 	"wireit": {
@@ -76,38 +75,7 @@
 				"./packages/vscode-lit-plugin:test"
 			]
 		},
-		"copylink": {
-			"dependencies": [
-				"./packages/ts-lit-plugin:build",
-				"./packages/vscode-lit-plugin:bundle"
-			],
-			"files": [
-				"./packages/vscode-lit-plugin/package.json",
-				"./packages/vscode-lit-plugin/schemas/**",
-				"./packages/vscode-lit-plugin/docs/**",
-				"./packages/vscode-lit-plugin/README.md",
-				"./packages/vscode-lit-plugin/LICENSE.md",
-				"scripts.js"
-			],
-			"output": [
-				"./packages/vscode-lit-plugin/built/docs",
-				"./packages/vscode-lit-plugin/built/node_modules",
-				"./packages/vscode-lit-plugin/built/schemas",
-				"./packages/vscode-lit-plugin/built/syntaxes",
-				"./packages/vscode-lit-plugin/built/LICENSE.md",
-				"./packages/vscode-lit-plugin/built/package.json",
-				"./packages/vscode-lit-plugin/built/README.md"
-			],
-			"command": "node scripts.js copylink",
-			"#comment": "TODO: rename this script"
-		},
 		"eslint": {
-			"files": [
-				"**/*.js",
-				"**/*.ts",
-				".eslint*",
-				"!**/node_modules/**"
-			],
 			"command": "eslint ."
 		},
 		"prettier:check": {
