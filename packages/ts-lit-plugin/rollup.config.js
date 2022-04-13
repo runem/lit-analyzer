@@ -16,7 +16,12 @@ const config = {
 		sourcemap: true,
 		compact: true
 	},
-	plugins: [nodeResolve({ preferBuiltins: true }), json(), commonjs(), typescript(), terser()]
+	plugins: [nodeResolve({ preferBuiltins: true }), json(), commonjs(), typescript({ outputToFilesystem: true }), terser()],
+	onwarn(warning) {
+		if (warning.code === "THIS_IS_UNDEFINED") return;
+		// eslint-disable-next-line no-console
+		console.error(warning);
+	}
 };
 
 export default config;

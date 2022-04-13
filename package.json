@@ -27,7 +27,6 @@
 	],
 	"scripts": {
 		"postinstall": "npm run bootstrap",
-		"prettier:check": "prettier --check \"packages/*/src/**/*.ts\"",
 		"prettier:write": "prettier --write \"packages/*/src/**/*.ts\"",
 		"postpublish": "lerna run install:safe --scope lit-plugin && echo \"🎉 Published successfully! You can now publish the vscode extension seperately by running 'cd packages/vscode-lit-plugin && npm run publish'\"",
 		"publish": "lerna run prepare && lerna publish --exact && npm run postpublish",
@@ -38,12 +37,13 @@
 		"dev": "cd dev && TSS_DEBUG=5999 code . --disable-extension runem.lit-plugin",
 		"dev:logs": "touch dev/lit-plugin.log && tail -f dev/lit-plugin.log",
 		"lint": "wireit",
-		"eslint": "eslint .",
+		"eslint": "wireit",
 		"build": "wireit",
 		"test": "wireit",
 		"test:headless": "wireit",
 		"test:headful": "wireit",
-		"copylink": "wireit"
+		"copylink": "wireit",
+		"prettier:check": "wireit"
 	},
 	"wireit": {
 		"build": {
@@ -78,10 +78,39 @@
 		},
 		"copylink": {
 			"dependencies": [
-				"./packages/lit-analyzer:build",
-				"./packages/ts-lit-plugin:build"
+				"./packages/ts-lit-plugin:build",
+				"./packages/vscode-lit-plugin:bundle"
 			],
-			"command": "node scripts.js copylink"
+			"files": [
+				"./packages/vscode-lit-plugin/package.json",
+				"./packages/vscode-lit-plugin/schemas/**",
+				"./packages/vscode-lit-plugin/docs/**",
+				"./packages/vscode-lit-plugin/README.md",
+				"./packages/vscode-lit-plugin/LICENSE.md",
+				"scripts.js"
+			],
+			"output": [
+				"./packages/vscode-lit-plugin/built",
+				"!./packages/vscode-lit-plugin/built/bundle.js"
+			],
+			"command": "node scripts.js copylink",
+			"#comment": "TODO: rename this script"
+		},
+		"eslint": {
+			"files": [
+				"**/*.js",
+				"**/*.ts",
+				".eslint*",
+				"!**/node_modules/**"
+			],
+			"command": "eslint ."
+		},
+		"prettier:check": {
+			"files": [
+				"packages/*/src/**/*.ts",
+				"prettier.config.js"
+			],
+			"command": "prettier --check \"packages/*/src/**/*.ts\""
 		}
 	},
 	"devDependencies": {
