@@ -89,11 +89,11 @@
 		},
 		"report-bundle-size": {
 			"dependencies": [
-				"bundle"
+				"bundle-esbuild"
 			],
 			"files": [],
 			"output": [],
-			"command": "ls -a -l -h -S lib/bundle.js"
+			"command": "ls -a -l -h -S lib/bundle-esbuild.js"
 		}
 	},
 	"main": "index.js",

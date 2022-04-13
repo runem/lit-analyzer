@@ -6,6 +6,9 @@ require("esbuild")
 		platform: "node",
 		external: ["typescript"],
 		minify: true,
-		target: "es2016"
+		target: "es2017",
+		format: "cjs",
+		color: true,
+		mainFields: ["module", "main"]
 	})
 	.catch(() => process.exit(1));

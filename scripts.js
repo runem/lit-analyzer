@@ -14,6 +14,7 @@ async function run(command) {
 		case "copylink":
 			await copyPackage("lit-analyzer", "vscode-lit-plugin");
 			await copyPackage("ts-lit-plugin", "vscode-lit-plugin");
+			await copy("./packages/ts-lit-plugin/package.json", "./packages/vscode-lit-plugin/node_modules/ts-lit-plugin/package.json");
 			break;
 
 		default:
