@@ -3,10 +3,8 @@
 Hi there, I really appreciate you considering contributing to this repository! This readme hopefully contains what you need to get started. If you have any questions please open an issue or PM me on twitter [@RuneMehlsen](https://twitter.com/RuneMehlsen).
 
 1. Clone the monorepo: `git clone https://github.com/runem/lit-analyzer.git`
-2. Install dependencies: `npm install`
-3. Bootstrap packages: `npm run bootstrap`
-4. Build libraries: `npm run watch`
-5. Run tests: `npm run test`
+2. Install dependencies: `npm ci`
+3. Run tests: `npm test`
 
 ## Contributing to readmes
 
@@ -39,17 +37,7 @@ In order to debug `vscode-lit-plugin` you can open vscode from `packages/vscode-
 
 ### `npm run package`
 
-You can use this script if you want to generate an installable package of vscode-lit-plugin. You can install the bundled package from vscode.
-
-### `npm run install:safe`
-
-Some dependencies are installed directly from Github URLs (see [syntaxes](#syntaxes)). In order to prevent `postinstall` scripts to run when installing these dependencies (which will crash), they are installed with `--ignore-scripts`. `npm run bootstrap` will make sure to execute `install:safe` when running.
-
-### `npm run copylink` (main package.json)
-
-VS Code doesn't support debugging symlinked dependencies. Therefore there are no symlinked dependencies in `packages/vscode-lit-plugin`. This means that local changes to `lit-analyzer` are not automatically reflected when debugging `vscode-lit-plugin`.
-
-Therefore you will have to run `npm run copylink` (from the main package.json) in order to test local changes. This script copies local js files directly from `lit-analyzer` into `packages/vscode-lit-plugin/node_modules/lit-analyzer`.
+You can use this script if you want to generate an installable package of vscode-lit-plugin. Afterwards, run `code --install-extension ./packages/vscode-lit-plugin/out/packaged.vsix` to install it.
 
 ### Syntaxes
 

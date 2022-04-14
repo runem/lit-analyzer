@@ -18,4 +18,4 @@ out
 /packages/*/test
 /packages/*/index.*
 
-/packaged-extension/
+/packages/vscode-lit-plugin/built

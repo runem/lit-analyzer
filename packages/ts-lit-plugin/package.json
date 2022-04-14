@@ -22,14 +22,27 @@
 	],
 	"scripts": {
 		"clean": "rimraf lib",
-		"prepare": "npm run build",
 		"watch": "tsc --watch",
 		"build": "wireit",
 		"test": "wireit",
-		"readme": "readme generate -i readme.blueprint.md -c readme.config.json"
+		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
+		"bundle-esbuild": "wireit",
+		"compile": "wireit",
+		"report-bundle-size": "wireit"
 	},
 	"wireit": {
 		"build": {
+			"dependencies": [
+				"compile",
+				"bundle-esbuild"
+			]
+		},
+		"test": {
+			"dependencies": [
+				"build"
+			]
+		},
+		"compile": {
 			"dependencies": [
 				"../lit-analyzer:build"
 			],
@@ -44,13 +57,29 @@
 			],
 			"clean": "if-file-deleted"
 		},
-		"test": {
+		"bundle-esbuild": {
 			"dependencies": [
-				"build"
+				"../lit-analyzer:build"
+			],
+			"command": "node esbuild.script.js",
+			"files": [
+				"src/**/*",
+				"esbuild.script.js"
+			],
+			"output": [
+				"lib/bundle-esbuild.js"
 			]
+		},
+		"report-bundle-size": {
+			"dependencies": [
+				"bundle-esbuild"
+			],
+			"files": [],
+			"output": [],
+			"command": "ls -a -l -h -S lib/bundle-esbuild.js"
 		}
 	},
-	"main": "lib/index.js",
+	"main": "index.js",
 	"files": [
 		"/lib/",
 		"/html-documentation/"
@@ -61,6 +90,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^14.0.13",
+		"esbuild": "^0.14.34",
 		"rimraf": "^3.0.2",
 		"typescript": "~4.4.3",
 		"wireit": "^0.1.1"

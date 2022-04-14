@@ -22,27 +22,25 @@
 		"type": "git",
 		"url": "https://github.com/runem/lit-analyzer.git"
 	},
-	"main": "./out/extension",
+	"main": "bundle.js",
 	"scripts": {
-		"clean": "rimraf out",
 		"watch": "tsc -watch -p ./",
-		"publish": "vsce publish",
 		"package": "wireit",
-		"install:safe": "npm install --ignore-scripts --no-package-lock && npm i --no-package-lock",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
 		"test": "wireit",
 		"build": "wireit",
 		"test:normal": "wireit",
 		"test:packaged": "wireit",
 		"create-isolated-extension-dir": "wireit",
-		"test:packaged-sequentialized": "wireit"
+		"test:packaged-sequentialized": "wireit",
+		"bundle": "wireit",
+		"make-built-dir": "wireit"
 	},
 	"wireit": {
 		"build": {
 			"dependencies": [
-				"../ts-lit-plugin:build",
 				"../lit-analyzer:build",
-				"../../:copylink"
+				"make-built-dir"
 			],
 			"command": "tsc --build --pretty",
 			"files": [
@@ -72,7 +70,7 @@
 				"schemas/**/*"
 			],
 			"output": [],
-			"command": "node ./out/test/scripts/test-runner.js"
+			"command": "node ./out/test/scripts/test-runner.js ./built"
 		},
 		"test:packaged": {
 			"dependencies": [
@@ -96,46 +94,82 @@
 		},
 		"package": {
 			"dependencies": [
-				"build"
+				"make-built-dir"
 			],
-			"files": [
-				"package.json",
-				"schemas/**/*"
-			],
+			"files": [],
 			"output": [
-				"./out/packaged.vsix"
+				"out/packaged.vsix"
 			],
-			"command": "vsce package -o ./out/packaged.vsix"
+			"command": "mkdir -p out && cd built && vsce package -o ../out/packaged.vsix"
+		},
+		"publish": {
+			"dependencies": [
+				"make-built-dir"
+			],
+			"command": "cd built && vsce publish"
 		},
 		"create-isolated-extension-dir": {
 			"dependencies": [
 				"package"
 			],
 			"files": [
-				"./out/packaged.vsix"
+				"out/packaged.vsix"
 			],
 			"command": "rm -rf ../../../packaged-extension/ && mkdir ../../../packaged-extension/ && unzip -qq ./out/packaged.vsix -d ../../../packaged-extension/",
 			"clean": false
+		},
+		"bundle": {
+			"dependencies": [
+				"../lit-analyzer:build"
+			],
+			"command": "node esbuild.script.js",
+			"files": [
+				"src/**/*",
+				"esbuild.script.js"
+			],
+			"output": [
+				"built/bundle.js"
+			]
+		},
+		"make-built-dir": {
+			"dependencies": [
+				"../ts-lit-plugin:build",
+				"bundle"
+			],
+			"files": [
+				"../ts-lit-plugin/package.json",
+				"package.json",
+				"schemas/**",
+				"syntaxes/**",
+				"docs/**",
+				"README.md",
+				"LICENSE.md",
+				"copy-to-built.js"
+			],
+			"output": [
+				"built/docs",
+				"built/node_modules",
+				"built/schemas",
+				"built/syntaxes",
+				"built/LICENSE.md",
+				"built/package.json",
+				"built/README.md"
+			],
+			"command": "node ./copy-to-built.js"
 		}
 	},
 	"dependencies": {
-		"ts-lit-plugin": "1.2.1",
-		"ts-simple-type": "~2.0.0-next.0",
-		"vscode-lit-html": "mjbvz/vscode-lit-html#1.11.1",
-		"vscode-styled-components": "styled-components/vscode-styled-components#v1.7.2",
-		"vscode-web-custom-data": "^0.3.6",
-		"web-component-analyzer": "2.0.0-next.4",
 		"typescript": "~4.6.3"
 	},
-	"#comment": "We shouldn't need ts-simple-type or typescript as dependencies here. Maybe not web-component-analyzer either. If we can grab a built and bundled version of ts-lit-plugin, that should simplify things considerably, and improve startup performance.",
 	"devDependencies": {
 		"@types/mocha": "^9.1.0",
 		"@types/node": "^14.0.13",
 		"@types/vscode": "^1.30.0",
+		"esbuild": "^0.14.36",
 		"mocha": "^9.1.4",
-		"rimraf": "^3.0.2",
 		"vsce": "^2.7.0",
-		"wireit": "^0.1.1"
+		"wireit": "^0.1.1",
+		"lit-analyzer": "^1.2.1"
 	},
 	"activationEvents": [
 		"onCommand:lit-plugin.analyze",
@@ -736,7 +770,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html",
-				"path": "./node_modules/vscode-lit-html/syntaxes/lit-html.json",
+				"path": "./syntaxes/vscode-lit-html/lit-html.json",
 				"embeddedLanguages": {
 					"meta.embedded.block.html": "html",
 					"meta.embedded.block.css": "css",
@@ -753,7 +787,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html.string.injection",
-				"path": "./node_modules/vscode-lit-html/syntaxes/lit-html-string-injection.json",
+				"path": "./syntaxes/vscode-lit-html/lit-html-string-injection.json",
 				"embeddedLanguages": {
 					"meta.template.expression.ts": "typescript"
 				}
@@ -768,7 +802,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html.style.injection",
-				"path": "./node_modules/vscode-lit-html/syntaxes/lit-html-style-injection.json",
+				"path": "./syntaxes/vscode-lit-html/lit-html-style-injection.json",
 				"embeddedLanguages": {
 					"meta.template.expression.ts": "typescript"
 				}
@@ -783,14 +817,14 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html-svg",
-				"path": "./node_modules/vscode-lit-html/syntaxes/lit-html-svg.json",
+				"path": "./syntaxes/vscode-lit-html/lit-html-svg.json",
 				"embeddedLanguages": {
 					"meta.embedded.block.svg": "xml"
 				}
 			},
 			{
 				"scopeName": "source.css.styled",
-				"path": "./node_modules/vscode-styled-components/syntaxes/css.styled.json"
+				"path": "./syntaxes/vscode-styled-components/css.styled.json"
 			},
 			{
 				"injectTo": [
@@ -801,7 +835,7 @@
 					"source.tsx"
 				],
 				"scopeName": "styled",
-				"path": "./node_modules/vscode-styled-components/syntaxes/styled-components.json",
+				"path": "./syntaxes/vscode-styled-components/styled-components.json",
 				"embeddedLanguages": {
 					"source.css.scss": "css",
 					"meta.embedded.line.ts": "typescript"
