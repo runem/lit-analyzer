@@ -102,7 +102,7 @@
 		"eslint-plugin-import": "^2.25.2",
 		"fs-extra": "^9.0.1",
 		"husky": "^4.2.5",
-		"lerna": "^3.22.1",
+		"lerna": "^4.0.0",
 		"lint-staged": "^10.2.10",
 		"nodemon": "^2.0.4",
 		"prettier": "^2.4.1",
