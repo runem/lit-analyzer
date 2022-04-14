@@ -24,7 +24,6 @@
 	},
 	"main": "bundle.js",
 	"scripts": {
-		"clean": "rimraf out",
 		"watch": "tsc -watch -p ./",
 		"package": "wireit",
 		"install:safe": "npm install --ignore-scripts --no-package-lock && npm i --no-package-lock",
@@ -102,7 +101,7 @@
 			"output": [
 				"./out/packaged.vsix"
 			],
-			"command": "cd built && vsce package -o ../out/packaged.vsix"
+			"command": "mkdir -p out && cd built && vsce package -o ../out/packaged.vsix"
 		},
 		"publish": {
 			"dependencies": [
