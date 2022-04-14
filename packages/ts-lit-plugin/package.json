@@ -22,7 +22,6 @@
 	],
 	"scripts": {
 		"clean": "rimraf lib",
-		"prepare": "npm run build",
 		"watch": "tsc --watch",
 		"build": "wireit",
 		"test": "wireit",

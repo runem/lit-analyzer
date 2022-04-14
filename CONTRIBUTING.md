@@ -39,10 +39,6 @@ In order to debug `vscode-lit-plugin` you can open vscode from `packages/vscode-
 
 You can use this script if you want to generate an installable package of vscode-lit-plugin. Afterwards, run `code --install-extension ./out/packaged.vsix` to install it.
 
-### `npm run install:safe`
-
-Some dependencies are installed directly from Github URLs (see [syntaxes](#syntaxes)). In order to prevent `postinstall` scripts to run when installing these dependencies (which will crash), they are installed with `--ignore-scripts`. `npm run bootstrap` will make sure to execute `install:safe` when running.
-
 ### Syntaxes
 
 All syntaxes come from [vscode-lit-html](https://github.com/mjbvz/vscode-lit-html) and [vscode-styled-components](https://github.com/styled-components/vscode-styled-components). Because these repositories are not published as npm-packages, they are instead installed from Github URLs. Therefore, as of now, changes to syntaxes must be upstreamed to one of these repositories.
