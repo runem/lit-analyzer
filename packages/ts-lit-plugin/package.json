@@ -84,7 +84,7 @@
 		"/html-documentation/"
 	],
 	"dependencies": {
-		"lit-analyzer": "1.2.1",
+		"lit-analyzer": "^2.0.0-pre.1",
 		"web-component-analyzer": "2.0.0-next.4"
 	},
 	"devDependencies": {

@@ -169,7 +169,7 @@
 		"mocha": "^9.1.4",
 		"vsce": "^2.7.0",
 		"wireit": "^0.1.1",
-		"lit-analyzer": "^1.2.1"
+		"lit-analyzer": "^2.0.0-pre.1"
 	},
 	"activationEvents": [
 		"onCommand:lit-plugin.analyze",
