@@ -37,7 +37,7 @@ In order to debug `vscode-lit-plugin` you can open vscode from `packages/vscode-
 
 ### `npm run package`
 
-You can use this script if you want to generate an installable package of vscode-lit-plugin. Afterwards, run `code --install-extension ./out/packaged.vsix` to install it.
+You can use this script if you want to generate an installable package of vscode-lit-plugin. Afterwards, run `code --install-extension ./packages/vscode-lit-plugin/out/packaged.vsix` to install it.
 
 ### Syntaxes
 
