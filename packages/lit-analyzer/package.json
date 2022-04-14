@@ -24,7 +24,6 @@
 		"lit-analyzer": "cli.js"
 	},
 	"scripts": {
-		"clean": "rimraf lib",
 		"build": "wireit",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
 		"test": "wireit",
@@ -85,7 +84,7 @@
 	"dependencies": {
 		"chalk": "^2.4.2",
 		"didyoumean2": "4.1.0",
-		"fast-glob": "^2.2.6",
+		"fast-glob": "^3.2.11",
 		"parse5": "5.1.0",
 		"ts-simple-type": "~2.0.0-next.0",
 		"vscode-css-languageservice": "4.3.0",

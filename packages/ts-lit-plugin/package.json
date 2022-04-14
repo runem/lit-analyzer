@@ -21,7 +21,6 @@
 		"template"
 	],
 	"scripts": {
-		"clean": "rimraf lib",
 		"watch": "tsc --watch",
 		"build": "wireit",
 		"test": "wireit",
