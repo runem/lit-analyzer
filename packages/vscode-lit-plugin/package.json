@@ -98,7 +98,7 @@
 			],
 			"files": [],
 			"output": [
-				"./out/packaged.vsix"
+				"out/packaged.vsix"
 			],
 			"command": "mkdir -p out && cd built && vsce package -o ../out/packaged.vsix"
 		},
@@ -113,7 +113,7 @@
 				"package"
 			],
 			"files": [
-				"./out/packaged.vsix"
+				"out/packaged.vsix"
 			],
 			"command": "rm -rf ../../../packaged-extension/ && mkdir ../../../packaged-extension/ && unzip -qq ./out/packaged.vsix -d ../../../packaged-extension/",
 			"clean": false
@@ -138,22 +138,22 @@
 			],
 			"files": [
 				"../ts-lit-plugin/package.json",
-				"./package.json",
-				"./schemas/**",
-				"./syntaxes/**",
-				"./docs/**",
-				"./README.md",
-				"./LICENSE.md",
+				"package.json",
+				"schemas/**",
+				"syntaxes/**",
+				"docs/**",
+				"README.md",
+				"LICENSE.md",
 				"copy-to-built.js"
 			],
 			"output": [
-				"./built/docs",
-				"./built/node_modules",
-				"./built/schemas",
-				"./built/syntaxes",
-				"./built/LICENSE.md",
-				"./built/package.json",
-				"./built/README.md"
+				"built/docs",
+				"built/node_modules",
+				"built/schemas",
+				"built/syntaxes",
+				"built/LICENSE.md",
+				"built/package.json",
+				"built/README.md"
 			],
 			"command": "node ./copy-to-built.js"
 		}
