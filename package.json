@@ -42,7 +42,8 @@
 		"test": "wireit",
 		"test:headless": "wireit",
 		"test:headful": "wireit",
-		"prettier:check": "wireit"
+		"prettier:check": "wireit",
+		"package": "wireit"
 	},
 	"wireit": {
 		"build": {
@@ -84,6 +85,11 @@
 				"prettier.config.js"
 			],
 			"command": "prettier --check \"packages/*/src/**/*.ts\""
+		},
+		"package": {
+			"dependencies": [
+				"./packages/vscode-lit-plugin:package"
+			]
 		}
 	},
 	"devDependencies": {
