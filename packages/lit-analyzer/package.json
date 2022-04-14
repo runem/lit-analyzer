@@ -24,7 +24,6 @@
 		"lit-analyzer": "cli.js"
 	},
 	"scripts": {
-		"clean": "rimraf lib",
 		"build": "wireit",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
 		"test": "wireit",
