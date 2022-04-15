@@ -25,6 +25,7 @@
 	},
 	"scripts": {
 		"build": "wireit",
+		"prepublishOnly": "npm test",
 		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
 		"test": "wireit",
 		"test:ava": "wireit",
