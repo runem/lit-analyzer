@@ -13,7 +13,10 @@ const { copy, mkdirp, writeFile } = require("fs-extra");
 async function main() {
 	// We don't bundle the typescript compiler into ./built/bundle.js, so we need
 	// a copy of it.
-	await copy("./node_modules/typescript", "./built/node_modules/typescript");
+	await mkdirp("./node_modules/typescript/lib");
+	await copy("./node_modules/typescript/package.json", "./built/node_modules/typescript/package.json");
+	await copy("./node_modules/typescript/lib/typescript.js", "./built/node_modules/typescript/lib/typescript.js");
+	await copy("./node_modules/typescript/lib/tsserverlibrary.js", "./built/node_modules/typescript/lib/tsserverlibrary.js");
 
 	// For the TS compiler plugin, it must be in node modules because that's
 	// hard coded by the TS compiler's custom module resolution logic.
