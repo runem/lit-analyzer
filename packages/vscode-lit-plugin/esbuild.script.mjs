@@ -1,6 +1,6 @@
 import * as esbuild from "esbuild";
 
-const buildUs = esbuild.build({
+await esbuild.build({
   entryPoints: ["src/extension.ts"],
   bundle: true,
   outfile: "built/bundle.js",
@@ -13,7 +13,7 @@ const buildUs = esbuild.build({
   mainFields: ["module", "main"]
 });
 
-const buildTsLitPlugin = esbuild.build({
+await esbuild.build({
   entryPoints: ["../ts-lit-plugin/src/index.ts"],
   bundle: true,
   outfile: "built/node_modules/ts-lit-plugin/lib/index.js",
@@ -25,9 +25,3 @@ const buildTsLitPlugin = esbuild.build({
   color: true,
   mainFields: ["module", "main"]
 });
-
-try {
-  await Promise.all([buildUs, buildTsLitPlugin]);
-} catch (e) {
-  process.exit(1);
-}
