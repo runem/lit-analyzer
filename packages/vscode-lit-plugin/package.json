@@ -153,6 +153,7 @@
 				"built/docs",
 				"built/node_modules/typescript",
 				"built/node_modules/ts-lit-plugin/package.json",
+				"built/node_modules/ts-lit-plugin/index.js",
 				"built/schemas",
 				"built/syntaxes",
 				"built/LICENSE.md",
