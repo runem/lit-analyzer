@@ -32,17 +32,6 @@
 	"wireit": {
 		"build": {
 			"dependencies": [
-				"compile",
-				"bundle-esbuild"
-			]
-		},
-		"test": {
-			"dependencies": [
-				"build"
-			]
-		},
-		"compile": {
-			"dependencies": [
 				"../lit-analyzer:build"
 			],
 			"command": "tsc --build --pretty",
@@ -56,26 +45,10 @@
 			],
 			"clean": "if-file-deleted"
 		},
-		"bundle-esbuild": {
+		"test": {
 			"dependencies": [
-				"../lit-analyzer:build"
-			],
-			"command": "node esbuild.script.js",
-			"files": [
-				"src/**/*",
-				"esbuild.script.js"
-			],
-			"output": [
-				"lib/bundle-esbuild.js"
+				"build"
 			]
-		},
-		"report-bundle-size": {
-			"dependencies": [
-				"bundle-esbuild"
-			],
-			"files": [],
-			"output": [],
-			"command": "ls -a -l -h -S lib/bundle-esbuild.js"
 		}
 	},
 	"main": "index.js",

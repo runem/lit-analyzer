@@ -122,13 +122,16 @@
 			"dependencies": [
 				"../lit-analyzer:build"
 			],
-			"command": "node esbuild.script.js",
+			"command": "node esbuild.script.mjs",
 			"files": [
 				"src/**/*",
-				"esbuild.script.js"
+				"../ts-lit-plugin/src/**/*",
+				"../ts-lit-plugin/index.js",
+				"esbuild.script.mjs"
 			],
 			"output": [
-				"built/bundle.js"
+				"built/bundle.js",
+				"built/node_modules/ts-lit-plugin/index.js"
 			]
 		},
 		"make-built-dir": {
@@ -148,7 +151,9 @@
 			],
 			"output": [
 				"built/docs",
-				"built/node_modules",
+				"built/node_modules/typescript",
+				"built/node_modules/ts-lit-plugin/package.json",
+				"built/node_modules/ts-lit-plugin/index.js",
 				"built/schemas",
 				"built/syntaxes",
 				"built/LICENSE.md",

@@ -2,4 +2,4 @@
 // we can't express that in proper ESM, so this hand-written JS
 // file bridges the difference.
 
-module.exports = require("./lib/bundle-esbuild").init;
+module.exports = require("./lib/index").init;
