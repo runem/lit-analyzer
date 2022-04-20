@@ -7,6 +7,13 @@ All notable changes to this project will be documented in this file.
 <!-- ### Removed -->
 <!-- ### Fixed -->
 
+## [1.2.4] - 19/4/2022
+
+- Fixed a bug where the TS plugin would interfere with automatic import
+  insertion.
+- Improved compatibility with recent and future versions of TypeScript.
+- Updated deps
+
 ## [1.2.1] - 25/7/2020
 
 ### Fixed
