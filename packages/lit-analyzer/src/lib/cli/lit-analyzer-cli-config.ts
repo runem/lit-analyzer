@@ -1,6 +1,6 @@
 import { LitAnalyzerRules } from "../analyze/lit-analyzer-config.js";
 
-export type FormatterFormat = "code" | "list" | "markdown";
+export type FormatterFormat = "code" | "list" | "markdown" | "json";
 
 export interface LitAnalyzerCliConfig {
 	debug?: boolean;
