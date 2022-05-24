@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 <!-- ### Removed -->
 <!-- ### Fixed -->
 
+## [2.0.0-pre.2]
+
+### Fixed
+
+- Fixed import issue in lit-analyzer CLI.
+
 ## [2.0.0-pre.1]
 
 ### Breaking
