@@ -1,4 +1,4 @@
-<h1 align="center">ts-lit-plugin</h1>
+<!-- ⚠️ This README has been generated from the file(s) "readme.blueprint.md" ⚠️--><h1 align="center">ts-lit-plugin</h1>
 <p align="center">
   <b>Typescript plugin that adds type checking and code completion to lit-html</b></br>
   <sub><sub>
@@ -13,11 +13,9 @@
 <a href="https://github.com/runem/lit-analyzer/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/runem/lit-analyzer.svg" height="20"/></a>
 	</p>
 
-
 <p align="center">
   <img src="https://user-images.githubusercontent.com/5372940/62078476-02c1ec00-b24d-11e9-8de5-1322012cbde2.gif" alt="Lit plugin GIF"/>
 </p>
-
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#installation)
 
@@ -25,13 +23,14 @@
 
 First, install the plugin:
 
+<!-- prettier-ignore -->
 ```bash
 npm install ts-lit-plugin -D
 ```
 
-
 Then add a `plugins` section to your [`tsconfig.json`](http://www.typescriptlang.org/docs/handbook/tsconfig-json.html):
 
+<!-- prettier-ignore -->
 ```json
 {
   "compilerOptions": {
@@ -47,17 +46,19 @@ Then add a `plugins` section to your [`tsconfig.json`](http://www.typescriptlang
 Finally, restart you Typescript Language Service, and you should start getting diagnostics from `ts-lit-plugin`.
 
 **Note:**
-* If you use Visual Studio Code you can also install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension. 
-* If you would rather use a CLI, you can install the [lit-analyzer](https://github.com/runem/lit-analyzer/blob/master/packages/lit-analyzer).
+
+- If you use Visual Studio Code you can also install the [lit-plugin](https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin) extension.
+- If you would rather use a CLI, you can install the [lit-analyzer](https://github.com/runem/lit-analyzer/blob/master/packages/lit-analyzer).
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#configuration)
 
 ## ➤ Configuration
 
-You can configure this plugin through your `tsconfig.json`. 
+You can configure this plugin through your `tsconfig.json`.
 
 ### Example
 
+<!-- prettier-ignore -->
 ```json
 {
   "compilerOptions": {
@@ -90,7 +91,8 @@ You can configure this plugin through your `tsconfig.json`.
 | `globalAttributes` | List of html attributes names that you expect to be present at all times. | `string[]` | |
 | `globalEvents` | List of event names that you expect to be present at all times | `string[]` | |
 | `customHtmlData` | This plugin supports the [custom vscode html data format](https://code.visualstudio.com/updates/v1_31#_html-and-css-custom-data-support) through this setting. | [Vscode Custom HTML Data Format](https://github.com/Microsoft/vscode-html-languageservice/blob/master/docs/customData.md). Supports arrays, objects and relative file paths | |
-
+| `maxProjectImportDepth` | Determines how many modules deep dependencies are followed to determine whether a custom element is available in the current file. When `-1` is used, dependencies will be followed infinitely deep. | `number` | `-1` |
+| `maxNodeModuleImportDepth` | Determines how many modules deep dependencies in __npm packages__ are followed to determine whether a custom element is available in the current file. When `-1` is used, dependencies in __npm packages__ will be followed infinitely deep.| `number` | `1` |
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#rules)
 
@@ -106,9 +108,9 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | Rule    | Description | Severity normal | Severity strict |
 | :------ | ----------- | --------------- | --------------- |
 | [no-unknown-tag-name](#-no-unknown-tag-name) | The existence of tag names are checked. Be aware that not all custom elements from libraries will be found out of the box. | off | warning |
-| [no-missing-import](#-no-missing-import)    | When using custom elements in HTML it is checked if the element has been imported and is available in the current context. | off | warning |
+| [no-missing-import](#-no-missing-import)     | When using custom elements in HTML it is checked if the element has been imported and is available in the current context. | off | warning |
 | [no-unclosed-tag](#-no-unclosed-tag)         | Unclosed tags, and invalid self closing tags like custom elements tags, are checked. | warning | error |
-
+| [no-missing-element-type-definition](#no-missing-element-type-definition) | This rule will ensure that custom elements are registered on the `HTMLElementTagNameMap` Typescript interface. | off | off |
 
 **Validating binding names**
 
@@ -118,7 +120,7 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | [no-unknown-attribute](#-no-unknown-attribute-no-unknown-property)<br> [no-unknown-property](#-no-unknown-attribute-no-unknown-property) | You will get a warning whenever you use an unknown attribute or property within your `lit-html` template. | off | warning |
 | [no-unknown-event](#-no-unknown-event)       | When using event bindings it's checked that the event names are fired. | off | off |
 | [no-unknown-slot](#-no-unknown-slot)         | Using the "@slot" jsdoc tag on your custom element class, you can tell which slots are accepted for a particular element. | off | warning |
-
+| [no-legacy-attribute](#no-legacy-attribute)         | Disallows use of legacy Polymer binding syntax (e.g. `foo$=`). | off | warning |
 
 **Validating binding types**
 
@@ -133,16 +135,17 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | [no-nullable-attribute-binding](#-no-nullable-attribute-binding) | Disallow attribute bindings with nullable types such as "null" or "undefined".  | error | error |
 | [no-incompatible-type-binding](#-no-incompatible-type-binding)   | Disallow incompatible type in bindings.  | error | error |
 | [no-invalid-directive-binding](#-no-invalid-directive-binding)   | Disallow using built-in directives in unsupported bindings. | error | error |
+| [no-unintended-mixed-binding](#-no-unintended-mixed-binding)   | Disallow mixed value bindings where a character `'`, `"`, `}` or `/` is unintentionally included in the binding. | warning | warning |
 
 **Validating LitElement**
 
 <!-- prettier-ignore -->
 | Rule    | Description | Severity normal | Severity strict |
 | :------ | ----------- | --------------- | --------------- |
-| [no-incompatible-property-type](#-no-incompatible-property-type) | When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type | error | error |
-| [no-unknown-property-converter](#-no-unknown-property-converter) | LitElement provides default converters. For example 'Function' is not a valid default converter type for a LitElement-managed property. | error | error |
+| [no-incompatible-property-type](#-no-incompatible-property-type) | When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type | warn | error |
 | [no-invalid-attribute-name](#-no-invalid-attribute-name)         | When using the property option `attribute`, the value is checked to make sure it's a valid attribute name. | error | error |
 | [no-invalid-tag-name](#-no-invalid-tag-name)                     | When defining a custom element the tag name is checked to make sure it's valid. | error | error |
+| [no-property-visibility-mismatch](#no-property-visibility-mismatch) | This rule will ensure public properties use `@property` and non-public properties use `@internalProperty`. | off | warn |
 
 **Validating CSS**
 
@@ -150,7 +153,6 @@ Each rule can have severity of `off`, `warning` or `error`. You can toggle rules
 | Rule    | Description | Severity normal | Severity strict |
 | :------ | ----------- | --------------- | --------------- |
 | [💅 no-invalid-css](#-no-invalid-css) | CSS within the tagged template literal `css` will be validated. | warning | error |
-
 
 ### Validating custom elements
 
@@ -162,6 +164,7 @@ Web components defined in libraries need to either extend the global `HTMLElemen
 
 Below you will see an example of what to add to your library typescript definition files if you want type checking support for a given html tag name.
 
+<!-- prettier-ignore -->
 ```typescript
 declare global {
   interface HTMLElementTagNameMap {
@@ -175,23 +178,28 @@ declare global {
 When using custom elements in HTML it is checked if the element has been imported and is available in the current context. It's considered imported if any imported module (or their imports) defines the custom element.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 // No import of "my-element"
 html`<my-element></my-element>`
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 import "my-element.js";
 html`<my-element></my-element>`
 ```
-
 
 #### ☯ no-unclosed-tag
 
 Unclosed tags, and invalid self closing tags like custom elements tags, are checked.
 
 The following examples are considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<div>`
 html`<video />`
@@ -199,11 +207,47 @@ html`<custom-element />`
 ```
 
 The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<div></div>`
 html`<custom-element></custom-element>`
 html`<video></video>`
 html`<input />`
+```
+
+#### no-missing-element-type-definition
+
+This rule is only applicable to Typescript files.
+
+When sharing custom elements it's a good practice to add custom elements to the global interface `HTMLElementTagNameMap`. This rule will ensure that custom elements are registered on this interface.
+
+The following example is considered a warning:
+
+<!-- prettier-ignore -->
+```ts
+export class MyElement extends HTMLElement {
+
+} 
+
+customElements.define("my-element", MyElement)
+```
+
+The following example is not considered a warning:
+
+<!-- prettier-ignore -->
+```ts
+export class MyElement extends HTMLElement {
+
+} 
+
+customElements.define("my-element", MyElement)
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "my-element": MyElement
+  }
+}
 ```
 
 ### Validating binding names
@@ -212,28 +256,36 @@ Attributes, properties and events are picked up on custom elements using [web-co
 
 #### ✅ no-unknown-attribute, no-unknown-property
 
-You will get a warning whenever you use an unknown attribute or property. This check is made on both custom elements and built in elements. 
+You will get a warning whenever you use an unknown attribute or property. This check is made on both custom elements and built in elements.
 
 **The following example is considered a warning:**
+
+<!-- prettier-ignore -->
 ```js
 html`<input .valuuue="${value}" unknownattribute="button" />`
 ```
 
 **The following example is not considered a warning:**
+
+<!-- prettier-ignore -->
 ```js
 html`<input .value="${value}" type="button" />`
 ```
 
 #### ⚡️ no-unknown-event
 
-You can opt in to check for unknown event names. Using the `@fires` jsdoc or the statement `this.dispatch(new CustomElement("my-event))` will make the event name available. All event names are accepted globally because events bubble. 
+You can opt in to check for unknown event names. Using the `@fires` jsdoc or the statement `this.dispatch(new CustomEvent("my-event))` will make the event name available. All event names are accepted globally because events bubble.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<input @iinput="${console.log}" />`
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<input @input="${console.log}" />`
 ```
@@ -242,6 +294,7 @@ html`<input @input="${console.log}" />`
 
 Using the "@slot" jsdoc tag on your custom element class, you can tell which slots are accepted for a particular element. Then you will get warnings for invalid slot names and if you forget to add the slot attribute on elements without an unnamed slot.
 
+<!-- prettier-ignore -->
 ```js
 /**
  * @slot - This is a comment for the unnamed slot
@@ -254,6 +307,8 @@ customElements.define("my-element", MyElement);
 ```
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`
 <my-element>
@@ -263,6 +318,8 @@ html`
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`
 <my-element>
@@ -273,6 +330,29 @@ html`
 `
 ```
 
+#### no-legacy-attribute
+
+A common mistake when dealing with Lit in particular is to use the
+legacy Polymer syntax as seen in earlier versions of Polymer (the
+predecessor of Lit).
+
+The following examples are considered warnings:
+
+<!-- prettier-ignore -->
+```js
+html`<input name$=${val} />`
+html`<input disabled?=${val} />`;
+html`<input name="val" />`;
+```
+
+The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
+```js
+html`<input name=${val} />`
+html`<input ?disabled=${val} />`;
+html`<input name=${val} />`;
+```
 
 ### Validating binding types
 
@@ -283,11 +363,15 @@ Be aware that many checks involving analyzing bindings will work better in Types
 It never makes sense to use the boolean attribute binding on a non-boolean type.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<input ?type="${"button"}" />`
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<input ?disabled="${isDisabled}" />`
 ```
@@ -297,26 +381,34 @@ html`<input ?disabled="${isDisabled}" />`
 Because of how `lit-html` [parses bindings internally](https://github.com/Polymer/lit-html/issues/843) you cannot use the property binding without an expression.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<input .value="text" />`
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<input .value="${text}" />`
 ```
 
 #### 🌀 no-noncallable-event-binding
 
-It's a common mistake to incorrectly call the function when setting up an event handler binding instead of passing a reference to the function. This makes the function call whenever the code evaluates. 
+It's a common mistake to incorrectly call the function when setting up an event handler binding instead of passing a reference to the function. This makes the function call whenever the code evaluates.
 
 The following examples are considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<button @click="${myEventHandler()}">Click</button>`
 html`<button @click="${{hannndleEvent: console.log()}}">Click</button>`
 ```
 
 The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<button @click="${myEventHandler}">Click</button>`
 html`<button @click="${{handleEvent: console.log}}">Click</button>`
@@ -329,11 +421,15 @@ You should not be binding to a boolean type using an attribute binding because i
 This error is particular tricky, because the string "false" is truthy when evaluated in a conditional.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<input disabled="${isDisabled}" />`
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<input ?disabled="${isDisabled}" />`
 ```
@@ -343,27 +439,34 @@ html`<input ?disabled="${isDisabled}" />`
 Binding an object using an attribute binding would result in binding the string "[object Object]" to the attribute. In this cases it's probably better to use a property binding instead.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<my-list listitems="${listItems}"></my-list>`
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 html`<my-list .listItems="${listItems}"></my-list>`
 ```
 
-
-#### ⭕️ no-nullable-attribute-binding 
+#### ⭕️ no-nullable-attribute-binding
 
 Binding `undefined` or `null` in an attribute binding will result in binding the string "undefined" or "null". Here you should probably wrap your expression in the "ifDefined" directive.
 
 The following examples are considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<input value="${maybeUndefined}" />`
 html`<input value="${maybeNull}" />`
 ```
 
 The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<input value="${ifDefined(maybeUndefined)}" />`
 html`<input value="${ifDefined(maybeNull === null ? undefined : maybeNull)}" />`
@@ -374,6 +477,8 @@ html`<input value="${ifDefined(maybeNull === null ? undefined : maybeNull)}" />`
 Assignments in your HTML are typed checked just like it would be in Typescript.
 
 The following examples are considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<input type="wrongvalue" />`
 html`<input placeholder />`
@@ -382,6 +487,8 @@ html`<my-list .listItems="${123}"></my-list>`
 ```
 
 The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<input type="button" />`
 html`<input placeholder="a placeholder" />`
@@ -391,22 +498,27 @@ html`<my-list .listItems="${listItems}"></my-list>`
 
 #### 💥 no-invalid-directive-binding
 
-Directives are checked to make sure that the following rules are met: 
-* `ifDefined` is only used in an attribute binding.
-* `class` is only used in an attribute binding on the 'class' attribute.
-* `style` is only used in an attribute binding on the 'style' attribute.
-* `unsafeHTML`, `cache`, `repeat`, `asyncReplace` and `asyncAppend` are only used within a text binding.
+Directives are checked to make sure that the following rules are met:
+
+- `ifDefined` is only used in an attribute binding.
+- `class` is only used in an attribute binding on the 'class' attribute.
+- `style` is only used in an attribute binding on the 'style' attribute.
+- `unsafeHTML`, `cache`, `repeat`, `asyncReplace` and `asyncAppend` are only used within a text binding.
 
 The directives already make these checks on runtime, so this will help you catch errors before runtime.
 
 The following examples are considered warnings:
+
+<!-- prettier-ignore -->
 ```js
-html`<button value="${unsafeHTML(html)}"></button>`
+html`<input value="${unsafeHTML(html)}" />`
 html`<input .value="${ifDefined(myValue)}" />`
 html`<div role="${class(classMap)}"></div>`
 ```
 
 The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 html`<button>${unsafeHTML(html)}</button>`
 html`<input .value="${myValue}" />`
@@ -414,41 +526,56 @@ html`<input value="${myValue}" />`
 html`<div class="${class(classMap)}"></div>`
 ```
 
+#### 🕷 no-unintended-mixed-binding
 
+Sometimes unintended characters sneak into bindings. This often indicates a typo such as `<input value=${"foo"}} />` where the expression is directly followed by a "}" which will be included in the value being bound, resulting in "foo}". Another example is self-closing tags without a space between the binding and "/" like `<input value=${"foo"}/>` which will result in binding the string "myvalue/".
+
+This rule disallows mixed value bindings where a character `'`, `"`, `}` or `/` is unintentionally included in the binding.
+
+The following examples are considered warnings:
+
+<!-- prettier-ignore -->
+```js
+html`<input .value=${"myvalue"}" />`
+html`<input value=${"myvalue"}} />`
+html`<input value=${"myvalue"}/>`
+html`<input ?required=${true}/>`
+```
+
+The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
+```js
+html`<input .value=${"myvalue"} />`
+html`<input value="${"myvalue"}" />`
+html`<input ?required=${true} />`
+html`<input @input="${console.log}" />`
+```
 
 ### Validating LitElement
 
 #### 💞 no-incompatible-property-type
 
-When using the @property decorator in Typescript, the property option `type` is checked against the declared property Typescript type.
+This rule checks that LitElement-controlled properties are correctly configured in accordance with the default value converter.
+
+The following is a summary of what this rule does:
+
+1. The `type` given to the LitElement property configuration is checked against the actual Typescript type of the property.
+2. The default converter only accepts the types `String`, `Boolean`, `Number`, `Array` and `Object`, so all other values for `type` are considered warnings.
+3. The absence of a `type` is only considered a warning if the property is not assignable to the `string` type.
+
+This rule will not check for a given LitElement-controlled property if the property has custom converter configured.
 
 The following examples are considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 class MyElement extends LitElement {
   @property({type: Number}) text: string;
   @property({type: Boolean}) count: number;
   @property({type: String}) disabled: boolean;
   @property({type: Object}) list: ListItem[];
-}
-```
 
-The following examples are not considered warnings:
-```js
-class MyElement extends LitElement {
-  @property({type: String}) text: string;
-  @property({type: Number}) count: number;
-  @property({type: Boolean}) disabled: boolean;
-  @property({type: Array}) list: ListItem[];
-}
-```
-
-#### 👎 no-unknown-property-converter
-
-The default converter in LitElement only accepts `String`, `Boolean`, `Number`, `Array` and `Object`, so all other values for `type` are considered warnings. This check doesn't run if a custom converter is used.
-
-The following example is considered a warning:
-```js
-class MyElement extends LitElement {
   static get properties () {
     return {
       callback: {
@@ -462,9 +589,16 @@ class MyElement extends LitElement {
 }
 ```
 
-The following example is not considered a warning:
+The following examples are not considered warnings:
+
+<!-- prettier-ignore -->
 ```js
 class MyElement extends LitElement {
+  @property({type: String}) text: string;
+  @property({type: Number}) count: number;
+  @property({type: Boolean}) disabled: boolean;
+  @property({type: Array}) list: ListItem[];
+
   static get properties () {
     return {
       callback: {
@@ -476,15 +610,17 @@ class MyElement extends LitElement {
       }
     }
   }
+
 }
 ```
-
 
 #### ⁉️ no-invalid-attribute-name
 
 When using the property option `attribute`, the value is checked to make sure it's a valid attribute name.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 class MyElement extends LitElement {
   static get properties () {
@@ -502,6 +638,8 @@ class MyElement extends LitElement {
 When defining a custom element, the tag name is checked to make sure it's a valid custom element name.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 @customElement("wrongElementName")
 class MyElement extends LitElement {
@@ -511,6 +649,8 @@ customElements.define("alsoWrongName", MyElement);
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 @customElement("my-element")
 class MyElement extends LitElement {
@@ -519,15 +659,36 @@ class MyElement extends LitElement {
 customElements.define("correct-element-name", MyElement);
 ```
 
+#### no-property-visibility-mismatch
+
+When using the `@property` decorator, your property should be publicly visible,
+expected to be exposed to consumers of the element. Private and protected
+properties however, should make use of the `@internalProperty` decorator
+instead.
+
+This rule will ensure public properties use `@property` and non-public
+properties use `@internalProperty`.
+
+The following example is considered a warning:
+
+<!-- prettier-ignore -->
+```ts
+class MyElement extends LitElement {
+	@property() private myProperty: string;
+}
+```
+
 ### Validating CSS
 
 `lit-analyzer` uses [vscode-css-languageservice](https://github.com/Microsoft/vscode-css-languageservice) to validate CSS.
 
 #### 💅 no-invalid-css
 
-CSS within the tagged template literal `css` will be validated. 
+CSS within the tagged template literal `css` will be validated.
 
 The following example is considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 css`
   button
@@ -537,6 +698,8 @@ css`
 ```
 
 The following example is not considered a warning:
+
+<!-- prettier-ignore -->
 ```js
 css`
   button {
@@ -551,6 +714,7 @@ css`
 
 Code is analyzed using [web-component-analyzer](https://github.com/runem/web-component-analyzer) in order to find properties, attributes and events. Unfortunately, sometimes it's not possible to analyze these things by looking at the code, and you will have to document how your component looks using `jsdoc`like this:
 
+<!-- prettier-ignore -->
 ```js
 /**
  * This is my element
@@ -563,6 +727,8 @@ Code is analyzed using [web-component-analyzer](https://github.com/runem/web-com
  * @slot - This is a comment for the unnamed slot
  * @slot right - Right content
  * @slot left
+ * @cssprop {Color} --border-color
+ * @csspart header
  */
 class MyElement extends HTMLElement { 
 }
@@ -570,20 +736,16 @@ class MyElement extends HTMLElement {
 customElements.define("my-element", MyElement);
 ```
 
-
-
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#contributors)
 
 ## ➤ Contributors
-	
 
 | [<img alt="Rune Mehlsen" src="https://avatars2.githubusercontent.com/u/5372940?s=460&v=4" width="100">](https://twitter.com/runemehlsen) | [<img alt="Andreas Mehlsen" src="https://avatars1.githubusercontent.com/u/6267397?s=460&v=4" width="100">](https://twitter.com/andreasmehlsen) | [<img alt="You?" src="https://joeschmoe.io/api/v1/random" width="100">](https://github.com/runem/lit-analyzer/blob/master/CONTRIBUTING.md) |
-|:--------------------------------------------------:|:--------------------------------------------------:|:--------------------------------------------------:|
-| [Rune Mehlsen](https://twitter.com/runemehlsen)  | [Andreas Mehlsen](https://twitter.com/andreasmehlsen) | [You?](https://github.com/runem/lit-analyzer/blob/master/CONTRIBUTING.md) |
-
+| :--------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: |
+|                                             [Rune Mehlsen](https://twitter.com/runemehlsen)                                              |                                             [Andreas Mehlsen](https://twitter.com/andreasmehlsen)                                              |                                 [You?](https://github.com/runem/lit-analyzer/blob/master/CONTRIBUTING.md)                                  |
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)](#license)
 
 ## ➤ License
-	
+
 Licensed under [MIT](https://opensource.org/licenses/MIT).

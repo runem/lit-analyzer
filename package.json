@@ -26,36 +26,97 @@
 		"template"
 	],
 	"scripts": {
-		"prettier:check": "prettier --list-different \"**/*\"",
-		"prettier:write": "prettier --write \"**/*\"",
-		"publish": "lerna run prepare && lerna publish --exact && lerna run install:safe --scope lit-plugin",
-		"bootstrap": "lerna clean --yes && lerna bootstrap --hoist --ignore-scripts --ignore lit-plugin && lerna run install:safe --scope lit-plugin && lerna run prepare",
-		"lint": "eslint 'packages/**/*.{ts,js}'",
-		"build": "lerna run build --parallel --stream",
-		"watch": "lerna run watch --parallel --stream",
+		"postinstall": "npm run bootstrap",
+		"prettier:write": "prettier --write \"packages/*/src/**/*.ts\"",
+		"postpublish": "echo \"🎉 Published successfully! You can now publish the vscode extension seperately by running 'cd packages/vscode-lit-plugin && npm run publish'\"",
+		"publish": "lerna run prepare && lerna publish --exact && npm run postpublish",
+		"publish:next": "lerna run prepare && echo \"When asked, please choose 'Custom Prerelease' and use default value\" && lerna publish --dist-tag next --preid next --exact && npm run postpublish",
+		"bootstrap": "lerna clean --yes && lerna bootstrap",
+		"test:watch": "lerna run test:watch --parallel --stream",
 		"readme": "lerna run readme && readme generate -i readme.blueprint.md -c readme.config.json",
-		"dev": "cd dev && TSS_LOG=\"-traceToConsole true -level verbose -file $(pwd)/ts-server-log.txt\" TSS_DEBUG=5999 code . --disable-extension runem.lit-plugin",
+		"dev": "cd dev && TSS_DEBUG=5999 code . --disable-extension runem.lit-plugin",
 		"dev:logs": "touch dev/lit-plugin.log && tail -f dev/lit-plugin.log",
-		"copylink": "node scripts.js copylink"
+		"lint": "wireit",
+		"eslint": "wireit",
+		"build": "wireit",
+		"test": "wireit",
+		"test:headless": "wireit",
+		"test:headful": "wireit",
+		"prettier:check": "wireit",
+		"package": "wireit"
 	},
-	"dependencies": {},
+	"wireit": {
+		"build": {
+			"dependencies": [
+				"./packages/lit-analyzer:build",
+				"./packages/ts-lit-plugin:build",
+				"./packages/vscode-lit-plugin:build"
+			]
+		},
+		"test": {
+			"dependencies": [
+				"test:headless",
+				"test:headful",
+				"lint"
+			]
+		},
+		"lint": {
+			"dependencies": [
+				"eslint",
+				"prettier:check"
+			]
+		},
+		"test:headless": {
+			"dependencies": [
+				"./packages/lit-analyzer:test"
+			]
+		},
+		"test:headful": {
+			"dependencies": [
+				"./packages/vscode-lit-plugin:test"
+			]
+		},
+		"eslint": {
+			"command": "eslint ."
+		},
+		"prettier:check": {
+			"files": [
+				"packages/*/src/**/*.ts",
+				"prettier.config.js"
+			],
+			"command": "prettier --check \"packages/*/src/**/*.ts\""
+		},
+		"package": {
+			"dependencies": [
+				"./packages/vscode-lit-plugin:package"
+			]
+		}
+	},
 	"devDependencies": {
-		"@appnest/readme": "^1.2.3",
-		"@typescript-eslint/eslint-plugin": "^1.13.0",
-		"@typescript-eslint/parser": "^1.13.0",
-		"eslint": "^6.1.0",
-		"eslint-config-prettier": "^6.0.0",
-		"fs-extra": "^8.1.0",
-		"husky": "^1.3.1",
-		"lerna": "^3.16.1",
-		"prettier": "^1.16.4",
-		"pretty-quick": "^1.10.0",
-		"typescript": "^3.5.3"
+		"@appnest/readme": "^1.2.7",
+		"@typescript-eslint/eslint-plugin": "^5.0.0",
+		"@typescript-eslint/parser": "^5.0.0",
+		"@vscode/test-electron": "^2.1.1",
+		"eslint": "^8.0.0",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-plugin-import": "^2.25.2",
+		"fs-extra": "^9.0.1",
+		"husky": "^4.2.5",
+		"lerna": "^4.0.0",
+		"lint-staged": "^10.2.10",
+		"nodemon": "^2.0.4",
+		"prettier": "^2.4.1",
+		"typescript": "~4.4.3",
+		"wireit": "^0.1.1"
 	},
 	"husky": {
 		"hooks": {
-			"pre-commit": "pretty-quick --staged && npm run lint"
+			"pre-commit": "lint-staged"
 		}
+	},
+	"lint-staged": {
+		"*.{ts,js}": "eslint --fix",
+		"*.{ts,js,md,json}": "prettier --write"
 	},
 	"contributors": [
 		{
@@ -67,6 +128,11 @@
 			"name": "Andreas Mehlsen",
 			"url": "https://twitter.com/andreasmehlsen",
 			"img": "https://avatars1.githubusercontent.com/u/6267397?s=460&v=4"
+		},
+		{
+			"name": "Peter Burns",
+			"url": "https://twitter.com/rictic",
+			"img": "https://avatars3.githubusercontent.com/u/1659?s=460&v=4"
 		},
 		{
 			"name": "You?",

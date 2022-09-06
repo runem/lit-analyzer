@@ -1,0 +1,29 @@
+import { RuleModule } from "../analyze/types/rule/rule-module.js";
+import { isValidCustomElementName } from "../analyze/util/is-valid-name.js";
+import { iterableFirst } from "../analyze/util/iterable-util.js";
+import { rangeFromNode } from "../analyze/util/range-util.js";
+
+const rule: RuleModule = {
+	id: "no-invalid-tag-name",
+	meta: {
+		priority: "low"
+	},
+	visitComponentDefinition(definition, context) {
+		// Check if the tag name is invalid
+		if (!isValidCustomElementName(definition.tagName) && definition.tagName !== "") {
+			const node = iterableFirst(definition.tagNameNodes) || iterableFirst(definition.identifierNodes);
+
+			// Only report diagnostic if the tag is not built in,
+			//  because this function among other things tests for missing "-" in custom element names
+			const tag = context.htmlStore.getHtmlTag(definition.tagName);
+			if (node != null && tag != null && !tag.builtIn) {
+				context.report({
+					location: rangeFromNode(node),
+					message: `The tag name '${definition.tagName}' is not a valid custom element name. Remember that a hyphen (-) is required.`
+				});
+			}
+		}
+	}
+};
+
+export default rule;

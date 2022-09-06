@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { LitAnalyzerConfig, makeConfig, VERSION, LitAnalyzerLoggerLevel } from "lit-analyzer";
+import { LitAnalyzerConfig, LitAnalyzerLoggerLevel, makeConfig, VERSION } from "lit-analyzer";
 import * as ts from "typescript";
-import * as tsServer from "typescript/lib/tsserverlibrary";
+import { CompilerOptions } from "typescript";
+import * as tsServer from "typescript/lib/tsserverlibrary.js";
 import { VERSION as WCA_VERSION } from "web-component-analyzer";
-import { decorateLanguageService } from "./decorate-language-service";
-import { logger } from "./logger";
-import { LitPluginContext } from "./ts-lit-plugin/lit-plugin-context";
-import { TsLitPlugin } from "./ts-lit-plugin/ts-lit-plugin";
-import { setTypescriptModule } from "./ts-module";
+import { decorateLanguageService } from "./decorate-language-service.js";
+import { logger } from "./logger.js";
+import { LitPluginContext } from "./ts-lit-plugin/lit-plugin-context.js";
+import { TsLitPlugin } from "./ts-lit-plugin/ts-lit-plugin.js";
+import { setTypescriptModule } from "./ts-module.js";
 
 const tsHtmlPluginSymbol = Symbol.for("__tsHtmlPlugin__");
 
@@ -17,7 +18,7 @@ let context: LitPluginContext | undefined = undefined;
  * Export a function for the ts-service to initialize our plugin.
  * @param typescript
  */
-function init({ typescript }: { typescript: typeof ts }): tsServer.server.PluginModule {
+export function init({ typescript }: { typescript: typeof ts }): tsServer.server.PluginModule {
 	// Cache the typescript module
 	setTypescriptModule(typescript);
 
@@ -29,7 +30,6 @@ function init({ typescript }: { typescript: typeof ts }): tsServer.server.Plugin
 		if (logger.level >= LitAnalyzerLoggerLevel.DEBUG) {
 			logger.debug(`Lit Analyzer: ${VERSION}`);
 			logger.debug(`Web Component Analyzer: ${WCA_VERSION}`);
-			logger.debug(`Installed Typescript: ${ts.version}`);
 			logger.debug(`Running Typescript: ${typescript.version}`);
 			logger.debug(`DIRNAME: ${__dirname}`);
 			printDebugOnce = undefined;
@@ -42,6 +42,7 @@ function init({ typescript }: { typescript: typeof ts }): tsServer.server.Plugin
 			if ((info.languageService as any)[tsHtmlPluginSymbol] != null) {
 				return info.languageService;
 			}
+			logger.setTsServerLogging(info.project.projectService.logger);
 
 			// Save the current working directory
 			info.config.cwd = info.config.cwd || info.project.getCurrentDirectory();
@@ -61,6 +62,7 @@ function init({ typescript }: { typescript: typeof ts }): tsServer.server.Plugin
 				context.updateConfig(makeConfig(info.config));
 
 				logger.verbose("Starting ts-lit-plugin...");
+
 				if (printDebugOnce != null) printDebugOnce();
 
 				const plugin = new TsLitPlugin(info.languageService, context);
@@ -78,12 +80,47 @@ function init({ typescript }: { typescript: typeof ts }): tsServer.server.Plugin
 			}
 		},
 
-		onConfigurationChanged(config: Partial<LitAnalyzerConfig>) {
-			if (context == null || config == null) return;
-			context.updateConfig(makeConfig(config));
+		/**
+		 * Unfortunately this function isn't called with configuration from tsconfig.json
+		 * @param externalConfig
+		 */
+		onConfigurationChanged(externalConfig?: Partial<LitAnalyzerConfig>) {
+			if (context == null || externalConfig == null) return;
+
+			// Manually merge in configuration from "tsconfig.json"
+			const compilerOptions = context.project?.getCompilerOptions();
+			const tsLitPluginOptions = compilerOptions != null ? readLitAnalyzerConfigFromCompilerOptions(compilerOptions) : undefined;
+
+			// Make seed where options from "external" takes precedence over options from "tsconfig.json"
+			const configSeed = {
+				...(tsLitPluginOptions || {}),
+				...externalConfig,
+
+				// Also merge rules deep
+				rules: {
+					...(tsLitPluginOptions?.rules || {}),
+					...(externalConfig.rules || {})
+				}
+			};
+
+			context.updateConfig(makeConfig(configSeed));
 			if (printDebugOnce != null) printDebugOnce();
 		}
 	};
 }
 
-export = init;
+/**
+ * Resolves the nearest tsconfig.json and returns the configuration seed within the plugins section for "ts-lit-plugin"
+ */
+function readLitAnalyzerConfigFromCompilerOptions(compilerOptions: CompilerOptions): Partial<LitAnalyzerConfig> | undefined {
+	// Finds the plugin section
+	if ("plugins" in compilerOptions) {
+		const plugins = compilerOptions.plugins as ({ name: string } & Partial<LitAnalyzerConfig>)[];
+		const tsLitPluginOptions = plugins.find(plugin => plugin.name === "ts-lit-plugin");
+		if (tsLitPluginOptions != null) {
+			return tsLitPluginOptions;
+		}
+	}
+
+	return undefined;
+}

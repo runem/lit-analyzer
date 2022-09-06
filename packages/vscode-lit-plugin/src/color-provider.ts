@@ -18,10 +18,10 @@ const COLOR_SECTION_REGEX = /(css|html)`([\s\S]*?)`/gi;
  * @param alpha
  */
 function RGBAToHex({ red, green, blue, alpha }: { red: number; green: number; blue: number; alpha: number }): string {
-	let r = red.toString(16).padStart(2, "0");
-	let g = green.toString(16).padStart(2, "0");
-	let b = blue.toString(16).padStart(2, "0");
-	let a = alpha.toString(16).padStart(2, "0");
+	const r = red.toString(16).padStart(2, "0");
+	const g = green.toString(16).padStart(2, "0");
+	const b = blue.toString(16).padStart(2, "0");
+	const a = alpha.toString(16).padStart(2, "0");
 
 	return `#${r}${g}${b}${a === "ff" ? "" : a}`;
 }
@@ -49,7 +49,7 @@ function hexToRGBA(hex: string): { red: number; green: number; blue: number; alp
 			red: parseInt(shorthandResult[1] + shorthandResult[1], 16),
 			green: parseInt(shorthandResult[2] + shorthandResult[2], 16),
 			blue: parseInt(shorthandResult[3] + shorthandResult[3], 16),
-			alpha: shorthandResult == null ? 255 : parseInt(shorthandResult[4] + shorthandResult[4], 16)
+			alpha: shorthandResult[4] == null ? 255 : parseInt(shorthandResult[4] + shorthandResult[4], 16)
 		};
 	}
 

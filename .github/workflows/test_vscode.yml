@@ -1,0 +1,35 @@
+name: VSCode Integration Test
+on: [push]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - run: npm ci
+      # Test normally on Mac
+      - run: npm run test:packaged
+        working-directory: packages/vscode-lit-plugin
+        if: runner.os == 'macOS'
+      # Run with xvfb on Linux so that the vscode window has an X to render
+      # into.
+      - run: xvfb-run -a npm run test:packaged
+        working-directory: packages/vscode-lit-plugin
+        if: runner.os == 'Linux'
+      # The test packaging doesn't work on Windows just because we'd need
+      # to use different commands to expand the vsix file back out, so just
+      # run the dev test and package up the vsix file.
+      - run: npm run package
+        working-directory: packages/vscode-lit-plugin
+        if: runner.os == 'Windows'
+      - run: npm run test:normal
+        working-directory: packages/vscode-lit-plugin
+        if: runner.os == 'Windows'

@@ -1,6 +1,6 @@
-import { ALL_RULE_NAMES, LitAnalyzerConfig } from "lit-analyzer";
+import { ALL_RULE_IDS, LitAnalyzerConfig } from "lit-analyzer";
 import { join } from "path";
-import { ColorProvider } from "./color-provider";
+import { ColorProvider } from "./color-provider.js";
 import * as vscode from "vscode";
 
 const tsLitPluginId = "ts-lit-plugin";
@@ -13,7 +13,7 @@ let defaultAnalyzeGlob = "src";
 
 const colorProvider = new ColorProvider();
 
-export async function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
 	const extension = vscode.extensions.getExtension(typeScriptExtensionId);
 	if (!extension) {
 		return;
@@ -45,7 +45,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// Register a color provider
 	const registration = vscode.languages.registerColorProvider(
-		[{ scheme: "file", language: "typescript" }, { scheme: "file", language: "javascript" }],
+		[
+			{ scheme: "file", language: "typescript" },
+			{ scheme: "file", language: "javascript" }
+		],
 		colorProvider
 	);
 	context.subscriptions.push(registration);
@@ -105,7 +108,15 @@ function getConfig(): Partial<LitAnalyzerConfig> {
 	withConfigValue(config, "strict", value => {
 		outConfig.strict = value;
 	});
-
+	withConfigValue(config, "securitySystem", value => {
+		outConfig.securitySystem = value;
+	});
+	withConfigValue(config, "maxProjectImportDepth", value => {
+		outConfig.maxProjectImportDepth = value;
+	});
+	withConfigValue(config, "maxNodeModuleImportDepth", value => {
+		outConfig.maxNodeModuleImportDepth = value;
+	});
 	// Template tags
 	withConfigValue(config, "htmlTemplateTags", value => {
 		outConfig.htmlTemplateTags = value;
@@ -139,7 +150,7 @@ function getConfig(): Partial<LitAnalyzerConfig> {
 	// Apply rules
 	const rules = outConfig.rules || {};
 
-	ALL_RULE_NAMES.forEach(ruleName => {
+	ALL_RULE_IDS.forEach(ruleName => {
 		withConfigValue(config, `rules.${ruleName}`, value => {
 			rules[ruleName] = value;
 		});

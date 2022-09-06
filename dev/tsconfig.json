@@ -5,6 +5,8 @@
 				"name": "ts-lit-plugin",
 				"logging": "verbose",
 				"strict": true,
+				"cssTemplateTags": ["css", "scss", "sass"],
+				"htmlTemplateTags": ["html", "md"],
 				"globalTags": ["my-external-tag"],
 				"globalAttributes": ["my-attribute"],
 				"globalEvents": ["my-event"],

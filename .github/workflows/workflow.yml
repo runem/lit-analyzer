@@ -1,0 +1,54 @@
+name: Test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  test:
+    name: Run
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        node: [16, 17]
+        exclude:
+          - os: windows-latest
+            node: "17"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install latest npm
+        run: npm i -g npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        if: matrix.os == 'ubuntu-latest'
+        run: npm run lint
+
+      - name: test
+        run: npm run test:headless
+
+      - name: Package vscode plugin
+        if: matrix.os == 'ubuntu-latest'
+        run: npm run package && mv packages/vscode-lit-plugin/out/packaged.vsix vscode-lit-plugin.vsix
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@master
+        if: matrix.os == 'ubuntu-latest' && matrix.node == 16
+        with:
+          name: vscode-lit-plugin.vsix
+          path: vscode-lit-plugin.vsix

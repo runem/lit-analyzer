@@ -1,10 +1,10 @@
 import { DefaultLitAnalyzerContext, LitAnalyzerConfig } from "lit-analyzer";
-import { logger } from "../logger";
+import { logger } from "../logger.js";
 
 export class LitPluginContext extends DefaultLitAnalyzerContext {
 	logger = logger;
 
-	public updateConfig(config: LitAnalyzerConfig) {
+	public updateConfig(config: LitAnalyzerConfig): void {
 		const hasChangedLogging = config.logging !== "off" && (this.config.logging !== config.logging || this.config.cwd !== config.cwd);
 
 		// Setup logging

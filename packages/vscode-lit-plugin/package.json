@@ -3,12 +3,12 @@
 	"private": true,
 	"displayName": "lit-plugin",
 	"description": "Syntax highlighting, type checking and code completion for lit-html",
-	"version": "1.1.6",
+	"version": "1.2.4",
 	"publisher": "runem",
 	"icon": "docs/assets/lit-plugin@256w.png",
 	"license": "MIT",
 	"engines": {
-		"vscode": "^1.30.0"
+		"vscode": "^1.63.0"
 	},
 	"categories": [
 		"Programming Languages"
@@ -22,28 +22,159 @@
 		"type": "git",
 		"url": "https://github.com/runem/lit-analyzer.git"
 	},
-	"main": "./out/extension",
+	"main": "bundle.js",
 	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
-		"postinstall": "node ./node_modules/vscode/bin/install",
-		"publish": "vsce publish",
-		"package": "vsce package",
-		"install:safe": "npm install --ignore-scripts --no-package-lock && npm i --no-package-lock # use this script in order to install directly from the github repositories",
-		"readme": "readme generate -i readme.blueprint.md -c readme.config.json"
+		"package": "wireit",
+		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
+		"test": "wireit",
+		"build": "wireit",
+		"test:normal": "wireit",
+		"test:packaged": "wireit",
+		"create-isolated-extension-dir": "wireit",
+		"test:packaged-sequentialized": "wireit",
+		"bundle": "wireit",
+		"make-built-dir": "wireit"
+	},
+	"wireit": {
+		"build": {
+			"dependencies": [
+				"../lit-analyzer:build",
+				"make-built-dir"
+			],
+			"command": "tsc --build --pretty",
+			"files": [
+				"src/**/*",
+				"tsconfig.json"
+			],
+			"output": [
+				"out/**/*.js",
+				"out/**/*.d.ts",
+				"out/**/*.d.ts.map",
+				".tsbuildinfo"
+			],
+			"clean": "if-file-deleted"
+		},
+		"test": {
+			"dependencies": [
+				"test:normal",
+				"test:packaged-sequentialized"
+			]
+		},
+		"test:normal": {
+			"dependencies": [
+				"build"
+			],
+			"files": [
+				"package.json",
+				"schemas/**/*"
+			],
+			"output": [],
+			"command": "node ./out/test/scripts/test-runner.js ./built"
+		},
+		"test:packaged": {
+			"dependencies": [
+				"build",
+				"create-isolated-extension-dir"
+			],
+			"files": [],
+			"output": [],
+			"command": "node ./out/test/scripts/test-runner.js ../../../packaged-extension/extension/"
+		},
+		"test:packaged-sequentialized": {
+			"#comment": "like test:packaged, only it ensures that test:normal runs first",
+			"dependencies": [
+				"test:normal",
+				"build",
+				"create-isolated-extension-dir"
+			],
+			"files": [],
+			"output": [],
+			"command": "node ./out/test/scripts/test-runner.js ../../../packaged-extension/extension/"
+		},
+		"package": {
+			"dependencies": [
+				"make-built-dir"
+			],
+			"files": [],
+			"output": [
+				"out/packaged.vsix"
+			],
+			"command": "mkdir -p out && cd built && vsce package -o ../out/packaged.vsix"
+		},
+		"publish": {
+			"dependencies": [
+				"make-built-dir"
+			],
+			"command": "cd built && vsce publish"
+		},
+		"create-isolated-extension-dir": {
+			"dependencies": [
+				"package"
+			],
+			"files": [
+				"out/packaged.vsix"
+			],
+			"command": "rm -rf ../../../packaged-extension/ && mkdir ../../../packaged-extension/ && unzip -qq ./out/packaged.vsix -d ../../../packaged-extension/",
+			"clean": false
+		},
+		"bundle": {
+			"dependencies": [
+				"../lit-analyzer:build"
+			],
+			"command": "node esbuild.script.mjs",
+			"files": [
+				"src/**/*",
+				"../ts-lit-plugin/src/**/*",
+				"../ts-lit-plugin/index.js",
+				"esbuild.script.mjs"
+			],
+			"output": [
+				"built/bundle.js",
+				"built/node_modules/ts-lit-plugin/index.js"
+			]
+		},
+		"make-built-dir": {
+			"dependencies": [
+				"../ts-lit-plugin:build",
+				"bundle"
+			],
+			"files": [
+				"../ts-lit-plugin/package.json",
+				"package.json",
+				"schemas/**",
+				"syntaxes/**",
+				"docs/**",
+				"README.md",
+				"LICENSE.md",
+				"copy-to-built.js"
+			],
+			"output": [
+				"built/docs",
+				"built/node_modules/typescript",
+				"built/node_modules/ts-lit-plugin/package.json",
+				"built/node_modules/ts-lit-plugin/index.js",
+				"built/schemas",
+				"built/syntaxes",
+				"built/LICENSE.md",
+				"built/package.json",
+				"built/README.md"
+			],
+			"command": "node ./copy-to-built.js"
+		}
 	},
 	"dependencies": {
-		"lit-html": "https://github.com/mjbvz/vscode-lit-html.git#1.11.0",
-		"ts-lit-plugin": "1.1.6",
-		"vscode-styled-components": "https://github.com/styled-components/vscode-styled-components#f806f23a027e3458e9d77001851b428f1cb992d5"
+		"typescript": "~4.6.3"
 	},
 	"devDependencies": {
-		"@appnest/readme": "^1.2.3",
-		"@types/node": "^10.12.24",
-		"typescript": "^3.5.3",
-		"vsce": "^1.58.0",
-		"vscode": "^1.1.29"
+		"@types/mocha": "^9.1.0",
+		"@types/node": "^14.0.13",
+		"@types/vscode": "^1.30.0",
+		"esbuild": "^0.14.36",
+		"mocha": "^9.1.4",
+		"vsce": "^2.7.0",
+		"wireit": "^0.1.1",
+		"lit-analyzer": "^2.0.0-pre.1"
 	},
 	"activationEvents": [
 		"onCommand:lit-plugin.analyze",
@@ -90,6 +221,25 @@
 						"type": "boolean",
 						"description": "Enable strict mode.",
 						"default": false
+					},
+					"lit-plugin.maxProjectImportDepth": {
+						"type": "integer",
+						"description": "Determines how many modules deep dependencies are followed to determine whether a custom element is available in the current file. When `-1` is used, dependencies will be followed infinitely deep.",
+						"default": -1
+					},
+					"lit-plugin.maxNodeModuleImportDepth": {
+						"type": "integer",
+						"description": "Determines how many modules deep dependencies in npm packages are followed to determine whether a custom element is available in the current file. When `-1` is used, dependencies will be followed infinitely deep.",
+						"default": 1
+					},
+					"lit-plugin.securitySystem": {
+						"type": "string",
+						"description": "The lit-html security sanitization strategy to assume.",
+						"default": "off",
+						"enum": [
+							"off",
+							"ClosureSafeTypes"
+						]
 					},
 					"lit-plugin.htmlTemplateTags": {
 						"type": "array",
@@ -169,6 +319,17 @@
 					"lit-plugin.rules.no-missing-import": {
 						"type": "string",
 						"description": "Check that custom elements used are imported.",
+						"default": "default",
+						"enum": [
+							"default",
+							"off",
+							"warning",
+							"error"
+						]
+					},
+					"lit-plugin.rules.no-missing-element-type-definition": {
+						"type": "string",
+						"description": "This rule will ensure that custom elements are registered on the HTMLElementTagNameMap Typescript interface.",
 						"default": "default",
 						"enum": [
 							"default",
@@ -323,17 +484,6 @@
 					"lit-plugin.rules.no-incompatible-property-type": {
 						"type": "string",
 						"description": "Check the 'type' key of the @property decorator against the actual property type.",
-						"default": "default",
-						"enum": [
-							"default",
-							"off",
-							"warning",
-							"error"
-						]
-					},
-					"lit-plugin.rules.no-unknown-property-converter": {
-						"type": "string",
-						"description": "Check that the converter of @property decorators exists.",
 						"default": "default",
 						"enum": [
 							"default",
@@ -625,7 +775,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html",
-				"path": "./node_modules/lit-html/syntaxes/lit-html.json",
+				"path": "./syntaxes/vscode-lit-html/lit-html.json",
 				"embeddedLanguages": {
 					"meta.embedded.block.html": "html",
 					"meta.embedded.block.css": "css",
@@ -642,7 +792,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html.string.injection",
-				"path": "./node_modules/lit-html/syntaxes/lit-html-string-injection.json",
+				"path": "./syntaxes/vscode-lit-html/lit-html-string-injection.json",
 				"embeddedLanguages": {
 					"meta.template.expression.ts": "typescript"
 				}
@@ -657,7 +807,7 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html.style.injection",
-				"path": "./node_modules/lit-html/syntaxes/lit-html-style-injection.json",
+				"path": "./syntaxes/vscode-lit-html/lit-html-style-injection.json",
 				"embeddedLanguages": {
 					"meta.template.expression.ts": "typescript"
 				}
@@ -672,14 +822,14 @@
 					"text.html.basic"
 				],
 				"scopeName": "inline.lit-html-svg",
-				"path": "./node_modules/lit-html/syntaxes/lit-html-svg.json",
+				"path": "./syntaxes/vscode-lit-html/lit-html-svg.json",
 				"embeddedLanguages": {
 					"meta.embedded.block.svg": "xml"
 				}
 			},
 			{
 				"scopeName": "source.css.styled",
-				"path": "./node_modules/vscode-styled-components/syntaxes/css.styled.json"
+				"path": "./syntaxes/vscode-styled-components/css.styled.json"
 			},
 			{
 				"injectTo": [
@@ -690,7 +840,7 @@
 					"source.tsx"
 				],
 				"scopeName": "styled",
-				"path": "./node_modules/vscode-styled-components/syntaxes/styled-components.json",
+				"path": "./syntaxes/vscode-styled-components/styled-components.json",
 				"embeddedLanguages": {
 					"source.css.scss": "css",
 					"meta.embedded.line.ts": "typescript"

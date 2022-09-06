@@ -9,22 +9,17 @@
 		{
 			"alt": "Downloads per Month",
 			"img": "https://img.shields.io/npm/dm/lit-analyzer.svg?label=lit-analyzer",
-			"url": "https://david-dm.org/runem/lit-analyzer"
+			"url": "https://www.npmjs.com/package/lit-analyzer"
 		},
 		{
 			"alt": "Downloads per Month",
-			"img": "https://img.shields.io/npm/dm/lit-analyzer.svg?label=lit-analyzer",
-			"url": "https://david-dm.org/runem/lit-analyzer"
+			"img": "https://img.shields.io/npm/dm/ts-lit-plugin.svg?label=ts-lit-plugin",
+			"url": "https://www.npmjs.com/package/ts-lit-plugin"
 		},
 		{
 			"alt": "Contributors",
 			"img": "https://img.shields.io/github/contributors/runem/lit-analyzer",
 			"url": "https://github.com/runem/lit-analyzer/graphs/contributors"
-		},
-		{
-			"alt": "Dependencies",
-			"img": "https://img.shields.io/david/runem/lit-analyzer?color=green",
-			"url": "https://david-dm.org/runem/lit-analyzer"
 		}
 	]
 }

@@ -1,6 +1,6 @@
 {
 	"name": "ts-lit-plugin",
-	"version": "1.1.6",
+	"version": "1.2.1",
 	"description": "Typescript plugin that adds type checking and code completion to lit-html",
 	"author": "runem",
 	"license": "MIT",
@@ -21,22 +21,51 @@
 		"template"
 	],
 	"scripts": {
-		"prepare": "npm run build",
 		"watch": "tsc --watch",
-		"build": "rm -rf lib && tsc",
-		"readme": "readme generate -i readme.blueprint.md -c readme.config.json"
+		"build": "wireit",
+		"test": "wireit",
+		"readme": "readme generate -i readme.blueprint.md -c readme.config.json",
+		"bundle-esbuild": "wireit",
+		"compile": "wireit",
+		"report-bundle-size": "wireit"
 	},
-	"main": "lib/index.js",
+	"wireit": {
+		"build": {
+			"dependencies": [
+				"../lit-analyzer:build"
+			],
+			"command": "tsc --build --pretty",
+			"files": [
+				"src/**/*",
+				"tsconfig.json"
+			],
+			"output": [
+				"lib",
+				"./tsbuildinfo"
+			],
+			"clean": "if-file-deleted"
+		},
+		"test": {
+			"dependencies": [
+				"build"
+			]
+		}
+	},
+	"main": "index.js",
 	"files": [
 		"/lib/",
 		"/html-documentation/"
 	],
 	"dependencies": {
-		"lit-analyzer": "1.1.6"
+		"lit-analyzer": "^2.0.0-pre.1",
+		"web-component-analyzer": "2.0.0-next.4"
 	},
 	"devDependencies": {
-		"@types/node": "^10.12.24",
-		"typescript": "^3.5.3"
+		"@types/node": "^14.0.13",
+		"esbuild": "^0.14.34",
+		"rimraf": "^3.0.2",
+		"typescript": "~4.4.3",
+		"wireit": "^0.1.1"
 	},
 	"contributors": [
 		{
