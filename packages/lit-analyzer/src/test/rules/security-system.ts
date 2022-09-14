@@ -70,15 +70,15 @@ tsTest(testName, t => {
 
 testName = "May pass either a SafeUrl or a TrustedResourceUrl or a string to img src with ClosureSafeTypes config";
 tsTest(testName, t => {
-	const { diagnostics } = getDiagnostics(preface + "html`<img src=${safeUrl}></script>`", { securitySystem: "ClosureSafeTypes" });
+	const { diagnostics } = getDiagnostics(preface + "html`<img src=${safeUrl}>`", { securitySystem: "ClosureSafeTypes" });
 	hasNoDiagnostics(t, diagnostics);
 
-	const { diagnostics: moreDiagnostics } = getDiagnostics(preface + "html`<img src=${trustedResourceUrl}></script>`", {
+	const { diagnostics: moreDiagnostics } = getDiagnostics(preface + "html`<img src=${trustedResourceUrl}>`", {
 		securitySystem: "ClosureSafeTypes"
 	});
 	hasNoDiagnostics(t, moreDiagnostics);
 
-	const { diagnostics: evenMoreDiagnostics } = getDiagnostics(preface + "html`<img src=${'/img.webp'}></script>`", {
+	const { diagnostics: evenMoreDiagnostics } = getDiagnostics(preface + "html`<img src=${'/img.webp'}>`", {
 		securitySystem: "ClosureSafeTypes"
 	});
 	hasNoDiagnostics(t, evenMoreDiagnostics);
@@ -86,15 +86,15 @@ tsTest(testName, t => {
 
 testName = "May pass either a SafeUrl or a TrustedResourceUrl or a string to img .src with ClosureSafeTypes config";
 tsTest(testName, t => {
-	const { diagnostics } = getDiagnostics(preface + "html`<img .src=${safeUrl}></script>`", { securitySystem: "ClosureSafeTypes" });
+	const { diagnostics } = getDiagnostics(preface + "html`<img .src=${safeUrl}>`", { securitySystem: "ClosureSafeTypes" });
 	hasNoDiagnostics(t, diagnostics);
 
-	const { diagnostics: moreDiagnostics } = getDiagnostics(preface + "html`<img .src=${trustedResourceUrl}></script>`", {
+	const { diagnostics: moreDiagnostics } = getDiagnostics(preface + "html`<img .src=${trustedResourceUrl}>`", {
 		securitySystem: "ClosureSafeTypes"
 	});
 	hasNoDiagnostics(t, moreDiagnostics);
 
-	const { diagnostics: evenMoreDiagnostics } = getDiagnostics(preface + "html`<img .src=${'/img.webp'}></script>`", {
+	const { diagnostics: evenMoreDiagnostics } = getDiagnostics(preface + "html`<img .src=${'/img.webp'}>`", {
 		securitySystem: "ClosureSafeTypes"
 	});
 	hasNoDiagnostics(t, evenMoreDiagnostics);
