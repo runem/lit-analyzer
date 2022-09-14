@@ -66,6 +66,10 @@ function checkClosureSecurityAssignability(typeB: SimpleType, htmlAttr: HtmlNode
 	if (overriddenTypes === undefined) {
 		return undefined;
 	}
+	// `any` is allowed to bind to anything.
+	if (typeB.kind === "ANY") {
+		return undefined;
+	}
 	// Directives are responsible for their own security.
 	if (isLitDirective(typeB)) {
 		return undefined;
