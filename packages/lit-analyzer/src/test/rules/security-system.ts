@@ -84,44 +84,54 @@ tsTest(testName, t => {
 
 testName = "May pass either a SafeUrl, a TrustedResourceUrl, a string, or `any` to img src with ClosureSafeTypes config";
 tsTest(testName, t => {
-	const { diagnostics } = getDiagnostics(preface + "html`<img src=${safeUrl}>`", { securitySystem: "ClosureSafeTypes" });
-	hasNoDiagnostics(t, diagnostics);
+	hasNoDiagnostics(t, getDiagnostics(preface + "html`<img src=${safeUrl}>`", { securitySystem: "ClosureSafeTypes" }).diagnostics);
 
-	const { diagnostics: moreDiagnostics } = getDiagnostics(preface + "html`<img src=${trustedResourceUrl}>`", {
-		securitySystem: "ClosureSafeTypes"
-	});
-	hasNoDiagnostics(t, moreDiagnostics);
+	hasNoDiagnostics(
+		t,
+		getDiagnostics(preface + "html`<img src=${trustedResourceUrl}>`", {
+			securitySystem: "ClosureSafeTypes"
+		}).diagnostics
+	);
 
-	const { diagnostics: evenMoreDiagnostics } = getDiagnostics(preface + "html`<img src=${'/img.webp'}>`", {
-		securitySystem: "ClosureSafeTypes"
-	});
-	hasNoDiagnostics(t, evenMoreDiagnostics);
+	hasNoDiagnostics(
+		t,
+		getDiagnostics(preface + "html`<img src=${'/img.webp'}>`", {
+			securitySystem: "ClosureSafeTypes"
+		}).diagnostics
+	);
 
-	const { diagnostics: evenMoreDiagnostics } = getDiagnostics(preface + "html`<img src=${anyValue}>`", {
-		securitySystem: "ClosureSafeTypes"
-	});
-	hasNoDiagnostics(t, evenMoreDiagnostics);
+	hasNoDiagnostics(
+		t,
+		getDiagnostics(preface + "html`<img src=${anyValue}>`", {
+			securitySystem: "ClosureSafeTypes"
+		}).diagnostics
+	);
 });
 
 testName = "May pass either a SafeUrl, a TrustedResourceUrl, a string, or `any` to img .src with ClosureSafeTypes config";
 tsTest(testName, t => {
-	const { diagnostics } = getDiagnostics(preface + "html`<img .src=${safeUrl}>`", { securitySystem: "ClosureSafeTypes" });
-	hasNoDiagnostics(t, diagnostics);
+	hasNoDiagnostics(t, getDiagnostics(preface + "html`<img .src=${safeUrl}>`", { securitySystem: "ClosureSafeTypes" }).diagnostics);
 
-	const { diagnostics: moreDiagnostics } = getDiagnostics(preface + "html`<img .src=${trustedResourceUrl}>`", {
-		securitySystem: "ClosureSafeTypes"
-	});
-	hasNoDiagnostics(t, moreDiagnostics);
+	hasNoDiagnostics(
+		t,
+		getDiagnostics(preface + "html`<img .src=${trustedResourceUrl}>`", {
+			securitySystem: "ClosureSafeTypes"
+		}).diagnostics
+	);
 
-	const { diagnostics: evenMoreDiagnostics } = getDiagnostics(preface + "html`<img .src=${'/img.webp'}>`", {
-		securitySystem: "ClosureSafeTypes"
-	});
-	hasNoDiagnostics(t, evenMoreDiagnostics);
+	hasNoDiagnostics(
+		t,
+		getDiagnostics(preface + "html`<img .src=${'/img.webp'}>`", {
+			securitySystem: "ClosureSafeTypes"
+		}).diagnostics
+	);
 
-	const { diagnostics: evenMoreDiagnostics } = getDiagnostics(preface + "html`<img .src=${anyValue}>`", {
-		securitySystem: "ClosureSafeTypes"
-	});
-	hasNoDiagnostics(t, evenMoreDiagnostics);
+	hasNoDiagnostics(
+		t,
+		getDiagnostics(preface + "html`<img .src=${anyValue}>`", {
+			securitySystem: "ClosureSafeTypes"
+		}).diagnostics
+	);
 });
 
 testName = "May pass a string to style with ClosureSafeTypes config";
