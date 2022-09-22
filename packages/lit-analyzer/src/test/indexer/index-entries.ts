@@ -6,6 +6,33 @@ import { getIndexEntries } from "../helpers/analyze.js";
 
 import { LitIndexEntry } from "../../lib/analyze/document-analyzer/html/lit-html-document-analyzer.js";
 
+tsTest("No entries are created for HTML-like template strings if the template tags are not named `html`.", t => {
+	const { indexEntries } = getIndexEntries([
+		{
+			fileName: "main.js",
+			entry: true,
+			text: `
+				class SomeElement extends HTMLElement {}
+
+				customElements.define('some-element', SomeElement);
+
+				declare global {
+					interface HTMLElementTagNameMap {
+						'some-element': SomeElement;
+					}
+				}
+
+				const nothtml = x => x;
+
+				nothtml\`<some-element></some-element>\`;
+			`
+		}
+	]);
+
+	const entries = Array.from(indexEntries);
+	t.is(entries.length, 0);
+});
+
 /**
  * Asserts that `entry` is a `LitIndexEntry` that describes an element with tag
  * name `tagName` that is defined by a class named `className` in `sourceFile`.
