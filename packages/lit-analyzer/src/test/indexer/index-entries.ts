@@ -13,7 +13,6 @@ tsTest("No entries are created for HTML-like template strings if the template ta
 			entry: true,
 			text: `
 				class SomeElement extends HTMLElement {}
-
 				customElements.define('some-element', SomeElement);
 
 				declare global {
@@ -23,7 +22,6 @@ tsTest("No entries are created for HTML-like template strings if the template ta
 				}
 
 				const nothtml = x => x;
-
 				nothtml\`<some-element></some-element>\`;
 			`
 		}
@@ -92,7 +90,6 @@ tsTest("`indexFile` creates a `HtmlNodeIndexEntry` for an element defined in the
 			entry: true,
 			text: `
 				class SomeElement extends HTMLElement {}
-
 				customElements.define('some-element', SomeElement);
 
 				declare global {
@@ -102,7 +99,6 @@ tsTest("`indexFile` creates a `HtmlNodeIndexEntry` for an element defined in the
 				}
 
 				const html = x => x;
-
 				html\`<some-element></some-element>\`;
 			`
 		}
@@ -129,7 +125,6 @@ tsTest("`indexFile` creates a `HtmlNodeIndexEntry` for an element defined in a d
 				import './some-element.js';
 
 				const html = x => x;
-
 				html\`<some-element></some-element>\`;
 			`
 		},
@@ -138,7 +133,6 @@ tsTest("`indexFile` creates a `HtmlNodeIndexEntry` for an element defined in a d
 			entry: true,
 			text: `
 				class SomeElement extends HTMLElement {}
-
 				customElements.define('some-element', SomeElement);
 
 				declare global {
