@@ -5,6 +5,7 @@ import { getCurrentTsModule, tsTest } from "../helpers/ts-test.js";
 import { getIndexEntries } from "../helpers/analyze.js";
 
 import { LitIndexEntry } from "../../lib/analyze/document-analyzer/html/lit-html-document-analyzer.js";
+import { HtmlNodeKind } from "../../lib/analyze/types/html-node/html-node-types.js";
 
 tsTest("No entries are created for HTML-like template strings if the template tags are not named `html`.", t => {
 	const { indexEntries } = getIndexEntries([
@@ -32,8 +33,9 @@ tsTest("No entries are created for HTML-like template strings if the template ta
 });
 
 /**
- * Asserts that `entry` is a `LitIndexEntry` that describes an element with tag
- * name `tagName` that is defined by a class named `className` in `sourceFile`.
+ * Asserts that `entry` is a `HtmlNodeIndexEntry` that describes an element with
+ * tag name `tagName` that is defined by a class named `className` in
+ * `sourceFile`.
  */
 const assertEntryTargetsClass = ({
 	t,
@@ -54,7 +56,7 @@ const assertEntryTargetsClass = ({
 	}
 
 	const { node: entryNode } = entry;
-	t.is(entryNode.kind, "NODE", "The entry should not originate from an `<svg>` or `<style>`.");
+	t.is(entryNode.kind, HtmlNodeKind.NODE, "The entry should not originate from an `<svg>` or `<style>`.");
 	t.is(entryNode.tagName, tagName, `The origin element is not a \`<${tagName}>\`.`);
 
 	const { target } = entry.definition;
@@ -83,7 +85,7 @@ const assertEntryTargetsClass = ({
 	t.is(targetNodeParent.name, targetNode, "The target node should be it's class definition's name.");
 };
 
-tsTest("`indexFile` creates a `HtmlNodeIndexEntry` for an element defined in the same file.", t => {
+tsTest("`indexFile` creates an `HtmlNodeIndexEntry` for an element defined in the same file.", t => {
 	const { indexEntries, sourceFile } = getIndexEntries([
 		{
 			fileName: "main.js",
@@ -116,7 +118,7 @@ tsTest("`indexFile` creates a `HtmlNodeIndexEntry` for an element defined in the
 	});
 });
 
-tsTest("`indexFile` creates a `HtmlNodeIndexEntry` for an element defined in a different file.", t => {
+tsTest("`indexFile` creates an `HtmlNodeIndexEntry` for an element defined in a different file.", t => {
 	const { indexEntries, program } = getIndexEntries([
 		{
 			fileName: "main.js",
@@ -130,7 +132,6 @@ tsTest("`indexFile` creates a `HtmlNodeIndexEntry` for an element defined in a d
 		},
 		{
 			fileName: "some-element.js",
-			entry: true,
 			text: `
 				class SomeElement extends HTMLElement {}
 				customElements.define('some-element', SomeElement);
