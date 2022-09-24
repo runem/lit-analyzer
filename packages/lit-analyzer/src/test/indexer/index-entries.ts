@@ -239,9 +239,58 @@ const assertIsAttrRefAndGetTargetNode = ({
 	return target.node;
 };
 
-tsTest("`indexFile` creates an `HtmlAttrNodeIndexEntry` for a property defined in the static `properties` getter.", t => {
+const assertIsAttrRefTargetingClass = ({
+	t,
+	entry,
+	name,
+	kind,
+	sourceFile,
+	className
+}: {
+	t: ExecutionContext;
+	entry: LitIndexEntry;
+	name: string;
+	kind: HtmlNodeAttrKind;
+	sourceFile: SourceFile;
+	className: string;
+}) => {
 	const { isClassDeclaration, isIdentifier, isPropertyAssignment } = getCurrentTsModule();
 
+	const targetNode = assertIsAttrRefAndGetTargetNode({
+		t,
+		entry,
+		name,
+		kind
+	});
+
+	t.is(targetNode.getSourceFile(), sourceFile, "The target node is not in the expected source file.");
+
+	// TODO: `targetNode` should probably always be the identifier.
+	const targetNodeName = isPropertyAssignment(targetNode) ? targetNode.name : targetNode;
+	if (!isIdentifier(targetNodeName)) {
+		throw new Error("The target node's name should be an `Identifier`.");
+	}
+	t.is(targetNodeName.text, name, "The target node's name should be `prop`.");
+
+	// Find the nearest class declaration.
+	let ancestor: Node = targetNode.parent;
+	while (!isClassDeclaration(ancestor)) {
+		ancestor = ancestor.parent;
+	}
+
+	if (!ancestor?.name) {
+		throw new Error("The target node was not contained in a named class.");
+	}
+
+	assertIdentifiesClass({
+		t,
+		identifier: ancestor.name,
+		sourceFile,
+		className: className
+	});
+};
+
+tsTest("`indexFile` creates an `HtmlAttrNodeIndexEntry` for a property defined in the static `properties` getter.", t => {
 	const { indexEntries, sourceFile } = getIndexEntries([
 		{
 			fileName: "main.js",
@@ -271,46 +320,17 @@ tsTest("`indexFile` creates an `HtmlAttrNodeIndexEntry` for a property defined i
 	const entries = Array.from(indexEntries).filter(entry => entry.kind === "ATTRIBUTE-REFERENCE");
 	t.is(entries.length, 1);
 
-	const targetNode = assertIsAttrRefAndGetTargetNode({
+	assertIsAttrRefTargetingClass({
 		t,
 		entry: entries[0],
 		name: "prop",
-		kind: HtmlNodeAttrKind.PROPERTY
-	});
-
-	t.is(targetNode.getSourceFile(), sourceFile, "The target node is not in the expected source file.");
-
-	if (!isPropertyAssignment(targetNode)) {
-		throw new Error("The target node should be a `PropertyAssignment`.");
-	}
-
-	const { name } = targetNode;
-	if (!isIdentifier(name)) {
-		throw new Error("The target node's name should be an `Identifier`.");
-	}
-	t.is(name.text, "prop", "The target node's name should be `prop`.");
-
-	// Find the nearest class declaration.
-	let ancestor: Node = targetNode.parent;
-	while (!isClassDeclaration(ancestor)) {
-		ancestor = ancestor.parent;
-	}
-
-	if (!ancestor?.name) {
-		throw new Error("The target node was not contained in a named class.");
-	}
-
-	assertIdentifiesClass({
-		t,
-		identifier: ancestor.name,
+		kind: HtmlNodeAttrKind.PROPERTY,
 		sourceFile,
 		className: "SomeElement"
 	});
 });
 
 tsTest("`indexFile` creates an `HtmlAttrNodeIndexEntry` for a property defined with a class field.", t => {
-	const { isClassDeclaration, isIdentifier } = getCurrentTsModule();
-
 	const { indexEntries, sourceFile } = getIndexEntries([
 		{
 			fileName: "main.ts",
@@ -336,34 +356,140 @@ tsTest("`indexFile` creates an `HtmlAttrNodeIndexEntry` for a property defined w
 	const entries = Array.from(indexEntries).filter(entry => entry.kind === "ATTRIBUTE-REFERENCE");
 	t.is(entries.length, 1);
 
-	const targetNode = assertIsAttrRefAndGetTargetNode({
+	assertIsAttrRefTargetingClass({
 		t,
 		entry: entries[0],
 		name: "prop",
-		kind: HtmlNodeAttrKind.PROPERTY
-	});
-
-	t.is(targetNode.getSourceFile(), sourceFile, "The target node is not in the expected source file.");
-
-	if (!isIdentifier(targetNode)) {
-		throw new Error("The target node should be an `Identifier`.");
-	}
-	t.is(targetNode.text, "prop", "The target node's name should be `prop`.");
-
-	// Find the nearest class declaration.
-	let ancestor: Node = targetNode.parent;
-	while (!isClassDeclaration(ancestor)) {
-		ancestor = ancestor.parent;
-	}
-
-	if (!ancestor?.name) {
-		throw new Error("The target node was not contained in a named class.");
-	}
-
-	assertIdentifiesClass({
-		t,
-		identifier: ancestor.name,
+		kind: HtmlNodeAttrKind.PROPERTY,
 		sourceFile,
 		className: "SomeElement"
 	});
+});
+
+tsTest("Boolean attribute references have the right kind.", t => {
+	const { indexEntries, sourceFile } = getIndexEntries([
+		{
+			fileName: "main.js",
+			entry: true,
+			text: `
+				class SomeElement extends HTMLElement {
+					static get properties() {
+						return {
+							prop: {type: String},
+						};
+					};
+				}
+				customElements.define('some-element', SomeElement);
+
+				declare global {
+					interface HTMLElementTagNameMap {
+						'some-element': SomeElement;
+					}
+				}
+
+				const html = x => x;
+				html\`<some-element ?prop="abc"></some-element>\`;
+			`
+		}
+	]);
+
+	const entries = Array.from(indexEntries).filter(entry => entry.kind === "ATTRIBUTE-REFERENCE");
+	t.is(entries.length, 1);
+
+	assertIsAttrRefTargetingClass({
+		t,
+		entry: entries[0],
+		name: "prop",
+		kind: HtmlNodeAttrKind.BOOLEAN_ATTRIBUTE,
+		sourceFile,
+		className: "SomeElement"
+	});
+});
+
+tsTest("Plain attributes references have the right kind.", t => {
+	const { indexEntries, sourceFile } = getIndexEntries([
+		{
+			fileName: "main.js",
+			entry: true,
+			text: `
+				class SomeElement extends HTMLElement {
+					static get properties() {
+						return {
+							// The indexer shouldn't mistake plain attributes with properties
+							// of the same name.
+							prop: {type: String},
+						};
+					};
+				}
+				customElements.define('some-element', SomeElement);
+
+				declare global {
+					interface HTMLElementTagNameMap {
+						'some-element': SomeElement;
+					}
+				}
+
+				const html = x => x;
+				html\`<some-element prop="abc"></some-element>\`;
+			`
+		}
+	]);
+
+	const entries = Array.from(indexEntries).filter(entry => entry.kind === "ATTRIBUTE-REFERENCE");
+	t.is(entries.length, 1);
+
+	assertIsAttrRefTargetingClass({
+		t,
+		entry: entries[0],
+		name: "prop",
+		kind: HtmlNodeAttrKind.ATTRIBUTE,
+		sourceFile,
+		className: "SomeElement"
+	});
+});
+
+tsTest("Event listeners do not produce entries.", t => {
+	const { indexEntries } = getIndexEntries([
+		{
+			fileName: "main.js",
+			entry: true,
+			text: `
+				class SomeElement extends HTMLElement {
+					static get properties() {
+						return {
+							// The indexer shouldn't mistake event listeners with properties
+							// of the same name.
+							someEvent: {type: Function},
+						};
+					};
+				}
+				customElements.define('some-element', SomeElement);
+
+				declare global {
+					interface HTMLElementTagNameMap {
+						'some-element': SomeElement;
+					}
+				}
+
+				// Supporting this might be a nice improvement but it doesn't currently work.
+
+				interface SomeElementEventMap extends HTMLElementEventMap, WindowEventHandlersEventMap {
+					'someEvent': Event;
+				}
+
+				interface SomeElement {
+					addEventListener<K extends keyof SomeElementEventMap>(type: K, listener: (this: SomeElement, ev: SomeElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+					addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+					removeEventListener<K extends keyof SomeElementEventMap>(type: K, listener: (this: SomeElement, ev: SomeElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+					removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+				}
+
+				const html = x => x;
+				html\`<some-element @someEvent=$\{(e) => console.log(e)}></some-element>\`;
+			`
+		}
+	]);
+
+	const entries = Array.from(indexEntries).filter(entry => entry.kind === "ATTRIBUTE-REFERENCE");
+	t.is(entries.length, 0);
 });
