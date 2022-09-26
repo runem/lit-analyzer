@@ -17,14 +17,51 @@ tsTest("No entries are created for HTML-like template strings if the template ta
 				class SomeElement extends HTMLElement {}
 				customElements.define('some-element', SomeElement);
 
+				const nothtml = x => x;
+				nothtml\`<some-element></some-element>\`;
+			`
+		}
+	]);
+
+	const entries = Array.from(indexEntries);
+	t.is(entries.length, 0);
+});
+
+tsTest("No entries are created for elements that are not defined with `customElements`.", t => {
+	const { indexEntries } = getIndexEntries([
+		{
+			fileName: "main.js",
+			entry: true,
+			text: `
+				class SomeElement extends HTMLElement {}
+
+				const html = x => x;
+				html\`<some-element></some-element>\`;
+			`
+		}
+	]);
+
+	const entries = Array.from(indexEntries);
+	t.is(entries.length, 0);
+});
+
+tsTest("No entries are created for tags that don't match any definition.", t => {
+	const { indexEntries } = getIndexEntries([
+		{
+			fileName: "main.js",
+			entry: true,
+			text: `
+				class SomeElement extends HTMLElement {}
+				customElements.define('some-element', SomeElement);
+
 				declare global {
 					interface HTMLElementTagNameMap {
 						'some-element': SomeElement;
 					}
 				}
 
-				const nothtml = x => x;
-				nothtml\`<some-element></some-element>\`;
+				const html = x => x;
+				html\`<unknown-element></unknown-element>\`;
 			`
 		}
 	]);
@@ -104,7 +141,7 @@ const assertEntryTargetsClass = ({
 	assertIdentifiesClass({ t, identifier: target.node, sourceFile, className });
 };
 
-tsTest("Element references can reference elements defined in the same file.", t => {
+tsTest("Element references can reference elements defined in the same file. (JS)", t => {
 	const { indexEntries, sourceFile } = getIndexEntries([
 		{
 			fileName: "main.js",
@@ -112,6 +149,65 @@ tsTest("Element references can reference elements defined in the same file.", t 
 			text: `
 				class SomeElement extends HTMLElement {}
 				customElements.define('some-element', SomeElement);
+
+				const html = x => x;
+				html\`<some-element></some-element>\`;
+			`
+		}
+	]);
+
+	const entries = Array.from(indexEntries);
+	t.is(entries.length, 1);
+
+	assertEntryTargetsClass({
+		t,
+		entry: entries[0],
+		sourceFile,
+		tagName: "some-element",
+		className: "SomeElement"
+	});
+});
+
+tsTest("Element references can reference elements defined in the same file. (TS)", t => {
+	const { indexEntries, sourceFile } = getIndexEntries([
+		{
+			fileName: "main.ts",
+			entry: true,
+			text: `
+				class SomeElement extends HTMLElement {}
+				customElements.define('some-element', SomeElement);
+
+				declare global {
+					interface HTMLElementTagNameMap {
+						'some-element': SomeElement;
+					}
+				}
+
+				const html = x => x;
+				html\`<some-element></some-element>\`;
+			`
+		}
+	]);
+
+	const entries = Array.from(indexEntries);
+	t.is(entries.length, 1);
+
+	assertEntryTargetsClass({
+		t,
+		entry: entries[0],
+		sourceFile,
+		tagName: "some-element",
+		className: "SomeElement"
+	});
+});
+
+tsTest("An entry is created for elements that are not defined with `customElements` if they are added to `HTMLElementTagNameMap` in TS.", t => {
+	const { indexEntries, sourceFile } = getIndexEntries([
+		{
+			fileName: "main.ts",
+			entry: true,
+			text: `
+				class SomeElement extends HTMLElement {}
 
 				declare global {
 					interface HTMLElementTagNameMap {
