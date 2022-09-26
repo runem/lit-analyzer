@@ -104,7 +104,7 @@ const assertEntryTargetsClass = ({
 	assertIdentifiesClass({ t, identifier: target.node, sourceFile, className });
 };
 
-tsTest("`indexFile` creates an `HtmlNodeIndexEntry` for an element defined in the same file.", t => {
+tsTest("Element references can reference elements defined in the same file.", t => {
 	const { indexEntries, sourceFile } = getIndexEntries([
 		{
 			fileName: "main.js",
@@ -137,7 +137,7 @@ tsTest("`indexFile` creates an `HtmlNodeIndexEntry` for an element defined in th
 	});
 });
 
-tsTest("`indexFile` creates an `HtmlNodeIndexEntry` for an element defined in a different file.", t => {
+tsTest("Element references can reference elements defined in a different file.", t => {
 	const { indexEntries, program } = getIndexEntries([
 		{
 			fileName: "main.js",
@@ -176,7 +176,7 @@ tsTest("`indexFile` creates an `HtmlNodeIndexEntry` for an element defined in a 
 	});
 });
 
-tsTest("`indexFile` does not create `HtmlAttrNodeIndexEntry`s for attributes that don't map to known properties.", t => {
+tsTest("Attribute references are not created for attributes that don't map to known properties.", t => {
 	const { indexEntries } = getIndexEntries([
 		{
 			fileName: "main.js",
@@ -290,7 +290,7 @@ const assertIsAttrRefTargetingClass = ({
 	});
 };
 
-tsTest("`indexFile` creates an `HtmlAttrNodeIndexEntry` for a property defined in the static `properties` getter.", t => {
+tsTest("Attribute references can reference properties defined in the static `properties` getter.", t => {
 	const { indexEntries, sourceFile } = getIndexEntries([
 		{
 			fileName: "main.js",
@@ -330,7 +330,7 @@ tsTest("`indexFile` creates an `HtmlAttrNodeIndexEntry` for a property defined i
 	});
 });
 
-tsTest("`indexFile` creates an `HtmlAttrNodeIndexEntry` for a property defined with a class field.", t => {
+tsTest("Attribute references can reference properties defined with a class field.", t => {
 	const { indexEntries, sourceFile } = getIndexEntries([
 		{
 			fileName: "main.ts",
@@ -406,7 +406,7 @@ tsTest("Boolean attribute references have the right kind.", t => {
 	});
 });
 
-tsTest("Plain attributes references have the right kind.", t => {
+tsTest("Attribute references have the right kind.", t => {
 	const { indexEntries, sourceFile } = getIndexEntries([
 		{
 			fileName: "main.js",
