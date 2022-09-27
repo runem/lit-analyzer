@@ -1,8 +1,8 @@
-import { isSimpleType, SimpleType, toSimpleType } from "ts-simple-type";
+import { isSimpleType, SimpleType, SimpleTypeAny, toSimpleType } from "ts-simple-type";
 import { TypeChecker } from "typescript";
 import { AnalyzerResult, ComponentDeclaration, ComponentDefinition, ComponentFeatures } from "web-component-analyzer";
 import { lazy } from "../util/general-util.js";
-import { HtmlDataCollection, HtmlDataFeatures, HtmlMemberBase, HtmlTag } from "./parse-html-data/html-tag.js";
+import { HtmlDataCollection, HtmlDataFeatures, HtmlTag } from "./parse-html-data/html-tag.js";
 
 export interface AnalyzeResultConversionOptions {
 	addDeclarationPropertiesAsAttributes?: boolean;
@@ -156,14 +156,14 @@ export function convertComponentFeaturesToHtml(
 			continue;
 		}
 
-		const base: HtmlMemberBase = {
+		const base = {
 			declaration: member,
 			description: member.jsDoc?.description,
 			getType: lazy(() => {
 				const type = member.type?.();
 
 				if (type == null) {
-					return { kind: "ANY" };
+					return { kind: "ANY" } as SimpleTypeAny;
 				}
 
 				return isSimpleType(type) ? type : toSimpleType(type, checker);
