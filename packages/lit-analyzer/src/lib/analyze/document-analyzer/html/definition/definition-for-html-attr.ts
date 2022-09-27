@@ -16,7 +16,8 @@ export function definitionForHtmlAttr(htmlAttr: HtmlNodeAttr, { htmlStore, ts }:
 			fromRange: rangeFromHtmlNodeAttr(htmlAttr),
 			target: {
 				kind: "node",
-				node: getNodeIdentifier(node, ts) || node
+				node: getNodeIdentifier(node, ts) || node,
+				name: target.name
 			}
 		};
 	} else if (isHtmlEvent(target) && target.declaration != null) {
@@ -26,7 +27,8 @@ export function definitionForHtmlAttr(htmlAttr: HtmlNodeAttr, { htmlStore, ts }:
 			fromRange: rangeFromHtmlNodeAttr(htmlAttr),
 			target: {
 				kind: "node",
-				node: getNodeIdentifier(node, ts) || node
+				node: getNodeIdentifier(node, ts) || node,
+				name: target.name
 			}
 		};
 	}

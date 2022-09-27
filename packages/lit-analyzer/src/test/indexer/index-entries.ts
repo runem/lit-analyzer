@@ -303,7 +303,7 @@ tsTest("Attribute references are not created for attributes that don't map to kn
  * Asserts that `entry` is a `HtmlNodeAttrIndexEntry` with name `name` and kind
  * `kind` that targets a `LitDefinitionTargetNode`.
  */
-const assertIsAttrRefAndGetTargetNode = ({
+const assertIsAttrRefAndGetTarget = ({
 	t,
 	entry,
 	name,
@@ -332,7 +332,7 @@ const assertIsAttrRefAndGetTargetNode = ({
 		throw new Error("The definition target should be a `LitDefinitionTargetNode`.");
 	}
 
-	return target.node;
+	return target;
 };
 
 const assertIsAttrRefTargetingClass = ({
@@ -350,9 +350,9 @@ const assertIsAttrRefTargetingClass = ({
 	sourceFile: SourceFile;
 	className: string;
 }) => {
-	const { isClassDeclaration, isIdentifier, isPropertyAssignment } = getCurrentTsModule();
+	const { isClassDeclaration } = getCurrentTsModule();
 
-	const targetNode = assertIsAttrRefAndGetTargetNode({
+	const { node: targetNode, name: targetName } = assertIsAttrRefAndGetTarget({
 		t,
 		entry,
 		name,
@@ -360,13 +360,9 @@ const assertIsAttrRefTargetingClass = ({
 	});
 
 	t.is(targetNode.getSourceFile(), sourceFile, "The target node is not in the expected source file.");
-
-	// TODO: `targetNode` should probably always be the identifier.
-	const targetNodeName = isPropertyAssignment(targetNode) ? targetNode.name : targetNode;
-	if (!isIdentifier(targetNodeName)) {
-		throw new Error("The target node's name should be an `Identifier`.");
+	if (targetName !== name) {
+		throw new Error(`The target node's name should be \`${name}\`.`);
 	}
-	t.is(targetNodeName.text, name, "The target node's name should be `prop`.");
 
 	// Find the nearest class declaration.
 	let ancestor: Node = targetNode.parent;
