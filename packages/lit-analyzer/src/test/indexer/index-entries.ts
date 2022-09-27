@@ -580,7 +580,7 @@ tsTest("Boolean attribute references have the right kind.", t => {
 				class SomeElement extends HTMLElement {
 					static get properties() {
 						return {
-							prop: {type: String},
+							prop: {type: Boolean},
 						};
 					};
 				}
