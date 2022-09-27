@@ -458,6 +458,119 @@ tsTest("Attribute references can reference properties defined with a class field
 	});
 });
 
+tsTest("Attribute references can reference properties defined with a setter.", t => {
+	const { indexEntries, sourceFile } = getIndexEntries([
+		{
+			fileName: "main.ts",
+			entry: true,
+			text: `
+				class SomeElement extends HTMLElement {
+					set prop() {}
+				}
+				customElements.define('some-element', SomeElement);
+
+				declare global {
+					interface HTMLElementTagNameMap {
+						'some-element': SomeElement;
+					}
+				}
+
+				const html = x => x;
+				html\`<some-element .prop="abc"></some-element>\`;
+			`
+		}
+	]);
+
+	const entries = Array.from(indexEntries).filter(entry => entry.kind === "ATTRIBUTE-REFERENCE");
+	t.is(entries.length, 1);
+
+	assertIsAttrRefTargetingClass({
+		t,
+		entry: entries[0],
+		name: "prop",
+		kind: HtmlNodeAttrKind.PROPERTY,
+		sourceFile,
+		className: "SomeElement"
+	});
+});
+
+tsTest("Attribute references can reference properties defined by assignment in the constructor.", t => {
+	const { indexEntries, sourceFile } = getIndexEntries([
+		{
+			fileName: "main.ts",
+			entry: true,
+			text: `
+				class SomeElement extends HTMLElement {
+					constructor() {
+						super();
+						this.prop = "def";
+					}
+				}
+				customElements.define('some-element', SomeElement);
+
+				declare global {
+					interface HTMLElementTagNameMap {
+						'some-element': SomeElement;
+					}
+				}
+
+				const html = x => x;
+				html\`<some-element .prop="abc"></some-element>\`;
+			`
+		}
+	]);
+
+	const entries = Array.from(indexEntries).filter(entry => entry.kind === "ATTRIBUTE-REFERENCE");
+	t.is(entries.length, 1);
+
+	assertIsAttrRefTargetingClass({
+		t,
+		entry: entries[0],
+		name: "prop",
+		kind: HtmlNodeAttrKind.PROPERTY,
+		sourceFile,
+		className: "SomeElement"
+	});
+});
+
+tsTest("Attribute references can reference properties defined in `observedAttributes`.", t => {
+	const { indexEntries, sourceFile } = getIndexEntries([
+		{
+			fileName: "main.ts",
+			entry: true,
+			text: `
+				class SomeElement extends HTMLElement {
+					static get observedAttributes() {
+						return ["some-attr"];
+					}
+				}
+				customElements.define('some-element', SomeElement);
+
+				declare global {
+					interface HTMLElementTagNameMap {
+						'some-element': SomeElement;
+					}
+				}
+
+				const html = x => x;
+				html\`<some-element some-attr="abc"></some-element>\`;
+			`
+		}
+	]);
+
+	const entries = Array.from(indexEntries).filter(entry => entry.kind === "ATTRIBUTE-REFERENCE");
+	t.is(entries.length, 1);
+
+	assertIsAttrRefTargetingClass({
+		t,
+		entry: entries[0],
+		name: "some-attr",
+		kind: HtmlNodeAttrKind.ATTRIBUTE,
+		sourceFile,
+		className: "SomeElement"
+	});
+});
+
 tsTest("Boolean attribute references have the right kind.", t => {
 	const { indexEntries, sourceFile } = getIndexEntries([
 		{
