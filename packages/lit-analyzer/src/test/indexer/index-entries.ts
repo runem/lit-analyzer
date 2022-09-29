@@ -246,7 +246,7 @@ tsTest("Element references can reference elements defined in a different file.",
 			`
 		},
 		{
-			fileName: "some-element.js",
+			fileName: "some-element.ts",
 			text: `
 				class SomeElement extends HTMLElement {}
 				customElements.define('some-element', SomeElement);
@@ -266,7 +266,7 @@ tsTest("Element references can reference elements defined in a different file.",
 	assertEntryTargetsClass({
 		t,
 		entry: entries[0],
-		sourceFile: program.getSourceFile("some-element.js"),
+		sourceFile: program.getSourceFile("some-element.ts"),
 		tagName: "some-element",
 		className: "SomeElement"
 	});
@@ -275,7 +275,7 @@ tsTest("Element references can reference elements defined in a different file.",
 tsTest("Attribute references are not created for attributes that don't map to known properties.", t => {
 	const { indexEntries } = getIndexEntries([
 		{
-			fileName: "main.js",
+			fileName: "main.ts",
 			entry: true,
 			text: `
 				class SomeElement extends HTMLElement {
@@ -385,7 +385,7 @@ const assertIsAttrRefTargetingClass = ({
 tsTest("Attribute references can reference properties defined in the static `properties` getter.", t => {
 	const { indexEntries, sourceFile } = getIndexEntries([
 		{
-			fileName: "main.js",
+			fileName: "main.ts",
 			entry: true,
 			text: `
 				class SomeElement extends HTMLElement {
@@ -574,7 +574,7 @@ tsTest("Attribute references can reference properties defined in `observedAttrib
 tsTest("Boolean attribute references have the right kind.", t => {
 	const { indexEntries, sourceFile } = getIndexEntries([
 		{
-			fileName: "main.js",
+			fileName: "main.ts",
 			entry: true,
 			text: `
 				class SomeElement extends HTMLElement {
@@ -614,7 +614,7 @@ tsTest("Boolean attribute references have the right kind.", t => {
 tsTest("Attribute references have the right kind.", t => {
 	const { indexEntries, sourceFile } = getIndexEntries([
 		{
-			fileName: "main.js",
+			fileName: "main.ts",
 			entry: true,
 			text: `
 				class SomeElement extends HTMLElement {
@@ -656,7 +656,7 @@ tsTest("Attribute references have the right kind.", t => {
 tsTest("Event listeners do not produce entries.", t => {
 	const { indexEntries } = getIndexEntries([
 		{
-			fileName: "main.js",
+			fileName: "main.ts",
 			entry: true,
 			text: `
 				class SomeElement extends HTMLElement {
