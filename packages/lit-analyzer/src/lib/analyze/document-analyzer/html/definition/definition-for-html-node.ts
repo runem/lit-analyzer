@@ -12,9 +12,11 @@ export function definitionForHtmlNode(htmlNode: HtmlNode, { htmlStore, ts }: Lit
 
 	return {
 		fromRange: rangeFromHtmlNode(htmlNode),
-		target: {
-			kind: "node",
-			node: getNodeIdentifier(node, ts) || node
-		}
+		targets: [
+			{
+				kind: "node",
+				node: getNodeIdentifier(node, ts) || node
+			}
+		]
 	};
 }

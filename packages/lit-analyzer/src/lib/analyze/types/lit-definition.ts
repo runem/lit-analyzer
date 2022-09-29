@@ -24,5 +24,5 @@ export type LitDefinitionTarget = LitDefinitionTargetNode | LitDefinitionTargetR
 
 export interface LitDefinition {
 	fromRange: SourceFileRange;
-	target: LitDefinitionTarget[] | LitDefinitionTarget;
+	targets: LitDefinitionTarget[];
 }
