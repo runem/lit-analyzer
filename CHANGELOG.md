@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 <!-- ### Removed -->
 <!-- ### Fixed -->
 
+## [Unreleased]
+
+### Added
+
+- Added the ability to emit 'index entries'. ([#271](https://github.com/runem/lit-analyzer/pull/271))
+
 ## [2.0.0-pre.2]
 
 ### Fixed
