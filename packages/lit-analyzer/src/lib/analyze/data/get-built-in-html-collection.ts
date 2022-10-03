@@ -1,6 +1,6 @@
 import { SimpleType } from "ts-simple-type";
 import { HTMLDataV1 } from "vscode-html-languageservice";
-import htmlDataJson from "vscode-web-custom-data/data/browsers.html-data.json";
+import htmlDataJson from "@vscode/web-custom-data/data/browsers.html-data.json";
 import { HtmlAttr, HtmlDataCollection } from "../parse/parse-html-data/html-tag.js";
 import { parseVscodeHtmlData } from "../parse/parse-html-data/parse-vscode-html-data.js";
 import { lazy } from "../util/general-util.js";
