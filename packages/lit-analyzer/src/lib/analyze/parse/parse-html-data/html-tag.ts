@@ -37,7 +37,7 @@ export interface HtmlTag extends HtmlDataFeatures {
 export type HtmlTagMemberKind = "attribute" | "property";
 
 export interface HtmlMemberBase {
-	kind?: HtmlTagMemberKind;
+	kind: HtmlTagMemberKind;
 	builtIn?: boolean;
 	required?: boolean;
 	description?: string;
