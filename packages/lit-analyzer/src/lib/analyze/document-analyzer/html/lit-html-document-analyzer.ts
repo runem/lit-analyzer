@@ -1,8 +1,8 @@
 import { FormatCodeSettings } from "typescript";
 import { LitAnalyzerContext } from "../../lit-analyzer-context.js";
 import { HtmlDocument } from "../../parse/document/text-document/html-document/html-document.js";
-import { isHTMLAttr } from "../../types/html-node/html-node-attr-types.js";
-import { isHTMLNode } from "../../types/html-node/html-node-types.js";
+import { isHTMLAttr, HtmlNodeAttr } from "../../types/html-node/html-node-attr-types.js";
+import { isHTMLNode, HtmlNode } from "../../types/html-node/html-node-types.js";
 import { LitClosingTagInfo } from "../../types/lit-closing-tag-info.js";
 import { LitCodeFix } from "../../types/lit-code-fix.js";
 import { LitCompletion } from "../../types/lit-completion.js";
@@ -148,4 +148,33 @@ export class LitHtmlDocumentAnalyzer {
 	getFormatEdits(document: HtmlDocument, settings: FormatCodeSettings): LitFormatEdit[] {
 		return this.vscodeHtmlService.format(document, settings);
 	}
+
+	*indexFile(document: HtmlDocument, context: LitAnalyzerContext): IterableIterator<LitIndexEntry> {
+		for (const node of document.nodes()) {
+			const definition = definitionForHtmlNode(node, context);
+			if (definition != null) {
+				yield { kind: "NODE-REFERENCE", node, document, definition };
+			}
+			for (const attribute of node.attributes) {
+				const definition = definitionForHtmlAttr(attribute, context);
+				if (definition != null) {
+					yield { kind: "ATTRIBUTE-REFERENCE", attribute, document, definition };
+				}
+			}
+		}
+	}
+}
+
+export type LitIndexEntry = HtmlNodeIndexEntry | HtmlNodeAttrIndexEntry;
+interface HtmlNodeIndexEntry {
+	kind: "NODE-REFERENCE";
+	node: HtmlNode;
+	document: HtmlDocument;
+	definition: LitDefinition;
+}
+interface HtmlNodeAttrIndexEntry {
+	kind: "ATTRIBUTE-REFERENCE";
+	attribute: HtmlNodeAttr;
+	document: HtmlDocument;
+	definition: LitDefinition;
 }

@@ -8,6 +8,7 @@ import { compileFiles, TestFile } from "./compile-files.js";
 import { getCurrentTsModule } from "./ts-test.js";
 import { Range } from "../../lib/analyze/types/range.js";
 import { LitCodeFix } from "../../lib/analyze/types/lit-code-fix.js";
+import { LitIndexEntry } from "../../lib/analyze/document-analyzer/html/lit-html-document-analyzer.js";
 
 /**
  * Prepares both the Typescript program and the LitAnalyzer
@@ -60,6 +61,7 @@ export function getDiagnostics(
 /**
  * Returns code fixes in 'virtual' files using the LitAnalyzer
  * @param inputFiles
+ * @param range
  * @param config
  */
 export function getCodeFixesAtRange(
@@ -71,6 +73,23 @@ export function getCodeFixesAtRange(
 
 	return {
 		codeFixes: analyzer.getCodeFixesAtPositionRange(sourceFile, range),
+		program,
+		sourceFile
+	};
+}
+
+/**
+ * @param inputFiles
+ * @param config
+ */
+export function getIndexEntries(
+	inputFiles: TestFile[] | TestFile,
+	config: Partial<LitAnalyzerConfig> = {}
+): { indexEntries: IterableIterator<LitIndexEntry>; program: Program; sourceFile: SourceFile } {
+	const { analyzer, sourceFile, program } = prepareAnalyzer(inputFiles, config);
+
+	return {
+		indexEntries: analyzer.indexFile(sourceFile),
 		program,
 		sourceFile
 	};
