@@ -112,7 +112,7 @@ function matchesAtLeastOneNominalType(typeNames: string[], typeB: SimpleType): b
 			return true;
 		}
 		const normalized = normalizeTypeName(typeBName);
-		if (normalized !== undefined && typeNames.includes(typeBName)) {
+		if (normalized !== undefined && typeNames.includes(normalized)) {
 			return true;
 		}
 	}

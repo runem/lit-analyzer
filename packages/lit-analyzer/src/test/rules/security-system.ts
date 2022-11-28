@@ -169,3 +169,29 @@ tsTest(testName, t => {
 	const { diagnostics } = getDiagnostics(preface + "html`<div .style=${anyValue}></div>`", { securitySystem: "ClosureSafeTypes" });
 	hasNoDiagnostics(t, diagnostics);
 });
+
+testName = "Types renamed by Clutz are properly matched against allowed types.";
+tsTest(testName, t => {
+	const { diagnostics } = getDiagnostics(
+		[
+			{
+				fileName: "main.ts",
+				text: `
+					// A type name known to have been output by Clutz.
+					class module$contents$goog$html$SafeUrl_SafeUrl {}
+
+					html\`<a href='\${"abc" as module$contents$goog$html$SafeUrl_SafeUrl}'>This is a link.</a>\`;
+
+					// A type name of the same format.
+					class module$some$clutz$name_TrustedResourceUrl {}
+
+					html\`<script src='\${"abc" as module$some$clutz$name_TrustedResourceUrl}'></script>\`;
+				`
+			}
+		],
+		{
+			securitySystem: "ClosureSafeTypes"
+		}
+	);
+	hasNoDiagnostics(t, diagnostics);
+});
