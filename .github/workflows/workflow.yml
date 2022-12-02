@@ -29,8 +29,9 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Install latest npm
-        run: npm i -g npm
+      # npm@9 doesn't support Node 17.
+      - name: Install npm@8
+        run: npm i -g npm@8
 
       - name: Install
         run: npm ci

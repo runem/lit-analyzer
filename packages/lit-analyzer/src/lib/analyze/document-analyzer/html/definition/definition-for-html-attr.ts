@@ -14,22 +14,26 @@ export function definitionForHtmlAttr(htmlAttr: HtmlNodeAttr, { htmlStore, ts }:
 
 		return {
 			fromRange: rangeFromHtmlNodeAttr(htmlAttr),
-			target: {
-				kind: "node",
-				node: getNodeIdentifier(node, ts) || node,
-				name: target.name
-			}
+			targets: [
+				{
+					kind: "node",
+					node: getNodeIdentifier(node, ts) || node,
+					name: target.name
+				}
+			]
 		};
 	} else if (isHtmlEvent(target) && target.declaration != null) {
 		const node = target.declaration.node;
 
 		return {
 			fromRange: rangeFromHtmlNodeAttr(htmlAttr),
-			target: {
-				kind: "node",
-				node: getNodeIdentifier(node, ts) || node,
-				name: target.name
-			}
+			targets: [
+				{
+					kind: "node",
+					node: getNodeIdentifier(node, ts) || node,
+					name: target.name
+				}
+			]
 		};
 	}
 	return;

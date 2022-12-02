@@ -67,7 +67,7 @@ export class LitCssDocumentAnalyzer {
 
 					return {
 						fromRange: documentRangeToSFRange(document, { start, end }),
-						target: nodes.map(node => ({
+						targets: nodes.map(node => ({
 							kind: "node",
 							node: getNodeIdentifier(node, context.ts) || node
 						}))
@@ -85,10 +85,12 @@ export class LitCssDocumentAnalyzer {
 
 				return {
 					fromRange: documentRangeToSFRange(document, { start, end }),
-					target: {
-						kind: "node",
-						node: getNodeIdentifier(node, context.ts) || node
-					}
+					targets: [
+						{
+							kind: "node",
+							node: getNodeIdentifier(node, context.ts) || node
+						}
+					]
 				};
 			}
 		}

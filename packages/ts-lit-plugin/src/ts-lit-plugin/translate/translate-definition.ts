@@ -5,7 +5,7 @@ import { translateRange } from "./translate-range.js";
 
 export function translateDefinition(definition: LitDefinition): DefinitionInfoAndBoundSpan {
 	return {
-		definitions: [...(Array.isArray(definition.target) ? definition.target : [definition.target])].map(translateDefinitionInfo),
+		definitions: definition.targets.map(translateDefinitionInfo),
 		textSpan: translateRange(definition.fromRange)
 	};
 }
