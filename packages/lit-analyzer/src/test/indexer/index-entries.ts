@@ -104,7 +104,7 @@ const assertIdentifiesClass = ({
 
 /**
  * Asserts that `entry` is a `HtmlNodeIndexEntry` that describes an element with
- * tag name `tagName` that is defined by a class named `className` in
+ * tag name `tagName` that is defined by a single class named `className` in
  * `sourceFile`.
  */
 const assertEntryTargetsClass = ({
@@ -128,12 +128,10 @@ const assertEntryTargetsClass = ({
 	t.is(entryNode.kind, HtmlNodeKind.NODE, "The entry should not originate from an `<svg>` or `<style>`.");
 	t.is(entryNode.tagName, tagName, `The origin element is not a \`<${tagName}>\`.`);
 
-	const { target } = entry.definition;
-	if (Array.isArray(target)) {
-		// TODO: What about single item arrays?
-		throw new Error("The definition should have a single target.");
-	}
+	const { targets } = entry.definition;
+	t.is(targets.length, 1, "The definition should have a single target.");
 
+	const [target] = targets;
 	if (target.kind !== "node") {
 		throw new Error("The definition target should be a `LitDefinitionTargetNode`.");
 	}
@@ -301,7 +299,7 @@ tsTest("Attribute references are not created for attributes that don't map to kn
 
 /**
  * Asserts that `entry` is a `HtmlNodeAttrIndexEntry` with name `name` and kind
- * `kind` that targets a `LitDefinitionTargetNode`.
+ * `kind` that has a single target `LitDefinitionTargetNode`.
  */
 const assertIsAttrRefAndGetTarget = ({
 	t,
@@ -322,12 +320,10 @@ const assertIsAttrRefAndGetTarget = ({
 	t.is(entryAttr.name, name, `The attribute name should be \`${name}\`.`);
 	t.is(entryAttr.kind, kind, `The attribute kind should be \`${kind}\`.`);
 
-	const { target } = entry.definition;
-	if (Array.isArray(target)) {
-		// TODO: What about single item arrays?
-		throw new Error("The definition should have a single target.");
-	}
+	const { targets } = entry.definition;
+	t.is(targets.length, 1, "The definition should have a single target.");
 
+	const [target] = targets;
 	if (target.kind !== "node") {
 		throw new Error("The definition target should be a `LitDefinitionTargetNode`.");
 	}
