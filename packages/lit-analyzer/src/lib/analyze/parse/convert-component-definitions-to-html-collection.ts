@@ -1,5 +1,5 @@
-import { isSimpleType, SimpleType, SimpleTypeAny, toSimpleType } from "ts-simple-type";
-import { TypeChecker } from "typescript";
+import { isSimpleType, SimpleType, SimpleTypeAny, SimpleTypeIntersection, toSimpleType } from "ts-simple-type";
+import { Node, Symbol, Type, TypeChecker } from "typescript";
 import { AnalyzerResult, ComponentDeclaration, ComponentDefinition, ComponentFeatures } from "web-component-analyzer";
 import { lazy } from "../util/general-util.js";
 import { HtmlDataCollection, HtmlDataFeatures, HtmlTag } from "./parse-html-data/html-tag.js";
@@ -47,7 +47,7 @@ export function convertComponentDeclarationToHtmlTag(
 		tagName,
 		builtIn,
 		description: declaration.jsDoc?.description,
-		...convertComponentFeaturesToHtml(declaration, { checker, builtIn, fromTagName: tagName })
+		...convertComponentFeaturesToHtml(declaration, { checker, builtIn, fromTagName: tagName, location: declaration.node })
 	};
 
 	if (addDeclarationPropertiesAsAttributes && !builtIn) {
@@ -66,7 +66,7 @@ export function convertComponentDeclarationToHtmlTag(
 
 export function convertComponentFeaturesToHtml(
 	features: ComponentFeatures,
-	{ checker, builtIn, fromTagName }: { checker: TypeChecker; builtIn?: boolean; fromTagName?: string }
+	{ checker, builtIn, fromTagName, location }: { checker: TypeChecker; builtIn?: boolean; fromTagName?: string; location?: Node }
 ): HtmlDataFeatures {
 	const result: HtmlDataFeatures = {
 		attributes: [],
@@ -160,6 +160,38 @@ export function convertComponentFeaturesToHtml(
 			declaration: member,
 			description: member.jsDoc?.description,
 			getType: lazy(() => {
+				if (location) {
+					const iType = checker.getTypeAtLocation(location);
+					if (iType.isClassOrInterface() && member.propName) {
+						const collectInheritedPropertySymbolsByName = (type: Type, name: string): Array<Symbol> => {
+							const prop = checker.getPropertyOfType(type, name);
+							if (prop) {
+								return [prop];
+							}
+
+							if (type.isClassOrInterface()) {
+								const props = [];
+								for (const baseType of checker.getBaseTypes(type)) {
+									props.push(...collectInheritedPropertySymbolsByName(baseType, name));
+								}
+								return props;
+							}
+
+							return [];
+						};
+
+						const props = collectInheritedPropertySymbolsByName(iType, member.propName);
+						if (props.length > 0) {
+							return {
+								kind: "INTERSECTION",
+								types: props.map(prop => {
+									return toSimpleType(checker.getTypeOfSymbolAtLocation(prop, location), checker);
+								})
+							} as SimpleTypeIntersection;
+						}
+					}
+				}
+
 				const type = member.type?.();
 
 				if (type == null) {

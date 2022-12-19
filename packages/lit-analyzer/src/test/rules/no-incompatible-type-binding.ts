@@ -293,3 +293,18 @@ tsTest("Attribute binding: the target attribute is correctly type checked when g
 
 	hasNoDiagnostics(t, diagnostics);
 });
+
+tsTest("Generics in element class", t => {
+	const { diagnostics } = getDiagnostics(`
+		class BaseElement<T> extends HTMLElement {
+			prop?: T;
+		}
+
+		class DerivedElement extends BaseElement<number> {}
+		customElements.define('derived-element', DerivedElement);
+
+		html\`<derived-element .prop="$\{123}"></derived-element>\`
+	`);
+
+	hasNoDiagnostics(t, diagnostics);
+});
