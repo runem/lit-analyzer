@@ -37,7 +37,7 @@
 		"lit-html": "https://github.com/mjbvz/vscode-lit-html.git#1.11.1",
 		"ts-lit-plugin": "1.2.1",
 		"vscode-styled-components": "https://github.com/styled-components/vscode-styled-components/archive/refs/tags/v1.7.8.tar.gz",
-		"web-component-analyzer": "~1.1.1"
+		"web-component-analyzer": "~1.1.7"
 	},
 	"devDependencies": {
 		"@types/node": "^14.0.13",
