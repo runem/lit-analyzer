@@ -143,15 +143,40 @@ function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, con
 	const fromSourceFile = node.getSourceFile();
 
 	// Resolve the imported string
-	const result = context.project
-		? context.project.getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, fromSourceFile.fileName)
-		: "getResolvedModuleWithFailedLookupLocationsFromCache" in context.program
-		? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-		  (context.program as any)["getResolvedModuleWithFailedLookupLocationsFromCache"](moduleSpecifier, fromSourceFile.fileName)
-		: undefined;
+	const maybeResolvedModule: ts.ResolvedModuleWithFailedLookupLocations | undefined = (() => {
+		if (context.project) {
+			return context.project.getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, fromSourceFile.fileName);
+		}
 
-	if (result?.resolvedModule?.resolvedFileName != null) {
-		const resolvedModule = result.resolvedModule;
+		if ("getResolvedModuleWithFailedLookupLocationsFromCache" in context.program) {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			return (context.program as any)["getResolvedModuleWithFailedLookupLocationsFromCache"](moduleSpecifier, fromSourceFile.fileName);
+		}
+
+		// `getResolvedModuleWithFailedLookupLocationsFromCache` was removed in
+		// <https://github.com/microsoft/TypeScript/pull/51546>. This is based on a
+		// replacement written in that PR:
+		// <https://github.com/microsoft/TypeScript/blob/21d6148a33994c99054e6db9e7cbc8e145027739/src/testRunner/unittests/tsserver/getEditsForFileRename.ts#L45>
+		if ("getModuleResolutionCache" in context.program) {
+			interface SourceFileWithInternals {
+				resolvedPath?: tsModule.Path;
+				impliedNodeFormat?: unknown /* tsModule.ResolutionMode */;
+			}
+
+			const { resolvedPath, impliedNodeFormat } = (fromSourceFile as unknown) as SourceFileWithInternals;
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const moduleResolutionCache = (context.program as any)["getModuleResolutionCache"]();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const directoryPath = (context.ts as any)["getDirectoryPath"](resolvedPath);
+
+			return moduleResolutionCache.getOrCreateCacheForDirectory(directoryPath).get(moduleSpecifier, impliedNodeFormat);
+		}
+
+		return undefined;
+	})();
+
+	if (maybeResolvedModule?.resolvedModule?.resolvedFileName != null) {
+		const resolvedModule = maybeResolvedModule.resolvedModule;
 		const sourceFile = context.program.getSourceFile(resolvedModule.resolvedFileName);
 		if (sourceFile != null) {
 			context.emitDirectImport?.(sourceFile);
