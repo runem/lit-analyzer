@@ -143,12 +143,14 @@ function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, con
 	const fromSourceFile = node.getSourceFile();
 
 	// Resolve the imported string
-	const result = context.project
-		? context.project.getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, fromSourceFile.fileName)
-		: "getResolvedModuleWithFailedLookupLocationsFromCache" in context.program
-		? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-		  (context.program as any)["getResolvedModuleWithFailedLookupLocationsFromCache"](moduleSpecifier, fromSourceFile.fileName)
-		: undefined;
+	let result: ts.ResolvedModuleWithFailedLookupLocations | undefined;
+
+	if (context.project) {
+		result = context.project.getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, fromSourceFile.fileName);
+	} else if ("getResolvedModuleWithFailedLookupLocationsFromCache" in context.program) {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		result = (context.program as any)["getResolvedModuleWithFailedLookupLocationsFromCache"](moduleSpecifier, fromSourceFile.fileName);
+	}
 
 	if (result?.resolvedModule?.resolvedFileName != null) {
 		const resolvedModule = result.resolvedModule;
