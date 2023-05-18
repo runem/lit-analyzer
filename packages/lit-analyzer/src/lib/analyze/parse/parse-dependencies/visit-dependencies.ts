@@ -133,6 +133,10 @@ function visitDirectImports(node: Node, context: IVisitDependenciesContext): voi
 	node.forEachChild(child => visitDirectImports(child, context));
 }
 
+interface MaybeModernProgram extends ts.Program {
+	getModuleResolutionCache?(): ts.ModuleResolutionCache | undefined;
+}
+
 /**
  * Resolves and emits a direct imported module
  * @param moduleSpecifier
@@ -150,6 +154,11 @@ function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, con
 	} else if ("getResolvedModuleWithFailedLookupLocationsFromCache" in context.program) {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		result = (context.program as any)["getResolvedModuleWithFailedLookupLocationsFromCache"](moduleSpecifier, fromSourceFile.fileName);
+	} else {
+		const cache = (context.program as MaybeModernProgram).getModuleResolutionCache?.();
+		if (cache != null) {
+			result = context.ts.resolveModuleNameFromCache(moduleSpecifier, node.getSourceFile().fileName, cache);
+		}
 	}
 
 	if (result?.resolvedModule?.resolvedFileName != null) {

@@ -64,7 +64,9 @@
 			],
 			"command": "ava --color",
 			"output": [],
-			"files": []
+			"files": [
+				"package.json"
+			]
 		},
 		"check-version": {
 			"dependencies": [
