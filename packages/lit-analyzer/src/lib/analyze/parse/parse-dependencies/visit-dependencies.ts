@@ -1,10 +1,11 @@
 import * as tsModule from "typescript";
+import tsServerModule from "typescript/lib/tsserverlibrary.js";
 import { Node, Program, SourceFile } from "typescript";
 
 interface IVisitDependenciesContext {
 	program: Program;
 	ts: typeof tsModule;
-	project: ts.server.Project | undefined;
+	project: tsServerModule.server.Project | undefined;
 	directImportCache: WeakMap<SourceFile, Set<SourceFile>>;
 	emitIndirectImport(file: SourceFile, importedFrom?: SourceFile): boolean;
 	emitDirectImport?(file: SourceFile): void;
@@ -133,8 +134,8 @@ function visitDirectImports(node: Node, context: IVisitDependenciesContext): voi
 	node.forEachChild(child => visitDirectImports(child, context));
 }
 
-interface MaybeModernProgram extends ts.Program {
-	getModuleResolutionCache?(): ts.ModuleResolutionCache | undefined;
+interface MaybeModernProgram extends tsModule.Program {
+	getModuleResolutionCache?(): tsModule.ModuleResolutionCache | undefined;
 }
 
 /**
@@ -147,7 +148,7 @@ function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, con
 	const fromSourceFile = node.getSourceFile();
 
 	// Resolve the imported string
-	let result: ts.ResolvedModuleWithFailedLookupLocations | undefined;
+	let result: tsModule.ResolvedModuleWithFailedLookupLocations | undefined;
 
 	if (context.project) {
 		result = context.project.getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, fromSourceFile.fileName);
