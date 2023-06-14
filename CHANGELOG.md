@@ -7,7 +7,13 @@ All notable changes to this project will be documented in this file.
 <!-- ### Removed -->
 <!-- ### Fixed -->
 
-## [Unreleased]
+<!-- ## [Unreleased] -->
+
+## [2.0.0-pre.3]
+
+### Breaking
+
+- Updated to support TypeScript 5.0, dropped support for TypeScript versions <4.4.4.
 
 ### Added
 
