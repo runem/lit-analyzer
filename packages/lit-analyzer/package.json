@@ -38,7 +38,8 @@
 			"command": "tsc --build --pretty",
 			"files": [
 				"src/**/*",
-				"tsconfig.json"
+				"tsconfig.json",
+				"../../tsconfig.json"
 			],
 			"output": [
 				"lib",
@@ -63,7 +64,9 @@
 			],
 			"command": "ava --color",
 			"output": [],
-			"files": []
+			"files": [
+				"package.json"
+			]
 		},
 		"check-version": {
 			"dependencies": [
@@ -91,7 +94,7 @@
 		"vscode-css-languageservice": "4.3.0",
 		"vscode-html-languageservice": "3.1.0",
 		"@vscode/web-custom-data": "^0.4.2",
-		"web-component-analyzer": "2.0.0-next.4"
+		"web-component-analyzer": "^2.0.0-next.5"
 	},
 	"devDependencies": {
 		"@appnest/readme": "^1.2.7",
@@ -99,12 +102,10 @@
 		"ava": "^3.8.2",
 		"rimraf": "^3.0.2",
 		"tslib": "^2.0.0",
-		"typescript": "~4.4.3",
-		"typescript-3.6": "npm:typescript@~3.6.4",
-		"typescript-3.7": "npm:typescript@~3.7.4",
-		"typescript-3.8": "npm:typescript@~3.8.3",
-		"typescript-3.9": "npm:typescript@~3.9.3",
-		"wireit": "^0.1.1"
+		"typescript": "~4.4.4",
+		"typescript-4.8": "npm:typescript@~4.8.2",
+		"typescript-5.0": "npm:typescript@~5.0.4",
+		"wireit": "^0.9.5"
 	},
 	"ava": {
 		"cache": true,

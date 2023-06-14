@@ -1,3 +1,9 @@
 {
-	"typescript.tsdk": "node_modules/typescript/lib"
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"editor.wordWrapColumn": 100,
+	"editor.rulers": [
+		{
+			"column": 100
+		}
+	]
 }

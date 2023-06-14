@@ -1,10 +1,11 @@
 import * as tsModule from "typescript";
+import tsServerModule from "typescript/lib/tsserverlibrary.js";
 import { Node, Program, SourceFile } from "typescript";
 
 interface IVisitDependenciesContext {
 	program: Program;
 	ts: typeof tsModule;
-	project: ts.server.Project | undefined;
+	project: tsServerModule.server.Project | undefined;
 	directImportCache: WeakMap<SourceFile, Set<SourceFile>>;
 	emitIndirectImport(file: SourceFile, importedFrom?: SourceFile): boolean;
 	emitDirectImport?(file: SourceFile): void;
@@ -133,6 +134,10 @@ function visitDirectImports(node: Node, context: IVisitDependenciesContext): voi
 	node.forEachChild(child => visitDirectImports(child, context));
 }
 
+interface MaybeModernProgram extends tsModule.Program {
+	getModuleResolutionCache?(): tsModule.ModuleResolutionCache | undefined;
+}
+
 /**
  * Resolves and emits a direct imported module
  * @param moduleSpecifier
@@ -143,12 +148,19 @@ function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, con
 	const fromSourceFile = node.getSourceFile();
 
 	// Resolve the imported string
-	const result = context.project
-		? context.project.getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, fromSourceFile.fileName)
-		: "getResolvedModuleWithFailedLookupLocationsFromCache" in context.program
-		? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-		  (context.program as any)["getResolvedModuleWithFailedLookupLocationsFromCache"](moduleSpecifier, fromSourceFile.fileName)
-		: undefined;
+	let result: tsModule.ResolvedModuleWithFailedLookupLocations | undefined;
+
+	if (context.project) {
+		result = context.project.getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, fromSourceFile.fileName);
+	} else if ("getResolvedModuleWithFailedLookupLocationsFromCache" in context.program) {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		result = (context.program as any)["getResolvedModuleWithFailedLookupLocationsFromCache"](moduleSpecifier, fromSourceFile.fileName);
+	} else {
+		const cache = (context.program as MaybeModernProgram).getModuleResolutionCache?.();
+		if (cache != null) {
+			result = context.ts.resolveModuleNameFromCache(moduleSpecifier, node.getSourceFile().fileName, cache);
+		}
+	}
 
 	if (result?.resolvedModule?.resolvedFileName != null) {
 		const resolvedModule = result.resolvedModule;
