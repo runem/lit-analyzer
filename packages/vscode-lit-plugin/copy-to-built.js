@@ -32,7 +32,7 @@ async function main() {
 	// vsce is _very_ picky about the directories in node_modules matching the
 	// extension's package.json, so we need an entry for ts-lit-plugin or it
 	// will think that it's extraneous.
-	pluginPackageJson.dependencies["ts-lit-plugin"] = "^v1.0.0-fake-version";
+	pluginPackageJson.dependencies["ts-lit-plugin"] = "*";
 	await writeFile("./built/package.json", JSON.stringify(pluginPackageJson, null, 2));
 
 	// Copy static files used by the extension.
