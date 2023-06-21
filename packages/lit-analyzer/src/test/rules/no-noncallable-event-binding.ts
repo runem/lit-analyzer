@@ -8,7 +8,7 @@ tsTest("Event binding: Callable value is bindable", t => {
 });
 
 tsTest("Event binding: Non callback value is not bindable", t => {
-	const { diagnostics } = getDiagnostics('html`<input @change="${(() => {})()}" />`');
+	const { diagnostics } = getDiagnostics('html`<input @change="${(():void => {})()}" />`');
 	hasDiagnostic(t, diagnostics, "no-noncallable-event-binding");
 });
 
