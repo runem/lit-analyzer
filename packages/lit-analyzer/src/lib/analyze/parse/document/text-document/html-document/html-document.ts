@@ -12,7 +12,8 @@ export class HtmlDocument extends TextDocument {
 
 	htmlAttrAreaAtOffset(offset: DocumentOffset | DocumentRange): HtmlNode | undefined {
 		return this.mapFindOne(node => {
-			if (offset > node.location.name.end && intersects(offset, node.location.startTag)) {
+			const offsetNum = typeof offset === "number" ? offset : offset.end;
+			if (offsetNum > node.location.name.end && intersects(offset, node.location.startTag)) {
 				// Check if the position intersects any attributes. Break if so.
 				for (const htmlAttr of node.attributes) {
 					if (intersects(offset, htmlAttr.location)) {
