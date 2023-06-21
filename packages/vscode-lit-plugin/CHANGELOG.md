@@ -7,6 +7,11 @@ All notable changes to this project will be documented in this file.
 <!-- ### Removed -->
 <!-- ### Fixed -->
 
+## [1.3.0] - 14/6/2023
+
+- Support TypeScript 5.0
+- Drop support for TypeScript versions <4.4.4
+
 ## [1.2.4] - 19/4/2022
 
 - Fixed a bug where the TS plugin would interfere with automatic import
