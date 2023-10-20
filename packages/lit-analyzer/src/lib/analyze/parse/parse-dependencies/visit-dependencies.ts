@@ -150,8 +150,9 @@ function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, con
 	// Resolve the imported string
 	let result: tsModule.ResolvedModuleWithFailedLookupLocations | undefined;
 
-	if (context.project) {
-		result = context.project.getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, fromSourceFile.fileName);
+	if (context.project && "getResolvedModuleWithFailedLookupLocationsFromCache" in context.project) {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		result = (context.project as any).getResolvedModuleWithFailedLookupLocationsFromCache(moduleSpecifier, fromSourceFile.fileName);
 	} else if ("getResolvedModuleWithFailedLookupLocationsFromCache" in context.program) {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		result = (context.program as any)["getResolvedModuleWithFailedLookupLocationsFromCache"](moduleSpecifier, fromSourceFile.fileName);

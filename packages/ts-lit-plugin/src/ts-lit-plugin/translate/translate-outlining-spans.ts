@@ -1,5 +1,6 @@
 import { LitOutliningSpan } from "lit-analyzer";
 import { translateRange } from "./translate-range.js";
+import type * as ts from "typescript";
 
 export function translateOutliningSpans(outliningSpans: LitOutliningSpan[]): ts.OutliningSpan[] {
 	return outliningSpans.map(outliningSpan => translateOutliningSpan(outliningSpan));

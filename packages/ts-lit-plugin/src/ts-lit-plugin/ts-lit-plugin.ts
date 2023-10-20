@@ -13,7 +13,8 @@ import {
 	RenameInfo,
 	RenameLocation,
 	SignatureHelpItems,
-	TextChange
+	TextChange,
+	UserPreferences
 } from "typescript";
 import { LitPluginContext } from "./lit-plugin-context.js";
 import { translateCodeFixes } from "./translate/translate-code-fixes.js";
@@ -121,8 +122,36 @@ export class TsLitPlugin {
 		return result;
 	}
 
-	findRenameLocations(...args: Parameters<LanguageService["findRenameLocations"]>): readonly RenameLocation[] | undefined {
-		const [fileName, position] = args;
+	// this overrload is only included to make the typescript compiler happy.
+	/** @deprecated Pass `providePrefixAndSuffixTextForRename` as part of a `UserPreferences` parameter. */
+	findRenameLocations(
+		fileName: string,
+		position: number,
+		findInStrings: boolean,
+		findInComments: boolean,
+		providePrefixAndSuffixTextForRename?: boolean
+	): readonly RenameLocation[] | undefined;
+	findRenameLocations(
+		fileName: string,
+		position: number,
+		findInStrings: boolean,
+		findInComments: boolean,
+		preferences: UserPreferences
+	): readonly RenameLocation[] | undefined;
+	findRenameLocations(
+		fileName: string,
+		position: number,
+		findInStrings: boolean,
+		findInComments: boolean,
+		preferencesOrProvidePrefixAndSuffixTextForRename?: UserPreferences | boolean
+	): readonly RenameLocation[] | undefined {
+		const args = [fileName, position, findInStrings, findInComments, preferencesOrProvidePrefixAndSuffixTextForRename] as [
+			string,
+			number,
+			boolean,
+			boolean,
+			UserPreferences
+		];
 		const file = this.program.getSourceFile(fileName)!;
 
 		const prev = this.prevLangService.findRenameLocations(...args);

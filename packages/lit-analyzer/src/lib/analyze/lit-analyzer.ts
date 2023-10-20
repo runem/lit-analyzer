@@ -1,4 +1,4 @@
-import { SourceFile } from "typescript";
+import { FormatCodeSettings, SourceFile } from "typescript";
 import { ComponentAnalyzer } from "./component-analyzer/component-analyzer.js";
 import { LitCssDocumentAnalyzer } from "./document-analyzer/css/lit-css-document-analyzer.js";
 import { LitHtmlDocumentAnalyzer, LitIndexEntry } from "./document-analyzer/html/lit-html-document-analyzer.js";
@@ -283,7 +283,7 @@ export class LitAnalyzer {
 		return [];
 	}
 
-	getFormatEditsInFile(file: SourceFile, settings: ts.FormatCodeSettings): LitFormatEdit[] {
+	getFormatEditsInFile(file: SourceFile, settings: FormatCodeSettings): LitFormatEdit[] {
 		this.context.setContextBase({ file });
 
 		const documents = this.getDocumentsInFile(file);
