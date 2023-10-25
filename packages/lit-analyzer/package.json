@@ -1,6 +1,6 @@
 {
 	"name": "lit-analyzer",
-	"version": "2.0.0-pre.3",
+	"version": "2.0.1",
 	"description": "CLI that type checks bindings in lit-html templates",
 	"author": "runem",
 	"license": "MIT",
@@ -82,7 +82,9 @@
 	"main": "index.js",
 	"files": [
 		"/lib/",
-		"index.{js|js.map|d.ts|d.ts.map}",
+		"index.js",
+		"index.d.ts",
+		"index.d.ts.map",
 		"cli.js"
 	],
 	"dependencies": {

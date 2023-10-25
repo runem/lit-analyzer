@@ -7,6 +7,11 @@ All notable changes to this project will be documented in this file.
 <!-- ### Removed -->
 <!-- ### Fixed -->
 
+## [1.4.0] - 25/10/2023
+
+- Support TypeScript 5.1 and 5.2
+- Drop support for TypeScript versions <4.8.0
+
 ## [1.3.0] - 14/6/2023
 
 - Support TypeScript 5.0
