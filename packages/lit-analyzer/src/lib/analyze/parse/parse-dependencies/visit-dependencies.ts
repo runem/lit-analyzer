@@ -158,8 +158,15 @@ function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, con
 		result = (context.program as any)["getResolvedModuleWithFailedLookupLocationsFromCache"](moduleSpecifier, fromSourceFile.fileName);
 	} else {
 		const cache = (context.program as MaybeModernProgram).getModuleResolutionCache?.();
+		let mode: tsModule.ModuleKind.CommonJS | tsModule.ModuleKind.ESNext | undefined = undefined; // tsModule.ModuleKind.ESNext;
+		if ((context.ts.isImportDeclaration(node) && !node.importClause?.isTypeOnly) || (context.ts.isExportDeclaration(node) && !node.isTypeOnly)) {
+			if (node.moduleSpecifier != null && context.ts.isStringLiteral(node.moduleSpecifier) && context.ts.isSourceFile(node.parent)) {
+				mode = tsModule.getModeForUsageLocation(fromSourceFile, node.moduleSpecifier);
+			}
+		}
+
 		if (cache != null) {
-			result = context.ts.resolveModuleNameFromCache(moduleSpecifier, node.getSourceFile().fileName, cache);
+			result = context.ts.resolveModuleNameFromCache(moduleSpecifier, node.getSourceFile().fileName, cache, mode);
 		}
 	}
 
