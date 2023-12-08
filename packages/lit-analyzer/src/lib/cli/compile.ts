@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from "fs";
-import { basename } from "path";
 import {
 	CompilerOptions,
-	convertCompilerOptionsFromJson,
+	parseJsonConfigFileContent,
+	sys,
 	createProgram,
 	findConfigFile,
 	ModuleKind,
@@ -20,9 +20,7 @@ const requiredCompilerOptions: CompilerOptions = {
 	allowJs: true,
 	//maxNodeModuleJsDepth: 3,
 	strictNullChecks: true, // Type checking will remove all "null" and "undefined" from types if "strictNullChecks" is false
-	moduleResolution: ModuleResolutionKind.NodeJs,
-	skipLibCheck: true,
-	lib: ["lib.esnext.d.ts", "lib.dom.d.ts"]
+	skipLibCheck: true
 };
 
 /**
@@ -38,7 +36,8 @@ const defaultCompilerOptions: CompilerOptions = {
 	esModuleInterop: true,
 	allowSyntheticDefaultImports: true,
 	allowUnreachableCode: true,
-	allowUnusedLabels: true
+	allowUnusedLabels: true,
+	lib: ["lib.esnext.d.ts", "lib.dom.d.ts"]
 };
 
 export interface CompileResult {
@@ -53,7 +52,6 @@ export interface CompileResult {
  */
 export function compileTypescript(filePaths: string | string[]): CompileResult {
 	const options = getCompilerOptions();
-
 	filePaths = Array.isArray(filePaths) ? filePaths : [filePaths];
 	const program = createProgram(filePaths, options);
 	const files = program
@@ -73,10 +71,16 @@ export function getCompilerOptions(): CompilerOptions {
 
 	// If we found existing compiler options, merged "required compiler options" into it.
 	if (compilerOptions != null) {
-		return {
+		const options = {
 			...compilerOptions,
 			...requiredCompilerOptions
 		};
+		// set module resolution to nodejs if it is classic
+		// but if the user has set it to something else, don't override it
+		if (!options.moduleResolution || options.moduleResolution === ModuleResolutionKind.Classic) {
+			options.moduleResolution = ModuleResolutionKind.NodeJs;
+		}
+		return options;
 	}
 
 	// Return default compiler options if no compiler options were found
@@ -93,10 +97,9 @@ export function resolveTsConfigCompilerOptions(): CompilerOptions | undefined {
 	if (tsConfigFilePath != null) {
 		// Read the tsconfig.json file
 		const parsedConfig = readConfigFile(tsConfigFilePath, path => readFileSync(path, "utf8"));
-
 		if (parsedConfig != null && parsedConfig.config != null) {
 			// Parse the tsconfig.json file
-			const parsedJson = convertCompilerOptionsFromJson(parsedConfig.config.compilerOptions, basename(tsConfigFilePath), "tsconfig.json");
+			const parsedJson = parseJsonConfigFileContent(parsedConfig.config, sys, process.cwd());
 			return parsedJson?.options;
 		}
 	}
