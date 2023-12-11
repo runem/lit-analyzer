@@ -7,6 +7,10 @@ All notable changes to this project will be documented in this file.
 <!-- ### Removed -->
 <!-- ### Fixed -->
 
+## [1.4.1] - 11/12/2023
+
+- Fix a number of issues when the tsconfig `moduleResolution` option is set. See [#313](https://github.com/runem/lit-analyzer/issues/313)
+
 ## [1.4.0] - 25/10/2023
 
 - Support TypeScript 5.1 and 5.2
