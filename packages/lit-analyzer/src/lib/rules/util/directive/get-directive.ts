@@ -4,7 +4,7 @@ import { HtmlNodeAttrAssignment, HtmlNodeAttrAssignmentKind } from "../../../ana
 import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context.js";
 import { lazy } from "../../../analyze/util/general-util.js";
 import { removeUndefinedFromType } from "../type/remove-undefined-from-type.js";
-import { isLitDirective } from "./is-lit-directive.js";
+import { isLit1Directive, isLitDirective } from "./is-lit-directive.js";
 
 export type BuiltInDirectiveKind =
 	| "ifDefined"
@@ -48,8 +48,14 @@ export function getDirective(assignment: HtmlNodeAttrAssignment, context: RuleMo
 				// This new type becomes the actual type of the expression
 				const actualType = lazy(() => {
 					if (args.length >= 1) {
-						const returnType = toSimpleType(checker.getTypeAtLocation(args[0]), checker);
-						return removeUndefinedFromType(returnType);
+						const exprType = toSimpleType(checker.getTypeAtLocation(assignment.expression), checker);
+
+						if (isLit1Directive(exprType)) {
+							const returnType = toSimpleType(checker.getTypeAtLocation(args[0]), checker);
+							return removeUndefinedFromType(returnType);
+						}
+
+						return toSimpleType(checker.getNonNullableType(checker.getTypeAtLocation(args[0])), checker);
 					}
 
 					return undefined;

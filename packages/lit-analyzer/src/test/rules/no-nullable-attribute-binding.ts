@@ -25,3 +25,11 @@ tsTest("Can assign 'null' in property binding", t => {
 	const { diagnostics } = getDiagnostics('html`<input .selectionEnd="${{} as number | null}" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
+
+tsTest("Return type of `ifDefined` is not `null`", t => {
+	const { diagnostics } = getDiagnostics(`
+		const ifDefined = <T>(x: T) => x ?? "non-null";
+		html\`<input some-attribute="$\{ifDefined(Math.random() < 0.5 ? 123 : null)}" />\`;
+	`);
+	hasNoDiagnostics(t, diagnostics);
+});
