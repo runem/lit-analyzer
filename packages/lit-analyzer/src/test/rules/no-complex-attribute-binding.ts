@@ -37,3 +37,27 @@ tsTest("Ignore element expressions", t => {
 	const { diagnostics } = getDiagnostics("html`<input ${{x: 1}} />`", { rules: { "no-incompatible-type-binding": false } });
 	hasNoDiagnostics(t, diagnostics);
 });
+
+tsTest("Complex types are assignable to attributes using converters", t => {
+	const { diagnostics } = getDiagnostics(
+		[
+			makeElement({
+				properties: {
+					"complex: string[]": `{
+					converter: {
+						fromAttribute(str) { return str.split(','); },
+						toAttribute(arr) { return arr.join(','); }
+					}
+				}`
+				}
+			}),
+			'html`<my-element complex="foo,bar"></my-element>`'
+		],
+		{
+			rules: {
+				"no-incompatible-type-binding": "off"
+			}
+		}
+	);
+	hasNoDiagnostics(t, diagnostics);
+});
