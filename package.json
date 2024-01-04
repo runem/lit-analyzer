@@ -96,7 +96,7 @@
 		"@appnest/readme": "^1.2.7",
 		"@typescript-eslint/eslint-plugin": "^5.0.0",
 		"@typescript-eslint/parser": "^5.0.0",
-		"@vscode/test-electron": "^2.1.1",
+		"@vscode/test-electron": "^2.3.8",
 		"eslint": "^8.0.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-import": "^2.25.2",
