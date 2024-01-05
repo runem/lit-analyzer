@@ -22,29 +22,15 @@ const rule: RuleModule = {
 		if (htmlAttr.kind !== HtmlNodeAttrKind.ATTRIBUTE) return;
 
 		const { typeB } = extractBindingTypes(assignment, context);
+		const isAssignableToNull = isAssignableToSimpleTypeKind(typeB, "NULL");
 
-		// Test if removing "null" from typeB would work and suggest using "ifDefined(exp === null ? undefined : exp)".
-		if (isAssignableToSimpleTypeKind(typeB, "NULL")) {
+		// Test if removing "undefined" or "null" from typeB would work and suggest using "ifDefined".
+		if (isAssignableToNull || isAssignableToSimpleTypeKind(typeB, "UNDEFINED")) {
 			context.report({
 				location: rangeFromHtmlNodeAttr(htmlAttr),
-				message: `This attribute binds the type '${typeToString(typeB)}' which can end up binding the string 'null'.`,
-				fixMessage: "Use the 'ifDefined' directive and strict null check?",
-				fix: () => {
-					const newValue = `ifDefined(${assignment.expression.getText()} === null ? undefined : ${assignment.expression.getText()})`;
-
-					return {
-						message: `Use '${newValue}'`,
-						actions: [{ kind: "changeAssignment", assignment, newValue }]
-					};
-				}
-			});
-		}
-
-		// Test if removing "undefined" from typeB would work and suggest using "ifDefined".
-		else if (isAssignableToSimpleTypeKind(typeB, "UNDEFINED")) {
-			context.report({
-				location: rangeFromHtmlNodeAttr(htmlAttr),
-				message: `This attribute binds the type '${typeToString(typeB)}' which can end up binding the string 'undefined'.`,
+				message: `This attribute binds the type '${typeToString(typeB)}' which can end up binding the string '${
+					isAssignableToNull ? "null" : "undefined"
+				}'.`,
 				fixMessage: "Use the 'ifDefined' directive?",
 				fix: () => ({
 					message: `Use the 'ifDefined' directive.`,
