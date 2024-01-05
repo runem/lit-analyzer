@@ -285,6 +285,6 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 
 		// Build a graph of component dependencies
 		const res = parseDependencies(file, this);
-		this.dependencyStore.importedComponentDefinitionsInFile.set(file.fileName, res);
+		this.dependencyStore.absorbComponentDefinitionsForFile(file, res);
 	}
 }
