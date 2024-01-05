@@ -3,7 +3,7 @@ import { ComponentDefinition } from "web-component-analyzer";
 import { AnalyzerDependencyStore } from "../analyzer-dependency-store.js";
 
 export class DefaultAnalyzerDependencyStore implements AnalyzerDependencyStore {
-	importedComponentDefinitionsInFile = new Map<string, ComponentDefinition[]>();
+	private importedComponentDefinitionsInFile = new Map<string, ComponentDefinition[]>();
 
 	absorbComponentDefinitionsForFile(sourceFile: SourceFile, result: ComponentDefinition[]): void {
 		this.importedComponentDefinitionsInFile.set(sourceFile.fileName, result);

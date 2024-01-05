@@ -7,6 +7,20 @@ import * as path from "path";
 import * as vscode from "vscode";
 // import * as litPlugin from "../extension.js";
 
+// wait until the TS language server is ready and diagnostics are produced
+async function getDiagnostics(docUri: vscode.Uri, retries = 1000) {
+	for (let i = 0; i < retries; i++) {
+		const diagnostics = vscode.languages.getDiagnostics(docUri);
+		if (diagnostics.length > 0) {
+			return diagnostics;
+		}
+		// Is there a better way to wait for the ts server to be ready?
+		// Maybe we can listen for the event that displays and hides the "initializing TS/JS language features" message?
+		await new Promise(resolve => setTimeout(resolve, 100));
+	}
+	throw new Error("No diagnostics found");
+}
+
 suite("Extension Test Suite", () => {
 	after(() => {
 		vscode.window.showInformationMessage("All tests done!");
@@ -25,25 +39,39 @@ suite("Extension Test Suite", () => {
 		const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(path.join(__dirname, "../../src/test/fixtures/missing-elem-type.ts")));
 		await vscode.window.showTextDocument(doc);
 
-		// wait until the TS language server is ready and diagnostics are produced
-		async function getDiagnostics() {
-			for (let i = 0; i < 1000; i++) {
-				const diagnostics = vscode.languages.getDiagnostics(doc.uri);
-				if (diagnostics.length > 0) {
-					return diagnostics;
-				}
-				// Is there a better way to wait for the ts server to be ready?
-				// Maybe we can listen for the event that displays and hides the "initializing TS/JS language features" message?
-				await new Promise(resolve => setTimeout(resolve, 100));
-			}
-			throw new Error("No diagnostics found");
-		}
-
-		const diagnostics = await getDiagnostics();
+		const diagnostics = await getDiagnostics(doc.uri);
 		assert.deepStrictEqual(
 			diagnostics.map(d => d.message),
 			["'my-element' has not been registered on HTMLElementTagNameMap"]
 		);
+	});
+
+	test("We detect no-missing-import properly", async () => {
+		const config = vscode.workspace.getConfiguration();
+		config.update("lit-plugin.logging", "verbose", true);
+		config.update("lit-plugin.rules.no-missing-import", "error", true);
+		const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(path.join(__dirname, "../../src/test/fixtures/missing-import.ts")));
+		const editor = await vscode.window.showTextDocument(doc);
+
+		const diagnostics = await getDiagnostics(doc.uri);
+		assert.deepStrictEqual(
+			diagnostics.map(d => d.message),
+			["Missing import for <my-other-element>\n  You can disable this check by disabling the 'no-missing-import' rule."]
+		);
+
+		// now add the fix
+		const editRange = doc.lineAt(0).range.start;
+		editor.edit(builder => {
+			if (!editor) {
+				throw new Error("No editor found");
+			}
+			editor.insertSnippet(new vscode.SnippetString("import './my-other-element';\n"), editRange);
+		});
+
+		// give it some time to settle
+		await new Promise(resolve => setTimeout(resolve, 1000));
+
+		assert.rejects(getDiagnostics(doc.uri, 3), "Expected rejection as no diagnostics will be found.");
 	});
 
 	test("We generate completions", async () => {

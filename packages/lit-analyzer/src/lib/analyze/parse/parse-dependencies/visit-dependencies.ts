@@ -168,6 +168,16 @@ function emitDirectModuleImportWithName(moduleSpecifier: string, node: Node, con
 		if (cache != null) {
 			result = context.ts.resolveModuleNameFromCache(moduleSpecifier, node.getSourceFile().fileName, cache, mode);
 		}
+		if (result == null) {
+			// Result could not be found from the cache, try and resolve module without using the
+			// cache.
+			result = context.ts.resolveModuleName(
+				moduleSpecifier,
+				node.getSourceFile().fileName,
+				context.program.getCompilerOptions(),
+				context.ts.createCompilerHost(context.program.getCompilerOptions())
+			);
+		}
 	}
 
 	if (result?.resolvedModule?.resolvedFileName != null) {
