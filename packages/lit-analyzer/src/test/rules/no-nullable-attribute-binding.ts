@@ -25,3 +25,17 @@ tsTest("Can assign 'null' in property binding", t => {
 	const { diagnostics } = getDiagnostics('html`<input .selectionEnd="${{} as number | null}" />`');
 	hasNoDiagnostics(t, diagnostics);
 });
+
+tsTest("Message for 'null' in attribute detects null type correctly", t => {
+	const { diagnostics } = getDiagnostics('html`<input maxlength="${{} as number | null}" />`');
+	hasDiagnostic(t, diagnostics, "no-nullable-attribute-binding");
+
+	t.true(diagnostics[0].message.includes("can end up binding the string 'null'"));
+});
+
+tsTest("Message for 'undefined' in attribute detects undefined type correctly", t => {
+	const { diagnostics } = getDiagnostics('html`<input maxlength="${{} as number | undefined}" />`');
+	hasDiagnostic(t, diagnostics, "no-nullable-attribute-binding");
+
+	t.true(diagnostics[0].message.includes("can end up binding the string 'undefined'"));
+});
