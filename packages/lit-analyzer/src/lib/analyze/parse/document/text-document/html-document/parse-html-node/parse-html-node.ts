@@ -5,6 +5,9 @@ import { getSourceLocation, IP5TagNode, P5Node } from "../parse-html-p5/parse-ht
 import { parseHtmlNodeAttrs } from "./parse-html-attribute.js";
 import { ParseHtmlContext } from "./parse-html-context.js";
 
+// List taken from https://html.spec.whatwg.org/multipage/syntax.html#void-elements
+const VOID_ELEMENTS = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"]);
+
 /**
  * Parses multiple p5Nodes into multiple html nodes.
  * @param p5Nodes
@@ -70,14 +73,26 @@ export function parseHtmlNode(p5Node: IP5TagNode, parent: HtmlNode | undefined, 
 }
 
 /**
- * Returns if this node is self-closed.
+ * Returns if this node was explicitly self-closed or void.
+ *
+ * Note: Self-closing tags do not actually exist in HTML
+ * https://developer.mozilla.org/en-US/docs/Glossary/Void_element#self-closing_tags
+ *
+ * Therefore this function returns `true` if `p5Node` is
+ * a void element, or was explicitly self-closed using XML/JSX
+ * syntax. If the node is implicitly closed, for example a
+ * `p` element followed by a `div`, then `false` is returned.
+ *
  * @param p5Node
  * @param context
  */
 function isSelfClosed(p5Node: IP5TagNode, context: ParseHtmlContext) {
-	const isEmpty = p5Node.childNodes == null || p5Node.childNodes.length === 0;
-	const isSelfClosed = getSourceLocation(p5Node)!.startTag.endOffset === getSourceLocation(p5Node)!.endOffset;
-	return isEmpty && isSelfClosed;
+	if (VOID_ELEMENTS.has(p5Node.tagName.toLowerCase())) {
+		return true;
+	}
+	const loc = getSourceLocation(p5Node)!;
+	const isSelfClosed = context.html[loc.startTag.endOffset - 2] === "/";
+	return isSelfClosed;
 }
 
 /**

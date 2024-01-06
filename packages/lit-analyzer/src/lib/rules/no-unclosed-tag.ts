@@ -11,7 +11,11 @@ const rule: RuleModule = {
 		priority: "low"
 	},
 	visitHtmlNode(htmlNode, context) {
-		if (!htmlNode.selfClosed && htmlNode.location.endTag == null) {
+		const {
+			selfClosed,
+			location: { endTag }
+		} = htmlNode;
+		if (!selfClosed && endTag == null) {
 			// Report specifically that a custom element cannot be self closing
 			//   if the user is trying to close a custom element.
 			const isCustomElement = isCustomElementTagName(htmlNode.tagName);
