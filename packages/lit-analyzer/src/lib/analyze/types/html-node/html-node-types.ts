@@ -20,11 +20,6 @@ export interface IHtmlNodeBase {
 	attributes: HtmlNodeAttr[];
 	parent?: HtmlNode;
 	children: HtmlNode[];
-	/**
-	 * Is true when an HTML node is either a void element, or was
-	 * explicitly closed with self-closing XML syntax.
-	 */
-	selfClosed: boolean;
 	document: HtmlDocument;
 }
 
