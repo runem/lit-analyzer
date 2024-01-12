@@ -217,6 +217,34 @@ tsTest("Property binding: Boolean type expression is not assignable to boolean p
 	hasNoDiagnostics(t, diagnostics);
 });
 
+tsTest("Property binding: String union type is assignable in property binding", t => {
+	const { diagnostics } = getDiagnostics(`
+
+class MyElement extends LitElement {
+	enumProp: 'opt1' | 'opt2';
+	static override properties = {
+		enumProp: {type: String, reflect: true},
+	};
+	constructor() {
+		super();
+		this.enumProp = 'opt1';
+	}
+};
+customElements.define("my-element", MyElement);
+
+class MyElement2 extends LitElement {
+	@property({attribute: false})
+	matchingEnum: 'opt1' | 'opt2' = 'opt2';
+
+	override render() {
+		return html\`<my-element .enumProp="\${this.matchingEnum}"></my-element>\`;
+	}
+};
+customElements.define("my-element2", MyElement2);	
+`);
+	hasNoDiagnostics(t, diagnostics);
+});
+
 tsTest("Attribute binding: 'ifDefined' directive correctly removes 'undefined' from the type union 1", t => {
 	const { diagnostics } = getDiagnostics('type ifDefined = Function; html`<input maxlength="${ifDefined({} as number | undefined)}" />`');
 	hasNoDiagnostics(t, diagnostics);
