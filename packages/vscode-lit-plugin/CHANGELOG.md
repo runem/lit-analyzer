@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 <!-- ### Removed -->
 <!-- ### Fixed -->
 
+## [1.4.4] - 02/06/2024
+
+- Updated the HTML and CSS language service to the latest version. This should fix a number of issues with autocompletion and diagnostics in styles and HTML attributes. See [#352](https://github.com/runem/lit-analyzer/pulls/352).
+
+<!-- A couple small releases not documented, erp! -->
+
 ## [1.4.1] - 11/12/2023
 
 - Fix a number of issues when the tsconfig `moduleResolution` option is set. See [#313](https://github.com/runem/lit-analyzer/issues/313)
