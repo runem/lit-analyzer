@@ -49,7 +49,6 @@ export function parseHtmlNode(p5Node: IP5TagNode, parent: HtmlNode | undefined, 
 
 	const htmlNodeBase: IHtmlNodeBase = {
 		tagName: p5Node.tagName.toLowerCase(),
-		selfClosed: isSelfClosed(p5Node, context),
 		attributes: [],
 		location: makeHtmlNodeLocation(p5Node, context),
 		children: [],
@@ -67,17 +66,6 @@ export function parseHtmlNode(p5Node: IP5TagNode, parent: HtmlNode | undefined, 
 	htmlNode.attributes = parseHtmlNodeAttrs(p5Node, { ...context, htmlNode });
 
 	return htmlNode;
-}
-
-/**
- * Returns if this node is self-closed.
- * @param p5Node
- * @param context
- */
-function isSelfClosed(p5Node: IP5TagNode, context: ParseHtmlContext) {
-	const isEmpty = p5Node.childNodes == null || p5Node.childNodes.length === 0;
-	const isSelfClosed = getSourceLocation(p5Node)!.startTag.endOffset === getSourceLocation(p5Node)!.endOffset;
-	return isEmpty && isSelfClosed;
 }
 
 /**

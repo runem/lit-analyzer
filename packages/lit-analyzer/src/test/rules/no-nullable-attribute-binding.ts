@@ -11,7 +11,7 @@ tsTest("Cannot assign 'undefined' in attribute binding", t => {
 tsTest("Can assign 'undefined' in property binding", t => {
 	const { diagnostics } = getDiagnostics([
 		makeElement({ slots: ["foo: number | undefined"] }),
-		'html`<my-element .foo="${{} as number | undefined}" />`'
+		'html`<my-element .foo="${{} as number | undefined}"></my-element>`'
 	]);
 	hasNoDiagnostics(t, diagnostics);
 });
