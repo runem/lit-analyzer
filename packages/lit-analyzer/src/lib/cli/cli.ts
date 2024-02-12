@@ -51,6 +51,7 @@ export async function cli(): Promise<void> {
                             o code                Highlight problems in the code (default)
                             o list                Short and precise list of problems
                             o markdown            Markdown format
+                            o json                Json format (eslint-compatible)
     --noColor             Print results without color
     --outFile FILE        Emit all output to a single file
     --maxWarnings NUMBER  Fail only when the number of warnings is larger than this number
