@@ -25,4 +25,4 @@ Below is a comparison table of the two plugins:
 | Completions             | ✅         | ✅         |
 | Quick info on hover     | ✅         | ✅         |
 | Code folding            | ✅         | ⚠️ (disabled until problem with calling 'program.getSourceFile' is fixed) |
-| Formatting              | ✅         | ⚠️ (disabled until problem with nested templates is fixed) |
+| Formatting              | ✅         | ⚠️ [Lit.dev suggests using Prettier, Beautifier, or Clang](https://lit.dev/docs/tools/development/#formatting). |
