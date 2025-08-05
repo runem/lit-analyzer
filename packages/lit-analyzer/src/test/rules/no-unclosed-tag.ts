@@ -11,3 +11,8 @@ tsTest("Don't report self closed tags", t => {
 	const { diagnostics } = getDiagnostics("html`<img />`", { rules: { "no-unclosed-tag": true } });
 	hasNoDiagnostics(t, diagnostics);
 });
+
+tsTest("Don't report unclosed tags when it's been ignored", t => {
+	const { diagnostics } = getDiagnostics("// @ts-ignore\nhtml`<div>`", { rules: { "no-unclosed-tag": true } });
+	hasNoDiagnostics(t, diagnostics);
+});

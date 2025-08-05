@@ -1,6 +1,7 @@
 import { Node, SourceFile, TaggedTemplateExpression } from "typescript";
 import { tsModule } from "../../ts-module.js";
-import { findParent, getNodeAtPosition } from "../../util/ast-util.js";
+import { findParent, getNodeAtPosition, leadingCommentsIncludes } from "../../util/ast-util.js";
+import { TS_IGNORE_FLAG } from "../../constants.js";
 
 /**
  * Returns all virtual documents in a given file.
@@ -51,9 +52,10 @@ export function visitTaggedTemplateNodes(astNode: Node, context: TaggedTemplateV
 	const newContext = { ...context };
 	if (tsModule.ts.isTaggedTemplateExpression(astNode) && context.shouldCheckTemplateTag(astNode.tag.getText())) {
 		// Only visit the template expression if the leading comments does not include the ts-ignore flag.
-		//if (!leadingCommentsIncludes(astNode.getSourceFile().getText(), astNode.getFullStart(), TS_IGNORE_FLAG)) {
-		newContext.parent = astNode;
-		context.emitTaggedTemplateNode(astNode);
+		if (!leadingCommentsIncludes(astNode.getSourceFile().getText(), astNode.getFullStart(), TS_IGNORE_FLAG)) {
+			newContext.parent = astNode;
+			context.emitTaggedTemplateNode(astNode);
+		}
 	}
 
 	astNode.forEachChild(child => visitTaggedTemplateNodes(child, context));
