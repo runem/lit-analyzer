@@ -13,9 +13,16 @@ import { HtmlNodeAttrKind } from "../../../analyze/types/html-node/html-node-att
 import { RuleModuleContext } from "../../../analyze/types/rule/rule-module-context.js";
 import { getDirective } from "../directive/get-directive.js";
 
-const cache = new WeakMap<HtmlNodeAttrAssignment, { typeA: SimpleType; typeB: SimpleType }>();
+const cache = new WeakMap<HtmlNodeAttrAssignment, ExtractedBindingTypes>();
 
-export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, context: RuleModuleContext): { typeA: SimpleType; typeB: SimpleType } {
+export interface ExtractedBindingTypes {
+	typeA: SimpleType;
+	typeB: SimpleType;
+	rawTypeA: SimpleType | Type | undefined;
+	rawTypeB: SimpleType | Type | undefined;
+}
+
+export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, context: RuleModuleContext): ExtractedBindingTypes {
 	if (cache.has(assignment)) {
 		return cache.get(assignment)!;
 	}
@@ -50,8 +57,17 @@ export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, context:
 		typeB = directiveType;
 	}
 
+	let result: ExtractedBindingTypes = { typeA: typeA, typeB: typeB, rawTypeB: typeBInferred, rawTypeA: htmlAttrTarget?.declaration?.type?.() };
+	if (assignment.htmlAttr?.name === "arialabel") {
+		// There are strange things about the arialabel type, where
+		// we end up resolving it to the type of the static properties
+		// declaration. It's very odd, because there's nothing unusual about
+		// it that I can find, and other very similar properties are resolved
+		// just fine. Fall back to simple types for it for now.
+		result = { typeA, typeB, rawTypeB: undefined, rawTypeA: undefined };
+	}
+
 	// Cache the result
-	const result = { typeA, typeB };
 	cache.set(assignment, result);
 
 	return result;
