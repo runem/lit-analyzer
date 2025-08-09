@@ -222,6 +222,9 @@ export function targetKindAndTypeText(target: HtmlAttrTarget, options: Descripti
 	const prefix = `(${targetKindText(target)}) ${options.modifier || ""}${target.name}`;
 
 	if (isAssignableToSimpleTypeKind(target.getType(), "ANY")) {
+		if(target.declaration?.typeHint){
+			return `${prefix}: ${target.declaration.typeHint}`
+		}
 		return `${prefix}`;
 	}
 
