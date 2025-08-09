@@ -118,7 +118,9 @@ function visitDirectImports(node: Node, context: IVisitDependenciesContext): voi
 			/*if (("importClause" in node && node.importClause != null) || ("exportClause" in node && node.exportClause != null)) {
 			 return;
 			 }*/
-
+			if (node.importClause?.namedBindings?.elements && node.importClause.namedBindings.elements.every(e=>e.isTypeOnly)) {
+				return;
+			}
 			emitDirectModuleImportWithName(node.moduleSpecifier.text, node, context);
 		}
 	}
