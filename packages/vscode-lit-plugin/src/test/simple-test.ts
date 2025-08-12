@@ -5,6 +5,7 @@ import * as path from "path";
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
 import * as vscode from "vscode";
+import { HSLA, RGBA } from "../color.js";
 // import * as litPlugin from "../extension.js";
 
 // wait until the TS language server is ready and diagnostics are produced
@@ -119,5 +120,35 @@ suite("Extension Test Suite", () => {
 		assert.ok(propLabels.includes(".prop1"), `Expected to find completion '.prop1' in completions: ${JSON.stringify(propLabels)}`);
 		assert.ok(propLabels.includes(".prop2"), `Expected to find completion '.prop2' in completions: ${JSON.stringify(propLabels)}`);
 		assert.ok(propLabels.includes(".prop3"), `Expected to find completion '.prop3' in completions: ${JSON.stringify(propLabels)}`);
+	});
+
+	test("We provide colors", async () => {
+		const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(path.join(__dirname, "../../src/test/fixtures/color-detection.ts")));
+		//const editor = await vscode.window.showTextDocument(doc);
+
+		// see: https://code.visualstudio.com/api/references/commands
+		const colors = await vscode.commands.executeCommand<vscode.ColorInformation[]>("vscode.executeDocumentColorProvide", doc.uri);
+
+		const reds = colors.slice(0, 4);
+		const greens = colors.slice(4, 10);
+		const blues = colors.slice(10, 16);
+
+		// Confirm that all reds are as they're supposed to be
+		assert.strictEqual(
+			reds.every(c => RGBA.equals(RGBA.fromVSCodeColor(c.color), new RGBA(255, 0, 0, 1.0))),
+			true
+		);
+
+		// Confirm that all greens are as they're supposed to be
+		assert.strictEqual(
+			greens.every(c => c.color.green === 1.0),
+			true
+		);
+
+		// Confirm that all blues are as they're supposed to be
+		assert.strictEqual(
+			blues.every(c => HSLA.fromRGBA(RGBA.fromVSCodeColor(c.color)).h === 230),
+			true
+		);
 	});
 });
