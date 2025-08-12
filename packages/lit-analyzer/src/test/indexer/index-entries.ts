@@ -567,6 +567,42 @@ tsTest("Attribute references can reference properties defined in `observedAttrib
 	});
 });
 
+tsTest("Attribute references can reference properties defined with a @property decorator", t => {
+	const { indexEntries, sourceFile } = getIndexEntries([
+		{
+			fileName: "main.ts",
+			entry: true,
+			text: `
+				class SomeElement extends HTMLElement {
+					@property({ attribute: "some-attr") someAttr: string;
+				}
+				customElements.define('some-element', SomeElement);
+
+				declare global {
+					interface HTMLElementTagNameMap {
+						'some-element': SomeElement;
+					}
+				}
+
+				const html = x => x;
+				html\`<some-element some-attr="abc"></some-element>\`;
+			`
+		}
+	]);
+
+	const entries = Array.from(indexEntries).filter(entry => entry.kind === "ATTRIBUTE-REFERENCE");
+	t.is(entries.length, 1);
+
+	assertIsAttrRefTargetingClass({
+		t,
+		entry: entries[0],
+		name: "some-attr",
+		kind: HtmlNodeAttrKind.ATTRIBUTE,
+		sourceFile,
+		className: "SomeElement"
+	});
+});
+
 tsTest("Boolean attribute references have the right kind.", t => {
 	const { indexEntries, sourceFile } = getIndexEntries([
 		{
