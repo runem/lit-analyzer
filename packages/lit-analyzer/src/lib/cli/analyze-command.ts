@@ -10,6 +10,7 @@ import { CodeDiagnosticFormatter } from "./format/code-diagnostic-formatter.js";
 import { AnalysisStats, DiagnosticFormatter } from "./format/diagnostic-formatter.js";
 import { ListDiagnosticFormatter } from "./format/list-diagnostic-formatter.js";
 import { MarkdownDiagnosticFormatter } from "./format/markdown-formatter.js";
+import { JsonDiagnosticFormatter } from "./format/json-formatter.js";
 import { FormatterFormat, LitAnalyzerCliConfig } from "./lit-analyzer-cli-config.js";
 
 function printText(text: string, config: LitAnalyzerCliConfig) {
@@ -153,6 +154,8 @@ function getFormatter(format: FormatterFormat): DiagnosticFormatter {
 			return new CodeDiagnosticFormatter();
 		case "markdown":
 			return new MarkdownDiagnosticFormatter();
+		case "json":
+			return new JsonDiagnosticFormatter();
 		default:
 			throw new Error(`Unknown format: '${format}'`);
 	}
