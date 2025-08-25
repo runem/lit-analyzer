@@ -293,3 +293,39 @@ tsTest("Attribute binding: the target attribute is correctly type checked when g
 
 	hasNoDiagnostics(t, diagnostics);
 });
+
+tsTest("Attribute binding: any symbols are ignored on type checking", t => {
+	const { diagnostics } = getDiagnostics(`
+declare const value: boolean | unique symbol;
+
+html\`<div aria-expanded=\${userInput}></div>\`
+	`);
+
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Attribute binding: symbols are not treated as any type", t => {
+	const { diagnostics } = getDiagnostics(`
+declare const value: "invalid" | unique symbol;
+
+html\`<div aria-expanded=\${value}></div>\`
+	`);
+
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});
+
+tsTest("Attribute binding: lit's nothing is ignored on type checking when returned by a function", t => {
+	const { diagnostics } = getDiagnostics(`
+declare const nothing: unique symbol;
+
+function customIfDef<T>(value: T | null | undefined): T | typeof nothing {
+	return value ?? nothing;
+}
+
+declare const value: boolean | null;
+
+html\`<div aria-expanded=\${customIfDef(value)}></div>\`
+	`);
+
+	hasNoDiagnostics(t, diagnostics);
+});

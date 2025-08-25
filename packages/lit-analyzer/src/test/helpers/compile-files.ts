@@ -105,7 +105,17 @@ export function compileFiles(inputFiles: TestFile[] | TestFile = []): { program:
 
 	const program = ts.createProgram({
 		//rootNames: [...files.map(file => file.fileName!), "node_modules/typescript/lib/lib.dom.d.ts"],
-		rootNames: [...files.map(file => file.fileName!), ...(includeLib ? ["node_modules/typescript/lib/lib.dom.d.ts"] : [])],
+		rootNames: [
+			...files.map(file => file.fileName!),
+			...(includeLib
+				? [
+						"node_modules/typescript/lib/lib.dom.d.ts",
+						// We need this to enable `Symbol`.
+						// We cannot use "esnext" since it cannot be loaded by TS 4.8.4.
+						"node_modules/typescript/lib/lib.es2015.d.ts"
+				  ]
+				: [])
+		],
 		//rootNames: files.map(file => file.fileName!),
 		options: compilerOptions,
 		host: compilerHost

@@ -50,6 +50,10 @@ export function extractBindingTypes(assignment: HtmlNodeAttrAssignment, context:
 		typeB = directiveType;
 	}
 
+	// Handle `nothing` and `noChange` symbols
+	// Since it's not possible to check the details of a symbol due to various restrictions (it's treated as a `unique symbol` or `Symbol()`), all symbols are excluded.
+	typeB = excludeSymbolsFromUnion(typeB);
+
 	// Cache the result
 	const result = { typeA, typeB };
 	cache.set(assignment, result);
@@ -80,6 +84,17 @@ export function inferTypeFromAssignment(assignment: HtmlNodeAttrAssignment, chec
 
 			return { kind: "STRING" } as SimpleTypeString;
 	}
+}
+
+function excludeSymbolsFromUnion(type: SimpleType): SimpleType {
+	if (type.kind !== "UNION") {
+		return type;
+	}
+
+	return {
+		...type,
+		types: type.types.filter(t => t.kind !== "ES_SYMBOL" && t.kind !== "ES_SYMBOL_UNIQUE")
+	};
 }
 
 /**
