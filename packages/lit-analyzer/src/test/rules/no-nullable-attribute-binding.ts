@@ -21,6 +21,18 @@ tsTest("Cannot assign 'null' in attribute binding", t => {
 	hasDiagnostic(t, diagnostics, "no-nullable-attribute-binding");
 });
 
+tsTest("Can pass 'null' through ifDefined in attribute binding", t => {
+	const { diagnostics } = getDiagnostics(
+		'import {ifDefined} from "lit/directives/if-defined.js";\nhtml`<input maxlength="${ifDefined({} as number | null)}" />`'
+	);
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Can pass 'null' through ??nothing in attribute binding", t => {
+	const { diagnostics } = getDiagnostics('html`<input maxlength="${({} as number | null) ?? nothing}" />`');
+	hasNoDiagnostics(t, diagnostics);
+});
+
 tsTest("Can assign 'null' in property binding", t => {
 	const { diagnostics } = getDiagnostics('html`<input .selectionEnd="${{} as number | null}" />`');
 	hasNoDiagnostics(t, diagnostics);
