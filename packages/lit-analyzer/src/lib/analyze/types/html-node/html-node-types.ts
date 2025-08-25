@@ -20,7 +20,6 @@ export interface IHtmlNodeBase {
 	attributes: HtmlNodeAttr[];
 	parent?: HtmlNode;
 	children: HtmlNode[];
-	selfClosed: boolean;
 	document: HtmlDocument;
 }
 
