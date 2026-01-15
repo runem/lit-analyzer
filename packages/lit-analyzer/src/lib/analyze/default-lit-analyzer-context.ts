@@ -1,5 +1,6 @@
+import { SimpleType, SimpleTypeFunctionParameter, toSimpleType } from "ts-simple-type";
 import * as tsMod from "typescript";
-import { HostCancellationToken, Program, SourceFile, TypeChecker } from "typescript";
+import { HostCancellationToken, Program, SourceFile, TypeChecker, SymbolFlags, displayPartsToString, Symbol, Node } from "typescript";
 import * as tsServer from "typescript/lib/tsserverlibrary.js";
 import { analyzeHTMLElement, analyzeSourceFile } from "web-component-analyzer";
 import { ALL_RULES } from "../rules/all-rules.js";
@@ -13,6 +14,7 @@ import {
 	convertAnalyzeResultToHtmlCollection,
 	convertComponentDeclarationToHtmlTag
 } from "./parse/convert-component-definitions-to-html-collection.js";
+import { HtmlDataCollection, HtmlTag, HtmlProp, HtmlAttr } from "./parse/parse-html-data/html-tag.js";
 import { parseDependencies } from "./parse/parse-dependencies/parse-dependencies.js";
 import { RuleCollection } from "./rule-collection.js";
 import { DefaultAnalyzerDefinitionStore } from "./store/definition-store/default-analyzer-definition-store.js";
@@ -21,6 +23,7 @@ import { DefaultAnalyzerDocumentStore } from "./store/document-store/default-ana
 import { DefaultAnalyzerHtmlStore } from "./store/html-store/default-analyzer-html-store.js";
 import { HtmlDataSourceKind } from "./store/html-store/html-data-source-merged.js";
 import { changedSourceFileIterator } from "./util/changed-source-file-iterator.js";
+import { lazy } from "./util/general-util.js";
 
 export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 	protected componentSourceFileIterator = changedSourceFileIterator();
@@ -266,6 +269,10 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 			checker: this.checker,
 			addDeclarationPropertiesAsAttributes: this.program.isSourceFileFromExternalLibrary(sourceFile)
 		});
+
+		// Refine types using HTMLElementTagNameMap specific to the source file context
+		this.refineHtmlCollection(htmlCollection, sourceFile);
+
 		this.htmlStore.absorbCollection(htmlCollection, reg);
 	}
 
@@ -286,5 +293,186 @@ export class DefaultLitAnalyzerContext implements LitAnalyzerContext {
 		// Build a graph of component dependencies
 		const res = parseDependencies(file, this);
 		this.dependencyStore.absorbComponentDefinitionsForFile(file, res);
+	}
+
+	/**
+	 * Refines the types of the HTML tags in the collection by looking up the tag name in the
+	 * HTMLElementTagNameMap interface. This allows resolving generic types that are instanced
+	 * in the map (e.g. "my-generic": GenericElement<{ foo: string }>).
+	 */
+	private refineHtmlCollection(collection: HtmlDataCollection, sourceFile: SourceFile): void {
+		const checker = this.checker;
+		// Try to find the HTMLElementTagNameMap symbol
+		const mapSymbol = (checker as unknown as ExtendedTypeChecker).resolveName("HTMLElementTagNameMap", sourceFile, SymbolFlags.Interface, false);
+		if (!mapSymbol) {
+			return;
+		}
+
+		// Get the type of the map (this includes merged declarations)
+		const mapType = checker.getDeclaredTypeOfSymbol(mapSymbol);
+
+		// properties of the map are the tag names
+		const mapProperties = checker.getPropertiesOfType(mapType);
+
+		for (const prop of mapProperties) {
+			const tagName = prop.getName();
+
+			// Find if we have a tag for this name in our collection
+			let tag: HtmlTag | undefined = collection.tags.find(t => t.tagName === tagName);
+
+			// Get the specific type of this element from the map property.
+			// We use the property's value declaration to get the type.
+			// If there are multiple declarations, one of them should suffice as the interface is merged,
+			// but specifically for the property type, we want the type of the member.
+			const declaration = prop.valueDeclaration || (prop.declarations && prop.declarations[0]);
+			if (!declaration) continue;
+
+			const elementType = checker.getTypeOfSymbolAtLocation(prop, declaration);
+
+			if (!tag) {
+				// If the tag is not found, we create it from the type in the map.
+				// This handles cases where the element is only declared in the map but not defined in code (or WCA failed to find it).
+				tag = {
+					tagName,
+					attributes: [],
+					properties: [],
+					events: [],
+					slots: [],
+					cssParts: [],
+					cssProperties: [],
+					builtIn: false
+				};
+				collection.tags.push(tag);
+
+				// Populate properties from the type
+				const elementProperties = checker.getPropertiesOfType(elementType);
+				for (const symbol of elementProperties) {
+					const symbolDecl = symbol.valueDeclaration || (symbol.declarations && symbol.declarations[0]);
+
+					// Skip if declaration is in default lib (e.g. HTMLElement properties) to avoid duplications/noise
+					// We assume global/built-in tags cover these.
+					if (symbolDecl) {
+						const fileName = symbolDecl.getSourceFile().fileName;
+						if (fileName.includes("lib.dom.d.ts") || fileName.includes("lib.es5.d.ts")) {
+							continue;
+						}
+
+						// Also skip methods as they are usually not properties we bind to
+						const type = checker.getTypeOfSymbolAtLocation(symbol, symbolDecl);
+						if (type.getCallSignatures().length > 0) {
+							continue;
+						}
+
+						const htmlProp: HtmlProp = {
+							kind: "property",
+							name: symbol.getName(),
+							description: displayPartsToString(symbol.getDocumentationComment(checker)),
+							getType: lazy(() => {
+								return toSimpleType(type, checker);
+							})
+						};
+						tag.properties.push(htmlProp);
+
+						tag.attributes.push({
+							kind: "attribute",
+							name: symbol.getName(),
+							description: htmlProp.description,
+							getType: htmlProp.getType
+						} as HtmlAttr);
+					}
+				}
+			}
+
+			// Now we want to update the properties of 'tag' to use 'elementType' for type resolution.
+			tag.properties.forEach(htmlProp => {
+				// Find the property in the elementType
+				const elementPropSymbol = checker.getPropertyOfType(elementType, htmlProp.name);
+
+				if (elementPropSymbol) {
+					// We found the property on the instantiated element type.
+					// We need to capture the *instantiated* type of this property.
+
+					// We create a new lazy getType function that resolves the type from the instantiated element.
+					htmlProp.getType = () => {
+						// We need a location to resolve the type. Using the declaration of the property itself is usually best.
+						// However, getTypeOfSymbolAtLocation requires a node.
+						const propDecl = elementPropSymbol.valueDeclaration || (elementPropSymbol.declarations && elementPropSymbol.declarations[0]);
+
+						let simpleType: SimpleType;
+						if (!propDecl) {
+							// Fallback if no declaration (e.g. synthetic), though unlikely for class members.
+							simpleType = toSimpleType(checker.getTypeOfSymbolAtLocation(elementPropSymbol, declaration), checker);
+						} else {
+							simpleType = toSimpleType(checker.getTypeOfSymbolAtLocation(elementPropSymbol, propDecl), checker);
+						}
+
+						// Attempt to instantiate generic types if the element type is generic
+						const simpleElementType = toSimpleType(elementType, checker);
+						if (
+							simpleElementType.kind === "GENERIC_ARGUMENTS" &&
+							simpleElementType.target.kind === "CLASS" &&
+							simpleElementType.target.typeParameters
+						) {
+							const typeParams = simpleElementType.target.typeParameters;
+							const typeArgs = simpleElementType.typeArguments;
+							if (typeParams.length === typeArgs.length) {
+								const map = new Map<string, SimpleType>();
+								typeParams.forEach((param, i) => {
+									map.set(param.name, typeArgs[i]);
+								});
+								return substituteSimpleType(simpleType, map);
+							}
+						}
+						return simpleType;
+					};
+				}
+			});
+		}
+	}
+}
+
+/**
+ * Internal interface to access private TypeScript APIs.
+ * `resolveName` is used to find symbols (like HTMLElementTagNameMap) in a specific scope.
+ */
+interface ExtendedTypeChecker extends TypeChecker {
+	resolveName(name: string, location: Node | undefined, meaning: SymbolFlags, excludeGlobals: boolean): Symbol | undefined;
+}
+
+function substituteSimpleType(type: SimpleType, map: Map<string, SimpleType>): SimpleType {
+	switch (type.kind) {
+		case "GENERIC_PARAMETER":
+			return map.get(type.name) || type;
+		case "UNION":
+			return { ...type, types: type.types.map((t: SimpleType) => substituteSimpleType(t, map)) };
+		case "INTERSECTION":
+			return { ...type, types: type.types.map((t: SimpleType) => substituteSimpleType(t, map)) };
+		case "ARRAY":
+			return { ...type, type: substituteSimpleType(type.type, map) };
+		case "PROMISE":
+			return { ...type, type: substituteSimpleType(type.type, map) };
+		case "GENERIC_ARGUMENTS":
+			return {
+				...type,
+				target: substituteSimpleType(type.target, map),
+				typeArguments: type.typeArguments.map((t: SimpleType) => substituteSimpleType(t, map))
+			};
+		case "FUNCTION":
+			return {
+				...type,
+				returnType: type.returnType ? substituteSimpleType(type.returnType, map) : undefined,
+				parameters: type.parameters
+					? type.parameters.map((p: SimpleTypeFunctionParameter) => ({ ...p, type: substituteSimpleType(p.type, map) }))
+					: undefined
+			};
+		case "METHOD":
+			return {
+				...type,
+				returnType: substituteSimpleType(type.returnType, map),
+				parameters: type.parameters.map((p: SimpleTypeFunctionParameter) => ({ ...p, type: substituteSimpleType(p.type, map) }))
+			};
+		// Add other types as needed
+		default:
+			return type;
 	}
 }

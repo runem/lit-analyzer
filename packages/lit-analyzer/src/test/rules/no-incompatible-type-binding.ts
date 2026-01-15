@@ -293,3 +293,88 @@ tsTest("Attribute binding: the target attribute is correctly type checked when g
 
 	hasNoDiagnostics(t, diagnostics);
 });
+
+tsTest("Generic element in GlobalHTMLElementTagNameMap", t => {
+	const { diagnostics } = getDiagnostics(`
+        import { LitElement, html, property, customElement } from 'lit-element';
+
+        export class GenericElement<T> extends LitElement {
+            @property() key: keyof T
+        }
+
+        declare global {
+            interface HTMLElementTagNameMap {
+                'generic-specific': GenericElement<{ id: number, name: string }>
+            }
+        }
+
+        html\`<generic-specific key='what??'></generic-specific>\`
+    `);
+
+	// We expect a diagnostic because 'what??' is not assignable to 'id' | 'name'
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});
+
+tsTest("Generic element in GlobalHTMLElementTagNameMap with correct type", t => {
+	const { diagnostics } = getDiagnostics(`
+        import { LitElement, html, property, customElement } from 'lit-element';
+
+        export class GenericElement<T> extends LitElement {
+            @property() key: keyof T
+        }
+
+        declare global {
+            interface HTMLElementTagNameMap {
+                'generic-specific': GenericElement<{ id: number, name: string }>
+            }
+        }
+
+        html\`<generic-specific key='id'></generic-specific>\`
+    `);
+
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Generic element: property binding type-checks when types are correct", t => {
+	const { diagnostics } = getDiagnostics(`
+		class Widget {}
+
+		type WidgetConstructor<WidgetT extends Widget> = new (element: WidgetElement<WidgetT>) => WidgetT;
+
+		class WidgetElement<WidgetT extends Widget> extends HTMLElement {
+			widgetClass: WidgetConstructor<WidgetT>;
+			params: WidgetT;
+		}
+		class TestClass extends Widget {
+			a: string;
+		}
+
+		interface HTMLElementTagNameMap {
+			'custom-widget': WidgetElement<TestClass>;
+		}
+		html\`<custom-widget .widgetClass=\${TestClass} .params=\${{a: 'b'}}></custom-widget>\`
+	`);
+	hasNoDiagnostics(t, diagnostics);
+});
+
+tsTest("Generic element: property binding type-checks when types are incorrect", t => {
+	const { diagnostics } = getDiagnostics(`
+		class Widget {}
+
+		type WidgetConstructor<WidgetT extends Widget> = new (element: WidgetElement<WidgetT>) => WidgetT;
+
+		class WidgetElement<WidgetT extends Widget> extends HTMLElement {
+			widgetClass: WidgetConstructor<WidgetT>;
+			params: WidgetT;
+		}
+		class TestClass extends Widget {
+			a: string;
+		}
+
+		interface HTMLElementTagNameMap {
+			'custom-widget': WidgetElement<TestClass>;
+		}
+		html\`<custom-widget .widgetClass=\${TestClass} .params=\${{a: 1}}></custom-widget>\`
+	`);
+	hasDiagnostic(t, diagnostics, "no-incompatible-type-binding");
+});
