@@ -5,7 +5,7 @@ import { DefaultLitAnalyzerContext } from "../analyze/default-lit-analyzer-conte
 import { LitAnalyzer } from "../analyze/lit-analyzer.js";
 import { LitAnalyzerConfig, makeConfig } from "../analyze/lit-analyzer-config.js";
 import { analyzeGlobs } from "./analyze-globs.js";
-import { readLitAnalyzerConfigFromTsConfig } from "./compile.js";
+import { readLitAnalyzerConfigFromProject } from "./compile.js";
 import { CodeDiagnosticFormatter } from "./format/code-diagnostic-formatter.js";
 import { AnalysisStats, DiagnosticFormatter } from "./format/diagnostic-formatter.js";
 import { ListDiagnosticFormatter } from "./format/list-diagnostic-formatter.js";
@@ -34,8 +34,8 @@ export async function analyzeCommand(globs: string[], cliConfig: LitAnalyzerCliC
 		}
 	});
 
-	// Read config from tsconfig.json
-	const configFromTS = readLitAnalyzerConfigFromTsConfig() || {};
+	// Read config from tsconfig.json or a Deno deno.json
+	const configFromTS = readLitAnalyzerConfigFromProject() || {};
 
 	// Read config from the CLI options
 	const configFromCLI = readLitAnalyzerConfigFromCliConfig(cliConfig);

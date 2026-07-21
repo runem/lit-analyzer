@@ -54,6 +54,10 @@ lit-analyzer --strict --rules.no-unknown-tag-name off --format markdown
 
 **Note:** You can also configure the CLI using a `tsconfig.json` file (see [ts-lit-plugin](https://github.com/runem/lit-analyzer/blob/master/packages/ts-lit-plugin)).
 
+### Deno projects
+
+When there is no `tsconfig.json`, the CLI reads `deno.json` (or `deno.jsonc`) instead: its `compilerOptions` become the compiler options, and rules go under a top-level `litAnalyzer` field.
+
 ### Available arguments
 
 <!-- prettier-ignore -->

@@ -9,6 +9,21 @@ lit-analyzer --strict --rules.no-unknown-tag-name off --format markdown
 
 **Note:** You can also configure the CLI using a `tsconfig.json` file (see [ts-lit-plugin](https://github.com/runem/lit-analyzer/blob/master/packages/ts-lit-plugin)).
 
+### Deno projects
+
+On a Deno project the CLI falls back to `deno.json` (or `deno.jsonc`) when no `tsconfig.json` is present. Its `compilerOptions` are used directly, and rules live under a top-level `litAnalyzer` field:
+
+<!-- prettier-ignore -->
+```json
+{
+  "nodeModulesDir": "auto",
+  "compilerOptions": { "lib": ["deno.window", "deno.ns", "dom", "es2022"] },
+  "litAnalyzer": { "strict": true, "rules": { "no-unclosed-tag": "error" } }
+}
+```
+
+Set `nodeModulesDir` to `"auto"` or `"manual"` and install dependencies (`deno install`). Otherwise npm packages live in Deno's global cache where TypeScript can't see them, and custom elements defined in packages read as unknown tags. Deno-only `lib` entries (`deno.*`) are dropped, since TypeScript doesn't know them.
+
 ### Available arguments
 
 <!-- prettier-ignore -->
